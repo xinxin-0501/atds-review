@@ -18,8 +18,7 @@ concurrency:
 
 jobs:
   review:
-    runs-on: ubuntu-latest    
-    environment: github‑pages
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,18 +46,24 @@ jobs:
       - name: Inject CSS and shared client JS
         run: node scripts/inject_client.js
 
+      - name: Flatten site to repository root
+        run: |
+          cp -f site/index.html index.html
+          cp -f site/main-rank.html main-rank.html
+          cp -f site/reviews/*.html ./
+
       - name: Commit updated data and site
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/reviews site
+          git add data/reviews site index.html main-rank.html *.html
           git commit -m "ATDS daily A-share review $(TZ='Asia/Shanghai' date +%Y-%m-%d-%H%M)" || echo "No changes to commit"
           git push
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: .
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
