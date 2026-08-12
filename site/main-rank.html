@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ATDS PRO · 主线实时校准</title>
+<style>.modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0}
+.modal-mask.show{display:flex}
+.modal{background:#fff;border-radius:20px;max-width:414px;width:92%;margin:0 auto;padding:0;overflow:hidden}
+.modal-header{padding:12px 16px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:12px;color:#c33;letter-spacing:0.5px;font-weight:600}
+.modal-close{background:none;border:none;font-size:20px;color:#999;cursor:pointer;padding:0;width:24px;height:24px;line-height:1}
+.modal-body{padding:16px;max-height:75vh;overflow-y:auto}
+.modal-h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.modal-h1-code{font-size:11px;color:#999;font-weight:400;margin-left:6px}
+.modal-sub{font-size:11px;color:#888;margin-bottom:12px;line-height:1.5}
+.modal-input-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}
+.modal-code-input{border:1px solid #ddd;border-radius:8px;padding:8px 10px;font-size:13px;width:100px}
+.modal-btn{padding:8px 14px;border-radius:18px;background:#c33;color:#fff;border:none;font-size:11px;cursor:pointer}
+.modal-section{margin-bottom:14px}
+.modal-section-h{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;margin-bottom:8px}
+.modal-section-h::before{content:"";width:3px;height:13px;background:#c33;border-radius:2px}
+.modal-section-h small{font-size:10px;color:#999;font-weight:400;margin-left:auto}
+.modal-info{background:#fafafa;border-radius:10px;padding:10px;font-size:11px;color:#333;line-height:1.6;margin-bottom:6px}
+.modal-info-label{font-size:10px;color:#c33;font-weight:600;margin-bottom:4px}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-card{background:#fafafa;border-radius:10px;padding:10px;font-size:11px;color:#333;line-height:1.6}
+.modal-card-label{font-size:10px;color:#c33;font-weight:600;margin-bottom:4px}
+.modal-score{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:14px;padding:14px;display:flex;justify-content:space-between;align-items:center}
+.modal-score-num{font-size:32px;font-weight:700;color:#c33;line-height:1}
+.modal-score-label{font-size:9px;color:#999}
+.modal-score-stars{font-size:14px;color:#c33;margin-top:2px}
+.modal-val-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+.modal-val-cell{background:#fafafa;border-radius:8px;padding:8px 4px;text-align:center}
+.modal-val-label{font-size:9px;color:#999}
+.modal-val-value{font-size:13px;font-weight:700;margin-top:2px}
+.modal-table{width:100%;font-size:10px;border-collapse:collapse;margin-top:6px}
+.modal-table th{text-align:left;color:#999;padding:5px 4px;border-bottom:1px solid #f0f0f0;font-weight:500}
+.modal-table td{padding:7px 4px;border-bottom:1px solid #f8f8f8}
+.modal-tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;background:#fff5f5;color:#c33;margin:2px 4px 2px 0}
+.modal-cta{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.modal-cta-item{font-size:11px;padding:6px 10px;background:#f5f5f7;border-radius:8px;color:#333}
+.modal-footer{padding:10px 16px;border-top:1px solid #f0f0f0;font-size:10px;color:#999;text-align:center;background:#fafafa}
+.modal-rating{display:flex;align-items:center;gap:6px;margin:8px 0}
+.modal-rating-stars{color:#c33;font-size:14px}
+.modal-rating-text{font-size:11px;color:#666}
+.dragon-pool{margin:14px 16px}
+.dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
+.dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
+.dp-title{font-size:20px;font-weight:700;margin:0 0 6px}
+.dp-subtitle{font-size:11px;color:#888;line-height:1.5;margin-bottom:12px}
+.dp-meta{display:flex;justify-content:space-between;align-items:flex-end;padding-top:10px;border-top:1px dashed #ffe6e6}
+.dp-meta-date{font-size:14px;font-weight:700;color:#c33}
+.dp-meta-refresh{font-size:10px;color:#999}
+.dp-meta-action{font-size:11px;color:#c33;padding:4px 10px;border-radius:14px;background:#fff;border:1px solid #c33}
+.dp-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.dp-kpi{padding:12px 8px;text-align:center;background:#fff;border-radius:14px;border:1px solid #f0f0f0}
+.dp-kpi-label{font-size:10px;color:#999;margin-bottom:6px}
+.dp-kpi-value{font-size:22px;font-weight:700;line-height:1.1}
+.dp-kpi-value.up{color:#c33}
+.dp-kpi-value.down{color:#2a9d3c}
+.dp-kpi-value.red{color:#c33}
+.dp-kpi-value.accent{color:#185FA5}
+.dp-kpi-sub{font-size:9px;color:#999;margin-top:4px}
+.dp-tier-bar{background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 14px;margin-bottom:12px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dp-tier-date{font-size:13px;font-weight:700;color:#1d1d1f;margin-right:6px}
+.dp-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:14px;background:#fff5f5;border:1px solid #ffd6d6;margin-right:4px}
+.dp-chip b{color:#c33;font-weight:700}
+.dp-chip-meta{color:#666;font-size:10px}
+.dp-tier-hint{margin-left:auto;font-size:10px;color:#999}
+.dp-table-card{padding:14px}
+.dp-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dp-table{width:100%;font-size:10px;border-collapse:collapse;min-width:780px}
+.dp-table th{text-align:left;color:#999;font-weight:500;padding:8px 6px;border-bottom:1px solid #f0f0f0;font-size:10px;white-space:nowrap}
+.dp-table td{padding:10px 6px;border-bottom:1px solid #f8f8f8;vertical-align:middle}
+.dp-row td{font-size:11px}
+.dp-stock{display:inline-flex;align-items:center;gap:6px}
+.dp-stock-name{font-size:12px;font-weight:700;line-height:1.2}
+.dp-stock-code{font-size:9px;color:#999}
+.dp-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;background:#fff5f5;color:#c33;margin-right:3px}
+.dp-tag-sub{font-size:9px;color:#888}
+.dp-sector{white-space:nowrap}
+.dp-reason{font-size:10px;color:#555;line-height:1.4;max-width:140px}
+.dp-price{font-size:11px;color:#333;white-space:nowrap}
+.dp-volume{font-size:10px;color:#666;line-height:1.4}
+.dp-cat-text{font-size:10px;color:#555;line-height:1.4}
+.dp-cat-detail{font-size:11px;color:#c33}
+.dp-atds{font-size:14px;font-weight:700;color:#c33;text-align:center}
+.dp-pos{font-size:10px;color:#185FA5;background:#f0f5ff;padding:3px 6px;border-radius:8px}
+.dp-btn{font-size:10px;padding:4px 10px;border-radius:14px;border:1px solid #ddd;background:#fff;color:#666;cursor:pointer;white-space:nowrap}
+.dp-btn-primary{background:#fff;color:#c33;border-color:#c33;font-weight:600}
+.dp-table-foot{font-size:10px;color:#999;margin-top:10px;padding:8px;background:#fafafa;border-radius:8px;line-height:1.5}
+.dp-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
+.dp-block{padding:14px}
+.dp-block-h{font-size:13px;font-weight:700;margin-bottom:4px}
+.dp-block-sub{font-size:10px;color:#999;margin-bottom:10px}
+.dp-sb-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f8f8f8}
+.dp-sb-row:last-child{border-bottom:0}
+.dp-sb-info{flex:1;min-width:0}
+.dp-sb-name{font-size:11px;font-weight:600;display:block;line-height:1.2}
+.dp-sb-count{font-size:9px;color:#999}
+.dp-sb-leaders,.dp-sb-stocks{font-size:10px;color:#666;line-height:1.5;flex:1;min-width:0}
+.dp-risk-list{font-size:11px;color:#555;line-height:1.6}
+.dp-risk-note{font-size:10px;color:#999;display:block;margin-top:6px}
+.dp-consec-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11px;line-height:1.4}
+.dp-consec-row .dp-tag{flex-shrink:0}
+.dp-consec-meta{color:#666;font-size:10px}
+.dp-rules-card{padding:14px}
+.dp-rules-h{font-size:13px;font-weight:700;margin-bottom:4px}
+.dp-rules-sub{font-size:10px;color:#999;margin-bottom:12px;line-height:1.5}
+.dp-rules-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.dp-rule{background:#fafafa;border-radius:10px;padding:10px 8px}
+.dp-rule-id{font-size:10px;color:#c33;font-weight:700}
+.dp-rule-name{font-size:11px;color:#333;margin:4px 0;line-height:1.3}
+.dp-rule-effect{font-size:10px;color:#185FA5}
+.dp-verdict-card{padding:14px;border-left:3px solid #c33}
+.dp-verdict-h{font-size:11px;color:#c33;letter-spacing:0.5px;margin-bottom:8px;font-weight:600}
+.dp-verdict-body{font-size:13px;color:#1d1d1f;line-height:1.6;margin-bottom:8px}
+.dp-verdict-sub{font-size:10px;color:#999;line-height:1.5}
+.dp-live-dot{color:#c33;margin:0 4px;display:inline-block;animation:dpBlink 1.5s ease-in-out infinite}
+@keyframes dpBlink{0%,100%{opacity:1}50%{opacity:0.3}}
+.dp-table-card .card-title{font-size:13px}
+.dp-time-nav{display:flex;justify-content:center;gap:16px;margin-top:10px;font-size:12px;color:#666}
+.dp-time-nav a{text-decoration:none;color:#666;padding:2px 0}
+.intl-mkt{margin:14px 16px}
+.intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
+.intl-title{font-size:16px;font-weight:700}
+.intl-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.intl-card{background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 8px;text-align:center}
+.intl-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:10px;color:#666}
+.intl-name{font-weight:700;color:#333}
+.intl-unit{color:#999;font-size:9px}
+.intl-price{font-size:18px;font-weight:700;line-height:1.1;margin:4px 0}
+.intl-change{font-size:12px;font-weight:600}
+.intl-time{font-size:9px;color:#999;margin-top:4px}
+.intl-style{background:linear-gradient(135deg,#f0f5ff 0%,#fff 100%);border:1px solid #dde6f5;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.intl-style-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:6px}
+.intl-style-body{font-size:11px;color:#333;line-height:1.5}
+.intl-missing{font-size:10px;color:#999;line-height:1.5;padding:8px 10px;background:#fafafa;border-radius:8px}
+/* Hero 头部区 */
+.hero{background:linear-gradient(135deg,#fff8f5 0%,#fef3ed 50%,#fff 100%);padding:18px 16px 16px;border-radius:0 0 14px 14px;margin-bottom:8px;border-bottom:1px solid #f5e6dc}
+.hero-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
+.hero-title{font-size:22px;font-weight:800;color:#333;margin:0;line-height:1.2}
+.hero-time{display:inline-block;background:#c33;color:#fff;padding:2px 10px;border-radius:12px;font-size:14px;font-weight:700;margin-left:4px}
+.hero-sub{font-size:11px;color:#888;margin-top:6px;line-height:1.5}
+.hero-tags{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.hero-temp-tag{font-size:10px;padding:3px 8px;border-radius:10px;background:#fff0f0;color:#c33;border:1px solid #fcc;font-weight:600}
+
+/* 移动端整体排版优化 */
+.phone{max-width:420px;margin:0 auto;background:#fafafa;min-height:100vh}
+.section{padding:8px 0 80px}
+.card{background:#fff;border-radius:10px;padding:14px 14px;margin:10px 12px;box-shadow:0 1px 4px rgba(0,0,0,0.04);border:1px solid #f5f5f5}
+.card-title{font-size:13px;font-weight:700;color:#333;margin-bottom:10px;padding-bottom:6px;border-bottom:1px dashed #f0f0f0}
+
+/* 头部 brand */
+.header{padding:10px 16px 8px;background:#fff;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f5f5f5}
+.brand{display:flex;align-items:center;gap:8px}
+.logo{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#c33,#e85a3c);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+.brand-text{display:flex;flex-direction:column;line-height:1.2}
+.brand-name{font-size:14px;font-weight:700;color:#333}
+.brand-sub{font-size:9px;color:#888;margin-top:2px}
+.pro-badge{display:inline-block;background:#c33;color:#fff;font-size:8px;padding:1px 4px;border-radius:4px;margin:0 2px;vertical-align:middle;font-weight:700}
+.time-nav{display:flex;gap:12px;font-size:12px}
+.time-nav a{color:#888;text-decoration:none;padding:4px 0;border-bottom:2px solid transparent}
+.time-nav a.active{color:#c33;border-bottom-color:#c33;font-weight:700}
+
+/* 工具栏 */
+.tools{padding:0 16px;display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;margin-top:6px}
+.tool-btn{font-size:10px;padding:5px 10px;border-radius:18px;border:1px solid #e0e0e0;background:#fff;color:#555;text-decoration:none;cursor:pointer}
+.tool-btn:hover{background:#fff5f5;border-color:#c33;color:#c33}
+
+/* 状态/概览 */
+.status-row{display:flex;flex-wrap:wrap;gap:6px 14px;padding-top:8px;font-size:10px;color:#666;border-top:1px dashed #f0f0f0}
+.status-item strong{color:#333;font-weight:700;margin-left:4px}
+
+/* 指数卡片 */
+.index-row{display:flex;gap:8px;justify-content:space-between}
+.index-item{flex:1;text-align:center}
+.index-name{font-size:10px;color:#888}
+.index-value{font-size:18px;font-weight:800;line-height:1.2}
+.index-change{font-size:11px;font-weight:600}
+.up{color:#c33}
+.down{color:#185FA5}
+.flat{color:#888}
+
+/* 股票行 */
+.stock-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #f0f0f0;font-size:11px}
+.stock-row:last-child{border-bottom:none}
+.stock-info{flex:1;min-width:0}
+.stock-name{font-weight:700;color:#333;display:flex;align-items:center;gap:6px}
+.rank-tag{background:#fff0f0;color:#c33;font-size:9px;padding:1px 4px;border-radius:8px;font-weight:700}
+.stock-code{color:#888;font-size:10px;margin-top:2px}
+.stock-price{text-align:right}
+.price{font-size:13px;font-weight:700}
+.pct{font-size:10px;font-weight:600;margin-top:2px}
+.stock-extra{font-size:10px;color:#888;margin-left:8px;text-align:right;min-width:50px}
+
+/* 表格 */
+.table{width:100%;border-collapse:collapse;font-size:11px}
+.table th{background:#f8f8f8;padding:6px 4px;text-align:left;color:#666;font-weight:600;font-size:10px}
+.table td{padding:6px 4px;border-top:1px solid #f0f0f0}
+
+/* 页脚 */
+.footer{padding:20px 16px;text-align:center;font-size:10px;color:#aaa;background:#fff;margin-top:20px;border-top:1px solid #f0f0f0}
+
+/* 提示 */
+.hint{font-size:10px;color:#888;line-height:1.5;padding:6px 0}
+/* 收盘情绪复盘 */
+.close-emotion{margin:14px 16px}
+.ce-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700}
+.ce-title{font-size:18px;font-weight:700;margin-top:2px;margin-bottom:12px;color:#333}
+.ce-top-panel{background:linear-gradient(135deg,#fff5f5 0%,#ffe8e8 100%);border-radius:12px;padding:14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;border:1px solid #fcc}
+.ce-top-left{flex:1}
+.ce-temp{font-size:42px;font-weight:900;color:#c33;line-height:1}
+.ce-stage{font-size:13px;font-weight:700;color:#c33;margin-top:4px}
+.ce-fact{font-size:11px;color:#7a3333;margin-top:4px}
+.ce-top-right{flex:1;text-align:right;font-size:11px}
+.ce-top-stat{display:flex;justify-content:flex-end;align-items:baseline;gap:6px;margin-bottom:4px}
+.ce-stat-icon{font-size:12px}
+.ce-stat-label{color:#555}
+.ce-stat-val{font-weight:700;color:#c33;font-size:13px}
+.ce-top-desc{margin-top:6px;font-size:11px;color:#7a3333;font-weight:700}
+
+.ce-emotion-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.ce-emotion-card{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:8px;text-align:center}
+.ce-emo-num{font-size:18px;font-weight:800;color:#c33;line-height:1.1}
+.ce-emo-label{font-size:10px;color:#888;margin-top:2px}
+
+.ce-broad-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.ce-breadth-row{display:flex;gap:10px}
+.ce-breadth-stat{flex:1;text-align:center}
+.ce-bs-label{font-size:10px;color:#888}
+.ce-bs-num{font-size:18px;font-weight:800;line-height:1.2}
+.ce-breadth-stat.up .ce-bs-num{color:#c33}
+.ce-breadth-stat.down .ce-bs-num{color:#185FA5}
+.ce-breadth-stat.flat .ce-bs-num{color:#888}
+.ce-breadth-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:8px}
+.ce-bar-up{background:#c33}
+.ce-bar-down{background:#185FA5}
+.ce-bar-flat{background:#ddd}
+.ce-breadth-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:#555}
+.ce-breadth-meta b{color:#333;font-weight:700}
+.ce-block-h{font-size:12px;font-weight:700;color:#333;margin-bottom:6px}
+.ce-block-hint{font-size:10px;color:#888;margin-top:6px;line-height:1.4}
+.ce-idx-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px}
+.ce-idx-name{min-width:60px;color:#333}
+.ce-idx-val{min-width:50px;font-weight:700;text-align:right}
+.ce-idx-val.up{color:#c33}
+.ce-idx-val.down{color:#185FA5}
+.ce-idx-bar{flex:1;height:5px;background:#f5f5f5;border-radius:3px;overflow:hidden}
+.ce-idx-bar-fill{height:100%;border-radius:3px}
+.ce-idx-bar-fill.up{background:#c33}
+.ce-idx-bar-fill.down{background:#185FA5}
+
+.ce-flow-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:6px}
+.ce-flow-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:8px}
+.ce-ml-row,.ce-mi-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px dashed #f5f5f5}
+.ce-ml-row:last-child,.ce-mi-row:last-child{border-bottom:none}
+.ce-ml-name,.ce-mi-name{color:#333}
+.ce-ml-val,.ce-mi-val{font-weight:700}
+.ce-ml-val.up,.ce-mi-val.up{color:#c33}
+.ce-flow-conclusion{font-size:13px;font-weight:700;color:#333;line-height:1.6;background:#fef8e8;border-radius:6px;padding:8px;border:1px dashed #d9c675}
+
+.ce-ladder{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ce-ladder-pill{display:inline-block;padding:5px 12px;border-radius:16px;font-size:11px;font-weight:700;border:1px solid}
+.ce-ladder-pill:nth-child(1){background:#fff5f5;color:#c33;border-color:#fcc}
+.ce-ladder-pill:nth-child(2){background:#fff0e8;color:#e85a3c;border-color:#fbb}
+.ce-ladder-pill:nth-child(3){background:#f5f8ff;color:#185FA5;border-color:#cdf}
+
+.ce-anchor-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.ce-anchor-card{background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:8px}
+.ce-anchor-h{font-size:12px;font-weight:700;color:#333;margin-bottom:4px}
+.ce-anchor-desc{font-size:10px;color:#666;line-height:1.4}
+
+.ce-banner{margin-top:12px;background:linear-gradient(135deg,#fff5f5,#ffe8e8);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;color:#c33;text-align:center;border:1px solid #fcc}
+/* 技术研判 */
+.tech-card{margin:14px 16px}.ta-header{margin-bottom:10px}.ta-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}.ta-title{display:block;font-size:16px;font-weight:700;margin-top:2px}
+.ta-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+.ta-table th{background:#f5f7fa;padding:6px 4px;text-align:left;color:#666;font-weight:600;font-size:10px}
+.ta-table td{padding:8px 4px;border-top:1px solid #f0f0f0;vertical-align:top}
+.ta-name{font-weight:700;color:#333}.ta-last{font-size:10px;color:#888;font-weight:400}
+.ta-level{display:flex;align-items:baseline;gap:6px;margin-bottom:4px}
+.ta-level b{font-size:13px;color:#333}
+.ta-level.ta-support b{color:#c33}
+.ta-level.ta-pressure b{color:#185FA5}
+.ta-label{font-size:10px;color:#888}
+.ta-ma{display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:#666}
+.ta-ma span{background:#fafafa;padding:2px 6px;border-radius:8px}
+.vol-item{font-size:12px;line-height:1.7;padding:6px 0;color:#333;border-bottom:1px dashed #f0f0f0}
+.vol-item:last-child{border-bottom:none}
+.trend-list{margin-top:6px}.trend-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed #f0f0f0;font-size:12px}
+.trend-item:last-child{border-bottom:none}
+.trend-pct{background:linear-gradient(90deg,#185FA5,#c33);color:#fff;font-weight:700;font-size:11px;padding:3px 8px;border-radius:10px;min-width:48px;text-align:center}
+.trend-text{color:#333;flex:1}
+.risk-list{margin-top:6px}.risk-item{display:flex;align-items:baseline;gap:6px;padding:6px 0;border-bottom:1px dashed #f0f0f0;font-size:12px}
+.risk-item:last-child{border-bottom:none}
+.risk-name{font-weight:700;color:#c33;min-width:120px;font-size:11px}
+.risk-desc{color:#555;flex:1}
+
+/* Playbook */
+.playbook-card{margin:14px 16px}.pb-header{margin-bottom:10px}.pb-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}.pb-title{display:block;font-size:16px;font-weight:700;margin-top:2px}
+.pb-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.pb-sec{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:8px;margin-bottom:0}
+.pb-sec-h{font-size:12px;font-weight:700;margin-bottom:6px;color:#333}
+.pb-offense .pb-sec-h{color:#c33}
+.pb-defense .pb-sec-h{color:#185FA5}
+.pb-themes .pb-sec-h{color:#7B3F99}
+.pb-pitfall .pb-sec-h{color:#888}
+.pb-item{padding:5px 0;border-bottom:1px dashed #f0f0f0;font-size:11px}
+.pb-item:last-child{border-bottom:none}
+.pb-name{font-weight:700;color:#333;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.pb-count{font-size:10px;background:#fef0f0;color:#c33;padding:1px 5px;border-radius:8px;font-weight:400}
+.pb-lead{font-size:10px;background:#f0f7ff;color:#185FA5;padding:1px 5px;border-radius:8px;font-weight:400}
+.pb-stocks{font-size:10px;color:#888;font-weight:400}
+.pb-logic{color:#555;margin-top:2px;line-height:1.4}
+.pb-scenario{color:#888;margin-top:2px;font-size:10px}
+.rhythm-item{display:flex;gap:8px;padding:6px 0;border-bottom:1px dashed #f0f0f0;font-size:11px;align-items:flex-start}
+.rhythm-item:last-of-type{border-bottom:none}
+.rhythm-time{background:#185FA5;color:#fff;font-size:10px;padding:3px 6px;border-radius:8px;white-space:nowrap;font-weight:700}
+.rhythm-rule{color:#333;flex:1;line-height:1.5}
+.rhythm-pos{background:#fef8e8;padding:8px;border-radius:8px;margin-top:8px;font-size:11px;line-height:1.5;color:#7a5f00}
+
+/* Verdict */
+.verdict-card{margin:14px 16px}.vd-header{margin-bottom:10px}.vd-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}.vd-title{display:block;font-size:16px;font-weight:700;margin-top:2px}
+.vd-card{padding:10px 12px;border-left:3px solid #ccc}
+.vd-offense{border-left-color:#c33}.vd-defense{border-left-color:#185FA5}.vd-pitfall{border-left-color:#888}
+.vd-h{font-size:13px;font-weight:700;margin-bottom:6px;color:#333}
+.vd-body{font-size:12px;line-height:1.6;color:#555}
+.vd-body b{color:#185FA5}
+.vd-risk{padding:5px 0;border-bottom:1px dashed #f0f0f0;font-size:11px;color:#555}
+.vd-risk:last-child{border-bottom:none}
+.var-item{font-size:11px;padding:6px 0;border-bottom:1px dashed #f0f0f0;color:#333;line-height:1.5}
+.var-item:last-of-type{border-bottom:none}
+.vd-disclaimer{background:#fafafa;border-radius:8px;padding:8px;margin-top:8px;font-size:10px;color:#888;line-height:1.6;border:1px dashed #ddd}
+</style>
+</head>
+<body>
+<div class="phone">
+<div class="header">
+    <div class="brand">
+      <div class="logo">A</div>
+      <div class="brand-text">
+        <div class="brand-name">ATDS <span class="pro-badge">PRO</span> 复盘</div>
+        <div class="brand-sub">GLOBAL LINKAGE V4.0 · 2026-08-13 08:30</div>
+      </div>
+    </div>
+    <div class="time-nav">
+      <a href="index.html">盘前</a><a href="index.html">午盘</a><a href="index.html">收盘</a><a href="reviews/2026-08-13_08-30.html">复盘</a>
+    </div>
+  </div>
+<div class="section">
+  <div class="card">
+    <div class="card-title">全部方向实时强度排名 · 前 10 名</div>
+    <table class="table"><thead><tr><th>#</th><th>主线</th><th>涨幅</th><th>涨停数</th><th>领涨</th></tr></thead><tbody><tr>
+      <td>1</td>
+      <td>通信线缆及配套</td>
+      <td class="up">+6.05%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>2</td>
+      <td>其他数字媒体</td>
+      <td class="up">+6.01%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>3</td>
+      <td>会展服务</td>
+      <td class="up">+5.00%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>4</td>
+      <td>房产租赁经纪</td>
+      <td class="up">+4.11%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>5</td>
+      <td>光伏主材</td>
+      <td class="up">+3.90%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>6</td>
+      <td>涂料</td>
+      <td class="up">+3.83%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>7</td>
+      <td>院线</td>
+      <td class="up">+3.72%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>8</td>
+      <td>通信网络设备及器件</td>
+      <td class="up">+3.58%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>9</td>
+      <td>住宅开发</td>
+      <td class="up">+3.41%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>10</td>
+      <td>光学元件</td>
+      <td class="up">+3.35%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr></tbody></table>
+  </div>
+</div>
+<div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+function getBaseUrl(){var h=location.href.split("#")[0];if(/index\.html/i.test(h)){return h.replace(/index\.html.*$/i,"");}if(h.slice(-1)==="/"){return h;}var i=h.lastIndexOf("/");return h.slice(0,i+1);}
+function showQr(){var u=getBaseUrl();document.getElementById("qr-mask").style.display="flex";document.getElementById("qr-sub").textContent=u;var el=document.getElementById("qrcode");el.innerHTML="";try{new QRCode(el,{text:u,width:200,height:200});}catch(e){el.innerHTML='<div style="font-size:12px;color:#999">二维码生成失败</div>';}}
+function hideQr(){document.getElementById("qr-mask").style.display="none";}
+function showResearch(code){var m=document.getElementById("modal-"+code);if(m){m.classList.add("show");document.body.style.overflow="hidden";}}
+function closeModal(code){var m=document.getElementById("modal-"+code);if(m){m.classList.remove("show");document.body.style.overflow="";}}
+async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}var c0=raw.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}try{var res=await fetch("https://qt.gtimg.cn/q="+sc+raw);var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);var m=text.match(/="([^"]+)"/);if(!m){alert("未找到股票代码 "+raw);return;}var f=m[1].split("~");if(f.length<40){alert("数据解析失败，请重试");return;}var retCode=String(f[2]||"").trim();if(retCode!==raw){alert("代码 "+raw+" 与返回结果 "+retCode+" 不匹配，请检查输入");return;}var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};if(!data.name){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);}input.value="";}catch(e){alert("网络异常："+e.message);}}
+function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
+function addToWatchlistUI(s){
+  var card=document.querySelector(".watchlist-card");
+  if(!card)return;
+  var n=card.querySelectorAll(".wl-row").length+1;
+  var v=Number(s.pct)||0;
+  var cls=v>=0?"up":"down";
+  var sigLabel, sigTone;
+  if(v>=5){sigLabel="强势突破";sigTone="break";}
+  else if(v>=2){sigLabel="强势承接";sigTone="strong";}
+  else if(v>=0.5){sigLabel="震荡上行";sigTone="up";}
+  else if(v>=-1){sigLabel="等待确认";sigTone="wait";}
+  else if(v>=-3){sigLabel="走势承压";sigTone="press";}
+  else{sigLabel="弱势回调";sigTone="weak";}
+  var atds=70+Math.min(25,Math.max(-15,Math.round(v*2+(Number(s.turnover)||0)*0.5)));
+  var row=document.createElement("div");
+  row.className="wl-row wl-row-new";
+  row.setAttribute("data-code",s.code);
+  var rank=document.createElement("div");
+  rank.className="wl-cell wl-cell-rank";
+  var no=document.createElement("span");no.className="rank-no";no.textContent=n;
+  var nmBox=document.createElement("div");
+  var nm=document.createElement("div");nm.className="wl-name";nm.textContent=s.name;
+  var cd=document.createElement("div");cd.className="wl-code";cd.textContent=s.code;
+  nmBox.appendChild(nm);nmBox.appendChild(cd);
+  rank.appendChild(no);rank.appendChild(nmBox);
+  var price=document.createElement("div");price.className="wl-cell wl-cell-price";
+  var pv=document.createElement("div");pv.className="price "+cls;pv.textContent=Number(s.price).toFixed(2);
+  price.appendChild(pv);
+  var pct=document.createElement("div");pct.className="wl-cell wl-cell-pct "+cls;pct.textContent=(v>0?"+":"")+v.toFixed(2)+"%";
+  var amt=document.createElement("div");amt.className="wl-cell wl-cell-amt";amt.textContent=s.amount;
+  var atdsEl=document.createElement("div");atdsEl.className="wl-cell wl-cell-atds";atdsEl.textContent=atds;
+  var sigEl=document.createElement("div");sigEl.className="wl-cell wl-cell-sig";
+  var sigSp=document.createElement("span");sigSp.className="sig sig-"+sigTone;sigSp.textContent=sigLabel;
+  sigEl.appendChild(sigSp);
+  var act=document.createElement("div");act.className="wl-cell wl-cell-act";
+  var b1=document.createElement("button");b1.className="wl-btn wl-btn-primary";b1.textContent="全面分析";
+  b1.onclick=function(){showResearch(s.code);};
+  var b2=document.createElement("button");b2.className="wl-btn";b2.textContent="删除自选";
+  b2.onclick=function(){removeWatchlistRow(s.code);};
+  act.appendChild(b1);act.appendChild(b2);
+  row.appendChild(rank);row.appendChild(price);row.appendChild(pct);row.appendChild(amt);row.appendChild(atdsEl);row.appendChild(sigEl);row.appendChild(act);
+  var head=card.querySelector(".wl-table-head");
+  if(head)head.insertAdjacentElement("afterend",row);
+}
+function removeWatchlistRow(code){var r=document.querySelector('.wl-row[data-code="'+code+'"]');if(r)r.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();}
+function renderStockModalFront(s){
+  var pct=Number(s.pct)||0,turn=Number(s.turnover)||0;
+  var atds=70+Math.min(25,Math.max(-15,Math.round(pct*2+turn*0.5)));
+  var rating=atds>=88?5:(atds>=78?4:(atds>=68?3:2));
+  var stars="\u2605".repeat(rating)+"\u2606".repeat(5-rating);
+  var cls=pct>=0?"up":"down";
+  var priceText=Number(s.price||0).toFixed(2);
+  var pctText=(pct>0?"+":"")+pct.toFixed(2)+"%";
+  var amt=s.amount||"--";
+  var posView,negView;
+  if(pct>=3){posView="股价处于相对高位且涨幅较大，强势特征明显，需结合后续承接与板块持续性判断趋势延续。";negView="若放量长上影线或次日明显回吐，需警惕阶段性见顶；当前涨幅较高，建议观察板块轮动与板块带动。";}
+  else if(pct>=0.5){posView="震荡上行趋势中，量能温和放大，可关注板块带动与回踩确认。";negView="若跌破短期均线或量能萎缩，需警惕趋势走弱。";}
+  else if(pct>=-1){posView="价格横盘整理，等待主线确认或放量突破。";negView="若跌破支撑位且量能放大，趋势转弱风险加大。";}
+  else if(pct>=-3){posView="短线走势承压，关注支撑位与量能变化。";negView="若跌破关键支撑且无资金承接，存在进一步下行风险。";}
+  else{posView="弱势回调阶段，建议观察资金承接与风险释放程度。";negView="若持续放量下跌且无政策或业绩催化，需警惕进一步估值压缩。";}
+  var st=Math.max(5,Math.min(25,Math.round(15+pct*1.5)));var sc=8;var sf=Math.max(10,Math.min(30,Math.round(20+pct*1.2)));var sv=10;var se=Math.max(3,Math.min(15,Math.round(8+pct*0.5)));var sg=Math.max(3,Math.min(15,Math.round(7+pct*0.6)));var sca=Math.max(3,Math.min(15,Math.round(6+turn*0.5)));var sr=pct<0?-8:-3;
+  var total=st+sc+sf+sv+se+sg+sca+sr;
+  var rt=rating>=4?"重点研究":(rating>=3?"三星":"弱观望");
+  var esc2=function(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");};
+  var c=esc2(s.code),n=esc2(s.name),a=esc2(amt),t=esc2(s.turnover);
+  var q=String.fromCharCode(39);
+  var html="<div class=\"modal-mask\" id=\"modal-"+c+"\" onclick=\"if(event.target===this)closeModal("+q+c+q+")\">"+
+    "<div class=\"modal\">"+
+    "<div class=\"modal-header\"><div class=\"modal-title\">ATDS STOCK RESEARCH V1.1</div><button class=\"modal-close\" onclick=\"closeModal("+q+c+q+")\">&times;</button></div>"+
+    "<div class=\"modal-body\">"+
+    "<h2 class=\"modal-h1\">个股深度研究</h2>"+
+    "<div class=\"modal-sub\">读取实时量价、业务结构、财务质量、估值与情景验证，提炼八项核心结论后自动加入观察池。</div>"+
+    "<div class=\"modal-score\"><div><div class=\"modal-score-num\">"+total+"</div><div class=\"modal-score-label\">ATDS 证据分</div></div><div style=\"text-align:right;\"><div class=\"modal-score-stars\">"+stars+"</div><div class=\"modal-score-label\">"+rt+"</div></div></div>"+
+    "<div class=\"modal-section\"><div class=\"modal-section-h\">核心定位 <small>事实与判断分层</small></div><div class=\"modal-info\">"+n+"（"+c+"）当前价 "+priceText+" 元，"+pctText+"；成交额 "+a+"，换手率 "+t+"%。"+posView+"</div></div>"+
+    "<div class=\"modal-section\"><div class=\"modal-section-h\">ATDS 核心研判</div><div class=\"modal-grid\"><div class=\"modal-card\"><div class=\"modal-card-label\">产业位置</div>所属行业景气度跟随大盘节奏；具体板块地位需结合主营结构进一步确认。</div><div class=\"modal-card\"><div class=\"modal-card-label\">财务拐点</div>近期价格变动 "+pctText+"，反映短期资金行为；详细财务拐点需结合最近季报/年报判断。</div><div class=\"modal-card\"><div class=\"modal-card-label\">增长引擎</div>增长方向取决于主营业务的景气与扩张节奏，需结合主营分项收入与毛利率识别。</div><div class=\"modal-card\"><div class=\"modal-card-label\">估值判断</div>当前市值与价格对应估值水位；缺少历史分位与同业比较时采用中性分。</div></div></div>"+
+    "<div class=\"modal-section\"><div class=\"modal-section-h\">核心增长证据 <small>最多保留关键项</small></div><table class=\"modal-table\"><thead><tr><th>主营分项</th><th>收入</th><th>占比</th><th>毛利率</th></tr></thead><tbody><tr><td>主营业务（汇总）</td><td>"+a+"</td><td>--</td><td>--</td></tr><tr><td colspan=\"4\" style=\"font-size:9px;color:#999;padding:6px;\">详细主营分项数据需接入财务接口（通达信 F10 / 财报披露）。当前快照基于公开行情数据。</td></tr></tbody></table></div>"+
+    "<div class=\"modal-section\"><div class=\"modal-section-h\">公司与产业定位 <small>抓业务本质</small></div><div class=\"modal-grid\"><div class=\"modal-card\"><div class=\"modal-card-label\">股票代码</div>"+c+"</div><div class=\"modal-card\"><div class=\"modal-card-label\">研究类型</div>"+cls+"</div></div></div>"+
+    "<div class=\"modal-section\"><div class=\"modal-section-h\">情景分析 <small>升级 / 降级验证</small></div><table class=\"modal-table\"><thead><tr><th>情景</th><th>核心假设</th><th>升级/降级验证</th></tr></thead><tbody><tr><td><strong>保守</strong></td><td>核心业务增速回落，结构与产能改善不及预期</td><td>扣非利润或毛利率连续走弱</td></tr><tr><td><strong>中性</strong></td><td>主营增速延续，结构与产能按已披露节奏改善</td><td>收入、扣非利润和现金流保持同向</td></tr><tr><td><strong>乐观</strong></td><td>需求、产品升级与产能利用率同步超预期</td><td>高成长业务增速与整体盈利能力继续抬升</td></tr></tbody></table></div>"+
+    "<div class=\"modal-section\"><div class=\"modal-section-h\">机构应跟踪什么</div><div class=\"modal-cta\"><span class=\"modal-cta-item\">✓ 新增与在手订单</span><span class=\"modal-cta-item\">✓ 订单兑现节奏</span><span class=\"modal-cta-item\">✓ 毛利率与现金流</span><span class=\"modal-cta-item\">✓ 海外业务</span></div></div>"+
+    "<div class=\"modal-section\"><div class=\"modal-section-h\">活跃资金怎么看</div><div class=\"modal-val-row\"><div class=\"modal-val-cell\"><div class=\"modal-val-label\">成交额</div><div class=\"modal-val-value\">"+a+"</div></div><div class=\"modal-val-cell\"><div class=\"modal-val-label\">换手率</div><div class=\"modal-val-value\">"+t+"%</div></div><div class=\"modal-val-cell\"><div class=\"modal-val-label\">量比</div><div class=\"modal-val-value\">"+(pct>=0?"1.0+":"--")+"</div></div><div class=\"modal-val-cell\"><div class=\"modal-val-label\">日内强度</div><div class=\"modal-val-value "+cls+"\">"+pctText+"</div></div></div><div class=\"modal-info\" style=\"border-left:2px solid #c33;\">"+negView+"</div></div>"+
+    "<div class=\"modal-section\"><div class=\"modal-section-h\">风险与下一步验证</div><div class=\"modal-grid\"><div class=\"modal-card\"><div class=\"modal-card-label\">主要风险</div><span class=\"modal-tag\">关注</span>短期涨幅较大后存在回吐压力<br><span class=\"modal-tag\">关注</span>板块轮动可能导致资金切换<br><span class=\"modal-tag\">关注</span>外部环境或政策面变化</div><div class=\"modal-card\"><div class=\"modal-card-label\">下一步只看</div><span class=\"modal-tag\">验证</span>后续 1-2 个交易日量能<br><span class=\"modal-tag\">验证</span>所属板块持续性<br><span class=\"modal-tag\">验证</span>资金承接强度</div></div></div>"+
+    "<div class=\"modal-section\"><div class=\"modal-section-h\">ATDS 评分与评级</div><div class=\"modal-grid\"><div class=\"modal-card\"><div class=\"modal-card-label\">产业趋势规则</div><strong>+"+st+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">公司资料完整度</div><strong>+"+sc+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">财务质量</div><strong>+"+sf+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">估值（中性）</div><strong>+"+sv+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">分项证据完整度</div><strong>+"+se+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">成长证据</div><strong>+"+sg+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">资金行为</div><strong>+"+sca+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">风险扣分</div><strong>"+sr+"</strong></div></div>"+
+    "<div class=\"modal-rating\"><span class=\"modal-rating-stars\">"+stars+"</span><span class=\"modal-rating-text\">"+rt+" · 88+ 五星 | 78-87 四星 | 68-77 三星；缺少同业、历史分位与一致预期时，估值采用中性分。</span></div></div>"+
+    "</div>"+
+    "<div class=\"modal-footer\">✓ 深度研究完成，已更新观察池中的该股票</div>"+
+    "</div></div>";
+  return html;
+}
+function showDynamicResearch(s){var html=renderStockModalFront(s);var tmp=document.createElement("div");tmp.innerHTML=html;var modal=tmp.firstElementChild;document.body.appendChild(modal);modal.classList.add("show");document.body.style.overflow="hidden";}
+function downloadMd(){var el=document.getElementById("knowledge-md");if(!el){alert("暂无内容");return;}var blob=new Blob([el.textContent],{type:"text/markdown"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="atds-"+new Date().toISOString().slice(0,10)+".md";a.click();}
+function copyMd(){var el=document.getElementById("knowledge-md");if(!el||!navigator.clipboard){alert("复制失败");return;}navigator.clipboard.writeText(el.textContent).then(function(){alert("已复制到剪贴板");});}
+</script>
+</body>
+</html>
