@@ -46,17 +46,26 @@ jobs:
       - name: Inject CSS and shared client JS
         run: node scripts/inject_client.js
 
-      - name: Flatten site to repository root
+      - name: Flatten site to repository root (flat layout)
         run: |
-          cp -f site/index.html index.html
-          cp -f site/main-rank.html main-rank.html
-          cp -f site/reviews/*.html ./
+          python3 - <<'PY'
+          import re, glob, shutil, os
+          shutil.copy('site/index.html', 'index.html')
+          shutil.copy('site/main-rank.html', 'main-rank.html')
+          for f in glob.glob('site/reviews/*.html'):
+              shutil.copy(f, os.path.basename(f))
+          c = open('index.html', encoding='utf-8').read()
+          for m in re.findall(r'reviews/[\w\-]+\.html', c):
+              c = c.replace(m, m.replace('reviews/', ''))
+          open('index.html', 'w', encoding='utf-8').write(c)
+          print('flattened')
+          PY
 
       - name: Commit updated data and site
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/reviews site index.html main-rank.html *.html
+          git add -A
           git commit -m "ATDS daily A-share review $(TZ='Asia/Shanghai' date +%Y-%m-%d-%H%M)" || echo "No changes to commit"
           git push
 
