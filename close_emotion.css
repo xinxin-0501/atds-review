@@ -1,0 +1,68 @@
+/* 收盘情绪复盘 */
+.close-emotion{margin:14px 16px}
+.ce-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700}
+.ce-title{font-size:18px;font-weight:700;margin-top:2px;margin-bottom:12px;color:#333}
+.ce-top-panel{background:linear-gradient(135deg,#fff5f5 0%,#ffe8e8 100%);border-radius:12px;padding:14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;border:1px solid #fcc}
+.ce-top-left{flex:1}
+.ce-temp{font-size:42px;font-weight:900;color:#c33;line-height:1}
+.ce-stage{font-size:13px;font-weight:700;color:#c33;margin-top:4px}
+.ce-fact{font-size:11px;color:#7a3333;margin-top:4px}
+.ce-top-right{flex:1;text-align:right;font-size:11px}
+.ce-top-stat{display:flex;justify-content:flex-end;align-items:baseline;gap:6px;margin-bottom:4px}
+.ce-stat-icon{font-size:12px}
+.ce-stat-label{color:#555}
+.ce-stat-val{font-weight:700;color:#c33;font-size:13px}
+.ce-top-desc{margin-top:6px;font-size:11px;color:#7a3333;font-weight:700}
+
+.ce-emotion-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.ce-emotion-card{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:8px;text-align:center}
+.ce-emo-num{font-size:18px;font-weight:800;color:#c33;line-height:1.1}
+.ce-emo-label{font-size:10px;color:#888;margin-top:2px}
+
+.ce-broad-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.ce-breadth-row{display:flex;gap:10px}
+.ce-breadth-stat{flex:1;text-align:center}
+.ce-bs-label{font-size:10px;color:#888}
+.ce-bs-num{font-size:18px;font-weight:800;line-height:1.2}
+.ce-breadth-stat.up .ce-bs-num{color:#c33}
+.ce-breadth-stat.down .ce-bs-num{color:#185FA5}
+.ce-breadth-stat.flat .ce-bs-num{color:#888}
+.ce-breadth-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:8px}
+.ce-bar-up{background:#c33}
+.ce-bar-down{background:#185FA5}
+.ce-bar-flat{background:#ddd}
+.ce-breadth-meta{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:#555}
+.ce-breadth-meta b{color:#333;font-weight:700}
+.ce-block-h{font-size:12px;font-weight:700;color:#333;margin-bottom:6px}
+.ce-block-hint{font-size:10px;color:#888;margin-top:6px;line-height:1.4}
+.ce-idx-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:11px}
+.ce-idx-name{min-width:60px;color:#333}
+.ce-idx-val{min-width:50px;font-weight:700;text-align:right}
+.ce-idx-val.up{color:#c33}
+.ce-idx-val.down{color:#185FA5}
+.ce-idx-bar{flex:1;height:5px;background:#f5f5f5;border-radius:3px;overflow:hidden}
+.ce-idx-bar-fill{height:100%;border-radius:3px}
+.ce-idx-bar-fill.up{background:#c33}
+.ce-idx-bar-fill.down{background:#185FA5}
+
+.ce-flow-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:6px}
+.ce-flow-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:8px}
+.ce-ml-row,.ce-mi-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px dashed #f5f5f5}
+.ce-ml-row:last-child,.ce-mi-row:last-child{border-bottom:none}
+.ce-ml-name,.ce-mi-name{color:#333}
+.ce-ml-val,.ce-mi-val{font-weight:700}
+.ce-ml-val.up,.ce-mi-val.up{color:#c33}
+.ce-flow-conclusion{font-size:13px;font-weight:700;color:#333;line-height:1.6;background:#fef8e8;border-radius:6px;padding:8px;border:1px dashed #d9c675}
+
+.ce-ladder{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ce-ladder-pill{display:inline-block;padding:5px 12px;border-radius:16px;font-size:11px;font-weight:700;border:1px solid}
+.ce-ladder-pill:nth-child(1){background:#fff5f5;color:#c33;border-color:#fcc}
+.ce-ladder-pill:nth-child(2){background:#fff0e8;color:#e85a3c;border-color:#fbb}
+.ce-ladder-pill:nth-child(3){background:#f5f8ff;color:#185FA5;border-color:#cdf}
+
+.ce-anchor-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.ce-anchor-card{background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:8px}
+.ce-anchor-h{font-size:12px;font-weight:700;color:#333;margin-bottom:4px}
+.ce-anchor-desc{font-size:10px;color:#666;line-height:1.4}
+
+.ce-banner{margin-top:12px;background:linear-gradient(135deg,#fff5f5,#ffe8e8);border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;color:#c33;text-align:center;border:1px solid #fcc}

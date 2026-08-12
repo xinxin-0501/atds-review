@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ATDS PRO 手机炒股工作台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; background: #f5f5f7; color: #1d1d1f; }
+    .phone { width: 100%; max-width: 414px; margin: 0 auto; background: #f5f5f7; min-height: 100vh; position: relative; padding-bottom: 80px; }
+    .header { background: #fff; padding: 12px 16px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+    .brand { display: flex; align-items: center; gap: 8px; }
+    .logo { width: 28px; height: 28px; background: #c33; color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+    .brand-text { flex: 1; }
+    .brand-name { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .pro-badge { font-size: 9px; color: #c33; border: 1px solid #c33; padding: 1px 4px; border-radius: 4px; }
+    .brand-sub { font-size: 10px; color: #999; letter-spacing: 0.5px; }
+    .time-nav { display: flex; justify-content: center; gap: 16px; margin-top: 10px; font-size: 12px; color: #666; }
+    .time-nav span { cursor: pointer; padding: 2px 0; }
+    .time-nav .active { color: #c33; border-bottom: 2px solid #c33; font-weight: 600; }
+    .live-time { position: absolute; right: 16px; top: 14px; font-size: 10px; color: #c33; }
+    .section { padding: 16px; }
+    .card { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .card-title { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .card-h1 { font-size: 22px; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+    .card-h2 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    .desc { font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 14px; }
+    .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .tag { font-size: 11px; padding: 5px 10px; border-radius: 20px; background: #f5f5f7; color: #666; border: 1px solid #eee; }
+    .tag.red { background: #fff0f0; color: #c33; border-color: #ffd6d6; }
+    .index-row { display: flex; justify-content: space-between; gap: 8px; }
+    .index-item { flex: 1; text-align: center; padding: 10px 4px; background: #fafafa; border-radius: 12px; }
+    .index-name { font-size: 10px; color: #999; margin-bottom: 4px; }
+    .index-value { font-size: 16px; font-weight: 700; }
+    .index-change { font-size: 10px; color: #c33; }
+    .status-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f0; font-size: 11px; color: #888; }
+    .status-item { text-align: center; }
+    .status-item strong { display: block; color: #333; font-size: 13px; margin-top: 2px; }
+    .direction-card { background: linear-gradient(135deg, #fff5f5 0%, #fff 100%); border: 1px solid #ffe6e6; border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+    .direction-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .direction-sub { font-size: 12px; color: #666; margin-bottom: 12px; }
+    .metrics { display: flex; gap: 8px; flex-wrap: wrap; }
+    .metric { background: #fff; border-radius: 10px; padding: 8px 10px; min-width: 70px; text-align: center; border: 1px solid #f0f0f0; }
+    .metric-label { font-size: 9px; color: #999; }
+    .metric-value { font-size: 13px; font-weight: 700; color: #c33; margin-top: 2px; }
+    .table { width: 100%; font-size: 11px; border-collapse: collapse; }
+    .table th { text-align: left; color: #999; font-weight: 500; padding: 8px 4px; border-bottom: 1px solid #f0f0f0; }
+    .table td { padding: 10px 4px; border-bottom: 1px solid #f8f8f8; vertical-align: middle; }
+    .rank { width: 22px; height: 22px; background: #c33; color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+    .up { color: #c33; }
+    .down { color: #2a9d3c; }
+    .badge { font-size: 9px; padding: 2px 6px; border-radius: 10px; background: #fff0f0; color: #c33; }
+    .pool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .pool-title { font-size: 16px; font-weight: 700; }
+    .pool-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { font-size: 11px; padding: 6px 10px; border-radius: 20px; border: 1px solid #ddd; background: #fff; color: #555; }
+    .btn.red { background: #c33; color: #fff; border-color: #c33; }
+    .stock-row { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f8f8f8; }
+    .stock-info { flex: 1; }
+    .stock-name { font-size: 14px; font-weight: 700; }
+    .stock-code { font-size: 10px; color: #999; }
+    .stock-price { text-align: right; min-width: 60px; }
+    .stock-price .price { font-size: 15px; font-weight: 700; }
+    .stock-price .pct { font-size: 11px; }
+    .stock-extra { text-align: right; min-width: 90px; font-size: 11px; color: #666; }
+    .stock-signal { text-align: right; min-width: 70px; }
+    .signal-box { font-size: 10px; padding: 4px 8px; border-radius: 6px; background: #333; color: #fff; display: inline-block; }
+    .ai-btn { position: fixed; right: 16px; bottom: 24px; background: #c33; color: #fff; padding: 10px 16px; border-radius: 24px; font-size: 12px; font-weight: 600; box-shadow: 0 4px 12px rgba(204,51,51,0.3); z-index: 200; display: flex; align-items: center; gap: 6px; }
+    .ai-btn::before { content: "AI"; background: #fff; color: #c33; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
+    .modal { background: #fff; width: 100%; max-width: 414px; max-height: 90vh; border-radius: 24px 24px 0 0; overflow-y: auto; padding: 20px 16px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .close { font-size: 20px; color: #999; }
+    .search-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .search-input { flex: 1; border: 1px solid #ddd; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+    .research-section { margin-bottom: 16px; }
+    .research-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .research-title::before { content: ""; width: 3px; height: 14px; background: #c33; border-radius: 2px; }
+    .score-card { display: flex; align-items: center; gap: 12px; background: #fff5f5; border-radius: 12px; padding: 12px; }
+    .score-num { font-size: 32px; font-weight: 700; color: #c33; }
+    .score-label { font-size: 11px; color: #666; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .info-card { background: #fafafa; border-radius: 12px; padding: 12px; }
+    .info-label { font-size: 10px; color: #999; margin-bottom: 4px; }
+    .info-value { font-size: 12px; color: #333; line-height: 1.5; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+    .stat-card { background: #fafafa; border-radius: 12px; padding: 12px 6px; text-align: center; }
+    .stat-num { font-size: 18px; font-weight: 700; color: #333; }
+    .stat-label { font-size: 9px; color: #999; margin-top: 4px; }
+    .news-item { padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+    .news-tag { font-size: 9px; color: #c33; background: #fff0f0; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
+    .news-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .news-meta { font-size: 10px; color: #999; }
+    .risk-level { display: inline-flex; align-items: center; gap: 6px; font-size: 18px; font-weight: 700; color: #c33; }
+    .flow { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #666; margin: 10px 0; flex-wrap: wrap; }
+    .flow-step { background: #f5f5f7; padding: 6px 10px; border-radius: 8px; }
+    .footer { text-align: center; padding: 40px 0; color: #ccc; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="header">
+      <div class="live-time">● 实时行情 15:13:58</div>
+      <div class="brand">
+        <div class="logo">A</div>
+        <div class="brand-text">
+          <div class="brand-name">ATDS <span class="pro-badge">PRO</span></div>
+          <div class="brand-sub">GLOBAL LINKAGE V4.0</div>
+        </div>
+      </div>
+      <div class="time-nav">
+        <span class="active">盘前 08:30</span>
+        <span>午盘 11:35</span>
+        <span>收盘 15:10</span>
+        <span>复盘 20:30</span>
+      </div>
+    </div>
+
+    <!-- 盘前交易驾驶舱 -->
+    <div class="section">
+      <div class="card-title">ATDS MARKET PULSE · 2026.08.12 WED · AUTO REFRESH</div>
+      <div class="card-h1">全球联动版盘前交易驾驶舱</div>
+      <div class="desc">
+        隔夜美股走跌、港股收阴，海外风险偏好转弱，而国内创业板指领涨且人民币汇率创三年半新高，外贸数据支撑信心，央行连续两日零投放略紧资金面。今日盘面大概率延续科技成长与高端制造轮动，AI 基础设施、机器人及电网设备热度居前但无单一主线，资金可能在算力、芯片与电力间再平衡。需观察开盘量能是否放大、板块扩散及政策催化持续性，若权重股搭台、题材活跃则上行可期；风险在于海外波动传导及高位股兑现压力。
+      </div>
+      <div class="tag-row">
+        <span class="tag red">策略状态：多线轮动</span>
+        <span class="tag">风险预算 60%</span>
+        <span class="tag">建议仓位 40-60%</span>
+      </div>
+
+      <div class="card">
+        <div class="index-row">
+          <div class="index-item">
+            <div class="index-name">上证指数</div>
+            <div class="index-value">3,946.68</div>
+            <div class="index-change">+0.32%</div>
+          </div>
+          <div class="index-item">
+            <div class="index-name">深证成指</div>
+            <div class="index-value">14,414.43</div>
+            <div class="index-change">+1.09%</div>
+          </div>
+          <div class="index-item">
+            <div class="index-name">创业板指</div>
+            <div class="index-value">3,602.08</div>
+            <div class="index-change">+1.49%</div>
+          </div>
+        </div>
+        <div class="status-row">
+          <div class="status-item">行情状态<strong>实时接入</strong></div>
+          <div class="status-item">刷新<strong>20s</strong></div>
+          <div class="status-item">观察池<strong>11 只</strong></div>
+          <div class="status-item">同步<strong>本机同步</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主线实时校准 -->
+    <div class="section">
+      <div class="card-title">MARKET BREADTH + LIMIT-UP LADDER · 5 MIN</div>
+      <div class="card-h2">主线实时校准</div>
+      <div class="direction-card">
+        <div class="direction-title">光模块 · 96 分</div>
+        <div class="direction-sub">当前全市场最强方向：光通信模块 +3.14%，6 家涨停，最高 1 板（通宇通讯）</div>
+        <div class="metrics">
+          <div class="metric"><div class="metric-label">板块涨幅</div><div class="metric-value">25%</div></div>
+          <div class="metric"><div class="metric-label">涨跌广度</div><div class="metric-value">12%</div></div>
+          <div class="metric"><div class="metric-label">涨停梯队</div><div class="metric-value">35%</div></div>
+          <div class="metric"><div class="metric-label">资金净流入</div><div class="metric-value">10%</div></div>
+          <div class="metric"><div class="metric-label">新闻催化</div><div class="metric-value">±5</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">全部方向实时强度排名（共 27 个方向）</div>
+        <table class="table">
+          <thead>
+            <tr><th>排名</th><th>主线</th><th>涨幅</th><th>涨停</th><th>ATDS</th><th>状态</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><div class="rank">01</div></td><td>光模块<br><span style="font-size:9px;color:#999">光通信模块</span></td><td class="up">+3.14%</td><td>6家/1板</td><td class="up">96</td><td><span class="badge">主线确认</span></td></tr>
+            <tr><td><div class="rank">02</div></td><td>通信设备<br><span style="font-size:9px;color:#999">通信设备</span></td><td class="up">+2.95%</td><td>9家/1板</td><td class="up">96</td><td><span class="badge">主线确认</span></td></tr>
+            <tr><td><div class="rank">03</div></td><td>算力<br><span style="font-size:9px;color:#999">算力概念</span></td><td class="up">+1.44%</td><td>13家/3板</td><td class="up">96</td><td><span class="badge">主线确认</span></td></tr>
+            <tr><td><div class="rank">04</div></td><td>算力租赁<br><span style="font-size:9px;color:#999">算力概念</span></td><td class="up">+1.44%</td><td>12家/3板</td><td class="up">96</td><td><span class="badge">主线确认</span></td></tr>
+            <tr><td><div class="rank">05</div></td><td>化学制药<br><span style="font-size:9px;color:#999">化学制药</span></td><td class="up">+0.66%</td><td>8家/7板</td><td>—</td><td>—</td></tr>
+            <tr><td><div class="rank">26</div></td><td>油气能源<br><span style="font-size:9px;color:#999">油气开采Ⅱ</span></td><td class="down">-0.61%</td><td>1家/1板</td><td>55</td><td>偏弱等待</td></tr>
+            <tr><td><div class="rank">27</div></td><td>燃气<br><span style="font-size:9px;color:#999">燃气Ⅲ</span></td><td class="up">+0.12%</td><td>0家/0板</td><td>48</td><td>偏弱等待</td></tr>
+          </tbody>
+        </table>
+        <div class="desc" style="margin-top:10px;margin-bottom:0;font-size:10px;color:#999;">
+          取消固定基础分；按板块当日涨幅、涨跌家数、资金净流入、涨停家数和最高连板实时重排，新闻只作为附加校准。东方财富公开板块行情、涨停连板与资金数据，新闻仅作校准。高分只有在板块涨幅与涨停/连板梯队互相验证时才标记「主线确认」。
+        </div>
+      </div>
+    </div>
+
+    <!-- 我的实时观察池 -->
+    <div class="section">
+      <div class="pool-header">
+        <div>
+          <div class="card-title">LIVE 我的实时观察池 · 15:15:13</div>
+          <div class="pool-title">实时观察池</div>
+        </div>
+      </div>
+      <div class="pool-actions" style="margin-bottom:12px;">
+        <button class="btn red">+ 加入自选</button>
+        <button class="btn">个股分析</button>
+        <button class="btn">批量导入</button>
+        <button class="btn">搜索股票/代码</button>
+      </div>
+
+      <div class="card">
+        <div class="stock-row">
+          <div class="stock-info"><div class="stock-name">亨通光电</div><div class="stock-code">600487 · 个股分析</div></div>
+          <div class="stock-price"><div class="price">59.30</div><div class="pct up">+2.92%</div></div>
+          <div class="stock-extra">103.5亿<br>ATDS 77</div>
+          <div class="stock-signal"><span class="signal-box">强势承接</span></div>
+        </div>
+        <div class="stock-row">
+          <div class="stock-info"><div class="stock-name">盛和资源</div><div class="stock-code">600392 · 新闻校准分析</div></div>
+          <div class="stock-price"><div class="price">23.71</div><div class="pct down">-0.63%</div></div>
+          <div class="stock-extra">15.8亿<br>ATDS 68</div>
+          <div class="stock-signal"><span class="signal-box">等待确认</span></div>
+        </div>
+        <div class="stock-row">
+          <div class="stock-info"><div class="stock-name">国瓷材料</div><div class="stock-code">300285 · 新闻校准分析</div></div>
+          <div class="stock-price"><div class="price">74.00</div><div class="pct up">+1.54%</div></div>
+          <div class="stock-extra">94.9亿<br>ATDS 76</div>
+          <div class="stock-signal"><span class="signal-box">强势承接</span></div>
+        </div>
+        <div class="stock-row">
+          <div class="stock-info"><div class="stock-name">中际旭创</div><div class="stock-code">300308 · 新闻校准分析</div></div>
+          <div class="stock-price"><div class="price">921.00</div><div class="pct up">+3.84%</div></div>
+          <div class="stock-extra">284.1亿<br>ATDS 75</div>
+          <div class="stock-signal"><span class="signal-box">强势承接</span></div>
+        </div>
+        <div class="stock-row">
+          <div class="stock-info"><div class="stock-name">美诺华</div><div class="stock-code">603538 · 新闻校准分析</div></div>
+          <div class="stock-price"><div class="price">33.33</div><div class="pct up">+10.00%</div></div>
+          <div class="stock-extra">14.3亿<br>ATDS 91</div>
+          <div class="stock-signal"><span class="signal-box">强势承接</span></div>
+        </div>
+        <div class="stock-row">
+          <div class="stock-info"><div class="stock-name">天银机电</div><div class="stock-code">300342 · 新闻校准分析</div></div>
+          <div class="stock-price"><div class="price">36.99</div><div class="pct up">+4.17%</div></div>
+          <div class="stock-extra">5.9亿<br>ATDS 79</div>
+          <div class="stock-signal"><span class="signal-box">强势承接</span></div>
+        </div>
+        <div class="stock-row">
+          <div class="stock-info"><div class="stock-name">拓斯达</div><div class="stock-code">300607 · 机械设备-机器人-工业机器人</div></div>
+          <div class="stock-price"><div class="price">33.92</div><div class="pct up">+1.41%</div></div>
+          <div class="stock-extra">7.8亿<br>ATDS 75</div>
+          <div class="stock-signal"><span class="signal-box">强势承接</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="background:#fafafa;">
+        <div class="card-title">KNOWLEDGE SYNC</div>
+        <div class="card-h2" style="font-size:16px;">沉淀到 Obsidian</div>
+        <div class="desc" style="font-size:12px;">将当前盘前结论、实时观察池与明日策略导出为标准 Markdown。</div>
+        <pre style="background:#fff;padding:10px;border-radius:8px;font-size:10px;color:#666;overflow-x:auto;">---
+title: ATDS Pro V4.0 盘前
+tags: [ATDS, 交易复盘]
+---
+# 盘前驾驶舱
+## 实时观察池
+- 亨通光电: 59.3</pre>
+        <div class="pool-actions" style="margin-top:10px;">
+          <button class="btn red">下载 .md 文件</button>
+          <button class="btn">复制 Markdown</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 个股深度研究 -->
+    <div class="section">
+      <div class="card-title">ATDS STOCK RESEARCH V1.1</div>
+      <div class="card-h2">个股深度研究</div>
+      <div class="desc">读取实时量价、业务结构、财务质量、估值与情景验证，提炼八项核心结论后自动加入观察池。</div>
+      <div class="search-row">
+        <input class="search-input" value="600487">
+        <button class="btn red">开始深度分析</button>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+          <div>
+            <div style="font-size:20px;font-weight:700;">亨通光电 <span style="font-size:12px;color:#999;font-weight:400;">600487</span></div>
+            <div class="desc" style="margin:8px 0 0;font-size:12px;">核心定位：全球光纤通信与海缆系统领先企业，业务覆盖光通信、海洋能源与通信、智能电网、工业与新能源智能等，形成光电网协同的产业布局。</div>
+          </div>
+          <div class="score-card" style="min-width:110px;text-align:center;">
+            <div class="score-num">80</div>
+            <div class="score-label">ATDS 证据分</div>
+            <div style="font-size:12px;color:#c33;margin-top:4px;">★★★★☆ 重点研究</div>
+          </div>
+        </div>
+
+        <div class="research-section">
+          <div class="research-title">ATDS 核心研判</div>
+          <div class="grid4">
+            <div class="info-card"><div class="info-label">产业位置</div><div class="info-value">通信传输设备行业受益于人工智能数据中心、算力网络与海上风电建设带来的需求增量。</div></div>
+            <div class="info-card"><div class="info-label">财务拐点</div><div class="info-value">最新季度营收与利润增速加快，扣非利润增速高于归母利润，盈利质量有所提升。</div></div>
+            <div class="info-card"><div class="info-label">增长引擎</div><div class="info-value">增长核心来源于海洋能源与通信、光通信等高毛利业务的放量。</div></div>
+            <div class="info-card"><div class="info-label">估值判断</div><div class="info-value">当前市盈率与市净率处于相对高位，且缺少历史分位、同业比较与一致预期数据，暂不判断贵便宜。</div></div>
+          </div>
+        </div>
+
+        <div class="research-section">
+          <div class="research-title">核心增长证据</div>
+          <table class="table">
+            <thead><tr><th>主营分项</th><th>收入</th><th>占比</th><th>毛利率</th></tr></thead>
+            <tbody>
+              <tr><td>制造业</td><td>654.88亿</td><td>0.98%</td><td>0.12%</td></tr>
+              <tr><td>其他(补充)</td><td>7.52亿</td><td>0.01%</td><td>0.02%</td></tr>
+              <tr><td>光通信</td><td>56.09亿</td><td>0.08%</td><td>0.28%</td></tr>
+              <tr><td>海洋能源与通信</td><td>57.37亿</td><td>0.09%</td><td>0.34%</td></tr>
+              <tr><td>工业与新能源智能</td><td>73.08亿</td><td>0.11%</td><td>0.14%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="research-section">
+          <div class="research-title">情景分析</div>
+          <table class="table">
+            <thead><tr><th>情景</th><th>核心假设</th><th>升级/降级验证</th></tr></thead>
+            <tbody>
+              <tr><td>保守</td><td>核心业务增速回落，产品结构与产能利用率改善不及预期</td><td>扣非利润或毛利率连续走弱</td></tr>
+              <tr><td>中性</td><td>主营增速延续，产品结构与产能按已披露节奏改善</td><td>收入、扣非利润和现金流保持同向</td></tr>
+              <tr><td>乐观</td><td>需求、产品升级和产能利用率同步超预期</td><td>高成长业务增速与整体盈利能力继续抬升</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="research-section">
+          <div class="research-title">机构应跟踪什么</div>
+          <div class="grid4">
+            <div class="info-card"><div class="info-value">✓ 新增与在手订单</div></div>
+            <div class="info-card"><div class="info-value">✓ 订单兑现节奏</div></div>
+            <div class="info-card"><div class="info-value">✓ 毛利率与现金流</div></div>
+            <div class="info-card"><div class="info-value">✓ 海外业务</div></div>
+          </div>
+          <div class="desc" style="font-size:10px;color:#999;margin-top:6px;">这里表示机构研究所需证据，不代表已有机构给出明确评级。</div>
+        </div>
+
+        <div class="research-section">
+          <div class="research-title">活跃资金怎么看</div>
+          <div class="grid4">
+            <div class="info-card"><div class="info-label">成交额</div><div class="info-value">103.52亿元</div></div>
+            <div class="info-card"><div class="info-label">换手率</div><div class="info-value">7.18%</div></div>
+            <div class="info-card"><div class="info-label">量比</div><div class="info-value">0.64</div></div>
+            <div class="info-card"><div class="info-label">日内强度</div><div class="info-value up">+2.92%</div></div>
+          </div>
+          <div class="desc" style="margin-top:10px;">股价处于相对高位，换手率较高，但量比偏低，短期交易活跃度一般；需结合业绩兑现与市场情绪判断趋势。</div>
+        </div>
+
+        <div class="research-section">
+          <div class="research-title">风险与下一步验证</div>
+          <div class="grid2">
+            <div class="info-card">
+              <div class="info-label">主要风险</div>
+              <div class="info-value">
+                • 高毛利业务增长不及预期，导致整体盈利改善乏力<br>
+                • 铜导体等低毛利业务占比过高，拖累综合毛利率<br>
+                • 经营现金流为负，若持续将影响财务健康<br>
+                • 资产负债率偏高，存在偿债与融资压力
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">下一步只看</div>
+              <div class="info-value">
+                • 下一份财报的扣非利润增速<br>
+                • 高成长业务收入与毛利率<br>
+                • 估值是否被利润增长持续消化
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="research-section">
+          <div class="research-title">ATDS 评分与评级</div>
+          <div class="grid4">
+            <div class="info-card"><div class="info-label">产业趋势规则</div><div class="info-value up" style="font-size:16px;font-weight:700;">+19</div></div>
+            <div class="info-card"><div class="info-label">公司资料完整度</div><div class="info-value up" style="font-size:16px;font-weight:700;">+8</div></div>
+            <div class="info-card"><div class="info-label">财务质量</div><div class="info-value up" style="font-size:16px;font-weight:700;">+26</div></div>
+            <div class="info-card"><div class="info-label">估值（中性）</div><div class="info-value up" style="font-size:16px;font-weight:700;">+10</div></div>
+            <div class="info-card"><div class="info-label">分项证据完整度</div><div class="info-value up" style="font-size:16px;font-weight:700;">+7</div></div>
+            <div class="info-card"><div class="info-label">成长证据</div><div class="info-value up" style="font-size:16px;font-weight:700;">+9</div></div>
+            <div class="info-card"><div class="info-label">资金行为</div><div class="info-value up" style="font-size:16px;font-weight:700;">+7</div></div>
+            <div class="info-card"><div class="info-label">风险扣分</div><div class="info-value down" style="font-size:16px;font-weight:700;">-6</div></div>
+          </div>
+          <div class="desc" style="margin-top:10px;">★★★★☆ 重点研究。88+ 五星 | 78-87 四星 | 68-77 三星；缺少同业、历史分位与一致预期时，估值采用中性分，不代表便宜。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 动态擒龙池 -->
+    <div class="section">
+      <div class="card-title">ATDS V4.1 · DYNAMIC DRAGON HUNT</div>
+      <div class="card-h2">🐉 动态擒龙池</div>
+      <div class="desc" style="font-size:12px;">全市场自动重排 · 连板身位 · 价格弹性 · 封板强度 · 板块带动 · 公告催化 · 监管风险</div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div>
+            <div style="font-size:12px;color:#999;">2026-08-12</div>
+            <div style="font-size:18px;font-weight:700;">当日收盘</div>
+          </div>
+          <div style="text-align:right;font-size:10px;color:#999;">每5分钟刷新<br>最近 15:15:41</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-num">93</div><div class="stat-label">涨停家数<br>全市场</div></div>
+          <div class="stat-card"><div class="stat-num">12</div><div class="stat-label">炸板家数<br>分歧观察</div></div>
+          <div class="stat-card"><div class="stat-num">7板</div><div class="stat-label">最高连板<br>身位高度</div></div>
+          <div class="stat-card"><div class="stat-num">AI</div><div class="stat-label">最强扩散<br>10股联动</div></div>
+        </div>
+        <div class="pool-actions">
+          <button class="btn red">立即重排</button>
+          <button class="btn">按最近交易日自动重排</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">2026-08-11 梯队</div>
+        <table class="table">
+          <thead><tr><th>排名</th><th>标的</th><th>题材</th><th>价格/身位</th><th>评分</th></tr></thead>
+          <tbody>
+            <tr><td><div class="rank">1</div></td><td>北京文化</td><td>趋势股</td><td>¥5.69<br>3板身位</td><td class="up">79</td></tr>
+            <tr><td><div class="rank">2</div></td><td>鸿博股份</td><td>人工智能</td><td>¥12.91<br>2板身位</td><td class="up">79</td></tr>
+            <tr><td><div class="rank">3</div></td><td>巨轮智能</td><td>人工智能</td><td>¥6.42<br>2板身位</td><td class="up">72</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">板块带动排序</div>
+        <table class="table">
+          <thead><tr><th>排名</th><th>方向</th><th>个股数</th><th>最高板</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>人工智能</td><td>10股</td><td>最高2板</td></tr>
+            <tr><td>2</td><td>房地产开发</td><td>6股</td><td>最高3板</td></tr>
+            <tr><td>3</td><td>数据中心</td><td>6股</td><td>最高3板</td></tr>
+            <tr><td>4</td><td>电商概念</td><td>5股</td><td>最高3板</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">监管与高位风险</div>
+        <div class="desc" style="margin-bottom:8px;">风险先扣分，再谈强度</div>
+        <div class="info-card" style="margin-bottom:8px;">
+          <div class="info-value">
+            • 北京文化：股票交易异常波动公告<br>
+            • 皇氏集团：股票交易异常波动公告<br>
+            • 蓝盾光电：股票交易异常波动公告
+          </div>
+        </div>
+        <div class="badge">公告风险已纳入本轮评分</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">自动淘汰观察</div>
+        <div class="desc" style="margin-bottom:8px;">昨日身位不等于今日资格</div>
+        <div class="info-value" style="font-size:12px;line-height:1.8;">
+          • 哈药股份（昨日3板）：未进入当日涨停池，承接强度待复核<br>
+          • 亚邦股份（昨日2板）：未进入当日涨停池，承接强度待复核<br>
+          • 联泰环保（昨日2板）：未进入当日涨停池，承接强度待复核<br>
+          • 国风新材（昨日2板）：未进入当日涨停池，承接强度待复核
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">DAILY AUTO RERANK · 五条动态规则</div>
+        <div class="grid4">
+          <div class="info-card"><div class="info-label">01 连板晋级与身位提升</div><div class="info-value up">加分</div></div>
+          <div class="info-card"><div class="info-label">02 题材涨停扩散与带动</div><div class="info-value up">加分</div></div>
+          <div class="info-card"><div class="info-label">03 封单、换手与回封质量</div><div class="info-value">动态校准</div></div>
+          <div class="info-card"><div class="info-label">04 监管/风险提示公告</div><div class="info-value down">自动扣分</div></div>
+        </div>
+        <div class="info-card" style="margin-top:10px;"><div class="info-label">05 未进当日涨停池</div><div class="info-value down">退出候选</div></div>
+      </div>
+    </div>
+
+    <!-- 国际重大事件监控 -->
+    <div class="section">
+      <div class="card-title">GLOBAL EVENT RADAR · 3 MIN REFRESH</div>
+      <div class="card-h2">国际重大事件监控</div>
+      <div class="desc">自动识别重大地缘、贸易、制裁和海外流动性事件，并推演对 A 股的传导路径。</div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="card-title">全球事件风险</div>
+          <div class="risk-level">中高</div>
+        </div>
+        <div class="news-item">
+          <span class="news-tag">地缘政策</span>
+          <div class="news-title">广西海洋经济发展“十五五”规划：建设平陆运河经济带</div>
+          <div class="news-meta">人民日报 · 08-12 15:05</div>
+        </div>
+        <div class="news-item">
+          <span class="news-tag">军事动态</span>
+          <div class="news-title">军事专家：湖北舰完成“毕业大考”已具备综合作战能力</div>
+          <div class="news-meta">中国新闻网 · 08-12 12:58</div>
+        </div>
+        <div class="news-item">
+          <span class="news-tag">贸易消费</span>
+          <div class="news-title">不只是“世界工厂”更是“世界市场”：上半年中国都在买什么？</div>
+          <div class="news-meta">央视新闻 · 08-12 10:43</div>
+        </div>
+        <div class="news-item">
+          <span class="news-tag">国际合作</span>
+          <div class="news-title">中国和刚果（布）中非合作论坛事务负责人举行会谈</div>
+          <div class="news-meta">财联社 · 08-12 09:51</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">国际政经 | A 股传导分析</div>
+        <div class="flow">
+          <span class="flow-step">国际事件</span>→<span class="flow-step">全球风险偏好变化</span>→<span class="flow-step">外资与大宗商品波动</span>→<span class="flow-step">A 股行业轮动</span>
+        </div>
+        <div class="desc" style="font-size:12px;margin-bottom:0;">风险偏好：-1。事件分用于校准短线风险权重，不替代产业逻辑与量价确认。</div>
+      </div>
+    </div>
+
+    <!-- 实时新闻驱动研判 -->
+    <div class="section">
+      <div class="card-title">LIVE NEWS CALIBRATION · 5 MIN REFRESH</div>
+      <div class="card-h2">实时新闻驱动研判</div>
+      <div class="desc">以下新闻作为动态证据层，实时校准十四章基础研判与主线分数。模型：DeepSeek · deepseek-v4-flash</div>
+
+      <div class="card">
+        <div class="card-title">中央政策原文雷达</div>
+        <div style="display:flex;gap:10px;margin:8px 0;">
+          <span class="badge">5 MIN</span>
+          <span class="badge">国家部委官网直连</span>
+        </div>
+        <div class="news-title">关于印发《煤炭工业发展“十五五”规划》的通知（发改能源〔2026〕979 号）</div>
+        <div class="desc" style="font-size:12px;">中央政策原文已核验，作为中期产业方向证据，短线交易仍需量价与公司订单确认。</div>
+        <div class="flow">
+          <span class="flow-step">中央政策发布</span>→<span class="flow-step">产业预期变化</span>→<span class="flow-step">资金重新定价</span>→<span class="flow-step">相关行业量价验证</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="research-title">DEEPSPEEK 市场主变量</div>
+        <div class="desc" style="font-size:12px;">宏观与资金面主导市场：央行连续零投放及零基预算改革显示政策收紧，资金面扰动债市；浙江脑机接口政策频出，上海软件规划及算力大会催化 TMT，期货成交活跃，外资加仓 A 股。</div>
+      </div>
+
+      <div class="card">
+        <div class="research-title">最大风险</div>
+        <div class="desc" style="font-size:12px;">债市收益率上行及央行零投放引发流动性收紧担忧，集采降价压力冲击中药饮片行业，结婚数据低迷反映消费疲弱，需警惕政策转向及行业分化风险。</div>
+      </div>
+
+      <div class="card">
+        <div class="research-title">下一步验证</div>
+        <div class="desc" style="font-size:12px;">验证脑机接口政策落地及个股机会，算力大会催化 AI 产业链，关注债市调整及资金面变化，跟踪医药集采影响，观察楼市修复持续性及外资动向。</div>
+      </div>
+
+      <div class="card">
+        <div class="pool-actions">
+          <button class="btn red">全部</button>
+          <button class="btn">市场资金</button>
+          <button class="btn">宏观政策</button>
+          <button class="btn">医药</button>
+          <button class="btn">机器人</button>
+          <button class="btn">AI 科技</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
+    <div class="ai-btn">问 ATDS AI</div>
+  </div>
+</body>
+</html>
