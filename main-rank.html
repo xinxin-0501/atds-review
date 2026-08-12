@@ -424,7 +424,7 @@ function showQr(){var u=getBaseUrl();document.getElementById("qr-mask").style.di
 function hideQr(){document.getElementById("qr-mask").style.display="none";}
 function showResearch(code){var m=document.getElementById("modal-"+code);if(m){m.classList.add("show");document.body.style.overflow="hidden";}}
 function closeModal(code){var m=document.getElementById("modal-"+code);if(m){m.classList.remove("show");document.body.style.overflow="";}}
-async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}var c0=raw.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}try{var res=await fetch("https://qt.gtimg.cn/q="+sc+raw);var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);var m=text.match(/="([^"]+)"/);if(!m){alert("未找到股票代码 "+raw);return;}var f=m[1].split("~");if(f.length<40){alert("数据解析失败，请重试");return;}var retCode=String(f[2]||"").trim();if(retCode!==raw){alert("代码 "+raw+" 与返回结果 "+retCode+" 不匹配，请检查输入");return;}var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};if(!data.name){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);}input.value="";}catch(e){alert("网络异常："+e.message);}}
+async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}var c0=raw.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}try{var res=await fetch("https://qt.gtimg.cn/q="+sc+raw);var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);var m=text.match(/="([^"]+)"/);if(!m){alert("未找到股票代码 "+raw);return;}var f=m[1].split("~");if(f.length<40){alert("数据解析失败，请重试");return;}var retCode=String(f[2]||"").trim();if(retCode!==raw){alert("代码 "+raw+" 与返回结果 "+retCode+" 不匹配，请检查输入");return;}var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};if(!data.name){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
 function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
@@ -471,6 +471,7 @@ function addToWatchlistUI(s){
   if(head)head.insertAdjacentElement("afterend",row);
 }
 function removeWatchlistRow(code){var r=document.querySelector('.wl-row[data-code="'+code+'"]');if(r)r.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();}
+function saveWatchlist(){try{var codes=[];document.querySelectorAll(".wl-row").forEach(function(r){var cd=r.getAttribute("data-code");if(cd)codes.push(cd);});localStorage.setItem("atds_watchlist",JSON.stringify(codes));}catch(e){}}
 function renderStockModalFront(s){
   var pct=Number(s.pct)||0,turn=Number(s.turnover)||0;
   var atds=70+Math.min(25,Math.max(-15,Math.round(pct*2+turn*0.5)));
@@ -517,6 +518,31 @@ function renderStockModalFront(s){
 function showDynamicResearch(s){var html=renderStockModalFront(s);var tmp=document.createElement("div");tmp.innerHTML=html;var modal=tmp.firstElementChild;document.body.appendChild(modal);modal.classList.add("show");document.body.style.overflow="hidden";}
 function downloadMd(){var el=document.getElementById("knowledge-md");if(!el){alert("暂无内容");return;}var blob=new Blob([el.textContent],{type:"text/markdown"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="atds-"+new Date().toISOString().slice(0,10)+".md";a.click();}
 function copyMd(){var el=document.getElementById("knowledge-md");if(!el||!navigator.clipboard){alert("复制失败");return;}navigator.clipboard.writeText(el.textContent).then(function(){alert("已复制到剪贴板");});}
+function loadSavedWatchlist(){try{var raw=localStorage.getItem("atds_watchlist");return raw?JSON.parse(raw):[];}catch(e){return [];}}
+function restoreSavedWatchlist(){
+  var codes=loadSavedWatchlist().filter(function(cd){
+    var existing=document.querySelector('.wl-row[data-code="'+cd+'"]');
+    return !existing;
+  });
+  if(!codes.length)return;
+  (async function(){
+    for(var i=0;i<codes.length;i++){
+      var raw=codes[i];
+      if(!/^\d{6}$/.test(raw))continue;
+      var c0=raw.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
+      try{
+        var res=await fetch("https://qt.gtimg.cn/q="+sc+raw);
+        var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);
+        var m=text.match(/="([^"]+)"/);if(!m)continue;
+        var f=m[1].split("~");if(f.length<40)continue;
+        var data={code:raw,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
+        if(!data.name)continue;
+        addToWatchlistUI(data);
+      }catch(e){}
+    }
+  })();
+}
+if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(restoreSavedWatchlist,600);});}
 </script>
 </body>
 </html>
