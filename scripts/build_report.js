@@ -924,6 +924,8 @@ ${renderHero(report)}
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="hint">市场综述 + AUTO REFRESH</div>
   </div>
+  ${renderRegimeGate(report)}
+  ${renderMarketScan(report)}
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
   ${renderDragonPool(report)}
