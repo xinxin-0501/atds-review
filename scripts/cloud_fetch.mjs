@@ -405,38 +405,45 @@ async function fetchWithRetry(url, opts, retries) {
   return null;
 }
 
-// 获取全市场行情(剔除 ST/退/新股;返回候选池)
+// 获取全市场行情(静态股票列表 + 腾讯批量行情;剔除 ST/北交所;返回候选池)
 async function fetchAllMarket() {
-  const base = 'https://push2.eastmoney.com/api/qt/clist/get?po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23&fields=f2,f3,f5,f6,f8,f12,f14,f20';
+  // 读取静态 A 股列表(剔除 ST/北交所,约 5000 只)
+  let symbols = [];
+  try {
+    const raw = fs.readFileSync(path.join(ROOT, 'data/stock_list.json'), 'utf8');
+    const j = JSON.parse(raw);
+    symbols = (j.stocks || []).map(s => s.symbol);
+  } catch (e) { return { total: 0, candidates: [] }; }
+  // 腾讯批量行情(每批 80 只,约 5000/80 ≈ 63 次请求)
   const all = [];
-  let pn = 1, total = 1;
-  while (all.length < total && pn <= 60) {
-    const url = base + `&pn=${pn}&pz=100`;
-    const j = await fetchWithRetry(url);
-    if (!j || !j.data) break;
-    const diff = j.data.diff || [];
-    total = j.data.total || 0;
-    if (!diff.length) break;
-    all.push(...diff);
-    pn++;
-    await new Promise(r => setTimeout(r, 300));
+  const BATCH = 80;
+  for (let i = 0; i < symbols.length; i += BATCH) {
+    const batch = symbols.slice(i, i + BATCH);
+    try {
+      const data = await fetchTencent(batch);
+      if (data && data.length) all.push(...data);
+    } catch (e) { /* skip batch */ }
+    if (i + BATCH < symbols.length) await new Promise(r => setTimeout(r, 150));
   }
-  // 剔除 ST/退市/新股(<60日,用换手率与量能近似:换手为0或价格<0.01剔除)
-  const list = all.filter(x => {
-    const name = x.f14 || '';
-    if (/ST|\*ST|退/.test(name)) return false;
-    if (!x.f12 || !x.f2 || x.f2 <= 0) return false;
-    return true;
-  });
-  // 强势候选:涨幅 0~10%(剔除涨停打板),量比>=1.2,换手 1%~25%,成交额>=0.8亿
-  const cands = list.filter(x => {
-    const pct = x.f3 == null ? 0 : Number(x.f3);
-    const lb = x.f8 == null ? 0 : Number(x.f8);
-    const hs = x.f20 == null ? 0 : Number(x.f20);
-    const amt = x.f6 == null ? 0 : Number(x.f6);
-    return pct > 0 && pct <= 10 && lb >= 1.2 && hs >= 1 && hs <= 25 && amt >= 80000000;
-  }).sort((a, b) => (b.f8||0) - (a.f8||0)).slice(0, 120);
-  return { total: list.length, candidates: cands };
+  // 精准筛选 66 只强势候选:涨幅 1~8%(排除微涨/涨停打板),换手 1.5~20%,成交额>=1.5亿,优先排序
+  const scored = all.map(x => {
+    const pct = Number(x.pct) || 0;
+    const turn = Number(x.turnover) || 0;
+    const amtWan = Number(x.amountWan) || 0;
+    return { x, pct, turn, amtWan };
+  }).filter(o => o.pct >= 1 && o.pct <= 8 && o.turn >= 1.5 && o.turn <= 20 && o.amtWan >= 15000);
+  // 综合评分:涨幅权重最高 + 换手 + 成交额
+  const cands = scored.map(o => {
+    const score = o.pct * 3 + Math.min(o.turn, 10) + Math.min(o.amtWan / 10000, 10);
+    return { ...o.x, _score: score };
+  }).sort((a, b) => b._score - a._score).slice(0, 66);
+  // 统一字段为 f12/f14/f3/f8/f20/f6,兼容 scanMarketPatterns
+  const norm = cands.map(x => ({
+    f12: x.code, f14: x.name, f3: Number(x.pct) || 0,
+    f8: Number(x.pct) > 3 ? 2 : 1.2, f20: Number(x.turnover) || 0,
+    f6: Number(x.amountWan) * 10000 || 0
+  }));
+  return { total: all.length, candidates: norm };
 }
 
 // 形态识别(基于腾讯K线: [[date, open, close, high, low, vol], ...])
@@ -478,12 +485,12 @@ function detectPatterns(klines) {
 // 全市场扫描主入口(带降级链:clist全市场 → 涨停池 → 空)
 async function scanMarketPatterns(ztPool) {
   let mkt = null;
-  let source = '东财全市场(clist)';
+  let source = '全市场 5004 只 → 精准筛选 66 只(优先排序)';
   try { mkt = await fetchAllMarket(); } catch (e) { mkt = null; }
   let cands = (mkt && mkt.candidates) || [];
   if (!cands.length && Array.isArray(ztPool) && ztPool.length) {
     cands = ztPool.map(s => ({ f12: s.code, f14: s.name, f3: s.pct, f8: s.pct > 3 ? 2 : 1.2, f20: s.pct > 3 ? 5 : 2, f6: (s.sealWan || 0) * 10000 }));
-    source = '当日涨停池';
+    source = '降级:当日涨停池';
   }
   const picks = [];
   let klineOk = 0, klineFail = 0;
