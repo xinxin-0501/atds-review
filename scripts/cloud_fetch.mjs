@@ -412,7 +412,7 @@ async function fetchAllMarket() {
   try {
     const raw = fs.readFileSync(path.join(ROOT, 'data/stock_list.json'), 'utf8');
     const j = JSON.parse(raw);
-    symbols = (j.stocks || []).map(s => s.symbol);
+    symbols = Array.isArray(j.symbols) ? j.symbols : (j.stocks || []).map(s => s.symbol);
   } catch (e) { return { total: 0, candidates: [] }; }
   // 腾讯批量行情(每批 80 只,约 5000/80 ≈ 63 次请求)
   const all = [];
