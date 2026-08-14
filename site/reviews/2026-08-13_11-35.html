@@ -864,6 +864,80 @@ tags: [ATDS, 交易复盘]
     <div class="card-title">LIVE NEWS CALIBRATION · 实时新闻驱动研判</div>
     <div class="hint">盘中由 Agent 扫描中央政策原文、央行公告与隔夜外盘要闻,校准主线方向与风险评分。</div>
   </div>
+  <div class="card gate-card">
+    <div class="card-title">反转闸门 · 温故知「加锁权」</div>
+    <div class="gate-note">核心规则:① AND ② 同时满足 → 闸门开(允许新仓);任一项未达标 → 闸门红(禁开新仓,埋伏名单豁免)</div>
+    <div class="gate-grid">
+      <div class="gate-block">
+        <div class="gate-h">① 成交额(沪深合计)</div>
+        <div class="gate-value red">--</div>
+        <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标</div>
+        <div class="gate-diff red">数据获取中</div>
+      </div>
+      <div class="gate-block">
+        <div class="gate-h">② 60日新高个股数</div>
+        <div class="gate-value red">0 只</div>
+        <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
+        <div class="gate-diff red">--</div>
+      </div>
+    </div>
+    <div class="gate-status gate-close">
+      <span class="gate-status-label">闸门状态：</span>
+      <span class="gate-status-text">✗ 红 禁开 · 仅允许执行预检埋伏名单(估值+硬止损+仓位上限已定)</span>
+    </div>
+    <div class="gate-src">数据源:①成交额(东财沪深接口/降级时显示--)/ ②60日新高(东财涨停池代理,基于1板+涨幅≥5%数量 = 0只/总涨停0只,真实接口数据更准)
+      <span class="da-score">准确性 6/10(代理指标)</span>
+    </div>
+  </div>
+  <div class="card da-card">
+    <div class="card-title">AI 数据分析 · 八步复盘</div>
+    <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
+    <div class="da-block">
+    <div class="da-h">第一步 · 市场定调</div>
+    <div class="da-line">指数：上证指数 -0.5% / 深证成指 -0.87% / 创业板指 -0.45%</div>
+    <div class="da-line">涨跌家数：涨 1396 / 跌 5180 / 平 108（红盘率 21%）</div>
+    <div class="da-line">涨停 59 家 · 炸板 36 家 · 最高连板 5 板（秦安股份）</div>
+    <div class="da-src">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score">准确性 9/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第二步 · 情绪周期</div>
+    <div class="da-line">情绪温度 74° → 阶段判定：<b class="da-cycle">加速</b></div>
+    <div class="da-line">操作基调：顺势参与，关注晋级与主线</div>
+    <div class="da-src">数据源：由东财涨停/炸板/连板数据推导<span class="da-score">准确性 7/10（逻辑推演）</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第三步 · 主线识别</div>
+    <div class="da-sub">涨停题材分布</div>
+    <div class="da-line">• 医疗服务：涨停 5 家 / 最高 2 板，领涨 澳洋健康</div><div class="da-line">• 汽车零部：涨停 4 家 / 最高 5 板，领涨 坤泰股份</div><div class="da-line">• 电力：涨停 3 家 / 最高 2 板，领涨 惠天热电</div><div class="da-line">• 通信设备：涨停 3 家 / 最高 1 板，领涨 移远通信</div>
+    <div class="da-line">连续 2-3 天上榜方向：秦安股份（5板）、北京文化（4板）、皇氏集团（4板）</div>
+    <div class="da-line">结构判断：龙头带队，有明确领涨梯队</div>
+    <div class="da-line">明日最可能机会方向（1-2个）：医疗服务、汽车零部</div>
+    <div class="da-src">数据源：东方财富涨停池分类聚合<span class="da-score">准确性 8/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第四步 · 核心个股拆解（Top5 涨停）</div>
+    <div class="da-line"><b>北京文化（000802）4板</b>：首板放量启动，随后连续晋级；高位连板(4板)，换手充分，筹码快速交换；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>坤泰股份（001260）2板</b>：首板放量启动，随后连续晋级；连板 2 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>金 螳 螂（002081）2板</b>：首板放量启动，随后连续晋级；连板 2 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>澳洋健康（002172）2板</b>：首板放量启动，随后连续晋级；连板 2 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>理工能科（002322）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>
+    <div class="da-src">数据源：东财涨停池 + 逻辑推演（启动/加速/分歧为推断，需结合K线人工验证）<span class="da-score">准确性 6/10</span></div>
+  </div><div class="da-block da-trade">
+    <div class="da-h">第五步 · 交易复盘</div>
+    <div class="da-line">待提供今日逐笔交易记录（股票、买点K线位置、买入理由、是否符合系统、卖出原因）后自动生成分析。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div><div class="da-block da-trade">
+    <div class="da-h">第六步 · 交易行为复盘</div>
+    <div class="da-line">待提供每笔交易数据后，分析追高/杀跌/持仓周期/情绪化交易等行为偏差与优化规则。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第七步 · 强势股共性模板</div>
+    <div class="da-line">当前市场最高连板 5 板。强势股共性：底部放量首板 → 缩量/换手连板加速 → 首次分歧不破位 → 承接有力再上攻。</div>
+    <div class="da-line">模板要点：① 首板看量能 ② 连板看换手 ③ 分歧看承接 ④ 只有承接验证通过的方向才值得次日跟进。</div>
+    <div class="da-src">数据源：逻辑推演（基于连板梯队）<span class="da-score">准确性 6/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第八步 · 主线资金复盘</div>
+    <div class="da-line">今日涨停题材分布：医疗服务(5家)、汽车零部(4家)、电力(3家)、通信设备(3家)、饮料乳品(2家)、通用设备(2家)</div>
+    <div class="da-line">重复上榜（连续2-3天）方向：秦安股份（5板）、北京文化（4板）、皇氏集团（4板）</div>
+    <div class="da-line">结构：龙头带队，处于高位加速</div>
+    <div class="da-line">明日最可能机会方向：医疗服务、汽车零部</div>
+    <div class="da-line">明日基调：<b class="da-stance">进攻（控仓）</b></div>
+    <div class="da-src">数据源：东方财富涨停池 + 板块统计<span class="da-score">准确性 8/10</span></div>
+  </div>
+  </div>
 </div>
 <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
 </div>
@@ -876,6 +950,13 @@ function showResearch(code){var m=document.getElementById("modal-"+code);if(m){m
 function closeModal(code){var m=document.getElementById("modal-"+code);if(m){m.classList.remove("show");document.body.style.overflow="";}}
 async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}var c0=raw.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}try{var res=await fetch("https://qt.gtimg.cn/q="+sc+raw);var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);var m=text.match(/="([^"]+)"/);if(!m){alert("未找到股票代码 "+raw);return;}var f=m[1].split("~");if(f.length<40){alert("数据解析失败，请重试");return;}var retCode=String(f[2]||"").trim();if(retCode!==raw){alert("代码 "+raw+" 与返回结果 "+retCode+" 不匹配，请检查输入");return;}var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};if(!data.name){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
+function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
+function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
+function deriveAdviceF(pct,atds,riskTone){var v=Number(pct)||0,a=Number(atds)||0;if(v<=-5)return{name:'减仓规避',tone:'cut'};if(a>=85&&riskTone!='high')return{name:'重点关注',tone:'focus'};if(a>=70)return{name:'持有观察',tone:'hold'};if(a<60&&v<=-1)return{name:'观望',tone:'wait'};return{name:'持有观察',tone:'hold'};}
+function deriveRiskTextF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0,lines=[];if(v>=5)lines.push('涨幅>5%,RSI 超买区');else if(v>=2)lines.push('涨幅 2-5%,技术偏强');else if(v>=-1)lines.push('震荡整理,方向未明');else if(v>=-3)lines.push('回调 2-3%,观察支撑');else lines.push('跌幅>3%,风险增大');if(t>=5)lines.push('放量活跃');else if(t>=2)lines.push('量能温和');else if(t>=0.5)lines.push('量能一般');else lines.push('量能偏低');return lines;}
+function deriveHorizonLinesF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0,sh=v>=3&&t>=2?'回踩 MA5 不破可继续,跌破减仓':v>=1?'区间震荡,顺势做 T,关注 MA10':v<=-3?'下跌趋势,反弹至 MA5 减仓':'区间震荡,关注 MA10 方向选择';var wa=v>=2?'沿 MA20 运行,跌破 MA60 警惕走弱':v<=-2?'跌至 MA20 下方,关注 MA60 是否扣住':'区间震荡,等待 MA20 方向选择';var lo=v>=0?'站上 MA120 偏多,关注 MA250 突破':'跌破 MA120,长线宜减仓观望';return[{k:'短线',v:sh},{k:'波段',v:wa},{k:'长线',v:lo}];}
+function deriveAdviceTextF(pct,atds,riskTone){var v=Number(pct)||0,a=Number(atds)||0;if(v<=-5)return'跌幅较大,建议减仓规避';if(a>=85&&riskTone!='high')return'ATDS 证据强,重点关注';if(a>=75&&v>=0)return'持有观察,等待放量催化';if(a<60&&v<=-1)return'技术偏弱,观望等待企稳';if(v>=5)return'高位震荡,逢高减仓为主';return'持有观察,关注量能配合';}
+function escHtmlF(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
   if(!card)return;
@@ -919,6 +1000,23 @@ function addToWatchlistUI(s){
   row.appendChild(rank);row.appendChild(price);row.appendChild(pct);row.appendChild(amt);row.appendChild(atdsEl);row.appendChild(sigEl);row.appendChild(act);
   var head=card.querySelector(".wl-table-head");
   if(head)head.insertAdjacentElement("afterend",row);
+
+  // 同时插入详情行(风险/风控/建议)
+  var pct=Number(s.pct)||0,turnover=Number(s.turnover)||0;
+  var atds=70+Math.min(25,Math.max(-15,Math.round(pct*2+turnover*0.5)));
+  var riskL=deriveRiskLevelF(pct),horizonL=deriveTimeHorizonF(pct,turnover),adviceL=deriveAdviceF(pct,atds,riskL.tone);
+  var riskLines=deriveRiskTextF(pct,turnover);
+  var horizons=deriveHorizonLinesF(pct,turnover);
+  var adviceText=deriveAdviceTextF(pct,atds,riskL.tone);
+  var detail=document.createElement('tr');
+  detail.className='wl-detail-row';
+  detail.setAttribute('data-detail-code',s.code);
+  detail.innerHTML='<td colspan="7" class="wl-detail-cell"><div class="detail-grid">'+
+    '<div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-'+riskL.tone+'">'+escHtmlF(riskL.name)+'</span></div>'+riskLines.map(function(l){return '<div class="detail-line">'+escHtmlF(l)+'</div>';}).join('')+'</div>'+
+    '<div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-'+horizonL.tone+'">'+escHtmlF(horizonL.name)+'</span></div>'+horizons.map(function(h){return '<div class="detail-line"><b>'+escHtmlF(h.k)+'</b>'+escHtmlF(h.v)+'</div>';}).join('')+'</div>'+
+    '<div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-'+adviceL.tone+'">'+escHtmlF(adviceL.name)+'</span></div><div class="detail-line">'+escHtmlF(adviceText)+'</div></div>'+
+    '</div></td>';
+  row.insertAdjacentElement('afterend',detail);
 }
 function removeWatchlistRow(code){var r=document.querySelector('.wl-row[data-code="'+code+'"]');if(r)r.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();}
 function saveWatchlist(){try{var codes=[];document.querySelectorAll(".wl-row").forEach(function(r){var cd=r.getAttribute("data-code");if(cd)codes.push(cd);});localStorage.setItem("atds_watchlist",JSON.stringify(codes));}catch(e){}}
@@ -988,6 +1086,7 @@ function restoreSavedWatchlist(){
         var data={code:raw,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
         if(!data.name)continue;
         addToWatchlistUI(data);
+        // detail 行由 addToWatchlistUI 内部统一添加
       }catch(e){}
     }
   })();
