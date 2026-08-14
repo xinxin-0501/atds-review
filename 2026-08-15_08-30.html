@@ -245,6 +245,18 @@
 .ms-refresh:active{opacity:.8}
 .ms-refresh{margin-left:8px;font-size:10px;padding:3px 10px;border-radius:12px;background:#c33;color:#fff;border:1px solid #c33;cursor:pointer}
 .ms-refresh:active{opacity:.8}
+.gate-click{cursor:pointer;transition:transform .15s}
+.gate-click:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(195,51,51,.15)}
+.gate-link{font-size:9px;color:#c33;font-weight:500;margin-left:4px}
+.nh-summary{font-size:12px;color:#333;margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed #eee}
+.nh-list{display:flex;flex-direction:column;gap:4px;max-height:50vh;overflow-y:auto}
+.nh-item{font-size:11px;background:#fafafa;padding:6px 10px;border-radius:6px}
+.gate-click{cursor:pointer;transition:transform .15s}
+.gate-click:hover{transform:translateY(-1px);box-shadow:0 2px 8px rgba(195,51,51,.15)}
+.gate-link{font-size:9px;color:#c33;font-weight:500;margin-left:4px}
+.nh-summary{font-size:12px;color:#333;margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed #eee}
+.nh-list{display:flex;flex-direction:column;gap:4px;max-height:50vh;overflow-y:auto}
+.nh-item{font-size:11px;background:#fafafa;padding:6px 10px;border-radius:6px}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -576,7 +588,7 @@
       <div class="index-change up">+1.12%</div>
     </div></div>
     <div class="status-row">
-      <div class="status-item">生成时间<strong>2026-08-15 01:21:22</strong></div>
+      <div class="status-item">生成时间<strong>2026-08-15 01:30:00</strong></div>
       <div class="status-item">数据源<strong>通达信实时</strong></div>
       <div class="status-item">类型<strong>盘前简报</strong></div>
     </div>
@@ -646,7 +658,7 @@
       <td>坤泰股份</td>
     </tr></tbody></table>
   </div>
-  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-08-15 01:21:22</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>风险</th><th>风控</th><th>建议</th><th>操作</th></tr></thead></div><div class="wl-table-body"><table class="wl-table"><tbody><tr class="wl-row" data-code="600487">
+  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-08-15 01:30:00</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>风险</th><th>风控</th><th>建议</th><th>操作</th></tr></thead></div><div class="wl-table-body"><table class="wl-table"><tbody><tr class="wl-row" data-code="600487">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">1</span><div><div class="wl-name">亨通光电</div><div class="wl-code">600487</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price up">62.98</div></td>
     <td class="wl-cell wl-cell-pct up">+10.01%</td>
@@ -862,7 +874,7 @@ tags: [ATDS, 交易复盘]
   </div>
   <div class="intl-mkt">
     <div class="intl-header"><span class="intl-eyebrow">GLOBAL LINKAGE · 4 MIN REFRESH</span><span class="intl-title">🌐 盘中信息 · 国际联动</span></div>
-    <div class="intl-cards"><div class="card intl-card"><div class="intl-head"><span class="intl-name">道琼斯</span><span class="intl-unit"></span></div><div class="intl-price down">53,730.26</div><div class="intl-change down">-0.20%</div><div class="intl-time">2026-08-14 13:23:00</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纳斯达克</span><span class="intl-unit"></span></div><div class="intl-price down">26,689.73</div><div class="intl-change down">-0.42%</div><div class="intl-time">2026-08-14 13:22:59</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约原油</span><span class="intl-unit">$/bbl</span></div><div class="intl-price up">82.31</div><div class="intl-change up">+1.61%</div><div class="intl-time">01:22:05</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约黄金</span><span class="intl-unit">$/oz</span></div><div class="intl-price up">4440.92</div><div class="intl-change up">+0.01%</div><div class="intl-time">01:22:08</div></div></div>
+    <div class="intl-cards"><div class="card intl-card"><div class="intl-head"><span class="intl-name">道琼斯</span><span class="intl-unit"></span></div><div class="intl-price down">53,730.75</div><div class="intl-change down">-0.20%</div><div class="intl-time">2026-08-14 13:31:20</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纳斯达克</span><span class="intl-unit"></span></div><div class="intl-price down">26,679.83</div><div class="intl-change down">-0.46%</div><div class="intl-time">2026-08-14 13:31:20</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约原油</span><span class="intl-unit">$/bbl</span></div><div class="intl-price up">82.33</div><div class="intl-change up">+1.64%</div><div class="intl-time">01:31:01</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约黄金</span><span class="intl-unit">$/oz</span></div><div class="intl-price up">4440.34</div><div class="intl-change up">+0.01%</div><div class="intl-time">01:31:07</div></div></div>
     <div class="intl-style"><div class="intl-style-h">📌 今日 A 股风格倾向（外盘推导）</div><div class="intl-style-body">原油强势 → 资源/能源板块或受关注</div></div>
     
     <div class="intl-missing">数据源：腾讯公开 API（道指/纳指/原油/黄金实时）+ 联网检索（欧股/标普/费半/英伟达/AMD/VIX/CNY）。A 股真正走势由内资承接和国内政策决定，外盘仅定开盘风格底色。</div>
@@ -994,6 +1006,108 @@ async function refreshMarketScan(){
   list.innerHTML = html;
   alert('刷新完成，识别 ' + picks.length + ' 只形态个股');
 }
+async function openRegimeNHList(){
+  var existing = document.getElementById('regime-nh-modal');
+  if (existing) { existing.classList.add('show'); refreshRegimeNH(); return; }
+  var modal = document.createElement('div');
+  modal.className = 'modal-mask show';
+  modal.id = 'regime-nh-modal';
+  modal.onclick = function(e){ if (e.target === modal) closeRegimeNH(); };
+  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">'+
+    '<div class="modal-header"><div class="modal-eyebrow">60日新高个股清单</div><span class="modal-close" onclick="closeRegimeNH()">×</span></div>'+
+    '<div class="modal-body"><div class="nh-summary" id="regime-nh-body">加载中...</div>'+
+    '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div></div>'+
+    '</div></div>';
+  document.body.appendChild(modal);
+  refreshRegimeNH();
+}
+async function refreshRegimeNH(){
+  var body = document.getElementById('regime-nh-body');
+  if (!body) return;
+  body.innerHTML = '<div style="text-align:center;color:#888">🔄 正在抓取60日K线...</div>';
+  var codes = new Set();
+  document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
+  if (codes.size < 5) {
+    document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
+    document.querySelectorAll('.wl-row').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
+  }
+  var arr = Array.from(codes).slice(0, 60);
+  var list = [];
+  for (var i = 0; i < arr.length; i++) {
+    var code = arr[i];
+    var c0 = code.charAt(0);
+    var full = c0 === '6' ? 'sh' + code : 'sz' + code;
+    var kl = await fetchKlineF(full, 65);
+    if (!kl || kl.length < 30) continue;
+    var highs = kl.map(function(k){ return parseFloat(k[3]); });
+    var peak60 = Math.max.apply(null, highs);
+    var last = parseFloat(kl[kl.length-1][2]);
+    if (last >= peak60 * 0.98) list.push({ code: code, last: last, peak60: peak60 });
+  }
+  var html = '<div class="nh-summary">60日新高个股 <b>' + list.length + '</b> 只 / 阈值 100</div>';
+  if (list.length) {
+    html += '<div class="nh-list">' + list.map(function(x, i){
+      return '<div class="nh-item"><span class="ms-rank">' + (i+1) + '</span> <b>' + x.code + '</b> 现价 ' + x.last.toFixed(2) + ' (峰值 ' + x.peak60.toFixed(2) + ')</div>';
+    }).join('') + '</div>';
+  } else {
+    html += '<div class="ms-empty">当前候选中未识别到60日新高个股</div>';
+  }
+  html += '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div>';
+  body.innerHTML = html;
+}
+function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
+
+async function openRegimeNHList(){
+  var existing = document.getElementById('regime-nh-modal');
+  if (existing) { existing.classList.add('show'); refreshRegimeNH(); return; }
+  var modal = document.createElement('div');
+  modal.className = 'modal-mask show';
+  modal.id = 'regime-nh-modal';
+  modal.onclick = function(e){ if (e.target === modal) closeRegimeNH(); };
+  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">'+
+    '<div class="modal-header"><div class="modal-eyebrow">60日新高个股清单</div><span class="modal-close" onclick="closeRegimeNH()">×</span></div>'+
+    '<div class="modal-body"><div class="nh-summary" id="regime-nh-body">加载中...</div>'+
+    '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div></div>'+
+    '</div></div>';
+  document.body.appendChild(modal);
+  refreshRegimeNH();
+}
+async function refreshRegimeNH(){
+  var body = document.getElementById('regime-nh-body');
+  if (!body) return;
+  body.innerHTML = '<div style="text-align:center;color:#888">🔄 正在抓取60日K线...</div>';
+  var codes = new Set();
+  document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
+  if (codes.size < 5) {
+    document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
+    document.querySelectorAll('.wl-row').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
+  }
+  var arr = Array.from(codes).slice(0, 60);
+  var list = [];
+  for (var i = 0; i < arr.length; i++) {
+    var code = arr[i];
+    var c0 = code.charAt(0);
+    var full = c0 === '6' ? 'sh' + code : 'sz' + code;
+    var kl = await fetchKlineF(full, 65);
+    if (!kl || kl.length < 30) continue;
+    var highs = kl.map(function(k){ return parseFloat(k[3]); });
+    var peak60 = Math.max.apply(null, highs);
+    var last = parseFloat(kl[kl.length-1][2]);
+    if (last >= peak60 * 0.98) list.push({ code: code, last: last, peak60: peak60 });
+  }
+  var html = '<div class="nh-summary">60日新高个股 <b>' + list.length + '</b> 只 / 阈值 100</div>';
+  if (list.length) {
+    html += '<div class="nh-list">' + list.map(function(x, i){
+      return '<div class="nh-item"><span class="ms-rank">' + (i+1) + '</span> <b>' + x.code + '</b> 现价 ' + x.last.toFixed(2) + ' (峰值 ' + x.peak60.toFixed(2) + ')</div>';
+    }).join('') + '</div>';
+  } else {
+    html += '<div class="ms-empty">当前候选中未识别到60日新高个股</div>';
+  }
+  html += '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div>';
+  body.innerHTML = html;
+}
+function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
+
 async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}

@@ -4,7 +4,7 @@
     "time": "08:30",
     "type": "premarket",
     "typeLabel": "盘前简报",
-    "generatedAt": "2026-08-15 01:21:22",
+    "generatedAt": "2026-08-15 01:30:00",
     "market": "A股",
     "dataSource": "腾讯行情 + 东方财富公开接口",
     "dataAsOfDate": "2026-08-14",
@@ -50,8 +50,8 @@
     "scanned": 5004,
     "candidates": 66,
     "source": "全市场 5004 只 → 精准筛选 66 只(优先排序)",
-    "klineOk": 32,
-    "klineFail": 34,
+    "klineOk": 38,
+    "klineFail": 28,
     "picks": [
       {
         "code": "300705",
@@ -116,6 +116,27 @@
         "reason": "拉升·量比2.0·5日涨23.6%"
       },
       {
+        "code": "300467",
+        "name": "Ѹ�οƼ�",
+        "pct": 7.55,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 50,
+        "reason": "拉升·量比2.0·5日涨12.6%"
+      },
+      {
+        "code": "002190",
+        "name": "�ɷɼ���",
+        "pct": 6.73,
+        "patterns": [
+          "启动",
+          "拉升"
+        ],
+        "score": 48,
+        "reason": "启动+拉升·量比2.0·5日涨8.7%"
+      },
+      {
         "code": "601890",
         "name": "����ê��",
         "pct": 6.87,
@@ -168,6 +189,16 @@
         ],
         "score": 33,
         "reason": "拉升·量比2.0·5日涨6.4%"
+      },
+      {
+        "code": "301680",
+        "name": "�̵µ��",
+        "pct": 7.25,
+        "patterns": [
+          "启动"
+        ],
+        "score": 33,
+        "reason": "启动·量比2.0·5日涨6.5%"
       },
       {
         "code": "300738",
@@ -4530,31 +4561,31 @@
   "intlMkt": {
     "us.DJI": {
       "name": "道琼斯",
-      "price": 53730.26,
-      "change": -109.73,
+      "price": 53730.75,
+      "change": -109.24,
       "changePct": -0.2,
-      "time": "2026-08-14 13:23:00"
+      "time": "2026-08-14 13:31:20"
     },
     "us.IXIC": {
       "name": "纳斯达克",
-      "price": 26689.73,
-      "change": -113.3,
-      "changePct": -0.42,
-      "time": "2026-08-14 13:22:59"
+      "price": 26679.83,
+      "change": -123.2,
+      "changePct": -0.46,
+      "time": "2026-08-14 13:31:20"
     },
     "hf_CL": {
       "name": "纽约原油",
-      "price": 82.31,
-      "change": 1.31,
-      "changePct": 1.61,
-      "time": "01:22:05"
+      "price": 82.33,
+      "change": 1.33,
+      "changePct": 1.64,
+      "time": "01:31:01"
     },
     "hf_GC": {
       "name": "纽约黄金",
-      "price": 4440.92,
-      "change": 0.46,
+      "price": 4440.34,
+      "change": 0.45,
       "changePct": 0.01,
-      "time": "01:22:08"
+      "time": "01:31:07"
     }
   },
   "closeEmotion": {
