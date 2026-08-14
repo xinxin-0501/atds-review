@@ -195,11 +195,64 @@ function renderIntlMkt(report) {
   if (ix && ix.changePct > 0.5) hints.push('纳指走强 → 科技/AI 板块或受提振');
   if (dj && dj.changePct < -0.5) hints.push('道指走弱 → 防御板块或受关注');
   const styleHint = hints.length ? hints.slice(0, 2).join('；') : '数据待补充，建议结合盘前/盘中走势综合判断';
+  // 国际联动明细表（联网补充数据：欧股/标普/费半/个股/VIX/汇率等）
+  let detailHtml = '';
+  const det = (report && report.intlDetail) || {};
+  const groups = [
+    ['us', '🇺🇸 美股（美东8/12收盘）'],
+    ['europe', '🇪🇺 欧洲（8/12收盘）'],
+    ['commodities', '🛢️ 商品'],
+    ['fx', '💱 汇率'],
+    ['sentiment', '🧭 情绪与关键变量']
+  ];
+  const rows = [];
+  for (const [gk, gLabel] of groups) {
+    const g = det[gk];
+    if (!g || !Object.keys(g).length) continue;
+    const itemRows = [];
+    for (const key of Object.keys(g)) {
+      const it = g[key];
+      if (typeof it !== 'object' || it === null) {
+        // 纯文本条目（如情绪说明）→ 合并渲染为一行说明
+        if (typeof it === 'string' && it.trim()) {
+          itemRows.push(`<tr><td colspan="5" class="intl-dt-note">${esc(it)}</td></tr>`);
+        }
+        continue;
+      }
+      const name = it.name || key;
+      const cls = upDownClass(it.changePct);
+      const priceStr = it.price != null && !isNaN(Number(it.price)) ? (typeof it.price === 'number' ? it.price.toLocaleString('zh-CN', { minimumFractionDigits: /fx|CNH|中间价/.test(name) ? 4 : 2, maximumFractionDigits: 4 }) : String(it.price)) : '--';
+      const pctStr = it.changePct != null && !isNaN(Number(it.changePct)) ? fmtPct(it.changePct) : (it.unit || '--');
+      const src = it.source ? `${it.source}` : '';
+      itemRows.push(`<tr>
+        <td>${esc(name)}</td>
+        <td class="${cls}">${priceStr}${it.unit ? ' ' + esc(it.unit) : ''}</td>
+        <td class="${cls}">${pctStr}</td>
+        <td class="intl-dt-time">${esc(it.time || '--')}</td>
+        <td class="intl-dt-src">${esc(src)}</td>
+      </tr>`);
+    }
+    if (itemRows.length) {
+      rows.push(`<tr class="intl-group-row"><td colspan="5" class="intl-group-td">${gLabel}</td></tr>`);
+      rows.push(...itemRows);
+    }
+  }
+  if (rows.length) {
+    detailHtml = `<div class="intl-detail">
+      <div class="intl-detail-h">📊 国际联动明细（联网补充 · 实时检索）</div>
+      <div class="intl-detail-asof">口径说明：${esc(det.asOfLabel || '')}</div>
+      <table class="intl-detail-table">
+        <thead><tr><th>指标</th><th>最新值</th><th>涨跌幅</th><th>来源时间</th><th>来源</th></tr></thead>
+        <tbody>${rows.join('')}</tbody>
+      </table>
+    </div>`;
+  }
   return `<div class="intl-mkt">
     <div class="intl-header"><span class="intl-eyebrow">GLOBAL LINKAGE · 4 MIN REFRESH</span><span class="intl-title">🌐 盘中信息 · 国际联动</span></div>
     <div class="intl-cards">${cards}</div>
     <div class="intl-style"><div class="intl-style-h">📌 今日 A 股风格倾向（外盘推导）</div><div class="intl-style-body">${esc(styleHint)}</div></div>
-    <div class="intl-missing">数据源：腾讯公开 API（道指/纳指/原油/黄金）。欧股、标普、费城半导体、英伟达、AMD、VIX、CNY 等需联网补充。</div>
+    ${detailHtml}
+    <div class="intl-missing">数据源：腾讯公开 API（道指/纳指/原油/黄金实时）+ 联网检索（欧股/标普/费半/英伟达/AMD/VIX/CNY）。A 股真正走势由内资承接和国内政策决定，外盘仅定开盘风格底色。</div>
   </div>`;
 }
 
@@ -465,18 +518,89 @@ function deriveStockAtds(pct, turnover) {
   return 70 + Math.min(25, Math.max(-15, Math.round(v * 2 + t * 0.5)));
 }
 
+function deriveRiskLevel(pct) {
+  const v = Number(pct) || 0;
+  if (v >= 5 || v <= -5) return { name: '高风险', tone: 'high' };
+  if (v >= 2 || v <= -2) return { name: '中风险', tone: 'mid' };
+  return { name: '低风险', tone: 'low' };
+}
+function deriveTimeHorizon(pct, turnover) {
+  const v = Number(pct) || 0;
+  const t = Number(turnover) || 0;
+  if (v >= 3 && t >= 2) return { name: '短线', tone: 'short' };
+  if (v >= -1 && v <= 3 && t >= 0.5) return { name: '波段', tone: 'wave' };
+  return { name: '长线', tone: 'long' };
+}
+function deriveAdvice(pct, atds, risk) {
+  const v = Number(pct) || 0;
+  const a = Number(atds) || 0;
+  if (v <= -5) return { name: '减仓规避', tone: 'cut' };
+  if (a >= 85 && risk !== 'high') return { name: '重点关注', tone: 'focus' };
+  if (a >= 70) return { name: '持有观察', tone: 'hold' };
+  if (a < 60 && v <= -1) return { name: '观望', tone: 'wait' };
+  return { name: '持有观察', tone: 'hold' };
+}
+function deriveRiskText(pct, turnover) {
+  const v = Number(pct) || 0;
+  const t = Number(turnover) || 0;
+  const lines = [];
+  if (v >= 5) lines.push('涨幅>5%,RSI 超买区');
+  else if (v >= 2) lines.push('涨幅 2-5%,技术偏强');
+  else if (v >= -1) lines.push('震荡整理,方向未明');
+  else if (v >= -3) lines.push('回调 2-3%,观察支撑');
+  else lines.push('跌幅>3%,风险增大');
+  if (t >= 5) lines.push('放量活跃');
+  else if (t >= 2) lines.push('量能温和');
+  else if (t >= 0.5) lines.push('量能一般');
+  else lines.push('量能偏低');
+  return lines;
+}
+function deriveHorizonLines(pct, turnover) {
+  const v = Number(pct) || 0;
+  const t = Number(turnover) || 0;
+  const short = v >= 3 && t >= 2 ? '回踩 MA5 不破可继续,跌破减仓'
+    : v >= 1 ? '区间震荡,顺势做 T,关注 MA10'
+    : v <= -3 ? '下跌趋势,反弹至 MA5 减仓'
+    : '区间震荡,关注 MA10 方向选择';
+  const wave = v >= 2 ? '沿 MA20 运行,跌破 MA60 警惕走弱'
+    : v <= -2 ? '跌至 MA20 下方,关注 MA60 是否守住'
+    : '区间震荡,等待 MA20 方向选择';
+  const long = v >= 0 ? '站上 MA120 偏多,关注 MA250 突破'
+    : '跌破 MA120,长线宜减仓观望';
+  return [{ k: '短线', v: short }, { k: '波段', v: wave }, { k: '长线', v: long }];
+}
+function deriveAdviceText(pct, atds, riskTone) {
+  const v = Number(pct) || 0;
+  const a = Number(atds) || 0;
+  if (v <= -5) return '跌幅较大,建议减仓规避';
+  if (a >= 85 && riskTone !== 'high') return 'ATDS 证据强,重点关注';
+  if (a >= 75 && v >= 0) return '持有观察,等待放量催化';
+  if (a < 60 && v <= -1) return '技术偏弱,观望等待企稳';
+  if (v >= 5) return '高位震荡,逢高减仓为主';
+  return '持有观察,关注量能配合';
+}
 function buildStockRow(s, i) {
   const cls = upDownClass(s.pct);
   const sig = deriveStockStrategy(s.pct);
   const atds = deriveStockAtds(s.pct, s.turnover);
   const code = s.code;
+  const riskTone = deriveRiskLevel(s.pct).tone;
+  const riskLines = deriveRiskText(s.pct, s.turnover);
+  const horizons = deriveHorizonLines(s.pct, s.turnover);
+  const adviceText = deriveAdviceText(s.pct, atds, riskTone);
+  const riskName = deriveRiskLevel(s.pct).name;
+  const horizonTone = deriveTimeHorizon(s.pct, s.turnover).tone;
+  const adviceTone = deriveAdvice(s.pct, atds, riskTone).tone;
   return `<tr class="wl-row" data-code="${esc(code)}">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><div><div class="wl-name">${esc(s.name)}</div><div class="wl-code">${esc(code)}</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price ${cls}">${fmtNum(s.price)}</div></td>
-    <td class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</td>
+    <td class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</div>
     <td class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</td>
     <td class="wl-cell wl-cell-atds">${atds}</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-${sig.tone}">${esc(sig.name)}</span></td>
+    <td class="wl-cell wl-cell-risk"><div class="risk-tag risk-${riskTone}">${esc(riskName)}</div><div class="cell-lines">${riskLines.map(l=>'<div class="cell-line">' + esc(l) + '</div>').join('')}</div></td>
+    <td class="wl-cell wl-cell-horizon"><div class="horizon-tag horizon-${horizonTone}">${esc(deriveTimeHorizon(s.pct, s.turnover).name)}</div><div class="cell-lines">${horizons.map(h=>'<div class="horizon-line"><b>' + esc(h.k) + ':</b>' + esc(h.v) + '</div>').join('')}</div></td>
+    <td class="wl-cell wl-cell-advice"><div class="advice-tag advice-${adviceTone}">${esc(deriveAdvice(s.pct, atds, riskTone).name)}</div><div class="cell-lines"><div class="cell-line">${esc(adviceText)}</div></div></td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="showResearch(this.dataset.code)">全面分析</button></td>
   </tr>`;
 }
@@ -515,7 +639,7 @@ function renderWatchlist(report) {
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
       '</div>' +
     '</div>' +
-    '<div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>操作</th></tr></thead></div>' +
+    '<div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>风险</th><th>风控</th><th>建议</th><th>操作</th></tr></thead></div>' +
     '<div class="wl-table-body"><table class="wl-table"><tbody>' + mds + '</tbody></table></div>' +
     '</div>';
   const modals = list.map(buildStockModal).join('');
