@@ -951,7 +951,7 @@ async function fetchKlineF(code, count) {
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
     const txt = await res.text();
     const j = JSON.parse(txt);
-    const series = j && j.data && j.data[code] && j.data[code].day;
+    const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
     return Array.isArray(series) ? series : [];
   } catch (e) { return []; }
 }
