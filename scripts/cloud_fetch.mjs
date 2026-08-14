@@ -184,7 +184,7 @@ async function fetchKline(code, count = 250) {
       const buf = await r.arrayBuffer();
       const t = new TextDecoder('gbk').decode(buf);
       const j = JSON.parse(t);
-      const series = j && j.data && j.data[code] && j.data[code].day;
+      const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
       if (Array.isArray(series) && series.length) return series;
     } catch (e) { /* try next */ }
   }
