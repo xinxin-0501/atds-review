@@ -1,3 +1,4 @@
+// ATDS-V3-GATE-TOP  ·  反转闸门/八步分析置于情绪区后
 // ATDS PRO 复盘报告渲染器
 const fs = require('fs');
 const path = require('path');
@@ -923,6 +924,8 @@ ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
   ${renderCloseEmotion(report)}
+  ${renderRegimeGate(report)}
+  ${renderDataAnalysis(report)}
   ${renderIntlMkt(report)}
   ${renderTechAnalysis(report)}
   ${renderPremarketStrategy(report)}
@@ -936,8 +939,6 @@ ${renderHero(report)}
   ${renderVerdict(report)}
   ${renderIntlEvents(report)}
   ${renderNewsDigest(report)}
-  ${renderRegimeGate(report)}
-  ${renderDataAnalysis(report)}
 </div>
 <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
 </div>
