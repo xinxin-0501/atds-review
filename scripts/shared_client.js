@@ -118,6 +118,108 @@ async function refreshMarketScan(){
   list.innerHTML = html;
   alert('刷新完成，识别 ' + picks.length + ' 只形态个股');
 }
+async function openRegimeNHList(){
+  var existing = document.getElementById('regime-nh-modal');
+  if (existing) { existing.classList.add('show'); refreshRegimeNH(); return; }
+  var modal = document.createElement('div');
+  modal.className = 'modal-mask show';
+  modal.id = 'regime-nh-modal';
+  modal.onclick = function(e){ if (e.target === modal) closeRegimeNH(); };
+  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">'+
+    '<div class="modal-header"><div class="modal-eyebrow">60日新高个股清单</div><span class="modal-close" onclick="closeRegimeNH()">×</span></div>'+
+    '<div class="modal-body"><div class="nh-summary" id="regime-nh-body">加载中...</div>'+
+    '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div></div>'+
+    '</div></div>';
+  document.body.appendChild(modal);
+  refreshRegimeNH();
+}
+async function refreshRegimeNH(){
+  var body = document.getElementById('regime-nh-body');
+  if (!body) return;
+  body.innerHTML = '<div style="text-align:center;color:#888">🔄 正在抓取60日K线...</div>';
+  var codes = new Set();
+  document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
+  if (codes.size < 5) {
+    document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
+    document.querySelectorAll('.wl-row').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
+  }
+  var arr = Array.from(codes).slice(0, 60);
+  var list = [];
+  for (var i = 0; i < arr.length; i++) {
+    var code = arr[i];
+    var c0 = code.charAt(0);
+    var full = c0 === '6' ? 'sh' + code : 'sz' + code;
+    var kl = await fetchKlineF(full, 65);
+    if (!kl || kl.length < 30) continue;
+    var highs = kl.map(function(k){ return parseFloat(k[3]); });
+    var peak60 = Math.max.apply(null, highs);
+    var last = parseFloat(kl[kl.length-1][2]);
+    if (last >= peak60 * 0.98) list.push({ code: code, last: last, peak60: peak60 });
+  }
+  var html = '<div class="nh-summary">60日新高个股 <b>' + list.length + '</b> 只 / 阈值 100</div>';
+  if (list.length) {
+    html += '<div class="nh-list">' + list.map(function(x, i){
+      return '<div class="nh-item"><span class="ms-rank">' + (i+1) + '</span> <b>' + x.code + '</b> 现价 ' + x.last.toFixed(2) + ' (峰值 ' + x.peak60.toFixed(2) + ')</div>';
+    }).join('') + '</div>';
+  } else {
+    html += '<div class="ms-empty">当前候选中未识别到60日新高个股</div>';
+  }
+  html += '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div>';
+  body.innerHTML = html;
+}
+function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
+
+async function openRegimeNHList(){
+  var existing = document.getElementById('regime-nh-modal');
+  if (existing) { existing.classList.add('show'); refreshRegimeNH(); return; }
+  var modal = document.createElement('div');
+  modal.className = 'modal-mask show';
+  modal.id = 'regime-nh-modal';
+  modal.onclick = function(e){ if (e.target === modal) closeRegimeNH(); };
+  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">'+
+    '<div class="modal-header"><div class="modal-eyebrow">60日新高个股清单</div><span class="modal-close" onclick="closeRegimeNH()">×</span></div>'+
+    '<div class="modal-body"><div class="nh-summary" id="regime-nh-body">加载中...</div>'+
+    '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div></div>'+
+    '</div></div>';
+  document.body.appendChild(modal);
+  refreshRegimeNH();
+}
+async function refreshRegimeNH(){
+  var body = document.getElementById('regime-nh-body');
+  if (!body) return;
+  body.innerHTML = '<div style="text-align:center;color:#888">🔄 正在抓取60日K线...</div>';
+  var codes = new Set();
+  document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
+  if (codes.size < 5) {
+    document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
+    document.querySelectorAll('.wl-row').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
+  }
+  var arr = Array.from(codes).slice(0, 60);
+  var list = [];
+  for (var i = 0; i < arr.length; i++) {
+    var code = arr[i];
+    var c0 = code.charAt(0);
+    var full = c0 === '6' ? 'sh' + code : 'sz' + code;
+    var kl = await fetchKlineF(full, 65);
+    if (!kl || kl.length < 30) continue;
+    var highs = kl.map(function(k){ return parseFloat(k[3]); });
+    var peak60 = Math.max.apply(null, highs);
+    var last = parseFloat(kl[kl.length-1][2]);
+    if (last >= peak60 * 0.98) list.push({ code: code, last: last, peak60: peak60 });
+  }
+  var html = '<div class="nh-summary">60日新高个股 <b>' + list.length + '</b> 只 / 阈值 100</div>';
+  if (list.length) {
+    html += '<div class="nh-list">' + list.map(function(x, i){
+      return '<div class="nh-item"><span class="ms-rank">' + (i+1) + '</span> <b>' + x.code + '</b> 现价 ' + x.last.toFixed(2) + ' (峰值 ' + x.peak60.toFixed(2) + ')</div>';
+    }).join('') + '</div>';
+  } else {
+    html += '<div class="ms-empty">当前候选中未识别到60日新高个股</div>';
+  }
+  html += '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div>';
+  body.innerHTML = html;
+}
+function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
+
 async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}

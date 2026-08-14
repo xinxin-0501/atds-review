@@ -513,8 +513,8 @@ function renderRegimeGate(report) {
         <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标</div>
         <div class="gate-diff ${taOk ? 'ok' : 'red'}">${ta ? (taOk ? '✓ 超过 ' + taDiff + ' 亿' : '✗ 差 ' + (29650 - ta).toFixed(0) + ' 亿 (' + taPct + '%)') : '数据获取中'}</div>
       </div>
-      <div class="gate-block">
-        <div class="gate-h">② 60日新高个股数</div>
+      <div class="gate-block gate-click" onclick="openRegimeNHList()">
+        <div class="gate-h">② 60日新高个股数 <span class="gate-link">📋 点击查看</span></div>
         <div class="gate-value ${nhOk ? 'ok' : 'red'}">${nh} 只</div>
         <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
         <div class="gate-diff ${nhOk ? 'ok' : 'red'}">${nh ? (nhOk ? '✓ 超过 ' + nhDiff + ' 只' : '✗ 差 ' + (-nhDiff) + ' 只 (' + nhPct + '%)') : '--'}</div>
