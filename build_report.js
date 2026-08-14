@@ -1,3 +1,4 @@
+// ATDS-V3-GATE-TOP  ·  反转闸门/八步分析置于情绪区后
 // ATDS PRO 复盘报告渲染器
 const fs = require('fs');
 const path = require('path');
@@ -529,6 +530,31 @@ function renderRegimeGate(report) {
   </div>`;
 }
 
+function renderMarketScan(report) {
+  const ms = report.marketScan || {};
+  const picks = ms.picks || [];
+  const gate = report.regimeGate || {};
+  const gateOpen = (gate.totalAmount || 0) >= 29650 && (gate.newHighCount || 0) >= 100;
+  const rows = picks.map((p, i) => `
+    <div class="ms-row">
+      <span class="ms-rank">${i + 1}</span>
+      <a class="da-stock ms-name" data-code="${esc(p.code)}" onclick="openStockResearch(this.dataset.code)">${esc(p.name)}</a>
+      <span class="ms-code">${esc(p.code)}</span>
+      <span class="ms-pct ${Number(p.pct) >= 0 ? 'up' : 'down'}">${Number(p.pct) >= 0 ? '+' : ''}${p.pct}%</span>
+      <span class="ms-patterns">${(p.patterns || []).map(x => '<span class="ms-pattern">' + esc(x) + '</span>').join('')}</span>
+      <span class="ms-score">${p.score}</span>
+      <button class="wl-btn ms-add" data-code="${esc(p.code)}" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>`).join('');
+  return `<div class="card ms-card">
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+    <div class="ms-note">扫描范围：${esc(ms.source || '--')}（${ms.candidates || 0} 只候选，剔除 ST/新股）→ 识别 ${picks.length} 只形态启动个股</div>
+    <div class="ms-gate ${gateOpen ? 'ok' : 'red'}">反转闸门：${gateOpen ? '绿 · 放行' : '红 · 禁开新仓（埋伏名单豁免）'}${gateOpen ? ' → 以下可考虑加入观察池' : ' → 仅埋伏名单可操作，新仓需谨慎'}</div>
+    <div class="ms-list">${rows || `<div class="ms-empty">${(ms.klineFail || 0) > 0 && !(ms.klineOk || 0) ? 'K线数据源当前不可达（' + (ms.klineFail || 0) + ' 只候选 K 线获取失败），形态识别未执行。网络恢复后自动生效。' : '当日无形态识别结果（数据源不可达或当日无启动形态个股）'}</div>`}</div>
+    ${picks.length ? '<button class="wl-tool wl-tool-red ms-addall" onclick="addAllPicks()">一键全部加入观察池</button>' : ''}
+    <div class="da-src">数据源：${esc(ms.source || '--')} + 腾讯/东财K线 形态识别（启动/老鸭头/拉升）<span class="da-score">准确性 7/10（技术形态自动识别）</span></div>
+  </div>`;
+}
+
 function renderDataAnalysis(report) {
   const ms = report.marketStats || {};
   const ce = report.closeEmotion || {};
@@ -569,8 +595,15 @@ function renderDataAnalysis(report) {
   const hotLines = ce.mainLines || [];
   let m3line = '';
   if (sectors.length) {
-    m3line = sectors.slice(0, 4).map(s =>
-      `<div class="da-line">• ${esc(s.name)}：涨停 ${s.count} 家 / 最高 ${s.maxLB} 板，领涨 ${esc(s.leadStock || '--')}</div>`).join('');
+    m3line = sectors.slice(0, 4).map(s => {
+      const lead = s.leadStock || '--';
+      const match = limitUpList.find(x => x.name === lead);
+      const code = match ? match.code : '';
+      const leadHtml = code
+        ? `<a class="da-stock" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">${esc(lead)}</a>`
+        : esc(lead);
+      return `<div class="da-line">• ${esc(s.name)}：涨停 ${s.count} 家 / 最高 ${s.maxLB} 板，领涨 ${leadHtml}</div>`;
+    }).join('');
   } else {
     m3line = '<div class="da-line">暂无板块聚合数据（东财接口未返回）</div>';
   }
@@ -595,7 +628,8 @@ function renderDataAnalysis(report) {
       const lb = s.lianban || 1;
       const start = lb >= 2 ? '首板放量启动，随后连续晋级' : '今日首板放量启动，观察次日承接';
       const accel = lb >= 4 ? `高位连板(${lb}板)，换手充分，筹码快速交换` : lb >= 2 ? `连板 ${lb} 天，缩量加速为主` : '首板放量，加速待验证';
-      return `<div class="da-line"><b>${esc(s.name)}（${s.code}）${lb}板</b>：${start}；${accel}；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>`;
+      const nameHtml = `<a class="da-stock" data-code="${esc(s.code)}" onclick="openStockResearch(this.dataset.code)">${esc(s.name)}</a>`;
+      return `<div class="da-line"><b>${nameHtml}（${s.code}）${lb}板</b>：${start}；${accel}；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>`;
     }).join('');
   } else {
     m4lines = '<div class="da-line">暂无涨停个股数据</div>';
@@ -924,6 +958,7 @@ ${renderHero(report)}
 <div class="section">
   ${renderCloseEmotion(report)}
   ${renderRegimeGate(report)}
+  ${renderMarketScan(report)}
   ${renderDataAnalysis(report)}
   ${renderIntlMkt(report)}
   ${renderTechAnalysis(report)}
