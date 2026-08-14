@@ -546,10 +546,10 @@ function renderMarketScan(report) {
       <button class="wl-btn ms-add" data-code="${esc(p.code)}" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
     </div>`).join('');
   return `<div class="card ms-card">
-    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升 <button class="wl-tool ms-refresh" onclick="refreshMarketScan()">🔄 刷新重扫</button></div>
     <div class="ms-note">扫描范围：${esc(ms.source || '--')}（${ms.candidates || 0} 只候选，剔除 ST/新股）→ 识别 ${picks.length} 只形态启动个股</div>
     <div class="ms-gate ${gateOpen ? 'ok' : 'red'}">反转闸门：${gateOpen ? '绿 · 放行' : '红 · 禁开新仓（埋伏名单豁免）'}${gateOpen ? ' → 以下可考虑加入观察池' : ' → 仅埋伏名单可操作，新仓需谨慎'}</div>
-    <div class="ms-list">${rows || `<div class="ms-empty">${(ms.klineFail || 0) > 0 && !(ms.klineOk || 0) ? 'K线数据源当前不可达（' + (ms.klineFail || 0) + ' 只候选 K 线获取失败），形态识别未执行。网络恢复后自动生效。' : '当日无形态识别结果（数据源不可达或当日无启动形态个股）'}</div>`}</div>
+    <div class="ms-list" id="ms-list">${rows || `<div class="ms-empty">${(ms.klineFail || 0) > 0 && !(ms.klineOk || 0) ? 'K线数据源当前不可达（' + (ms.klineFail || 0) + ' 只候选 K 线获取失败），形态识别未执行。网络恢复后自动生效。' : '当日无形态识别结果（数据源不可达或当日无启动形态个股）'}</div>`}</div>
     ${picks.length ? '<button class="wl-tool wl-tool-red ms-addall" onclick="addAllPicks()">一键全部加入观察池</button>' : ''}
     <div class="da-src">数据源：${esc(ms.source || '--')} + 腾讯/东财K线 形态识别（启动/老鸭头/拉升）<span class="da-score">准确性 7/10（技术形态自动识别）</span></div>
   </div>`;
