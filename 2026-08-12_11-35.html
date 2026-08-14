@@ -545,80 +545,115 @@
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-08-12 01:01:56</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>风险</th><th>风控</th><th>建议</th><th>操作</th></tr></thead></div><div class="wl-table-body"><table class="wl-table"><tbody><tr class="wl-row" data-code="600487">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">1</span><div><div class="wl-name">亨通光电</div><div class="wl-code">600487</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price up">59.30</div></td>
-    <td class="wl-cell wl-cell-pct up">+2.92%</div>
+    <td class="wl-cell wl-cell-pct up">+2.92%</td>
     <td class="wl-cell wl-cell-amt">103.5亿</td>
     <td class="wl-cell wl-cell-atds">79</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-strong">强势承接</span></td>
-    <td class="wl-cell wl-cell-risk"><div class="risk-tag risk-mid">中风险</div><div class="cell-lines"><div class="cell-line">涨幅 2-5%,技术偏强</div><div class="cell-line">放量活跃</div></div></td>
-    <td class="wl-cell wl-cell-horizon"><div class="horizon-tag horizon-wave">波段</div><div class="cell-lines"><div class="horizon-line"><b>短线:</b>区间震荡,顺势做 T,关注 MA10</div><div class="horizon-line"><b>波段:</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="horizon-line"><b>长线:</b>站上 MA120 偏多,关注 MA250 突破</div></div></td>
-    <td class="wl-cell wl-cell-advice"><div class="advice-tag advice-hold">持有观察</div><div class="cell-lines"><div class="cell-line">持有观察,等待放量催化</div></div></td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600487" onclick="showResearch(this.dataset.code)">全面分析</button></td>
+  </tr><tr class="wl-detail-row" data-detail-code="600487">
+    <td colspan="7" class="wl-detail-cell">
+      <div class="detail-grid">
+        <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-mid">中风险</span></div><div class="detail-line">涨幅 2-5%,技术偏强</div><div class="detail-line">放量活跃</div></div>
+        <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-wave">波段</span></div><div class="detail-line"><b>短线</b>区间震荡,顺势做 T,关注 MA10</div><div class="detail-line"><b>波段</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="detail-line"><b>长线</b>站上 MA120 偏多,关注 MA250 突破</div></div>
+        <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,等待放量催化</div></div>
+      </div>
+    </td>
   </tr><tr class="wl-row" data-code="600392">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">2</span><div><div class="wl-name">盛和资源</div><div class="wl-code">600392</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price down">23.71</div></td>
-    <td class="wl-cell wl-cell-pct down">-0.63%</div>
+    <td class="wl-cell wl-cell-pct down">-0.63%</td>
     <td class="wl-cell wl-cell-amt">15.8亿</td>
     <td class="wl-cell wl-cell-atds">71</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-wait">等待确认</span></td>
-    <td class="wl-cell wl-cell-risk"><div class="risk-tag risk-low">低风险</div><div class="cell-lines"><div class="cell-line">震荡整理,方向未明</div><div class="cell-line">量能温和</div></div></td>
-    <td class="wl-cell wl-cell-horizon"><div class="horizon-tag horizon-wave">波段</div><div class="cell-lines"><div class="horizon-line"><b>短线:</b>区间震荡,关注 MA10 方向选择</div><div class="horizon-line"><b>波段:</b>区间震荡,等待 MA20 方向选择</div><div class="horizon-line"><b>长线:</b>跌破 MA120,长线宜减仓观望</div></div></td>
-    <td class="wl-cell wl-cell-advice"><div class="advice-tag advice-hold">持有观察</div><div class="cell-lines"><div class="cell-line">持有观察,关注量能配合</div></div></td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="showResearch(this.dataset.code)">全面分析</button></td>
+  </tr><tr class="wl-detail-row" data-detail-code="600392">
+    <td colspan="7" class="wl-detail-cell">
+      <div class="detail-grid">
+        <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">震荡整理,方向未明</div><div class="detail-line">量能温和</div></div>
+        <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-wave">波段</span></div><div class="detail-line"><b>短线</b>区间震荡,关注 MA10 方向选择</div><div class="detail-line"><b>波段</b>区间震荡,等待 MA20 方向选择</div><div class="detail-line"><b>长线</b>跌破 MA120,长线宜减仓观望</div></div>
+        <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,关注量能配合</div></div>
+      </div>
+    </td>
   </tr><tr class="wl-row" data-code="300285">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">3</span><div><div class="wl-name">国瓷材料</div><div class="wl-code">300285</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price up">74.00</div></td>
-    <td class="wl-cell wl-cell-pct up">+1.54%</div>
+    <td class="wl-cell wl-cell-pct up">+1.54%</td>
     <td class="wl-cell wl-cell-amt">94.9亿</td>
     <td class="wl-cell wl-cell-atds">81</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-up">震荡上行</span></td>
-    <td class="wl-cell wl-cell-risk"><div class="risk-tag risk-low">低风险</div><div class="cell-lines"><div class="cell-line">震荡整理,方向未明</div><div class="cell-line">放量活跃</div></div></td>
-    <td class="wl-cell wl-cell-horizon"><div class="horizon-tag horizon-wave">波段</div><div class="cell-lines"><div class="horizon-line"><b>短线:</b>区间震荡,顺势做 T,关注 MA10</div><div class="horizon-line"><b>波段:</b>区间震荡,等待 MA20 方向选择</div><div class="horizon-line"><b>长线:</b>站上 MA120 偏多,关注 MA250 突破</div></div></td>
-    <td class="wl-cell wl-cell-advice"><div class="advice-tag advice-hold">持有观察</div><div class="cell-lines"><div class="cell-line">持有观察,等待放量催化</div></div></td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300285" onclick="showResearch(this.dataset.code)">全面分析</button></td>
+  </tr><tr class="wl-detail-row" data-detail-code="300285">
+    <td colspan="7" class="wl-detail-cell">
+      <div class="detail-grid">
+        <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">震荡整理,方向未明</div><div class="detail-line">放量活跃</div></div>
+        <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-wave">波段</span></div><div class="detail-line"><b>短线</b>区间震荡,顺势做 T,关注 MA10</div><div class="detail-line"><b>波段</b>区间震荡,等待 MA20 方向选择</div><div class="detail-line"><b>长线</b>站上 MA120 偏多,关注 MA250 突破</div></div>
+        <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,等待放量催化</div></div>
+      </div>
+    </td>
   </tr><tr class="wl-row" data-code="300308">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">4</span><div><div class="wl-name">中际旭创</div><div class="wl-code">300308</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price up">921.00</div></td>
-    <td class="wl-cell wl-cell-pct up">+3.84%</div>
+    <td class="wl-cell wl-cell-pct up">+3.84%</td>
     <td class="wl-cell wl-cell-amt">284.1亿</td>
     <td class="wl-cell wl-cell-atds">79</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-strong">强势承接</span></td>
-    <td class="wl-cell wl-cell-risk"><div class="risk-tag risk-mid">中风险</div><div class="cell-lines"><div class="cell-line">涨幅 2-5%,技术偏强</div><div class="cell-line">量能温和</div></div></td>
-    <td class="wl-cell wl-cell-horizon"><div class="horizon-tag horizon-short">短线</div><div class="cell-lines"><div class="horizon-line"><b>短线:</b>回踩 MA5 不破可继续,跌破减仓</div><div class="horizon-line"><b>波段:</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="horizon-line"><b>长线:</b>站上 MA120 偏多,关注 MA250 突破</div></div></td>
-    <td class="wl-cell wl-cell-advice"><div class="advice-tag advice-hold">持有观察</div><div class="cell-lines"><div class="cell-line">持有观察,等待放量催化</div></div></td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300308" onclick="showResearch(this.dataset.code)">全面分析</button></td>
+  </tr><tr class="wl-detail-row" data-detail-code="300308">
+    <td colspan="7" class="wl-detail-cell">
+      <div class="detail-grid">
+        <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-mid">中风险</span></div><div class="detail-line">涨幅 2-5%,技术偏强</div><div class="detail-line">量能温和</div></div>
+        <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-short">短线</span></div><div class="detail-line"><b>短线</b>回踩 MA5 不破可继续,跌破减仓</div><div class="detail-line"><b>波段</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="detail-line"><b>长线</b>站上 MA120 偏多,关注 MA250 突破</div></div>
+        <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,等待放量催化</div></div>
+      </div>
+    </td>
   </tr><tr class="wl-row" data-code="603538">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">5</span><div><div class="wl-name">美诺华</div><div class="wl-code">603538</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price up">33.33</div></td>
-    <td class="wl-cell wl-cell-pct up">+10.00%</div>
+    <td class="wl-cell wl-cell-pct up">+10.00%</td>
     <td class="wl-cell wl-cell-amt">14.3亿</td>
     <td class="wl-cell wl-cell-atds">95</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-break">强势突破</span></td>
-    <td class="wl-cell wl-cell-risk"><div class="risk-tag risk-high">高风险</div><div class="cell-lines"><div class="cell-line">涨幅&gt;5%,RSI 超买区</div><div class="cell-line">放量活跃</div></div></td>
-    <td class="wl-cell wl-cell-horizon"><div class="horizon-tag horizon-short">短线</div><div class="cell-lines"><div class="horizon-line"><b>短线:</b>回踩 MA5 不破可继续,跌破减仓</div><div class="horizon-line"><b>波段:</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="horizon-line"><b>长线:</b>站上 MA120 偏多,关注 MA250 突破</div></div></td>
-    <td class="wl-cell wl-cell-advice"><div class="advice-tag advice-hold">持有观察</div><div class="cell-lines"><div class="cell-line">持有观察,等待放量催化</div></div></td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="603538" onclick="showResearch(this.dataset.code)">全面分析</button></td>
+  </tr><tr class="wl-detail-row" data-detail-code="603538">
+    <td colspan="7" class="wl-detail-cell">
+      <div class="detail-grid">
+        <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-high">高风险</span></div><div class="detail-line">涨幅&gt;5%,RSI 超买区</div><div class="detail-line">放量活跃</div></div>
+        <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-short">短线</span></div><div class="detail-line"><b>短线</b>回踩 MA5 不破可继续,跌破减仓</div><div class="detail-line"><b>波段</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="detail-line"><b>长线</b>站上 MA120 偏多,关注 MA250 突破</div></div>
+        <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,等待放量催化</div></div>
+      </div>
+    </td>
   </tr><tr class="wl-row" data-code="300342">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">6</span><div><div class="wl-name">天银机电</div><div class="wl-code">300342</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price up">36.99</div></td>
-    <td class="wl-cell wl-cell-pct up">+4.17%</div>
+    <td class="wl-cell wl-cell-pct up">+4.17%</td>
     <td class="wl-cell wl-cell-amt">5.9亿</td>
     <td class="wl-cell wl-cell-atds">80</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-strong">强势承接</span></td>
-    <td class="wl-cell wl-cell-risk"><div class="risk-tag risk-mid">中风险</div><div class="cell-lines"><div class="cell-line">涨幅 2-5%,技术偏强</div><div class="cell-line">量能温和</div></div></td>
-    <td class="wl-cell wl-cell-horizon"><div class="horizon-tag horizon-short">短线</div><div class="cell-lines"><div class="horizon-line"><b>短线:</b>回踩 MA5 不破可继续,跌破减仓</div><div class="horizon-line"><b>波段:</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="horizon-line"><b>长线:</b>站上 MA120 偏多,关注 MA250 突破</div></div></td>
-    <td class="wl-cell wl-cell-advice"><div class="advice-tag advice-hold">持有观察</div><div class="cell-lines"><div class="cell-line">持有观察,等待放量催化</div></div></td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300342" onclick="showResearch(this.dataset.code)">全面分析</button></td>
+  </tr><tr class="wl-detail-row" data-detail-code="300342">
+    <td colspan="7" class="wl-detail-cell">
+      <div class="detail-grid">
+        <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-mid">中风险</span></div><div class="detail-line">涨幅 2-5%,技术偏强</div><div class="detail-line">量能温和</div></div>
+        <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-short">短线</span></div><div class="detail-line"><b>短线</b>回踩 MA5 不破可继续,跌破减仓</div><div class="detail-line"><b>波段</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="detail-line"><b>长线</b>站上 MA120 偏多,关注 MA250 突破</div></div>
+        <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,等待放量催化</div></div>
+      </div>
+    </td>
   </tr><tr class="wl-row" data-code="300607">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">7</span><div><div class="wl-name">拓斯达</div><div class="wl-code">300607</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price up">33.92</div></td>
-    <td class="wl-cell wl-cell-pct up">+1.41%</div>
+    <td class="wl-cell wl-cell-pct up">+1.41%</td>
     <td class="wl-cell wl-cell-amt">7.8亿</td>
     <td class="wl-cell wl-cell-atds">76</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-up">震荡上行</span></td>
-    <td class="wl-cell wl-cell-risk"><div class="risk-tag risk-low">低风险</div><div class="cell-lines"><div class="cell-line">震荡整理,方向未明</div><div class="cell-line">放量活跃</div></div></td>
-    <td class="wl-cell wl-cell-horizon"><div class="horizon-tag horizon-wave">波段</div><div class="cell-lines"><div class="horizon-line"><b>短线:</b>区间震荡,顺势做 T,关注 MA10</div><div class="horizon-line"><b>波段:</b>区间震荡,等待 MA20 方向选择</div><div class="horizon-line"><b>长线:</b>站上 MA120 偏多,关注 MA250 突破</div></div></td>
-    <td class="wl-cell wl-cell-advice"><div class="advice-tag advice-hold">持有观察</div><div class="cell-lines"><div class="cell-line">持有观察,等待放量催化</div></div></td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300607" onclick="showResearch(this.dataset.code)">全面分析</button></td>
+  </tr><tr class="wl-detail-row" data-detail-code="300607">
+    <td colspan="7" class="wl-detail-cell">
+      <div class="detail-grid">
+        <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">震荡整理,方向未明</div><div class="detail-line">放量活跃</div></div>
+        <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-wave">波段</span></div><div class="detail-line"><b>短线</b>区间震荡,顺势做 T,关注 MA10</div><div class="detail-line"><b>波段</b>区间震荡,等待 MA20 方向选择</div><div class="detail-line"><b>长线</b>站上 MA120 偏多,关注 MA250 突破</div></div>
+        <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,等待放量催化</div></div>
+      </div>
+    </td>
   </tr></tbody></table></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 午盘快照
 tags: [ATDS, 交易复盘]
