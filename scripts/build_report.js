@@ -926,13 +926,10 @@ ${renderHero(report)}
   </div>
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
-  ${renderDragonPool(report)}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
   ${renderWatchlist(report)}
   ${renderStockResearch(report)}
-  ${renderSectors(report)}
-  ${renderLimitUp(report)}
   ${renderIntlEvents(report)}
   ${renderIntlMkt(report)}
   ${renderNewsDigest(report)}
@@ -968,7 +965,6 @@ ${renderHero(report)}
   ${renderMarketStats(report)}
   ${renderSectors(report)}
   ${renderLimitUp(report)}
-  ${renderWatchlist(report)}
   ${renderPlaybook(report)}
   ${renderVerdict(report)}
   ${renderIntlEvents(report)}
