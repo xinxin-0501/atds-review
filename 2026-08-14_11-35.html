@@ -44,6 +44,163 @@
 .modal-rating{display:flex;align-items:center;gap:6px;margin:8px 0}
 .modal-rating-stars{color:#c33;font-size:14px}
 .modal-rating-text{font-size:11px;color:#666}
+.watchlist-card{padding:14px 12px;margin:0}
+.wl-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:10px;border-bottom:1px solid #f0f0f0}
+.wl-title{font-size:13px;font-weight:700;color:#333}
+.wl-time{font-size:10px;color:#999;font-weight:400;margin-left:6px}
+.wl-time::before{content:'●';color:#c33;margin-right:3px}
+.wl-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.wl-search-input{font-size:11px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:14px;width:120px;outline:none;background:#fafafa}
+.wl-tool{font-size:10px;padding:4px 10px;border:1px solid #e0e0e0;border-radius:14px;background:#fff;color:#555;cursor:pointer;white-space:nowrap}
+.wl-tool-red{background:#c33;color:#fff;border-color:#c33}
+.wl-table{width:100%;border-collapse:collapse;font-size:10px}
+.wl-table th{background:#fafafa;padding:8px 4px;text-align:left;color:#666;font-weight:600;font-size:9px;white-space:nowrap;border-bottom:1px solid #eee}
+.wl-table td{padding:8px 4px;border-bottom:1px dashed #f5f5f5;vertical-align:middle}
+.wl-row{transition:background .2s}
+.wl-row:hover{background:#fafafa}
+.wl-cell{font-size:10px}
+.wl-cell-rank{display:flex;align-items:center;gap:6px}
+.rank-no{background:#f5f5f5;color:#666;border-radius:4px;padding:2px 6px;font-weight:600;font-size:10px;min-width:18px;text-align:center}
+.wl-name{font-weight:700;color:#333;font-size:11px;line-height:1.2}
+.wl-code{color:#888;font-size:9px;margin-top:2px}
+.wl-cell-price .price{font-weight:700;font-size:12px}
+.wl-cell-pct{font-weight:700;font-size:11px}
+.wl-cell-amt{color:#888;font-size:10px;white-space:nowrap}
+.wl-cell-atds{font-weight:700;color:#333;font-size:11px;text-align:center}
+.wl-cell-sig,.wl-cell-risk,.wl-cell-horizon,.wl-cell-advice{white-space:nowrap}
+.sig{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.sig-break{background:#fee;color:#c33}
+.sig-strong{background:#ffe8d6;color:#e85a3c}
+.sig-up{background:#fef0e8;color:#e85a3c}
+.sig-wait{background:#f5f5f5;color:#888}
+.sig-press{background:#fff7e6;color:#d49000}
+.sig-weak{background:#f0f5ff;color:#185FA5}
+.risk{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.risk-high{background:#fee;color:#c33}
+.risk-mid{background:#fff7e6;color:#d49000}
+.risk-low{background:#e8f5e9;color:#2e7d32}
+.horizon{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.horizon-short{background:#e3f2fd;color:#1565c0}
+.horizon-wave{background:#f3e5f5;color:#7b1fa2}
+.horizon-long{background:#e0f7fa;color:#00695c}
+.advice{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.advice-focus{background:#c33;color:#fff}
+.advice-hold{background:#f5f5f5;color:#555}
+.advice-wait{background:#fff7e6;color:#d49000}
+.advice-cut{background:#fee;color:#c33}
+.wl-cell-act{white-space:nowrap}
+.wl-btn{font-size:10px;padding:3px 8px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;color:#555;cursor:pointer;margin-right:4px}
+.wl-btn-primary{background:#c33;color:#fff;border-color:#c33}
+.cell-lines{margin-top:4px;font-size:9px;line-height:1.4;color:#555}
+.cell-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.horizon-line{font-size:9px;line-height:1.4;color:#555;margin-bottom:2px}
+.horizon-line b{color:#7b1fa2;margin-right:3px;font-weight:600}
+.risk-tag,.horizon-tag,.advice-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;margin-bottom:2px}
+.risk-tag.risk-high{background:#fee;color:#c33}
+.risk-tag.risk-mid{background:#fff7e6;color:#d49000}
+.risk-tag.risk-low{background:#e8f5e9;color:#2e7d32}
+.horizon-tag.horizon-short{background:#e3f2fd;color:#1565c0}
+.horizon-tag.horizon-wave{background:#f3e5f5;color:#7b1fa2}
+.horizon-tag.horizon-long{background:#e0f7fa;color:#00695c}
+.advice-tag.advice-focus{background:#c33;color:#fff}
+.advice-tag.advice-hold{background:#f5f5f5;color:#555}
+.advice-tag.advice-wait{background:#fff7e6;color:#d49000}
+.advice-tag.advice-cut{background:#fee;color:#c33}
+.wl-cell-risk,.wl-cell-horizon,.wl-cell-advice{min-width:140px;max-width:160px}
+.cell-lines{margin-top:4px;font-size:9px;line-height:1.4;color:#555}
+.cell-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.horizon-line{font-size:9px;line-height:1.4;color:#555;margin-bottom:2px}
+.horizon-line b{color:#7b1fa2;margin-right:3px;font-weight:600}
+.risk-tag,.horizon-tag,.advice-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;margin-bottom:2px}
+.risk-tag.risk-high{background:#fee;color:#c33}
+.risk-tag.risk-mid{background:#fff7e6;color:#d49000}
+.risk-tag.risk-low{background:#e8f5e9;color:#2e7d32}
+.horizon-tag.horizon-short{background:#e3f2fd;color:#1565c0}
+.horizon-tag.horizon-wave{background:#f3e5f5;color:#7b1fa2}
+.horizon-tag.horizon-long{background:#e0f7fa;color:#00695c}
+.advice-tag.advice-focus{background:#c33;color:#fff}
+.advice-tag.advice-hold{background:#f5f5f5;color:#555}
+.advice-tag.advice-wait{background:#fff7e6;color:#d49000}
+.advice-tag.advice-cut{background:#fee;color:#c33}
+.wl-cell-risk,.wl-cell-horizon,.wl-cell-advice{min-width:140px;max-width:160px}
+.wl-detail-row{background:#fafafa}
+.wl-detail-row td{padding:0 8px 10px 8px !important;border-bottom:1px solid #f0f0f0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 0 4px 0}
+@media (max-width:380px){.detail-grid{grid-template-columns:1fr}}
+.detail-block{background:#fff;border-radius:8px;padding:8px 10px;font-size:10px;color:#444;line-height:1.5;border:1px solid #f0f0f0}
+.detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.detail-line{font-size:9px;color:#555;line-height:1.5;margin-top:3px}
+.detail-line b{color:#7b1fa2;margin-right:4px;font-weight:600}
+.wl-detail-row{background:#fafafa}
+.wl-detail-row td{padding:0 8px 10px 8px !important;border-bottom:1px solid #f0f0f0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 0 4px 0}
+@media (max-width:380px){.detail-grid{grid-template-columns:1fr}}
+.detail-block{background:#fff;border-radius:8px;padding:8px 10px;font-size:10px;color:#444;line-height:1.5;border:1px solid #f0f0f0}
+.detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.detail-line{font-size:9px;color:#555;line-height:1.5;margin-top:3px}
+.detail-line b{color:#7b1fa2;margin-right:4px;font-weight:600}
+.da-card{padding:14px 12px}
+.da-note{font-size:10px;color:#888;margin-bottom:10px;line-height:1.5}
+.da-block{background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.da-h{font-size:12px;font-weight:700;color:#c33;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #eee}
+.da-sub{font-size:10px;color:#666;font-weight:600;margin:6px 0 4px}
+.da-line{font-size:10px;color:#444;line-height:1.6;margin-bottom:3px}
+.da-line b{color:#333}
+.da-cycle{color:#c33}
+.da-stance{color:#c33}
+.da-src{font-size:9px;color:#999;margin-top:6px;padding-top:4px;border-top:1px dashed #eee}
+.da-score{background:#fff7e6;color:#d49000;padding:1px 6px;border-radius:3px;font-weight:600;margin-left:4px}
+.da-trade{background:#fff;border-style:dashed}
+.da-card{padding:14px 12px}
+.da-note{font-size:10px;color:#888;margin-bottom:10px;line-height:1.5}
+.da-block{background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.da-h{font-size:12px;font-weight:700;color:#c33;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #eee}
+.da-sub{font-size:10px;color:#666;font-weight:600;margin:6px 0 4px}
+.da-line{font-size:10px;color:#444;line-height:1.6;margin-bottom:3px}
+.da-line b{color:#333}
+.da-cycle{color:#c33}
+.da-stance{color:#c33}
+.da-src{font-size:9px;color:#999;margin-top:6px;padding-top:4px;border-top:1px dashed #eee}
+.da-score{background:#fff7e6;color:#d49000;padding:1px 6px;border-radius:3px;font-weight:600;margin-left:4px}
+.da-trade{background:#fff;border-style:dashed}
+.gate-card{padding:14px 12px}
+.gate-note{font-size:10px;color:#666;background:#fff7e6;padding:6px 10px;border-radius:6px;margin-bottom:10px;border:1px solid #ffe6c2}
+.gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+@media (max-width:380px){.gate-grid{grid-template-columns:1fr}}
+.gate-block{background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:10px}
+.gate-h{font-size:10px;font-weight:700;color:#666;margin-bottom:4px}
+.gate-value{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:4px}
+.gate-value.ok{color:#2e7d32}
+.gate-value.red{color:#c33}
+.gate-th{font-size:9px;color:#999;margin-bottom:4px}
+.gate-diff{font-size:10px;font-weight:600}
+.gate-diff.ok{color:#2e7d32}
+.gate-diff.red{color:#c33}
+.gate-status{padding:12px 14px;border-radius:10px;text-align:center;font-size:13px;font-weight:700;margin-bottom:10px}
+.gate-open{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.gate-close{background:#fee;color:#c33;border:1px solid #fcc}
+.gate-status-label{font-size:11px;font-weight:500;color:inherit}
+.gate-status-text{font-size:13px}
+.gate-src{font-size:9px;color:#999;line-height:1.4}
+.gate-card{padding:14px 12px}
+.gate-note{font-size:10px;color:#666;background:#fff7e6;padding:6px 10px;border-radius:6px;margin-bottom:10px;border:1px solid #ffe6c2}
+.gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+@media (max-width:380px){.gate-grid{grid-template-columns:1fr}}
+.gate-block{background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:10px}
+.gate-h{font-size:10px;font-weight:700;color:#666;margin-bottom:4px}
+.gate-value{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:4px}
+.gate-value.ok{color:#2e7d32}
+.gate-value.red{color:#c33}
+.gate-th{font-size:9px;color:#999;margin-bottom:4px}
+.gate-diff{font-size:10px;font-weight:600}
+.gate-diff.ok{color:#2e7d32}
+.gate-diff.red{color:#c33}
+.gate-status{padding:12px 14px;border-radius:10px;text-align:center;font-size:13px;font-weight:700;margin-bottom:10px}
+.gate-open{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.gate-close{background:#fee;color:#c33;border:1px solid #fcc}
+.gate-status-label{font-size:11px;font-weight:500;color:inherit}
+.gate-status-text{font-size:13px}
+.gate-src{font-size:9px;color:#999;line-height:1.4}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -138,6 +295,16 @@
 .intl-style-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:6px}
 .intl-style-body{font-size:11px;color:#333;line-height:1.5}
 .intl-missing{font-size:10px;color:#999;line-height:1.5;padding:8px 10px;background:#fafafa;border-radius:8px}
+.intl-detail{margin-top:10px;background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.intl-detail-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:4px}
+.intl-detail-asof{font-size:10px;color:#999;margin-bottom:8px;line-height:1.4}
+.intl-detail-table{width:100%;border-collapse:collapse;font-size:11px}
+.intl-detail-table th{background:#f6f8fb;color:#666;font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid #eee;font-size:10px}
+.intl-detail-table td{padding:6px 8px;border-bottom:1px solid #f5f5f5;color:#333;vertical-align:top}
+.intl-group-row td{background:#fafcff;color:#185FA5;font-weight:700;font-size:11px;padding:8px 8px 4px}
+.intl-dt-time{font-size:10px;color:#999}
+.intl-dt-src{font-size:10px;color:#999}
+.intl-dt-note{font-size:10px;color:#666;line-height:1.5;background:#fafcff}
 /* Hero 头部区 */
 .hero{background:linear-gradient(135deg,#fff8f5 0%,#fef3ed 50%,#fff 100%);padding:18px 16px 16px;border-radius:0 0 14px 14px;margin-bottom:8px;border-bottom:1px solid #f5e6dc}
 .hero-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
@@ -346,12 +513,86 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="../index.html">盘前</a><a href="2026-08-14_11-35.html" class="active">午盘</a><a href="2026-08-14_15-20.html">收盘</a><a href="2026-08-14_15-20.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-08-14_11-35.html" class="active">午盘</a><a href="2026-08-14_15-20.html">收盘</a><a href="2026-08-14_15-20.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照</div><h1 class="hero-title">2026-08-14 · <span class="hero-time">11:35</span></h1><div class="hero-sub">实时盘中快照 · 数据截至 11:35</div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 89°</span></div></div>
 <div class="section">
   <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-14 午盘快照 · 数据截至 11:35</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">89°</div><div class="ce-stage">过热区 · 情绪极度亢奋</div><div class="ce-fact">主特征: 谨防高潮后分歧</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">46%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">63</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">63</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈77%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">5板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">22%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">3103</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">3365</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">216</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:3103"></div><div class="ce-bar-flat" style="flex:216"></div><div class="ce-bar-down" style="flex:3365"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>46%</b></span><span>成交额 <b>待补充</b>(早盘较昨日需联网)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val up">+0.01%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:0.3%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val up">+0.45%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:13.5%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val up">+1.12%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:33.6%"></div></div></div><div class="ce-block-hint">成长科技领涨,量能微缩但仍在 2 万亿上方</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">通信设备</span><span class="ce-ml-val up">+7.6%</span></div><div class="ce-ml-row"><span class="ce-ml-name">汽车零部</span><span class="ce-ml-val up">+6.9%</span></div><div class="ce-ml-row"><span class="ce-ml-name">环境治理</span><span class="ce-ml-val up">+5.3%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">通信设备</span><span class="ce-mi-val up">+7.6亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">汽车零部</span><span class="ce-mi-val up">+6.9亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">环境治理</span><span class="ce-mi-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学纤维</span><span class="ce-mi-val up">+5.4亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title">04 情绪高度(连板梯队)</div><div class="ce-ladder"><span class="ce-ladder-pill">5板 · 蓝盾光电</span><span class="ce-ladder-pill">3板 · 华西股份</span><span class="ce-ladder-pill">2板 · 神奇制药</span></div></div><div class="card"><div class="card-title">05 明日观察锚点</div><div class="ce-anchor-grid"><div class="ce-anchor-card"><div class="ce-anchor-h">🎯 主线持续性</div><div class="ce-anchor-desc">观察中际旭创 / 新易盛 / 天孚通信能否继续表态</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">⚠️ 情绪退潮阈值</div><div class="ce-anchor-desc">炸板率 &gt; 40% 或晋级率 &lt; 50% 需警惕</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">📊 量能验证</div><div class="ce-anchor-desc">2.15 万亿基础上能否重拾放量</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">🛡️ 高位风险</div><div class="ce-anchor-desc">百花医药 7 板与医药板块背离</div></div></div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
+  <div class="card gate-card">
+    <div class="card-title">反转闸门 · 温故知「加锁权」</div>
+    <div class="gate-note">核心规则:① AND ② 同时满足 → 闸门开(允许新仓);任一项未达标 → 闸门红(禁开新仓,埋伏名单豁免)</div>
+    <div class="gate-grid">
+      <div class="gate-block">
+        <div class="gate-h">① 成交额(沪深合计)</div>
+        <div class="gate-value red">--</div>
+        <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标</div>
+        <div class="gate-diff red">数据获取中</div>
+      </div>
+      <div class="gate-block">
+        <div class="gate-h">② 60日新高个股数</div>
+        <div class="gate-value red">0 只</div>
+        <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
+        <div class="gate-diff red">--</div>
+      </div>
+    </div>
+    <div class="gate-status gate-close">
+      <span class="gate-status-label">闸门状态：</span>
+      <span class="gate-status-text">✗ 红 禁开 · 仅允许执行预检埋伏名单(估值+硬止损+仓位上限已定)</span>
+    </div>
+    <div class="gate-src">数据源:①成交额(东财沪深接口/降级时显示--)/ ②60日新高(东财涨停池代理,基于1板+涨幅≥5%数量 = 0只/总涨停0只,真实接口数据更准)
+      <span class="da-score">准确性 6/10(代理指标)</span>
+    </div>
+  </div>
+  <div class="card da-card">
+    <div class="card-title">AI 数据分析 · 八步复盘</div>
+    <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
+    <div class="da-block">
+    <div class="da-h">第一步 · 市场定调</div>
+    <div class="da-line">指数：上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div>
+    <div class="da-line">涨跌家数：涨 3103 / 跌 3365 / 平 216（红盘率 46%）</div>
+    <div class="da-line">涨停 63 家 · 炸板 19 家 · 最高连板 5 板（蓝盾光电）</div>
+    <div class="da-src">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score">准确性 9/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第二步 · 情绪周期</div>
+    <div class="da-line">情绪温度 89° → 阶段判定：<b class="da-cycle">分歧</b></div>
+    <div class="da-line">操作基调：高位分歧加大，控制仓位，低吸不追高</div>
+    <div class="da-src">数据源：由东财涨停/炸板/连板数据推导<span class="da-score">准确性 7/10（逻辑推演）</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第三步 · 主线识别</div>
+    <div class="da-sub">涨停题材分布</div>
+    <div class="da-line">• 通信设备：涨停 4 家 / 最高 2 板，领涨 共进股份</div><div class="da-line">• 汽车零部：涨停 3 家 / 最高 3 板，领涨 坤泰股份</div><div class="da-line">• 环境治理：涨停 3 家 / 最高 1 板，领涨 德创环保</div><div class="da-line">• 化学纤维：涨停 2 家 / 最高 3 板，领涨 华西股份</div>
+    <div class="da-line">连续 2-3 天上榜方向：蓝盾光电（5板）、华西股份（3板）、坤泰股份（3板）</div>
+    <div class="da-line">结构判断：龙头带队，有明确领涨梯队</div>
+    <div class="da-line">明日最可能机会方向（1-2个）：通信设备、汽车零部</div>
+    <div class="da-src">数据源：东方财富涨停池分类聚合<span class="da-score">准确性 8/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第四步 · 核心个股拆解（Top5 涨停）</div>
+    <div class="da-line"><b>华西股份（000936）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>坤泰股份（001260）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>澳洋健康（002172）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>华森制药（002907）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>中石科技（300684）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>
+    <div class="da-src">数据源：东财涨停池 + 逻辑推演（启动/加速/分歧为推断，需结合K线人工验证）<span class="da-score">准确性 6/10</span></div>
+  </div><div class="da-block da-trade">
+    <div class="da-h">第五步 · 交易复盘</div>
+    <div class="da-line">待提供今日逐笔交易记录（股票、买点K线位置、买入理由、是否符合系统、卖出原因）后自动生成分析。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div><div class="da-block da-trade">
+    <div class="da-h">第六步 · 交易行为复盘</div>
+    <div class="da-line">待提供每笔交易数据后，分析追高/杀跌/持仓周期/情绪化交易等行为偏差与优化规则。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第七步 · 强势股共性模板</div>
+    <div class="da-line">当前市场最高连板 5 板。强势股共性：底部放量首板 → 缩量/换手连板加速 → 首次分歧不破位 → 承接有力再上攻。</div>
+    <div class="da-line">模板要点：① 首板看量能 ② 连板看换手 ③ 分歧看承接 ④ 只有承接验证通过的方向才值得次日跟进。</div>
+    <div class="da-src">数据源：逻辑推演（基于连板梯队）<span class="da-score">准确性 6/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第八步 · 主线资金复盘</div>
+    <div class="da-line">今日涨停题材分布：通信设备(4家)、汽车零部(3家)、环境治理(3家)、化学纤维(2家)、医疗服务(2家)、装修装饰(2家)</div>
+    <div class="da-line">重复上榜（连续2-3天）方向：蓝盾光电（5板）、华西股份（3板）、坤泰股份（3板）</div>
+    <div class="da-line">结构：龙头带队，处于高位加速</div>
+    <div class="da-line">明日最可能机会方向：通信设备、汽车零部</div>
+    <div class="da-line">明日基调：<b class="da-stance">收缩</b></div>
+    <div class="da-src">数据源：东方财富涨停池 + 板块统计<span class="da-score">准确性 8/10</span></div>
+  </div>
+  </div>
   <div class="intl-mkt">
     <div class="intl-header"><span class="intl-eyebrow">GLOBAL LINKAGE · 4 MIN REFRESH</span><span class="intl-title">🌐 盘中信息 · 国际联动</span></div>
     <div class="intl-cards"><div class="card intl-card"><div class="intl-head"><span class="intl-name">道琼斯</span><span class="intl-unit"></span></div><div class="intl-price up">53,839.99</div><div class="intl-change up">+0.13%</div><div class="intl-time">2026-08-13 16:39:34</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纳斯达克</span><span class="intl-unit"></span></div><div class="intl-price up">26,803.03</div><div class="intl-change up">+0.81%</div><div class="intl-time">2026-08-13 17:15:59</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约原油</span><span class="intl-unit">$/bbl</span></div><div class="intl-price up">81.65</div><div class="intl-change up">+0.60%</div><div class="intl-time">18:23:59</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约黄金</span><span class="intl-unit">$/oz</span></div><div class="intl-price flat">4411.21</div><div class="intl-change flat">0.00%</div><div class="intl-time">18:24:03</div></div></div>
@@ -863,80 +1104,6 @@ tags: [ATDS, 交易复盘]
   <div class="card">
     <div class="card-title">LIVE NEWS CALIBRATION · 实时新闻驱动研判</div>
     <div class="hint">盘中由 Agent 扫描中央政策原文、央行公告与隔夜外盘要闻,校准主线方向与风险评分。</div>
-  </div>
-  <div class="card gate-card">
-    <div class="card-title">反转闸门 · 温故知「加锁权」</div>
-    <div class="gate-note">核心规则:① AND ② 同时满足 → 闸门开(允许新仓);任一项未达标 → 闸门红(禁开新仓,埋伏名单豁免)</div>
-    <div class="gate-grid">
-      <div class="gate-block">
-        <div class="gate-h">① 成交额(沪深合计)</div>
-        <div class="gate-value red">--</div>
-        <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标</div>
-        <div class="gate-diff red">数据获取中</div>
-      </div>
-      <div class="gate-block">
-        <div class="gate-h">② 60日新高个股数</div>
-        <div class="gate-value red">0 只</div>
-        <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
-        <div class="gate-diff red">--</div>
-      </div>
-    </div>
-    <div class="gate-status gate-close">
-      <span class="gate-status-label">闸门状态：</span>
-      <span class="gate-status-text">✗ 红 禁开 · 仅允许执行预检埋伏名单(估值+硬止损+仓位上限已定)</span>
-    </div>
-    <div class="gate-src">数据源:①成交额(东财沪深接口/降级时显示--)/ ②60日新高(东财涨停池代理,基于1板+涨幅≥5%数量 = 0只/总涨停0只,真实接口数据更准)
-      <span class="da-score">准确性 6/10(代理指标)</span>
-    </div>
-  </div>
-  <div class="card da-card">
-    <div class="card-title">AI 数据分析 · 八步复盘</div>
-    <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
-    <div class="da-block">
-    <div class="da-h">第一步 · 市场定调</div>
-    <div class="da-line">指数：上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div>
-    <div class="da-line">涨跌家数：涨 3103 / 跌 3365 / 平 216（红盘率 46%）</div>
-    <div class="da-line">涨停 63 家 · 炸板 19 家 · 最高连板 5 板（蓝盾光电）</div>
-    <div class="da-src">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score">准确性 9/10</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第二步 · 情绪周期</div>
-    <div class="da-line">情绪温度 89° → 阶段判定：<b class="da-cycle">分歧</b></div>
-    <div class="da-line">操作基调：高位分歧加大，控制仓位，低吸不追高</div>
-    <div class="da-src">数据源：由东财涨停/炸板/连板数据推导<span class="da-score">准确性 7/10（逻辑推演）</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第三步 · 主线识别</div>
-    <div class="da-sub">涨停题材分布</div>
-    <div class="da-line">• 通信设备：涨停 4 家 / 最高 2 板，领涨 共进股份</div><div class="da-line">• 汽车零部：涨停 3 家 / 最高 3 板，领涨 坤泰股份</div><div class="da-line">• 环境治理：涨停 3 家 / 最高 1 板，领涨 德创环保</div><div class="da-line">• 化学纤维：涨停 2 家 / 最高 3 板，领涨 华西股份</div>
-    <div class="da-line">连续 2-3 天上榜方向：蓝盾光电（5板）、华西股份（3板）、坤泰股份（3板）</div>
-    <div class="da-line">结构判断：龙头带队，有明确领涨梯队</div>
-    <div class="da-line">明日最可能机会方向（1-2个）：通信设备、汽车零部</div>
-    <div class="da-src">数据源：东方财富涨停池分类聚合<span class="da-score">准确性 8/10</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第四步 · 核心个股拆解（Top5 涨停）</div>
-    <div class="da-line"><b>华西股份（000936）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>坤泰股份（001260）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>澳洋健康（002172）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>华森制药（002907）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b>中石科技（300684）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>
-    <div class="da-src">数据源：东财涨停池 + 逻辑推演（启动/加速/分歧为推断，需结合K线人工验证）<span class="da-score">准确性 6/10</span></div>
-  </div><div class="da-block da-trade">
-    <div class="da-h">第五步 · 交易复盘</div>
-    <div class="da-line">待提供今日逐笔交易记录（股票、买点K线位置、买入理由、是否符合系统、卖出原因）后自动生成分析。</div>
-    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
-  </div><div class="da-block da-trade">
-    <div class="da-h">第六步 · 交易行为复盘</div>
-    <div class="da-line">待提供每笔交易数据后，分析追高/杀跌/持仓周期/情绪化交易等行为偏差与优化规则。</div>
-    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第七步 · 强势股共性模板</div>
-    <div class="da-line">当前市场最高连板 5 板。强势股共性：底部放量首板 → 缩量/换手连板加速 → 首次分歧不破位 → 承接有力再上攻。</div>
-    <div class="da-line">模板要点：① 首板看量能 ② 连板看换手 ③ 分歧看承接 ④ 只有承接验证通过的方向才值得次日跟进。</div>
-    <div class="da-src">数据源：逻辑推演（基于连板梯队）<span class="da-score">准确性 6/10</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第八步 · 主线资金复盘</div>
-    <div class="da-line">今日涨停题材分布：通信设备(4家)、汽车零部(3家)、环境治理(3家)、化学纤维(2家)、医疗服务(2家)、装修装饰(2家)</div>
-    <div class="da-line">重复上榜（连续2-3天）方向：蓝盾光电（5板）、华西股份（3板）、坤泰股份（3板）</div>
-    <div class="da-line">结构：龙头带队，处于高位加速</div>
-    <div class="da-line">明日最可能机会方向：通信设备、汽车零部</div>
-    <div class="da-line">明日基调：<b class="da-stance">收缩</b></div>
-    <div class="da-src">数据源：东方财富涨停池 + 板块统计<span class="da-score">准确性 8/10</span></div>
-  </div>
   </div>
 </div>
 <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>

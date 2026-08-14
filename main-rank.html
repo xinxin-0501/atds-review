@@ -44,6 +44,163 @@
 .modal-rating{display:flex;align-items:center;gap:6px;margin:8px 0}
 .modal-rating-stars{color:#c33;font-size:14px}
 .modal-rating-text{font-size:11px;color:#666}
+.watchlist-card{padding:14px 12px;margin:0}
+.wl-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:10px;border-bottom:1px solid #f0f0f0}
+.wl-title{font-size:13px;font-weight:700;color:#333}
+.wl-time{font-size:10px;color:#999;font-weight:400;margin-left:6px}
+.wl-time::before{content:'●';color:#c33;margin-right:3px}
+.wl-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.wl-search-input{font-size:11px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:14px;width:120px;outline:none;background:#fafafa}
+.wl-tool{font-size:10px;padding:4px 10px;border:1px solid #e0e0e0;border-radius:14px;background:#fff;color:#555;cursor:pointer;white-space:nowrap}
+.wl-tool-red{background:#c33;color:#fff;border-color:#c33}
+.wl-table{width:100%;border-collapse:collapse;font-size:10px}
+.wl-table th{background:#fafafa;padding:8px 4px;text-align:left;color:#666;font-weight:600;font-size:9px;white-space:nowrap;border-bottom:1px solid #eee}
+.wl-table td{padding:8px 4px;border-bottom:1px dashed #f5f5f5;vertical-align:middle}
+.wl-row{transition:background .2s}
+.wl-row:hover{background:#fafafa}
+.wl-cell{font-size:10px}
+.wl-cell-rank{display:flex;align-items:center;gap:6px}
+.rank-no{background:#f5f5f5;color:#666;border-radius:4px;padding:2px 6px;font-weight:600;font-size:10px;min-width:18px;text-align:center}
+.wl-name{font-weight:700;color:#333;font-size:11px;line-height:1.2}
+.wl-code{color:#888;font-size:9px;margin-top:2px}
+.wl-cell-price .price{font-weight:700;font-size:12px}
+.wl-cell-pct{font-weight:700;font-size:11px}
+.wl-cell-amt{color:#888;font-size:10px;white-space:nowrap}
+.wl-cell-atds{font-weight:700;color:#333;font-size:11px;text-align:center}
+.wl-cell-sig,.wl-cell-risk,.wl-cell-horizon,.wl-cell-advice{white-space:nowrap}
+.sig{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.sig-break{background:#fee;color:#c33}
+.sig-strong{background:#ffe8d6;color:#e85a3c}
+.sig-up{background:#fef0e8;color:#e85a3c}
+.sig-wait{background:#f5f5f5;color:#888}
+.sig-press{background:#fff7e6;color:#d49000}
+.sig-weak{background:#f0f5ff;color:#185FA5}
+.risk{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.risk-high{background:#fee;color:#c33}
+.risk-mid{background:#fff7e6;color:#d49000}
+.risk-low{background:#e8f5e9;color:#2e7d32}
+.horizon{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.horizon-short{background:#e3f2fd;color:#1565c0}
+.horizon-wave{background:#f3e5f5;color:#7b1fa2}
+.horizon-long{background:#e0f7fa;color:#00695c}
+.advice{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
+.advice-focus{background:#c33;color:#fff}
+.advice-hold{background:#f5f5f5;color:#555}
+.advice-wait{background:#fff7e6;color:#d49000}
+.advice-cut{background:#fee;color:#c33}
+.wl-cell-act{white-space:nowrap}
+.wl-btn{font-size:10px;padding:3px 8px;border:1px solid #e0e0e0;border-radius:4px;background:#fff;color:#555;cursor:pointer;margin-right:4px}
+.wl-btn-primary{background:#c33;color:#fff;border-color:#c33}
+.cell-lines{margin-top:4px;font-size:9px;line-height:1.4;color:#555}
+.cell-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.horizon-line{font-size:9px;line-height:1.4;color:#555;margin-bottom:2px}
+.horizon-line b{color:#7b1fa2;margin-right:3px;font-weight:600}
+.risk-tag,.horizon-tag,.advice-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;margin-bottom:2px}
+.risk-tag.risk-high{background:#fee;color:#c33}
+.risk-tag.risk-mid{background:#fff7e6;color:#d49000}
+.risk-tag.risk-low{background:#e8f5e9;color:#2e7d32}
+.horizon-tag.horizon-short{background:#e3f2fd;color:#1565c0}
+.horizon-tag.horizon-wave{background:#f3e5f5;color:#7b1fa2}
+.horizon-tag.horizon-long{background:#e0f7fa;color:#00695c}
+.advice-tag.advice-focus{background:#c33;color:#fff}
+.advice-tag.advice-hold{background:#f5f5f5;color:#555}
+.advice-tag.advice-wait{background:#fff7e6;color:#d49000}
+.advice-tag.advice-cut{background:#fee;color:#c33}
+.wl-cell-risk,.wl-cell-horizon,.wl-cell-advice{min-width:140px;max-width:160px}
+.cell-lines{margin-top:4px;font-size:9px;line-height:1.4;color:#555}
+.cell-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.horizon-line{font-size:9px;line-height:1.4;color:#555;margin-bottom:2px}
+.horizon-line b{color:#7b1fa2;margin-right:3px;font-weight:600}
+.risk-tag,.horizon-tag,.advice-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600;margin-bottom:2px}
+.risk-tag.risk-high{background:#fee;color:#c33}
+.risk-tag.risk-mid{background:#fff7e6;color:#d49000}
+.risk-tag.risk-low{background:#e8f5e9;color:#2e7d32}
+.horizon-tag.horizon-short{background:#e3f2fd;color:#1565c0}
+.horizon-tag.horizon-wave{background:#f3e5f5;color:#7b1fa2}
+.horizon-tag.horizon-long{background:#e0f7fa;color:#00695c}
+.advice-tag.advice-focus{background:#c33;color:#fff}
+.advice-tag.advice-hold{background:#f5f5f5;color:#555}
+.advice-tag.advice-wait{background:#fff7e6;color:#d49000}
+.advice-tag.advice-cut{background:#fee;color:#c33}
+.wl-cell-risk,.wl-cell-horizon,.wl-cell-advice{min-width:140px;max-width:160px}
+.wl-detail-row{background:#fafafa}
+.wl-detail-row td{padding:0 8px 10px 8px !important;border-bottom:1px solid #f0f0f0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 0 4px 0}
+@media (max-width:380px){.detail-grid{grid-template-columns:1fr}}
+.detail-block{background:#fff;border-radius:8px;padding:8px 10px;font-size:10px;color:#444;line-height:1.5;border:1px solid #f0f0f0}
+.detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.detail-line{font-size:9px;color:#555;line-height:1.5;margin-top:3px}
+.detail-line b{color:#7b1fa2;margin-right:4px;font-weight:600}
+.wl-detail-row{background:#fafafa}
+.wl-detail-row td{padding:0 8px 10px 8px !important;border-bottom:1px solid #f0f0f0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 0 4px 0}
+@media (max-width:380px){.detail-grid{grid-template-columns:1fr}}
+.detail-block{background:#fff;border-radius:8px;padding:8px 10px;font-size:10px;color:#444;line-height:1.5;border:1px solid #f0f0f0}
+.detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.detail-line{font-size:9px;color:#555;line-height:1.5;margin-top:3px}
+.detail-line b{color:#7b1fa2;margin-right:4px;font-weight:600}
+.da-card{padding:14px 12px}
+.da-note{font-size:10px;color:#888;margin-bottom:10px;line-height:1.5}
+.da-block{background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.da-h{font-size:12px;font-weight:700;color:#c33;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #eee}
+.da-sub{font-size:10px;color:#666;font-weight:600;margin:6px 0 4px}
+.da-line{font-size:10px;color:#444;line-height:1.6;margin-bottom:3px}
+.da-line b{color:#333}
+.da-cycle{color:#c33}
+.da-stance{color:#c33}
+.da-src{font-size:9px;color:#999;margin-top:6px;padding-top:4px;border-top:1px dashed #eee}
+.da-score{background:#fff7e6;color:#d49000;padding:1px 6px;border-radius:3px;font-weight:600;margin-left:4px}
+.da-trade{background:#fff;border-style:dashed}
+.da-card{padding:14px 12px}
+.da-note{font-size:10px;color:#888;margin-bottom:10px;line-height:1.5}
+.da-block{background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.da-h{font-size:12px;font-weight:700;color:#c33;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #eee}
+.da-sub{font-size:10px;color:#666;font-weight:600;margin:6px 0 4px}
+.da-line{font-size:10px;color:#444;line-height:1.6;margin-bottom:3px}
+.da-line b{color:#333}
+.da-cycle{color:#c33}
+.da-stance{color:#c33}
+.da-src{font-size:9px;color:#999;margin-top:6px;padding-top:4px;border-top:1px dashed #eee}
+.da-score{background:#fff7e6;color:#d49000;padding:1px 6px;border-radius:3px;font-weight:600;margin-left:4px}
+.da-trade{background:#fff;border-style:dashed}
+.gate-card{padding:14px 12px}
+.gate-note{font-size:10px;color:#666;background:#fff7e6;padding:6px 10px;border-radius:6px;margin-bottom:10px;border:1px solid #ffe6c2}
+.gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+@media (max-width:380px){.gate-grid{grid-template-columns:1fr}}
+.gate-block{background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:10px}
+.gate-h{font-size:10px;font-weight:700;color:#666;margin-bottom:4px}
+.gate-value{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:4px}
+.gate-value.ok{color:#2e7d32}
+.gate-value.red{color:#c33}
+.gate-th{font-size:9px;color:#999;margin-bottom:4px}
+.gate-diff{font-size:10px;font-weight:600}
+.gate-diff.ok{color:#2e7d32}
+.gate-diff.red{color:#c33}
+.gate-status{padding:12px 14px;border-radius:10px;text-align:center;font-size:13px;font-weight:700;margin-bottom:10px}
+.gate-open{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.gate-close{background:#fee;color:#c33;border:1px solid #fcc}
+.gate-status-label{font-size:11px;font-weight:500;color:inherit}
+.gate-status-text{font-size:13px}
+.gate-src{font-size:9px;color:#999;line-height:1.4}
+.gate-card{padding:14px 12px}
+.gate-note{font-size:10px;color:#666;background:#fff7e6;padding:6px 10px;border-radius:6px;margin-bottom:10px;border:1px solid #ffe6c2}
+.gate-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+@media (max-width:380px){.gate-grid{grid-template-columns:1fr}}
+.gate-block{background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:10px}
+.gate-h{font-size:10px;font-weight:700;color:#666;margin-bottom:4px}
+.gate-value{font-size:22px;font-weight:800;line-height:1.2;margin-bottom:4px}
+.gate-value.ok{color:#2e7d32}
+.gate-value.red{color:#c33}
+.gate-th{font-size:9px;color:#999;margin-bottom:4px}
+.gate-diff{font-size:10px;font-weight:600}
+.gate-diff.ok{color:#2e7d32}
+.gate-diff.red{color:#c33}
+.gate-status{padding:12px 14px;border-radius:10px;text-align:center;font-size:13px;font-weight:700;margin-bottom:10px}
+.gate-open{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.gate-close{background:#fee;color:#c33;border:1px solid #fcc}
+.gate-status-label{font-size:11px;font-weight:500;color:inherit}
+.gate-status-text{font-size:13px}
+.gate-src{font-size:9px;color:#999;line-height:1.4}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -138,6 +295,16 @@
 .intl-style-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:6px}
 .intl-style-body{font-size:11px;color:#333;line-height:1.5}
 .intl-missing{font-size:10px;color:#999;line-height:1.5;padding:8px 10px;background:#fafafa;border-radius:8px}
+.intl-detail{margin-top:10px;background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.intl-detail-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:4px}
+.intl-detail-asof{font-size:10px;color:#999;margin-bottom:8px;line-height:1.4}
+.intl-detail-table{width:100%;border-collapse:collapse;font-size:11px}
+.intl-detail-table th{background:#f6f8fb;color:#666;font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid #eee;font-size:10px}
+.intl-detail-table td{padding:6px 8px;border-bottom:1px solid #f5f5f5;color:#333;vertical-align:top}
+.intl-group-row td{background:#fafcff;color:#185FA5;font-weight:700;font-size:11px;padding:8px 8px 4px}
+.intl-dt-time{font-size:10px;color:#999}
+.intl-dt-src{font-size:10px;color:#999}
+.intl-dt-note{font-size:10px;color:#666;line-height:1.5;background:#fafcff}
 /* Hero 头部区 */
 .hero{background:linear-gradient(135deg,#fff8f5 0%,#fef3ed 50%,#fff 100%);padding:18px 16px 16px;border-radius:0 0 14px 14px;margin-bottom:8px;border-bottom:1px solid #f5e6dc}
 .hero-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
@@ -354,64 +521,64 @@
     <div class="card-title">全部方向实时强度排名 · 前 10 名</div>
     <table class="table"><thead><tr><th>#</th><th>主线</th><th>涨幅</th><th>涨停数</th><th>领涨</th></tr></thead><tbody><tr>
       <td>1</td>
-      <td>电子化学</td>
-      <td class="up">+20.01%</td>
-      <td>1家 / 1板</td>
-      <td>中石科技</td>
+      <td>稀土</td>
+      <td class="up">+5.82%</td>
+      <td>--</td>
+      <td>--</td>
     </tr><tr>
       <td>2</td>
-      <td>轨交设备</td>
-      <td class="up">+20.01%</td>
-      <td>1家 / 1板</td>
-      <td>九州一轨</td>
+      <td>通信线缆及配套</td>
+      <td class="up">+5.33%</td>
+      <td>--</td>
+      <td>--</td>
     </tr><tr>
       <td>3</td>
-      <td>半导体</td>
-      <td class="up">+20.01%</td>
-      <td>1家 / 1板</td>
-      <td>敏芯股份</td>
+      <td>激光设备</td>
+      <td class="up">+4.44%</td>
+      <td>--</td>
+      <td>--</td>
     </tr><tr>
       <td>4</td>
-      <td>通用设备</td>
-      <td class="up">+19.99%</td>
-      <td>1家 / 5板</td>
-      <td>蓝盾光电</td>
+      <td>电子化学品Ⅲ</td>
+      <td class="up">+3.75%</td>
+      <td>--</td>
+      <td>--</td>
     </tr><tr>
       <td>5</td>
-      <td>其他电子</td>
-      <td class="up">+15.00%</td>
-      <td>2家 / 1板</td>
-      <td>富信科技</td>
+      <td>电子化学品Ⅱ</td>
+      <td class="up">+3.75%</td>
+      <td>--</td>
+      <td>--</td>
     </tr><tr>
       <td>6</td>
-      <td>化学制药</td>
-      <td class="up">+14.97%</td>
-      <td>2家 / 2板</td>
-      <td>神奇制药</td>
-    </tr><tr>
-      <td>7</td>
-      <td>医疗服务</td>
-      <td class="up">+14.97%</td>
-      <td>2家 / 3板</td>
-      <td>澳洋健康</td>
-    </tr><tr>
-      <td>8</td>
-      <td>环境治理</td>
-      <td class="up">+13.32%</td>
-      <td>3家 / 1板</td>
-      <td>德创环保</td>
-    </tr><tr>
-      <td>9</td>
       <td>通信设备</td>
-      <td class="up">+12.50%</td>
+      <td class="up">+2.37%</td>
       <td>4家 / 2板</td>
       <td>共进股份</td>
     </tr><tr>
+      <td>7</td>
+      <td>非金属材料Ⅲ</td>
+      <td class="up">+3.61%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>8</td>
+      <td>非金属材料Ⅱ</td>
+      <td class="up">+3.61%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
+      <td>9</td>
+      <td>玻纤制造</td>
+      <td class="up">+3.52%</td>
+      <td>--</td>
+      <td>--</td>
+    </tr><tr>
       <td>10</td>
-      <td>汽车零部</td>
-      <td class="up">+10.02%</td>
-      <td>3家 / 3板</td>
-      <td>坤泰股份</td>
+      <td>被动元件</td>
+      <td class="up">+3.40%</td>
+      <td>--</td>
+      <td>--</td>
     </tr></tbody></table>
   </div>
 </div>
