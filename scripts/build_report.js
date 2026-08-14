@@ -1101,7 +1101,7 @@ function build() {
     const m = report.meta;
     const sameDay = byDate[m.date] || {};
     const nav = {
-      home: '../index.html',
+      home: 'index.html',
       midday: stripReviews(sameDay.midday) || latestOfType('midday') || '../index.html',
       close: stripReviews(sameDay.close) || latestOfType('close') || '../index.html',
       latest: stripReviews(latest)
