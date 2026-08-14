@@ -1,0 +1,575 @@
+{
+  "meta": {
+    "date": "2026-08-13",
+    "time": "15:20",
+    "type": "close",
+    "typeLabel": "收盘复盘",
+    "generatedAt": "2026-08-13 21:16:24",
+    "market": "A股",
+    "dataSource": "通达信 tdx-connector",
+    "dataAsOfDate": "2026-08-13",
+    "dataAsOfLabel": "今日收盘"
+  },
+  "indices": [
+    {
+      "name": "上证指数",
+      "code": "000001",
+      "price": 3926.96,
+      "changePct": -0.5
+    },
+    {
+      "name": "深证成指",
+      "code": "399001",
+      "price": 14289.44,
+      "changePct": -0.87
+    },
+    {
+      "name": "创业板指",
+      "code": "399006",
+      "price": 3586.04,
+      "changePct": -0.45
+    }
+  ],
+  "marketStats": {
+    "upCount": 1142,
+    "downCount": 4317,
+    "flatCount": 80,
+    "limitUpCount": 62,
+    "limitDownCount": 4,
+    "zhaBanCount": 40,
+    "maxLianBan": 5,
+    "maxLianBanStock": "秦安股份",
+    "totalAmount": "2.55万亿"
+  },
+  "hotSectors": [
+    {
+      "rank": 1,
+      "name": "创新药/医药",
+      "changePct": 10.19,
+      "limitUpCount": 15,
+      "leadStock": "亚泰集团"
+    },
+    {
+      "rank": 2,
+      "name": "算力/数据中心",
+      "changePct": 10.04,
+      "limitUpCount": 13,
+      "leadStock": "城地香江"
+    },
+    {
+      "rank": 3,
+      "name": "人工智能",
+      "changePct": 9.99,
+      "limitUpCount": 11,
+      "leadStock": "移远通信"
+    },
+    {
+      "rank": 4,
+      "name": "人形机器人",
+      "changePct": 10.04,
+      "limitUpCount": 9,
+      "leadStock": "秦安股份"
+    },
+    {
+      "rank": 5,
+      "name": "电力/绿电",
+      "changePct": 10.02,
+      "limitUpCount": 7,
+      "leadStock": "大唐发电"
+    },
+    {
+      "rank": 6,
+      "name": "汽车零部件",
+      "changePct": 9.99,
+      "limitUpCount": 4,
+      "leadStock": "坤泰股份"
+    },
+    {
+      "rank": 7,
+      "name": "房地产开发",
+      "changePct": 10.04,
+      "limitUpCount": 2,
+      "leadStock": "京投发展"
+    },
+    {
+      "rank": 8,
+      "name": "影视院线",
+      "changePct": 10.02,
+      "limitUpCount": 1,
+      "leadStock": "北京文化"
+    }
+  ],
+  "limitUp": [
+    {
+      "rank": 1,
+      "code": "300862",
+      "name": "蓝盾光电",
+      "price": 39.41,
+      "pct": 20.01,
+      "lianban": 4,
+      "boardInfo": "4天4板",
+      "reason": "光通信/环境监测",
+      "sealAmount": "10.38",
+      "kaiban": 0
+    },
+    {
+      "rank": 2,
+      "code": "601991",
+      "name": "大唐发电",
+      "price": 6.92,
+      "pct": 10.02,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "电力/绿电",
+      "sealAmount": "3.77",
+      "kaiban": 0
+    },
+    {
+      "rank": 3,
+      "code": "000887",
+      "name": "中鼎股份",
+      "price": 23.69,
+      "pct": 9.98,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "人形机器人/数据中心",
+      "sealAmount": "3.59",
+      "kaiban": 1
+    },
+    {
+      "rank": 4,
+      "code": "603236",
+      "name": "移远通信",
+      "price": 59.43,
+      "pct": 9.99,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "人工智能/机器人概念",
+      "sealAmount": "3.35",
+      "kaiban": 0
+    },
+    {
+      "rank": 5,
+      "code": "002081",
+      "name": "金螳螂",
+      "price": 4.81,
+      "pct": 10.07,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "装修装饰/芯片",
+      "sealAmount": "3.15",
+      "kaiban": 0
+    },
+    {
+      "rank": 6,
+      "code": "001260",
+      "name": "坤泰股份",
+      "price": 21.03,
+      "pct": 9.99,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "汽车零部件",
+      "sealAmount": "2.92",
+      "kaiban": 0
+    },
+    {
+      "rank": 7,
+      "code": "603887",
+      "name": "城地香江",
+      "price": 12.49,
+      "pct": 10.04,
+      "lianban": 3,
+      "boardInfo": "3天3板",
+      "reason": "算力租赁/云服务/华为概念",
+      "sealAmount": "2.71",
+      "kaiban": 0
+    },
+    {
+      "rank": 8,
+      "code": "300333",
+      "name": "兆日科技",
+      "price": 10.64,
+      "pct": 19.95,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "芯片/IT设备",
+      "sealAmount": "1.82",
+      "kaiban": 0
+    },
+    {
+      "rank": 9,
+      "code": "603758",
+      "name": "秦安股份",
+      "price": 15.35,
+      "pct": 10.04,
+      "lianban": 5,
+      "boardInfo": "5天5板",
+      "reason": "人形机器人/汽车零部件",
+      "sealAmount": "1.79",
+      "kaiban": 0
+    },
+    {
+      "rank": 10,
+      "code": "000802",
+      "name": "北京文化",
+      "price": 6.26,
+      "pct": 10.02,
+      "lianban": 4,
+      "boardInfo": "4天4板",
+      "reason": "影视院线",
+      "sealAmount": "1.68",
+      "kaiban": 1
+    },
+    {
+      "rank": 11,
+      "code": "600683",
+      "name": "京投发展",
+      "price": 12.93,
+      "pct": 10.04,
+      "lianban": 4,
+      "boardInfo": "4天4板",
+      "reason": "房地产开发/国企改革",
+      "sealAmount": "1.64",
+      "kaiban": 0
+    },
+    {
+      "rank": 12,
+      "code": "002174",
+      "name": "游族网络",
+      "price": 13.38,
+      "pct": 10.03,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "人工智能/华为概念",
+      "sealAmount": "1.57",
+      "kaiban": 0
+    },
+    {
+      "rank": 13,
+      "code": "000936",
+      "name": "华西股份",
+      "price": 6.34,
+      "pct": 10.07,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "芯片/光通信",
+      "sealAmount": "1.29",
+      "kaiban": 0
+    },
+    {
+      "rank": 14,
+      "code": "002575",
+      "name": "群兴玩具",
+      "price": 6.08,
+      "pct": 9.95,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "算力租赁",
+      "sealAmount": "1.19",
+      "kaiban": 0
+    },
+    {
+      "rank": 15,
+      "code": "600726",
+      "name": "华电能源",
+      "price": 6.8,
+      "pct": 10.03,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "电力/国企改革",
+      "sealAmount": "1.19",
+      "kaiban": 1
+    }
+  ],
+  "limitDown": [
+    {
+      "rank": 1,
+      "code": "603990",
+      "name": "麦迪科技",
+      "price": 22.26,
+      "pct": -9.99
+    },
+    {
+      "rank": 2,
+      "code": "003032",
+      "name": "传智教育",
+      "price": 11.62,
+      "pct": -9.99
+    },
+    {
+      "rank": 3,
+      "code": "002827",
+      "name": "高争民爆",
+      "price": 55.1,
+      "pct": -10.0
+    },
+    {
+      "rank": 4,
+      "code": "000779",
+      "name": "甘咨询",
+      "price": 10.73,
+      "pct": -9.98
+    }
+  ],
+  "watchlist": [
+    {
+      "code": "600487",
+      "name": "亨通光电",
+      "price": 57.25,
+      "pct": -3.46,
+      "amount": "128.5亿",
+      "turnover": "8.82"
+    },
+    {
+      "code": "600392",
+      "name": "盛和资源",
+      "price": 22.85,
+      "pct": -3.63,
+      "amount": "18.2亿",
+      "turnover": "4.44"
+    },
+    {
+      "code": "300285",
+      "name": "国瓷材料",
+      "price": 70.66,
+      "pct": -4.51,
+      "amount": "108.0亿",
+      "turnover": "17.24"
+    },
+    {
+      "code": "300308",
+      "name": "中际旭创",
+      "price": 921.04,
+      "pct": 0.0,
+      "amount": "277.5亿",
+      "turnover": "2.64"
+    },
+    {
+      "code": "603538",
+      "name": "美诺华",
+      "price": 32.57,
+      "pct": -2.28,
+      "amount": "38.1亿",
+      "turnover": "33.72"
+    },
+    {
+      "code": "300342",
+      "name": "天银机电",
+      "price": 36.81,
+      "pct": -0.49,
+      "amount": "6.0亿",
+      "turnover": "3.84"
+    },
+    {
+      "code": "300607",
+      "name": "拓斯达",
+      "price": 34.39,
+      "pct": 1.39,
+      "amount": "13.9亿",
+      "turnover": "11.8"
+    }
+  ],
+  "mainRank": [
+    {
+      "rank": 1,
+      "name": "创新药/医药",
+      "mappedName": "创新药/医药",
+      "changePct": 10.19,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "15家 / 3板",
+      "leadStock": "亚泰集团",
+      "newsAdjust": "+1",
+      "atds": 96,
+      "status": "主线确认"
+    },
+    {
+      "rank": 2,
+      "name": "算力/数据中心",
+      "mappedName": "算力/数据中心",
+      "changePct": 10.04,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "13家 / 3板",
+      "leadStock": "城地香江",
+      "newsAdjust": "+1",
+      "atds": 96,
+      "status": "主线确认"
+    },
+    {
+      "rank": 3,
+      "name": "人工智能",
+      "mappedName": "人工智能",
+      "changePct": 9.99,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "11家 / 1板",
+      "leadStock": "移远通信",
+      "newsAdjust": "+1",
+      "atds": 96,
+      "status": "主线确认"
+    },
+    {
+      "rank": 4,
+      "name": "人形机器人",
+      "mappedName": "人形机器人",
+      "changePct": 10.04,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "9家 / 5板",
+      "leadStock": "秦安股份",
+      "newsAdjust": "+1",
+      "atds": 96,
+      "status": "主线确认"
+    },
+    {
+      "rank": 5,
+      "name": "电力/绿电",
+      "mappedName": "电力/绿电",
+      "changePct": 10.02,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "7家 / 2板",
+      "leadStock": "大唐发电",
+      "newsAdjust": "0",
+      "atds": 84,
+      "status": "关注"
+    },
+    {
+      "rank": 6,
+      "name": "汽车零部件",
+      "mappedName": "汽车零部件",
+      "changePct": 9.99,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "4家 / 5板",
+      "leadStock": "坤泰股份",
+      "newsAdjust": "0",
+      "atds": 84,
+      "status": "关注"
+    },
+    {
+      "rank": 7,
+      "name": "房地产开发",
+      "mappedName": "房地产开发",
+      "changePct": 10.04,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "2家 / 4板",
+      "leadStock": "京投发展",
+      "newsAdjust": "0",
+      "atds": 84,
+      "status": "关注"
+    },
+    {
+      "rank": 8,
+      "name": "影视院线",
+      "mappedName": "影视院线",
+      "changePct": 10.02,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "1家 / 4板",
+      "leadStock": "北京文化",
+      "newsAdjust": "0",
+      "atds": 84,
+      "status": "关注"
+    }
+  ],
+  "closeEmotion": {
+    "tempScore": 45,
+    "stage": "退潮期",
+    "tone": "偏冷",
+    "fact": "指数普跌、红盘率20.6%、炸板率39%",
+    "redRate": 20.6,
+    "ztTotal": 62,
+    "limitBoardRate": 60.8,
+    "maxLB": 5,
+    "promotionRate": "--",
+    "upCount": 1142,
+    "downCount": 4317,
+    "flatCount": 80,
+    "mainLines": [
+      { "name": "创新药", "changePct": "10.19" },
+      { "name": "算力/数据中心", "changePct": "10.04" },
+      { "name": "人形机器人", "changePct": "10.04" }
+    ],
+    "moneyInflow": [],
+    "ladder": [
+      { "lianban": "5", "lead": "秦安股份" },
+      { "lianban": "4", "lead": "蓝盾光电" },
+      { "lianban": "3", "lead": "城地香江" },
+      { "lianban": "2", "lead": "中鼎股份" }
+    ]
+  },
+  "playbook": {
+    "offense": [
+      {
+        "name": "创新药/医药",
+        "count": 15,
+        "maxLB": 3,
+        "leadStock": "亚泰集团",
+        "logic": "1-7月创新药BD交易总额达1063亿美元催化，板块涨停家数居首",
+        "scenario": "产业催化延续"
+      },
+      {
+        "name": "算力/数据中心",
+        "count": 13,
+        "maxLB": 3,
+        "leadStock": "城地香江",
+        "logic": "腾讯资本开支超预期、美股算力租赁Nebius暴涨，算力租赁与IDC共振",
+        "scenario": "AI算力景气上行"
+      }
+    ],
+    "defense": [
+      {
+        "name": "电力/绿电",
+        "count": 7,
+        "maxLB": 2,
+        "leadStock": "大唐发电",
+        "logic": "全国用电负荷创历史新高，电力板块防御属性+旺季景气",
+        "scenario": "高温用电旺季"
+      },
+      {
+        "name": "消费/食品",
+        "count": 5,
+        "maxLB": 4,
+        "leadStock": "一鸣食品",
+        "logic": "CPI同比+0.5%回升，消费复苏预期升温",
+        "scenario": "CPI温和回升"
+      }
+    ],
+    "themes": [
+      {
+        "name": "人形机器人",
+        "stocks": ["秦安股份", "中鼎股份", "移远通信", "风语筑"]
+      }
+    ],
+    "pitfall": [
+      {
+        "name": "高位连板股",
+        "count": 1,
+        "maxLB": 5,
+        "leadStock": "秦安股份",
+        "logic": "市场普跌、炸板率39%，5板高度接力风险上升",
+        "scenario": "情绪退潮期"
+      },
+      {
+        "name": "ST/微盘股",
+        "count": 2,
+        "maxLB": 2,
+        "leadStock": "ST龙元",
+        "logic": "跌停4家集中于高位题材股，ST股封单偏弱",
+        "scenario": "退市风险"
+      }
+    ]
+  },
+  "intlMkt": {},
+  "dragonPool": {
+    "todayDate": "20260813",
+    "todayTotal": 62,
+    "zhaBanCount": 40,
+    "maxLianBan": 5,
+    "strongestSector": "创新药/医药",
+    "strongestSectorCount": 15
+  }
+}

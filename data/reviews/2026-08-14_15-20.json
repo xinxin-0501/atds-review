@@ -1,0 +1,470 @@
+{
+  "meta": {
+    "date": "2026-08-14",
+    "time": "15:20",
+    "type": "close",
+    "typeLabel": "收盘复盘",
+    "generatedAt": "2026-08-14 18:31:37",
+    "market": "A股",
+    "dataSource": "通达信（tdx-connector）",
+    "dataAsOfDate": "2026-08-14",
+    "dataAsOfLabel": "今日收盘"
+  },
+  "indices": [
+    {
+      "name": "上证指数",
+      "code": "000001",
+      "price": 3927.18,
+      "changePct": 0.01
+    },
+    {
+      "name": "深证成指",
+      "code": "399001",
+      "price": 14354.31,
+      "changePct": 0.45
+    },
+    {
+      "name": "创业板指",
+      "code": "399006",
+      "price": 3626.30,
+      "changePct": 1.12
+    }
+  ],
+  "marketStats": {
+    "upCount": 2400,
+    "downCount": 2970,
+    "flatCount": 172,
+    "limitUpCount": 64,
+    "limitDownCount": 10,
+    "zhaBanCount": 21,
+    "maxLianBan": 5,
+    "maxLianBanStock": "蓝盾光电",
+    "totalAmount": "2.14万亿"
+  },
+  "hotSectors": [
+    {
+      "rank": 1,
+      "name": "光通信/CPO",
+      "changePct": 20.01,
+      "limitUpCount": 14,
+      "leadStock": "中石科技"
+    },
+    {
+      "rank": 2,
+      "name": "机器人",
+      "changePct": 10.06,
+      "limitUpCount": 13,
+      "leadStock": "艾华集团"
+    },
+    {
+      "rank": 3,
+      "name": "创新药",
+      "changePct": 20.0,
+      "limitUpCount": 9,
+      "leadStock": "博济医药"
+    },
+    {
+      "rank": 4,
+      "name": "算力租赁",
+      "changePct": 20.01,
+      "limitUpCount": 6,
+      "leadStock": "网宿科技"
+    },
+    {
+      "rank": 5,
+      "name": "存储芯片",
+      "changePct": 20.01,
+      "limitUpCount": 5,
+      "leadStock": "敏芯股份"
+    },
+    {
+      "rank": 6,
+      "name": "稀土永磁",
+      "changePct": 10.0,
+      "limitUpCount": 2,
+      "leadStock": "中国稀土"
+    }
+  ],
+  "limitUp": [
+    {
+      "rank": 1,
+      "code": "300684",
+      "name": "中石科技",
+      "price": 67.36,
+      "pct": 20.01,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "CPO概念.储能.华为概念",
+      "sealAmount": "10.43",
+      "kaiban": 0
+    },
+    {
+      "rank": 2,
+      "code": "600487",
+      "name": "亨通光电",
+      "price": 62.98,
+      "pct": 10.01,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "CPO概念.非周期股",
+      "sealAmount": "8.44",
+      "kaiban": 1
+    },
+    {
+      "rank": 3,
+      "code": "603186",
+      "name": "华正新材",
+      "price": 167.55,
+      "pct": 10.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "芯片.储能.元器件",
+      "sealAmount": "3.82",
+      "kaiban": 0
+    },
+    {
+      "rank": 4,
+      "code": "001260",
+      "name": "坤泰股份",
+      "price": 23.13,
+      "pct": 9.99,
+      "lianban": 3,
+      "boardInfo": "3天3板",
+      "reason": "汽车零部件",
+      "sealAmount": "3.37",
+      "kaiban": 0
+    },
+    {
+      "rank": 5,
+      "code": "603083",
+      "name": "剑桥科技",
+      "price": 185.9,
+      "pct": 10.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "CPO概念.非周期股",
+      "sealAmount": "3.08",
+      "kaiban": 1
+    },
+    {
+      "rank": 6,
+      "code": "603629",
+      "name": "利通电子",
+      "price": 137.5,
+      "pct": 10.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "算力租赁.绩优股",
+      "sealAmount": "3.04",
+      "kaiban": 1
+    },
+    {
+      "rank": 7,
+      "code": "300017",
+      "name": "网宿科技",
+      "price": 17.33,
+      "pct": 20.01,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "算力租赁.非周期股",
+      "sealAmount": "2.59",
+      "kaiban": 0
+    },
+    {
+      "rank": 8,
+      "code": "600353",
+      "name": "旭光电子",
+      "price": 31.03,
+      "pct": 10.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "CPO概念.芯片.华为概念",
+      "sealAmount": "2.25",
+      "kaiban": 0
+    },
+    {
+      "rank": 9,
+      "code": "603881",
+      "name": "数据港",
+      "price": 29.04,
+      "pct": 10.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "云服务.液冷服务器",
+      "sealAmount": "2.19",
+      "kaiban": 0
+    },
+    {
+      "rank": 10,
+      "code": "600186",
+      "name": "莲花控股",
+      "price": 12.02,
+      "pct": 9.97,
+      "lianban": 1,
+      "boardInfo": "9天3板",
+      "reason": "算力租赁.新零售",
+      "sealAmount": "1.99",
+      "kaiban": 2
+    },
+    {
+      "rank": 11,
+      "code": "603989",
+      "name": "艾华集团",
+      "price": 32.99,
+      "pct": 10.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "储能.元器件.机器人概念",
+      "sealAmount": "1.82",
+      "kaiban": 4
+    },
+    {
+      "rank": 12,
+      "code": "301419",
+      "name": "阿莱德",
+      "price": 37.62,
+      "pct": 20.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "存储芯片.CPO概念",
+      "sealAmount": "1.66",
+      "kaiban": 0
+    },
+    {
+      "rank": 13,
+      "code": "003031",
+      "name": "中瓷电子",
+      "price": 130.08,
+      "pct": 10.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "CPO概念.无人机",
+      "sealAmount": "1.62",
+      "kaiban": 0
+    },
+    {
+      "rank": 14,
+      "code": "603618",
+      "name": "杭电股份",
+      "price": 29.87,
+      "pct": 10.02,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "电网设备.储能",
+      "sealAmount": "1.52",
+      "kaiban": 3
+    },
+    {
+      "rank": 15,
+      "code": "600613",
+      "name": "神奇制药",
+      "price": 6.41,
+      "pct": 9.95,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "中药.活跃小盘非融",
+      "sealAmount": "1.49",
+      "kaiban": 0
+    }
+  ],
+  "limitDown": [
+    {
+      "rank": 1,
+      "code": "603758",
+      "name": "秦安股份",
+      "price": 13.82,
+      "pct": -9.97,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "人形机器人.传感器",
+      "sealAmount": "1.82",
+      "kaiban": 0
+    },
+    {
+      "rank": 2,
+      "code": "002400",
+      "name": "省广集团",
+      "price": 7.16,
+      "pct": -9.94,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "AI营销.人工智能.国企改革",
+      "sealAmount": "1.50",
+      "kaiban": 3
+    },
+    {
+      "rank": 3,
+      "code": "002047",
+      "name": "宝鹰股份",
+      "price": 3.78,
+      "pct": -10.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "昨日断板.装修装饰",
+      "sealAmount": "0.67",
+      "kaiban": 1
+    },
+    {
+      "rank": 4,
+      "code": "600936",
+      "name": "北投科技",
+      "price": 5.36,
+      "pct": -10.07,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "机器人概念.软件服务",
+      "sealAmount": "0.41",
+      "kaiban": 13
+    },
+    {
+      "rank": 5,
+      "code": "000593",
+      "name": "德龙汇能",
+      "price": 25.02,
+      "pct": -10.0,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "储能.燃气",
+      "sealAmount": "0.28",
+      "kaiban": 30
+    }
+  ],
+  "watchlist": [
+    {
+      "code": "600487",
+      "name": "亨通光电",
+      "price": 62.98,
+      "pct": 10.01,
+      "amount": "192.0亿",
+      "turnover": "12.97"
+    },
+    {
+      "code": "600392",
+      "name": "盛和资源",
+      "price": 23.9,
+      "pct": 4.6,
+      "amount": "22.6亿",
+      "turnover": "5.46"
+    },
+    {
+      "code": "300285",
+      "name": "国瓷材料",
+      "price": 70.96,
+      "pct": 0.42,
+      "amount": "69.7亿",
+      "turnover": "11.50"
+    },
+    {
+      "code": "300308",
+      "name": "中际旭创",
+      "price": 943.0,
+      "pct": 2.38,
+      "amount": "186.9亿",
+      "turnover": "1.80"
+    },
+    {
+      "code": "603538",
+      "name": "美诺华",
+      "price": 30.21,
+      "pct": -7.25,
+      "amount": "25.0亿",
+      "turnover": "24.38"
+    },
+    {
+      "code": "300342",
+      "name": "天银机电",
+      "price": 37.25,
+      "pct": 1.2,
+      "amount": "4.8亿",
+      "turnover": "3.12"
+    },
+    {
+      "code": "300607",
+      "name": "拓斯达",
+      "price": 35.7,
+      "pct": 3.81,
+      "amount": "13.2亿",
+      "turnover": "11.18"
+    }
+  ],
+  "mainRank": [
+    {
+      "rank": 1,
+      "name": "光通信/CPO",
+      "mappedName": "光通信/CPO",
+      "changePct": 20.01,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "14家 / 5板",
+      "leadStock": "蓝盾光电",
+      "newsAdjust": "+1",
+      "atds": 96,
+      "status": "主线确认"
+    },
+    {
+      "rank": 2,
+      "name": "机器人",
+      "mappedName": "机器人",
+      "changePct": 10.06,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "13家 / 3板",
+      "leadStock": "坤泰股份",
+      "newsAdjust": "+1",
+      "atds": 96,
+      "status": "主线确认"
+    },
+    {
+      "rank": 3,
+      "name": "创新药",
+      "mappedName": "创新药",
+      "changePct": 20.0,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "9家 / 3板",
+      "leadStock": "博济医药",
+      "newsAdjust": "+1",
+      "atds": 96,
+      "status": "主线确认"
+    },
+    {
+      "rank": 4,
+      "name": "算力租赁",
+      "mappedName": "算力租赁",
+      "changePct": 20.01,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "6家 / 3板",
+      "leadStock": "网宿科技",
+      "newsAdjust": "+1",
+      "atds": 96,
+      "status": "主线确认"
+    },
+    {
+      "rank": 5,
+      "name": "存储芯片",
+      "mappedName": "存储芯片",
+      "changePct": 20.01,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "5家 / 1板",
+      "leadStock": "敏芯股份",
+      "newsAdjust": "0",
+      "atds": 84,
+      "status": "关注"
+    },
+    {
+      "rank": 6,
+      "name": "稀土永磁",
+      "mappedName": "稀土永磁",
+      "changePct": 10.0,
+      "upDown": "-- / --",
+      "inflowYi": "--",
+      "limitUpMax": "2家 / 1板",
+      "leadStock": "中国稀土",
+      "newsAdjust": "0",
+      "atds": 84,
+      "status": "关注"
+    }
+  ]
+}
