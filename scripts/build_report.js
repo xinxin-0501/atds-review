@@ -570,8 +570,15 @@ function renderDataAnalysis(report) {
   const hotLines = ce.mainLines || [];
   let m3line = '';
   if (sectors.length) {
-    m3line = sectors.slice(0, 4).map(s =>
-      `<div class="da-line">• ${esc(s.name)}：涨停 ${s.count} 家 / 最高 ${s.maxLB} 板，领涨 ${esc(s.leadStock || '--')}</div>`).join('');
+    m3line = sectors.slice(0, 4).map(s => {
+      const lead = s.leadStock || '--';
+      const match = limitUpList.find(x => x.name === lead);
+      const code = match ? match.code : '';
+      const leadHtml = code
+        ? `<a class="da-stock" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">${esc(lead)}</a>`
+        : esc(lead);
+      return `<div class="da-line">• ${esc(s.name)}：涨停 ${s.count} 家 / 最高 ${s.maxLB} 板，领涨 ${leadHtml}</div>`;
+    }).join('');
   } else {
     m3line = '<div class="da-line">暂无板块聚合数据（东财接口未返回）</div>';
   }
@@ -596,7 +603,8 @@ function renderDataAnalysis(report) {
       const lb = s.lianban || 1;
       const start = lb >= 2 ? '首板放量启动，随后连续晋级' : '今日首板放量启动，观察次日承接';
       const accel = lb >= 4 ? `高位连板(${lb}板)，换手充分，筹码快速交换` : lb >= 2 ? `连板 ${lb} 天，缩量加速为主` : '首板放量，加速待验证';
-      return `<div class="da-line"><b>${esc(s.name)}（${s.code}）${lb}板</b>：${start}；${accel}；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>`;
+      const nameHtml = `<a class="da-stock" data-code="${esc(s.code)}" onclick="openStockResearch(this.dataset.code)">${esc(s.name)}</a>`;
+      return `<div class="da-line"><b>${nameHtml}（${s.code}）${lb}板</b>：${start}；${accel}；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>`;
     }).join('');
   } else {
     m4lines = '<div class="da-line">暂无涨停个股数据</div>';

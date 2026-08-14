@@ -5,7 +5,44 @@ function showQr(){var u=getBaseUrl();document.getElementById("qr-mask").style.di
 function hideQr(){document.getElementById("qr-mask").style.display="none";}
 function showResearch(code){var m=document.getElementById("modal-"+code);if(m){m.classList.add("show");document.body.style.overflow="hidden";}}
 function closeModal(code){var m=document.getElementById("modal-"+code);if(m){m.classList.remove("show");document.body.style.overflow="";}}
-async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}var c0=raw.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}try{var res=await fetch("https://qt.gtimg.cn/q="+sc+raw);var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);var m=text.match(/="([^"]+)"/);if(!m){alert("未找到股票代码 "+raw);return;}var f=m[1].split("~");if(f.length<40){alert("数据解析失败，请重试");return;}var retCode=String(f[2]||"").trim();if(retCode!==raw){alert("代码 "+raw+" 与返回结果 "+retCode+" 不匹配，请检查输入");return;}var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};if(!data.name){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
+async function fetchStockData(raw){
+  if(!/^\d{6}$/.test(String(raw)))return null;
+  var c0=String(raw).charAt(0);var sc;
+  if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
+  try{
+    var res=await fetch("https://qt.gtimg.cn/q="+sc+raw);
+    var buf=await res.arrayBuffer();
+    var text=new TextDecoder("gbk").decode(buf);
+    var m=text.match(/="([^"]+)"/);if(!m)return null;
+    var f=m[1].split("~");if(f.length<40)return null;
+    var retCode=String(f[2]||"").trim();
+    if(retCode!==String(raw))return null;
+    var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
+    if(!data.name)return null;
+    return data;
+  }catch(e){return null;}
+}
+async function openStockResearch(code){
+  code=String(code||"").trim();
+  if(document.getElementById("modal-"+code)){showResearch(code);return;}
+  var data=await fetchStockData(code);
+  if(!data){alert("未找到股票代码 "+code);return;}
+  showDynamicResearch(data);
+  var atds=70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
+  if(atds>=85 && !document.querySelector('.wl-row[data-code="'+code+'"]')){addToWatchlistUI(data);saveWatchlist();setTimeout(function(){var el=document.querySelector('.wl-row[data-code="'+code+'"]');if(el)el.style.background="#e8f5e9";},50);}
+}
+async function addFetchedToWatchlist(code){
+  code=String(code||"").trim();
+  if(document.querySelector('.wl-row[data-code="'+code+'"]')){alert("已在观察池中");return;}
+  var data=await fetchStockData(code);
+  if(!data){alert("获取行情失败");return;}
+  addToWatchlistUI(data);
+  saveWatchlist();
+  var el=document.querySelector('.wl-row[data-code="'+code+'"]');
+  if(el)el.style.background="#e8f5e9";
+  alert("已加入观察池:"+data.name);
+}
+async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
 function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
@@ -116,7 +153,7 @@ function renderStockModalFront(s){
     "<div class=\"modal-section\"><div class=\"modal-section-h\">ATDS 评分与评级</div><div class=\"modal-grid\"><div class=\"modal-card\"><div class=\"modal-card-label\">产业趋势规则</div><strong>+"+st+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">公司资料完整度</div><strong>+"+sc+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">财务质量</div><strong>+"+sf+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">估值（中性）</div><strong>+"+sv+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">分项证据完整度</div><strong>+"+se+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">成长证据</div><strong>+"+sg+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">资金行为</div><strong>+"+sca+"</strong></div><div class=\"modal-card\"><div class=\"modal-card-label\">风险扣分</div><strong>"+sr+"</strong></div></div>"+
     "<div class=\"modal-rating\"><span class=\"modal-rating-stars\">"+stars+"</span><span class=\"modal-rating-text\">"+rt+" · 88+ 五星 | 78-87 四星 | 68-77 三星；缺少同业、历史分位与一致预期时，估值采用中性分。</span></div></div>"+
     "</div>"+
-    "<div class=\"modal-footer\">✓ 深度研究完成，已更新观察池中的该股票</div>"+
+    "<div class=\"modal-footer\" style=\"display:flex;justify-content:space-between;align-items:center;\"><span>✓ 深度研究完成，已更新观察池中的该股票</span><button class=\"wl-btn wl-btn-primary\" data-code=\"'+c+'\" onclick=\"addFetchedToWatchlist(this.dataset.code)\" style=\"font-size:11px;padding:6px 12px;\">+ 加入观察池</button></div>"+
     "</div></div>";
   return html;
 }
