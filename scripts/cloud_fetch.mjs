@@ -175,6 +175,7 @@ async function fetchIntlMkt() {
 }
 
 async function fetchKline(code, count = 250) {
+  // 腾讯优先
   const url = `http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},day,,,${count},qfq`;
   for (const host of ['http://web.ifzq.gtimg.cn', 'https://web.ifzq.gtimg.cn']) {
     try {
@@ -189,6 +190,21 @@ async function fetchKline(code, count = 250) {
       if (Array.isArray(series) && series.length) return series;
     } catch (e) { /* try next */ }
   }
+  // 东财备用
+  try {
+    const mkt = code.indexOf('sh') === 0 ? '1' : '0';
+    const num = code.slice(2);
+    const emUrl = `https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=${mkt}.${num}&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=20200101&end=20991231`;
+    const r = await fetch(emUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const j = await r.json();
+    const kl = (j && j.data && j.data.klines) || [];
+    if (Array.isArray(kl) && kl.length) {
+      return kl.slice(-count).map(line => {
+        const p = line.split(',');
+        return [p[0], parseFloat(p[1]), parseFloat(p[2]), parseFloat(p[3]), parseFloat(p[4]), parseFloat(p[5])];
+      });
+    }
+  } catch (e) { /* ignore */ }
   return [];
 }
 
@@ -377,6 +393,127 @@ async function fetchNewHighCount(dateArg) {
 }
 
 
+
+// ===== 全市场形态扫描(启动/老鸭头/拉升) =====
+async function fetchWithRetry(url, opts, retries) {
+  retries = retries || 2;
+  for (let i = 0; i <= retries; i++) {
+    try {
+      const res = await fetch(url, opts || { headers: { 'User-Agent': 'Mozilla/5.0' } });
+      if (res.ok) return await res.json();
+    } catch (e) { /* retry */ }
+    if (i < retries) await new Promise(r => setTimeout(r, 800 * (i + 1)));
+  }
+  return null;
+}
+
+// 获取全市场行情(剔除 ST/退/新股;返回候选池)
+async function fetchAllMarket() {
+  const base = 'https://push2.eastmoney.com/api/qt/clist/get?po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23&fields=f2,f3,f5,f6,f8,f12,f14,f20';
+  const all = [];
+  let pn = 1, total = 1;
+  while (all.length < total && pn <= 60) {
+    const url = base + `&pn=${pn}&pz=100`;
+    const j = await fetchWithRetry(url);
+    if (!j || !j.data) break;
+    const diff = j.data.diff || [];
+    total = j.data.total || 0;
+    if (!diff.length) break;
+    all.push(...diff);
+    pn++;
+    await new Promise(r => setTimeout(r, 300));
+  }
+  // 剔除 ST/退市/新股(<60日,用换手率与量能近似:换手为0或价格<0.01剔除)
+  const list = all.filter(x => {
+    const name = x.f14 || '';
+    if (/ST|\*ST|退/.test(name)) return false;
+    if (!x.f12 || !x.f2 || x.f2 <= 0) return false;
+    return true;
+  });
+  // 强势候选:涨幅 0~10%(剔除涨停打板),量比>=1.2,换手 1%~25%,成交额>=0.8亿
+  const cands = list.filter(x => {
+    const pct = x.f3 == null ? 0 : Number(x.f3);
+    const lb = x.f8 == null ? 0 : Number(x.f8);
+    const hs = x.f20 == null ? 0 : Number(x.f20);
+    const amt = x.f6 == null ? 0 : Number(x.f6);
+    return pct > 0 && pct <= 10 && lb >= 1.2 && hs >= 1 && hs <= 25 && amt >= 80000000;
+  }).sort((a, b) => (b.f8||0) - (a.f8||0)).slice(0, 120);
+  return { total: list.length, candidates: cands };
+}
+
+// 形态识别(基于腾讯K线: [[date, open, close, high, low, vol], ...])
+function detectPatterns(klines) {
+  if (!Array.isArray(klines) || klines.length < 65) return null;
+  const closes = klines.map(k => parseFloat(k[2])).filter(n => !isNaN(n));
+  if (closes.length < 65) return null;
+  const vols = klines.map(k => parseFloat(k[5]) || 0);
+  const ma = (arr, n) => { let s = 0; for (let i = arr.length - n; i < arr.length; i++) s += arr[i]; return s / n; };
+  const ma5 = ma(closes, 5), ma10 = ma(closes, 10), ma20 = ma(closes, 20), ma60 = ma(closes, 60);
+  const vol5 = ma(vols, 5), vol20 = ma(vols, 20);
+  const last = closes[closes.length - 1];
+  const lastVol = vols[vols.length - 1];
+  const pct5 = ((last / closes[closes.length - 6]) - 1) * 100;
+  const ma20Prev3 = ma(closes.slice(0, -3), 20);
+  const patterns = [];
+  // 启动:突破MA20 + 放量 + MA20拐头向上 + 近期横盘后放量
+  const recentAmp = (Math.max(...closes.slice(-20)) - Math.min(...closes.slice(-20))) / Math.min(...closes.slice(-20)) * 100;
+  if (last > ma20 && ma20 > (ma20Prev3 || 0) && lastVol > (vol20 || 1) * 1.3 && recentAmp < 25) {
+    patterns.push('启动');
+  }
+  // 老鸭头:MA10>MA20>MA60 + 回调形成鸭鼻孔 + 放量突破前高
+  if (ma10 > ma20 && ma20 > ma60) {
+    const r12 = klines.slice(-12);
+    const highs = r12.map(k => parseFloat(k[3]));
+    const peak = Math.max(...highs.slice(0, -2));
+    const low12 = Math.min(...r12.map(k => parseFloat(k[4])));
+    if (low12 < peak * 0.97 && last > peak && lastVol > (vol5 || 1) * 1.2) {
+      patterns.push('老鸭头');
+    }
+  }
+  // 拉升:多头排列 + 5日涨幅>5% + 放量
+  if (ma5 > ma10 && ma10 > ma20 && pct5 > 5 && (vol5 || 0) > (vol20 || 1) * 1.1) {
+    patterns.push('拉升');
+  }
+  return { patterns, pct5, ma5, ma10, ma20, ma60 };
+}
+
+// 全市场扫描主入口(带降级链:clist全市场 → 涨停池 → 空)
+async function scanMarketPatterns(ztPool) {
+  let mkt = null;
+  let source = '东财全市场(clist)';
+  try { mkt = await fetchAllMarket(); } catch (e) { mkt = null; }
+  let cands = (mkt && mkt.candidates) || [];
+  if (!cands.length && Array.isArray(ztPool) && ztPool.length) {
+    cands = ztPool.map(s => ({ f12: s.code, f14: s.name, f3: s.pct, f8: s.pct > 3 ? 2 : 1.2, f20: s.pct > 3 ? 5 : 2, f6: (s.sealWan || 0) * 10000 }));
+    source = '当日涨停池';
+  }
+  const picks = [];
+  for (const s of cands) {
+    try {
+      const code = String(s.f12 || '').trim();
+      if (!code) continue;
+      const c0 = code.charAt(0);
+      const full = c0 === '6' ? 'sh' + code : (c0 === '0' || c0 === '3') ? 'sz' + code : '';
+      if (!full) continue;
+      const arr = await fetchKline(full, 70);
+      if (!arr || !arr.length) continue;
+      const det = detectPatterns(arr);
+      if (!det || !det.patterns.length) continue;
+      const score = Math.min(100, Math.round(
+        Math.min(det.pct5, 12) * 3 + (Number(s.f8) || 0) * 3 + Math.min(det.patterns.length * 8, 24)
+      ));
+      picks.push({
+        code, name: s.f14 || code, pct: Math.round((Number(s.f3) || 0) * 100) / 100,
+        patterns: det.patterns, score,
+        reason: det.patterns.join('+') + '·量比' + (Number(s.f8) || 1).toFixed(1) + '·5日涨' + det.pct5.toFixed(1) + '%'
+      });
+    } catch (e) { /* skip */ }
+  }
+  picks.sort((a, b) => b.score - a.score);
+  return { scanned: (mkt && mkt.total) || cands.length, candidates: cands.length, source, picks: picks.slice(0, 20) };
+}
+
+
 async function main() {
   const now = shanghaiNow();
   const explicitArg = process.argv[3] || '';
@@ -405,7 +542,10 @@ async function main() {
   // 反转闸门指标:全市场成交额 + 60日新高个股数
   const totalAmountYi = (await fetchTotalAmount()) / 1e8;
   const newHigh = await fetchNewHighCount(todayCompact);
+
   const zt = await fetchZT(todayCompact);
+  // 全市场形态扫描(启动/老鸭头/拉升)
+  const marketScan = await scanMarketPatterns(zt.list);
   const qdateRaw = String(zt.qdate || '');
   const qdate = qdateRaw.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
   // 数据接口正常且明确为非交易日时才跳过;接口失败(qdate 为空)时降级继续,保证 workflow 不中断
@@ -535,6 +675,7 @@ async function main() {
       totalAmount: totalAmountYi ? totalAmountYi.toFixed(0) + '亿' : '--'
     },
     newHigh: newHigh,
+    marketScan: marketScan,
     regimeGate: { totalAmount: totalAmountYi, newHighCount: newHigh.count, totalZhengZhang: newHigh.total, newHighSource: newHigh.source },
     hotSectors,
     limitUp,

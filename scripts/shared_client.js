@@ -42,6 +42,19 @@ async function addFetchedToWatchlist(code){
   if(el)el.style.background="#e8f5e9";
   alert("已加入观察池:"+data.name);
 }
+async function addAllPicks(){
+  var buttons = document.querySelectorAll('.ms-add');
+  var added = 0;
+  for (var i = 0; i < buttons.length; i++) {
+    var code = buttons[i].getAttribute('data-code');
+    if (!code) continue;
+    if (document.querySelector('.wl-row[data-code="'+code+'"]')) continue;
+    var data = await fetchStockData(code);
+    if (data) { addToWatchlistUI(data); added++; }
+  }
+  saveWatchlist();
+  alert('已加入 ' + added + ' 只形态个股到观察池');
+}
 async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
