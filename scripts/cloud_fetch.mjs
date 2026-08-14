@@ -175,14 +175,12 @@ async function fetchIntlMkt() {
 }
 
 async function fetchKline(code, count = 250) {
+  const fetchT = (u, h, m) => { const ac = new AbortController(); const t = setTimeout(() => ac.abort(), m || 9000); return fetch(u, { headers: h || { 'User-Agent': 'Mozilla/5.0' }, redirect: 'follow', signal: ac.signal }).finally(() => clearTimeout(t)); };
   // 腾讯优先
   const url = `http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},day,,,${count},qfq`;
   for (const host of ['http://web.ifzq.gtimg.cn', 'https://web.ifzq.gtimg.cn']) {
     try {
-      const r = await fetch(host === 'https' ? url.replace('http://', 'https://') : url, {
-        headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'http://gu.qq.com/' },
-        redirect: 'follow',
-      });
+      const r = await fetchT(host === 'https' ? url.replace('http://', 'https://') : url, { 'User-Agent': 'Mozilla/5.0', 'Referer': 'http://gu.qq.com/' });
       const buf = await r.arrayBuffer();
       const t = new TextDecoder('gbk').decode(buf);
       const j = JSON.parse(t);
@@ -195,7 +193,7 @@ async function fetchKline(code, count = 250) {
     const mkt = code.indexOf('sh') === 0 ? '1' : '0';
     const num = code.slice(2);
     const emUrl = `https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=${mkt}.${num}&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=20200101&end=20991231`;
-    const r = await fetch(emUrl, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const r = await fetchT(emUrl);
     const j = await r.json();
     const kl = (j && j.data && j.data.klines) || [];
     if (Array.isArray(kl) && kl.length) {
@@ -488,6 +486,7 @@ async function scanMarketPatterns(ztPool) {
     source = '当日涨停池';
   }
   const picks = [];
+  let klineOk = 0, klineFail = 0;
   for (const s of cands) {
     try {
       const code = String(s.f12 || '').trim();
@@ -496,7 +495,8 @@ async function scanMarketPatterns(ztPool) {
       const full = c0 === '6' ? 'sh' + code : (c0 === '0' || c0 === '3') ? 'sz' + code : '';
       if (!full) continue;
       const arr = await fetchKline(full, 70);
-      if (!arr || !arr.length) continue;
+      if (!arr || !arr.length) { klineFail++; continue; }
+      klineOk++;
       const det = detectPatterns(arr);
       if (!det || !det.patterns.length) continue;
       const score = Math.min(100, Math.round(
@@ -510,7 +510,7 @@ async function scanMarketPatterns(ztPool) {
     } catch (e) { /* skip */ }
   }
   picks.sort((a, b) => b.score - a.score);
-  return { scanned: (mkt && mkt.total) || cands.length, candidates: cands.length, source, picks: picks.slice(0, 20) };
+  return { scanned: (mkt && mkt.total) || cands.length, candidates: cands.length, source, klineOk, klineFail, picks: picks.slice(0, 20) };
 }
 
 
