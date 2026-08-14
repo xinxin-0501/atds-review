@@ -552,39 +552,6 @@
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="hint">市场综述 + AUTO REFRESH</div>
   </div>
-  <div class="card gate-card">
-    <div class="card-title">反转闸门 · 温故知「加锁权」</div>
-    <div class="gate-note">核心规则:① AND ② 同时满足 → 闸门开(允许新仓);任一项未达标 → 闸门红(禁开新仓,埋伏名单豁免)</div>
-    <div class="gate-grid">
-      <div class="gate-block">
-        <div class="gate-h">① 成交额(沪深合计)</div>
-        <div class="gate-value red">--</div>
-        <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标</div>
-        <div class="gate-diff red">数据获取中</div>
-      </div>
-      <div class="gate-block">
-        <div class="gate-h">② 60日新高个股数</div>
-        <div class="gate-value red">0 只</div>
-        <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
-        <div class="gate-diff red">--</div>
-      </div>
-    </div>
-    <div class="gate-status gate-close">
-      <span class="gate-status-label">闸门状态：</span>
-      <span class="gate-status-text">✗ 红 禁开 · 仅允许执行预检埋伏名单(估值+硬止损+仓位上限已定)</span>
-    </div>
-    <div class="gate-src">数据源:①成交额(东财沪深接口/降级时显示--)/ ②60日新高(东财涨停池代理,基于1板+涨幅≥5%数量 = 0只/总涨停0只,真实接口数据更准)
-      <span class="da-score">准确性 6/10(代理指标)</span>
-    </div>
-  </div>
-  <div class="card ms-card">
-    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
-    <div class="ms-note">扫描范围：--（0 只候选，剔除 ST/新股）→ 识别 0 只形态启动个股</div>
-    <div class="ms-gate red">反转闸门：红 · 禁开新仓（埋伏名单豁免） → 仅埋伏名单可操作，新仓需谨慎</div>
-    <div class="ms-list"><div class="ms-empty">当日无形态识别结果（数据源不可达或当日无启动形态个股）</div></div>
-    
-    <div class="da-src">数据源：-- + 腾讯/东财K线 形态识别（启动/老鸭头/拉升）<span class="da-score">准确性 7/10（技术形态自动识别）</span></div>
-  </div>
   <div class="card">
     <div class="card-title">策略状态</div>
     <div class="hint">多线轮动 / 风险预算 60% / 建议仓位 40-60%</div>
