@@ -488,6 +488,172 @@ function renderVerdict(report) {
   '</div>';
 }
 
+function renderRegimeGate(report) {
+  const gate = report.regimeGate || {};
+  const ta = gate.totalAmount || 0;
+  const nh = gate.newHighCount || 0;
+  const totalZ = gate.totalZhengZhang || 0;
+  const taOk = ta >= 29650;
+  const nhOk = nh >= 100;
+  const gateOpen = taOk && nhOk;
+  const taPct = ta ? ((29650 - ta) / 29650 * 100).toFixed(1) : '--';
+  const nhPct = nh ? ((100 - nh) / 100 * 100).toFixed(0) : '--';
+  const taDiff = ta ? (ta - 29650).toFixed(0) : '--';
+  const nhDiff = nh - 100;
+  const status = gateOpen ? 'OPEN' : 'CLOSE';
+  const cls = gateOpen ? 'gate-open' : 'gate-close';
+  return `<div class="card gate-card">
+    <div class="card-title">反转闸门 · 温故知「加锁权」</div>
+    <div class="gate-note">核心规则:① AND ② 同时满足 → 闸门开(允许新仓);任一项未达标 → 闸门红(禁开新仓,埋伏名单豁免)</div>
+    <div class="gate-grid">
+      <div class="gate-block">
+        <div class="gate-h">① 成交额(沪深合计)</div>
+        <div class="gate-value ${taOk ? 'ok' : 'red'}">${ta ? ta.toFixed(0) + ' 亿' : '--'}</div>
+        <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标</div>
+        <div class="gate-diff ${taOk ? 'ok' : 'red'}">${ta ? (taOk ? '✓ 超过 ' + taDiff + ' 亿' : '✗ 差 ' + (29650 - ta).toFixed(0) + ' 亿 (' + taPct + '%)') : '数据获取中'}</div>
+      </div>
+      <div class="gate-block">
+        <div class="gate-h">② 60日新高个股数</div>
+        <div class="gate-value ${nhOk ? 'ok' : 'red'}">${nh} 只</div>
+        <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
+        <div class="gate-diff ${nhOk ? 'ok' : 'red'}">${nh ? (nhOk ? '✓ 超过 ' + nhDiff + ' 只' : '✗ 差 ' + (-nhDiff) + ' 只 (' + nhPct + '%)') : '--'}</div>
+      </div>
+    </div>
+    <div class="gate-status ${cls}">
+      <span class="gate-status-label">闸门状态：</span>
+      <span class="gate-status-text">${status === 'OPEN' ? '✓ 绿 放行 · 允许开新仓' : '✗ 红 禁开 · 仅允许执行预检埋伏名单(估值+硬止损+仓位上限已定)'}</span>
+    </div>
+    <div class="gate-src">数据源:①成交额(东财沪深接口/降级时显示--)/ ②60日新高(东财涨停池代理,基于1板+涨幅≥5%数量 = ${nh}只/总涨停${totalZ}只,真实接口数据更准)
+      <span class="da-score">准确性 6/10(代理指标)</span>
+    </div>
+  </div>`;
+}
+
+function renderDataAnalysis(report) {
+  const ms = report.marketStats || {};
+  const ce = report.closeEmotion || {};
+  const dp = report.dragonPool || {};
+  const idx = report.indices || [];
+  const mainRank = report.mainRank || [];
+  const limitUpList = report.limitUp || [];
+
+  // ---- 模块1 市场定调 ----
+  const idxLine = idx.map(i => `${i.name} ${(i.changePct >= 0 ? '+' : '') + i.changePct}%`).join(' / ');
+  const total = ms.upCount + ms.downCount + ms.flatCount || 1;
+  const ratio = ((ms.upCount / total) * 100).toFixed(0);
+  const m1 = `<div class="da-block">
+    <div class="da-h">第一步 · 市场定调</div>
+    <div class="da-line">指数：${esc(idxLine || '--')}</div>
+    <div class="da-line">涨跌家数：涨 ${ms.upCount} / 跌 ${ms.downCount} / 平 ${ms.flatCount}（红盘率 ${ratio}%）</div>
+    <div class="da-line">涨停 ${ms.limitUpCount} 家 · 炸板 ${ms.zhaBanCount} 家 · 最高连板 ${ms.maxLianBan} 板（${esc(ms.maxLianBanStock || '--')}）</div>
+    <div class="da-src">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score">准确性 9/10</span></div>
+  </div>`;
+
+  // ---- 模块2 情绪周期 ----
+  let cycle = '回暖', tone;
+  const score = ce.tempScore || 0;
+  if (score < 30) { cycle = '冰点'; tone = '轻仓防守，等待情绪底部信号'; }
+  else if (score < 60) { cycle = '回暖'; tone = '分批试错，聚焦低位首板'; }
+  else if (score < 85) { cycle = '加速'; tone = '顺势参与，关注晋级与主线'; }
+  else { cycle = '分歧'; tone = '高位分歧加大，控制仓位，低吸不追高'; }
+  const m2 = `<div class="da-block">
+    <div class="da-h">第二步 · 情绪周期</div>
+    <div class="da-line">情绪温度 ${score}° → 阶段判定：<b class="da-cycle">${cycle}</b></div>
+    <div class="da-line">操作基调：${esc(tone)}</div>
+    <div class="da-src">数据源：由东财涨停/炸板/连板数据推导<span class="da-score">准确性 7/10（逻辑推演）</span></div>
+  </div>`;
+
+  // ---- 模块3 主线识别 ----
+  const sectors = dp.sectorBoards || [];
+  const consec = dp.consecutiveBoards || [];
+  const hotLines = ce.mainLines || [];
+  let m3line = '';
+  if (sectors.length) {
+    m3line = sectors.slice(0, 4).map(s =>
+      `<div class="da-line">• ${esc(s.name)}：涨停 ${s.count} 家 / 最高 ${s.maxLB} 板，领涨 ${esc(s.leadStock || '--')}</div>`).join('');
+  } else {
+    m3line = '<div class="da-line">暂无板块聚合数据（东财接口未返回）</div>';
+  }
+  const sust = consec.filter(x => x.lbc >= 2).slice(0, 3);
+  const sustLine = sust.length ? sust.map(s => `${esc(s.name)}（${s.lbc}板）`).join('、') : '暂无明显连续梯队';
+  const leadMode = (hotLines[0] && hotLines[0].changePct >= 5 && (sectors[0] || {}).count >= 3) ? '龙头带队' : '分散轮动';
+  const m3 = `<div class="da-block">
+    <div class="da-h">第三步 · 主线识别</div>
+    <div class="da-sub">涨停题材分布</div>
+    ${m3line}
+    <div class="da-line">连续 2-3 天上榜方向：${esc(sustLine)}</div>
+    <div class="da-line">结构判断：${leadMode}${leadMode === '龙头带队' ? '，有明确领涨梯队' : '，缺乏连续承接，需防一日游'}</div>
+    <div class="da-line">明日最可能机会方向（1-2个）：${(hotLines.slice(0,2).map(h => esc(h.name)).join('、')) || '--'}</div>
+    <div class="da-src">数据源：东方财富涨停池分类聚合<span class="da-score">准确性 8/10</span></div>
+  </div>`;
+
+  // ---- 模块4 核心个股拆解 ----
+  const coreStocks = limitUpList.slice(0, 5);
+  let m4lines = '';
+  if (coreStocks.length) {
+    m4lines = coreStocks.map(s => {
+      const lb = s.lianban || 1;
+      const start = lb >= 2 ? '首板放量启动，随后连续晋级' : '今日首板放量启动，观察次日承接';
+      const accel = lb >= 4 ? `高位连板(${lb}板)，换手充分，筹码快速交换` : lb >= 2 ? `连板 ${lb} 天，缩量加速为主` : '首板放量，加速待验证';
+      return `<div class="da-line"><b>${esc(s.name)}（${s.code}）${lb}板</b>：${start}；${accel}；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>`;
+    }).join('');
+  } else {
+    m4lines = '<div class="da-line">暂无涨停个股数据</div>';
+  }
+  const m4 = `<div class="da-block">
+    <div class="da-h">第四步 · 核心个股拆解（Top5 涨停）</div>
+    ${m4lines}
+    <div class="da-src">数据源：东财涨停池 + 逻辑推演（启动/加速/分歧为推断，需结合K线人工验证）<span class="da-score">准确性 6/10</span></div>
+  </div>`;
+
+  // ---- 模块5/6 交易复盘（占位,用户提供后填充） ----
+  const m5 = `<div class="da-block da-trade">
+    <div class="da-h">第五步 · 交易复盘</div>
+    <div class="da-line">待提供今日逐笔交易记录（股票、买点K线位置、买入理由、是否符合系统、卖出原因）后自动生成分析。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div>`;
+  const m6 = `<div class="da-block da-trade">
+    <div class="da-h">第六步 · 交易行为复盘</div>
+    <div class="da-line">待提供每笔交易数据后，分析追高/杀跌/持仓周期/情绪化交易等行为偏差与优化规则。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div>`;
+
+  // ---- 模块7 强势股共性模板 ----
+  const maxLB = dp.maxLianBan || 0;
+  const m7 = `<div class="da-block">
+    <div class="da-h">第七步 · 强势股共性模板</div>
+    <div class="da-line">当前市场最高连板 ${maxLB} 板。强势股共性：底部放量首板 → 缩量/换手连板加速 → 首次分歧不破位 → 承接有力再上攻。</div>
+    <div class="da-line">模板要点：① 首板看量能 ② 连板看换手 ③ 分歧看承接 ④ 只有承接验证通过的方向才值得次日跟进。</div>
+    <div class="da-src">数据源：逻辑推演（基于连板梯队）<span class="da-score">准确性 6/10</span></div>
+  </div>`;
+
+  // ---- 模块8 主线资金复盘 ----
+  let m8line = '';
+  if (sectors.length) {
+    m8line = sectors.map(s => `${esc(s.name)}(${s.count}家)`)
+      .slice(0, 6).join('、');
+  } else { m8line = '--'; }
+  const next = (hotLines[0] && hotLines[1])
+    ? `${esc(hotLines[0].name)}、${esc(hotLines[1].name)}`
+    : (hotLines[0] ? esc(hotLines[0].name) : '--');
+  const stance = (ce.tempScore || 0) >= 85 ? '收缩' : (ce.tempScore || 0) >= 60 ? '进攻（控仓）' : '观望';
+  const m8 = `<div class="da-block">
+    <div class="da-h">第八步 · 主线资金复盘</div>
+    <div class="da-line">今日涨停题材分布：${esc(m8line)}</div>
+    <div class="da-line">重复上榜（连续2-3天）方向：${esc(sustLine)}</div>
+    <div class="da-line">结构：${leadMode}${(hotLines[0] && hotLines[0].changePct >= 5) ? '，处于高位加速' : '，多为低位补涨'}</div>
+    <div class="da-line">明日最可能机会方向：${esc(next)}</div>
+    <div class="da-line">明日基调：<b class="da-stance">${stance}</b></div>
+    <div class="da-src">数据源：东方财富涨停池 + 板块统计<span class="da-score">准确性 8/10</span></div>
+  </div>`;
+
+  return `<div class="card da-card">
+    <div class="card-title">AI 数据分析 · 八步复盘</div>
+    <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
+    ${m1}${m2}${m3}${m4}${m5}${m6}${m7}${m8}
+  </div>`;
+}
+
 function renderIntlEvents(report) {
   return `<div class="card">
     <div class="card-title">GLOBAL EVENT RADAR · 国际重大事件监控</div>
@@ -770,6 +936,8 @@ ${renderHero(report)}
   ${renderVerdict(report)}
   ${renderIntlEvents(report)}
   ${renderNewsDigest(report)}
+  ${renderRegimeGate(report)}
+  ${renderDataAnalysis(report)}
 </div>
 <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
 </div>

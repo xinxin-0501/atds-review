@@ -347,6 +347,36 @@ function fmtAmount(wan) {
   return Math.round(wan).toLocaleString() + '万';
 }
 
+
+// 全市场成交额(沪深两市合计,单位:亿元)
+async function fetchTotalAmount() {
+  try {
+    // 东财沪深两市实时数据 push2.eastmoney.com → sh+sz 累计
+    const url = 'https://push2.eastmoney.com/api/qt/stock/get?fields=f43&secids=1.000001,0.399001';
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const j = await res.json();
+    const diff = (j.data && j.data.diff) || [];
+    let total = 0;
+    for (const it of diff) total += (it.f43 || 0);
+    return total;  // 元,转亿需 /1e8
+  } catch (e) { console.error('fetchTotalAmount 失败:', e.message); return 0; }
+}
+
+// 60日新高个股数(基于东财涨停池 + 创新高近似估算;实际接口数据准确性 6/10)
+async function fetchNewHighCount(dateArg) {
+  try {
+    // 优先尝试东财 push2ex "新高"接口
+    const url = `http://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=200&sort=fbt%3Aasc&date=${dateArg || process.argv[3] || ''}`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const j = await res.json();
+    const pool = (j.data && j.data.pool) || [];
+    // 用 lbc=1(首板)+ pct>=5% 近似"今日创新高"代理指标
+    const proxy = pool.filter(s => (s.lbc || 1) === 1 && (s.zdp || 0) >= 5).length;
+    return { count: proxy, total: pool.length, source: '东财涨停池代理' };
+  } catch (e) { console.error('fetchNewHighCount 失败:', e.message); return { count: 0, total: 0, source: '接口失败' }; }
+}
+
+
 async function main() {
   const now = shanghaiNow();
   const explicitArg = process.argv[3] || '';
@@ -372,6 +402,9 @@ async function main() {
   });
 
   // 2. 涨停/炸板池（东财）。支持显式传入目标日期（argv[3]），否则用今天
+  // 反转闸门指标:全市场成交额 + 60日新高个股数
+  const totalAmountYi = (await fetchTotalAmount()) / 1e8;
+  const newHigh = await fetchNewHighCount(todayCompact);
   const zt = await fetchZT(todayCompact);
   const qdateRaw = String(zt.qdate || '');
   const qdate = qdateRaw.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
@@ -499,8 +532,10 @@ async function main() {
       upCount: breadth.up, downCount: breadth.down, flatCount: breadth.flat,
       limitUpCount: zt.total, limitDownCount: 0, zhaBanCount: zbCount,
       maxLianBan: dragonPool.maxLianBan || '--', maxLianBanStock: (dragonPool.consecutiveBoards && dragonPool.consecutiveBoards[0]) ? dragonPool.consecutiveBoards[0].name : '--',
-      totalAmount: '--'
+      totalAmount: totalAmountYi ? totalAmountYi.toFixed(0) + '亿' : '--'
     },
+    newHigh: newHigh,
+    regimeGate: { totalAmount: totalAmountYi, newHighCount: newHigh.count, totalZhengZhang: newHigh.total, newHighSource: newHigh.source },
     hotSectors,
     limitUp,
     limitDown: [],
