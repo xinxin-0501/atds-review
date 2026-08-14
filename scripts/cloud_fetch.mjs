@@ -27,35 +27,39 @@ function shanghaiNow() {
 }
 
 async function fetchTencent(codes) {
-  const url = `https://qt.gtimg.cn/q=${codes.join(',')}`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-  const text = await res.text();
-  const out = [];
-  for (const line of text.trim().split(';')) {
-    const m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/);
-    if (!m) continue;
-    const f = m[1].split('~');
-    out.push({
-      name: f[1], code: f[2], price: parseFloat(f[3]), pct: parseFloat(f[32]),
-      amountWan: parseFloat(f[37]) || 0, turnover: parseFloat(f[38])
-    });
-  }
-  return out;
+  try {
+    const url = `https://qt.gtimg.cn/q=${codes.join(',')}`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const text = await res.text();
+    const out = [];
+    for (const line of text.trim().split(';')) {
+      const m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/);
+      if (!m) continue;
+      const f = m[1].split('~');
+      out.push({
+        name: f[1], code: f[2], price: parseFloat(f[3]), pct: parseFloat(f[32]),
+        amountWan: parseFloat(f[37]) || 0, turnover: parseFloat(f[38])
+      });
+    }
+    return out;
+  } catch (e) { console.error('fetchTencent 失败:', e.message); return []; }
 }
 
 async function fetchZT(dateArg) {
-  const url = `http://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=fbt%3Aasc&date=${dateArg || process.argv[3] || ''}`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-  const j = await res.json();
-  const d = j.data || {};
-  const list = (d.pool || []).map(s => ({
-    code: String(s.c), name: s.n, price: (s.p || 0) / 1000,
-    pct: Math.round((s.zdp || 0) * 100) / 100, lianban: s.lbc || 1,
-    boardInfo: `${s.zttj && s.zttj.days ? s.zttj.days : s.lbc || 1}天${s.zttj && s.zttj.ct ? s.zttj.ct : s.lbc || 1}板`,
-    hybk: s.hybk || '', sealWan: Math.round((s.fund || 0) / 10000), kaiban: s.zbc || 0,
-    firstTime: String(s.fbt || ''), lastTime: String(s.lbt || '')
-  }));
-  return { total: d.tc || list.length, list, qdate: String(d.qdate || '') };
+  try {
+    const url = `http://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=fbt%3Aasc&date=${dateArg || process.argv[3] || ''}`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const j = await res.json();
+    const d = j.data || {};
+    const list = (d.pool || []).map(s => ({
+      code: String(s.c), name: s.n, price: (s.p || 0) / 1000,
+      pct: Math.round((s.zdp || 0) * 100) / 100, lianban: s.lbc || 1,
+      boardInfo: `${s.zttj && s.zttj.days ? s.zttj.days : s.lbc || 1}天${s.zttj && s.zttj.ct ? s.zttj.ct : s.lbc || 1}板`,
+      hybk: s.hybk || '', sealWan: Math.round((s.fund || 0) / 10000), kaiban: s.zbc || 0,
+      firstTime: String(s.fbt || ''), lastTime: String(s.lbt || '')
+    }));
+    return { total: d.tc || list.length, list, qdate: String(d.qdate || '') };
+  } catch (e) { console.error('fetchZT 失败:', e.message); return { total: 0, list: [], qdate: '' }; }
 }
 
 async function fetchZB(dateArg) {
@@ -66,13 +70,15 @@ async function fetchZB(dateArg) {
 }
 
 async function fetchBreadth() {
-  const url = 'http://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f1,f2,f3,f104,f105,f106&secids=1.000001,0.399001,0.399006';
-  const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-  const j = await res.json();
-  const diff = (j.data && j.data.diff) || [];
-  let up = 0, down = 0, flat = 0;
-  for (const it of diff) { up += it.f104 || 0; down += it.f105 || 0; flat += it.f106 || 0; }
-  return { up, down, flat };
+  try {
+    const url = 'http://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f1,f2,f3,f104,f105,f106&secids=1.000001,0.399001,0.399006';
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const j = await res.json();
+    const diff = (j.data && j.data.diff) || [];
+    let up = 0, down = 0, flat = 0;
+    for (const it of diff) { up += it.f104 || 0; down += it.f105 || 0; flat += it.f106 || 0; }
+    return { up, down, flat };
+  } catch (e) { console.error('fetchBreadth 失败:', e.message); return { up: 0, down: 0, flat: 0 }; }
 }
 
 async function fetchDragonPool(today, yesterday) {
@@ -367,8 +373,10 @@ async function main() {
 
   // 2. 涨停/炸板池（东财）。支持显式传入目标日期（argv[3]），否则用今天
   const zt = await fetchZT(todayCompact);
-  const qdate = zt.qdate.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
-  if (!isPre && qdate !== date) {
+  const qdateRaw = String(zt.qdate || '');
+  const qdate = qdateRaw.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+  // 数据接口正常且明确为非交易日时才跳过;接口失败(qdate 为空)时降级继续,保证 workflow 不中断
+  if (!isPre && qdate && qdate !== date) {
     console.log(`目标(${date})非交易日（最新行情数据日期 ${qdate}），跳过生成`);
     process.exit(0);
   }
