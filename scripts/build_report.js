@@ -1008,6 +1008,18 @@ function renderIndex(reports) {
     const label = `${d} ${t} · ${esc(r.meta.typeLabel || '')}`;
     return `<a class="report-card" href="${url}"><div class="rc-title">${label}</div><div class="rc-meta">${esc((r.indices || []).slice(0,3).map(i => i.name + ' ' + fmtPct(i.changePct)).join(' / '))}</div></a>`;
   }).join('');
+  // 动态取最新盘前/午盘/收盘
+  const urlOf = r => `reviews/${r.meta.date}_${String(r.meta.time).replace(':', '-')}.html`;
+  const pre = reports.find(r => r.meta.type === 'premarket');
+  const mid = reports.find(r => r.meta.type === 'midday');
+  const clo = reports.find(r => r.meta.type === 'close');
+  const preUrl = pre ? urlOf(pre) : 'main-rank.html';
+  const midUrl = mid ? urlOf(mid) : 'main-rank.html';
+  const cloUrl = clo ? urlOf(clo) : 'main-rank.html';
+  const preLabel = pre ? `${pre.meta.date} 08:30 简报` : '暂无盘前数据';
+  const midLabel = mid ? `${mid.meta.date} 11:35 快照` : '暂无盘中数据';
+  const cloLabel = clo ? `${clo.meta.date} 15:20 复盘` : '暂无收盘数据';
+
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1032,9 +1044,9 @@ function renderIndex(reports) {
 </div>
 <div class="section">
   <div class="tools">
-    <a class="tool-btn" href="reviews/2026-08-13_08-30.html">盘前 08:30 简报</a>
-    <a class="tool-btn" href="reviews/2026-08-12_11-35.html">盘中 11:35 快照</a>
-    <a class="tool-btn" href="reviews/2026-08-12_15-20.html">收盘 15:20 复盘</a>
+    <a class="tool-btn" href="${preUrl}">盘前 08:30 简报 · ${pre.meta ? pre.meta.date : ''}</a>
+    <a class="tool-btn" href="${midUrl}">盘中 11:35 快照 · ${mid ? mid.meta.date : ''}</a>
+    <a class="tool-btn" href="${cloUrl}">收盘 15:20 复盘 · ${clo ? clo.meta.date : ''}</a>
     <a class="tool-btn" href="main-rank.html">主线实时校准</a>
     <button class="tool-btn qr-btn" onclick="showQr()">手机扫码打开</button>
   </div>
