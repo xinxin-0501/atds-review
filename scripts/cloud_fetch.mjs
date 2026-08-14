@@ -750,50 +750,58 @@ async function main() {
     if (s.lianban > v.maxLB) { v.maxLB = s.lianban; v.leadStock = s.name; }
     v.inflow += s.sealWan;
   }
-  let mainRank;
-  if (sectorsAll.length) {
-    mainRank = sectorsAll.map(s => {
-      const z = ztByHybk.get(s.name);
-      const count = z ? z.count : 0;
-      const maxLB = z ? z.maxLB : 0;
-      const leadStock = z ? z.leadStock : '--';
-      const score = s.changePct * 15 + count * 5;
-      let status = '正常', atds = 70;
-      if (s.changePct >= 2 && count >= 3) { status = '主线确认'; atds = 96; }
-      else if (s.changePct >= 1 && count >= 1) { status = '关注'; atds = 84; }
-      else if (s.changePct <= -1) { status = '偏弱等待'; atds = 55; }
-      else if (s.changePct < 0) { status = '弱势'; atds = 62; }
-      return {
-        rank: 0,
-        name: s.name,
-        mappedName: s.name,
-        changePct: Math.round(s.changePct * 100) / 100,
-        upDown: `${s.up} / ${s.down}`,
-        inflowYi: Math.round((s.inflow || 0) / 100000000 * 10) / 10,
-        limitUpMax: z ? `${count}家 / ${maxLB}板` : '--',
-        leadStock,
-        newsAdjust: count >= 3 ? '+1' : '0',
-        atds,
-        status,
-        _score: score
-      };
-    }).sort((a, b) => b._score - a._score).slice(0, 27).map((s, i) => { s.rank = i + 1; delete s._score; return s; });
-  } else {
-    // Fallback: 板块 API 不可用时，从涨停池按 hybk 聚合生成
-    mainRank = [...ztByHybk.entries()].map(([name, v]) => {
-      const score = (v.pctSum / v.count) * 15 + v.count * 5;
-      const avgPct = Math.round((v.pctSum / v.count) * 100) / 100;
-      let status = '正常', atds = 70;
-      if (avgPct >= 2 && v.count >= 3) { status = '主线确认'; atds = 96; }
-      else if (avgPct >= 1 && v.count >= 1) { status = '关注'; atds = 84; }
-      else if (avgPct <= -1) { status = '偏弱等待'; atds = 55; }
-      return {
-        rank: 0, name, mappedName: name, changePct: avgPct,
-        upDown: '-- / --', inflowYi: '--', limitUpMax: `${v.count}家 / ${v.maxLB}板`,
-        leadStock: v.leadStock, newsAdjust: v.count >= 3 ? '+1' : '0', atds, status,
-        _score: score
-      };
-    }).sort((a, b) => b._score - a._score).slice(0, 27).map((s, i) => { s.rank = i + 1; delete s._score; return s; });
+  // mainRank 合并策略:从 ztByHybk(涨停池)取所有有涨停的行业 + sectorsAll 中涨幅突出的行业
+  // 行业名模糊匹配:hotSectors 板块名(同花顺/通达信口径)与 hybk(东财口径)用关键词匹配
+  const usedKeys = new Set();
+  const rows = [];
+  // 1) 先加所有有涨停的行业(必然有完整 limitUpMax/leadStock)
+  for (const [name, v] of ztByHybk.entries()) {
+    if (v.count < 1) continue;
+    // 尝试模糊匹配 hotSectors 取涨幅
+    let hs = hotSectors.find(s => s.name === name);
+    if (!hs) hs = hotSectors.find(s => s.name.includes(name) || name.includes(s.name));
+    const avgPct = v.pctSum / v.count;
+    const changePct = hs ? hs.changePct : Math.round(avgPct * 100) / 100;
+    const score = v.count * 12 + v.maxLB * 20 + Math.min(changePct, 10) * 3;
+    rows.push({
+      name, mappedName: name,
+      changePct: Math.round(changePct * 100) / 100,
+      upDown: hs ? `${hs.up} / ${hs.down}` : '-- / --',
+      inflowYi: hs ? Math.round((hs.inflow || 0) / 100000000 * 10) / 10 : Math.round((v.inflow || 0) / 10000 / 10000 * 10) / 10,
+      limitUpMax: `${v.count}家 / ${v.maxLB}板`,
+      leadStock: v.leadStock || '--',
+      _score: score,
+      _hasZT: true
+    });
+    usedKeys.add(name);
+  }
+  // 2) 补加 hotSectors 中涨幅 ≥1% 但无涨停匹配的行业(确保涨幅榜前位都列出)
+  for (const s of hotSectors) {
+    if (s.changePct < 1) break;
+    const matched = rows.find(r => r.name === s.name || s.name.includes(r.name) || r.name.includes(s.name));
+    if (matched) { matched.changePct = s.changePct; matched.upDown = `${s.up} / ${s.down}`; matched.inflowYi = Math.round((s.inflow || 0) / 100000000 * 10) / 10; continue; }
+    rows.push({
+      name: s.name, mappedName: s.name,
+      changePct: Math.round(s.changePct * 100) / 100,
+      upDown: `${s.up} / ${s.down}`,
+      inflowYi: Math.round((s.inflow || 0) / 100000000 * 10) / 10,
+      limitUpMax: '0', leadStock: '--',
+      _score: s.changePct * 10,
+      _hasZT: false
+    });
+  }
+  // 3) 计算 status / atds 并排序
+  for (const r of rows) {
+    if (r.changePct >= 2 && r.limitUpMax !== '0') { r.status = '主线确认'; r.atds = 96; }
+    else if (r.changePct >= 1) { r.status = '关注'; r.atds = 84; }
+    else if (r.changePct <= -1) { r.status = '偏弱等待'; r.atds = 55; }
+    else if (r.changePct < 0) { r.status = '弱势'; r.atds = 62; }
+    else { r.status = '正常'; r.atds = 70; }
+    r.newsAdjust = (!r.limitUpMax.startsWith('0')) ? '+1' : '0';
+  }
+  const mainRank = rows.sort((a, b) => b._score - a._score).slice(0, 27).map((s, i) => { s.rank = i + 1; delete s._score; delete s._hasZT; return s });
+  if (!mainRank.length && ztByHybk.size === 0) {
+    // 终极兜底:数据完全缺失时给个空数组
   }
 
   const dataAsOfDate = isPre ? qdate : date;
