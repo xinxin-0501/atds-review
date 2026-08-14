@@ -241,6 +241,10 @@
 .ms-add{font-size:10px;padding:3px 10px}
 .ms-addall{margin-top:4px;width:100%;padding:8px;font-size:12px;border-radius:8px}
 .ms-empty{font-size:11px;color:#999;padding:12px;text-align:center}
+.ms-refresh{margin-left:8px;font-size:10px;padding:3px 10px;border-radius:12px;background:#c33;color:#fff;border:1px solid #c33;cursor:pointer}
+.ms-refresh:active{opacity:.8}
+.ms-refresh{margin-left:8px;font-size:10px;padding:3px 10px;border-radius:12px;background:#c33;color:#fff;border:1px solid #c33;cursor:pointer}
+.ms-refresh:active{opacity:.8}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -335,6 +339,16 @@
 .intl-style-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:6px}
 .intl-style-body{font-size:11px;color:#333;line-height:1.5}
 .intl-missing{font-size:10px;color:#999;line-height:1.5;padding:8px 10px;background:#fafafa;border-radius:8px}
+.intl-detail{margin-top:10px;background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.intl-detail-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:4px}
+.intl-detail-asof{font-size:10px;color:#999;margin-bottom:8px;line-height:1.4}
+.intl-detail-table{width:100%;border-collapse:collapse;font-size:11px}
+.intl-detail-table th{background:#f6f8fb;color:#666;font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid #eee;font-size:10px}
+.intl-detail-table td{padding:6px 8px;border-bottom:1px solid #f5f5f5;color:#333;vertical-align:top}
+.intl-group-row td{background:#fafcff;color:#185FA5;font-weight:700;font-size:11px;padding:8px 8px 4px}
+.intl-dt-time{font-size:10px;color:#999}
+.intl-dt-src{font-size:10px;color:#999}
+.intl-dt-note{font-size:10px;color:#666;line-height:1.5;background:#fafcff}
 /* Hero 头部区 */
 .hero{background:linear-gradient(135deg,#fff8f5 0%,#fef3ed 50%,#fff 100%);padding:18px 16px 16px;border-radius:0 0 14px 14px;margin-bottom:8px;border-bottom:1px solid #f5e6dc}
 .hero-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
@@ -543,7 +557,7 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="../index.html">盘前</a><a href="2026-08-12_11-35.html">午盘</a><a href="2026-08-12_15-20.html" class="active">收盘</a><a href="2026-08-15_08-30.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-08-12_11-35.html">午盘</a><a href="2026-08-12_15-20.html" class="active">收盘</a><a href="2026-08-14_15-20.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘</div><h1 class="hero-title">2026-08-12 · <span class="hero-time">15:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 15:00</div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 100°</span></div></div>
@@ -575,10 +589,10 @@
     </div>
   </div>
   <div class="card ms-card">
-    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升 <button class="wl-tool ms-refresh" onclick="refreshMarketScan()">🔄 刷新重扫</button></div>
     <div class="ms-note">扫描范围：--（0 只候选，剔除 ST/新股）→ 识别 0 只形态启动个股</div>
     <div class="ms-gate red">反转闸门：红 · 禁开新仓（埋伏名单豁免） → 仅埋伏名单可操作，新仓需谨慎</div>
-    <div class="ms-list"><div class="ms-empty">当日无形态识别结果（数据源不可达或当日无启动形态个股）</div></div>
+    <div class="ms-list" id="ms-list"><div class="ms-empty">当日无形态识别结果（数据源不可达或当日无启动形态个股）</div></div>
     
     <div class="da-src">数据源：-- + 腾讯/东财K线 形态识别（启动/老鸭头/拉升）<span class="da-score">准确性 7/10（技术形态自动识别）</span></div>
   </div>
@@ -890,6 +904,69 @@ async function addAllPicks(){
   }
   saveWatchlist();
   alert('已加入 ' + added + ' 只形态个股到观察池');
+}
+// 前端形态识别(腾讯K线,支持CORS)
+async function fetchKlineF(code, count) {
+  count = count || 70;
+  try {
+    const url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + code + ',day,,,' + count + ',qfq';
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const txt = await res.text();
+    const j = JSON.parse(txt);
+    const series = j && j.data && j.data[code] && j.data[code].day;
+    return Array.isArray(series) ? series : [];
+  } catch (e) { return []; }
+}
+function detectPatternsF(klines) {
+  if (!Array.isArray(klines) || klines.length < 65) return null;
+  var closes = klines.map(function(k){ return parseFloat(k[2]); });
+  var vols = klines.map(function(k){ return parseFloat(k[5]) || 0; });
+  var ma = function(arr, n){ var s = 0; for (var i = arr.length - n; i < arr.length; i++) s += arr[i]; return s / n; };
+  var ma5 = ma(closes,5), ma10 = ma(closes,10), ma20 = ma(closes,20), ma60 = ma(closes,60);
+  var vol5 = ma(vols,5), vol20 = ma(vols,20);
+  var last = closes[closes.length-1], lastVol = vols[vols.length-1];
+  var pct5 = (last / closes[closes.length-6] - 1) * 100;
+  var ma20Prev3 = ma(closes.slice(0,-3), 20);
+  var patterns = [];
+  var recentAmp = (Math.max.apply(null, closes.slice(-20)) - Math.min.apply(null, closes.slice(-20))) / Math.min.apply(null, closes.slice(-20)) * 100;
+  if (last > ma20 && ma20 > ma20Prev3 && lastVol > vol20 * 1.3 && recentAmp < 25) patterns.push('启动');
+  if (ma10 > ma20 && ma20 > ma60) {
+    var r12 = klines.slice(-12);
+    var highs = r12.map(function(k){ return parseFloat(k[3]); });
+    var peak = Math.max.apply(null, highs.slice(0,-2));
+    var low12 = Math.min.apply(null, r12.map(function(k){ return parseFloat(k[4]); }));
+    if (low12 < peak * 0.97 && last > peak && lastVol > vol5 * 1.2) patterns.push('老鸭头');
+  }
+  if (ma5 > ma10 && ma10 > ma20 && pct5 > 5 && vol5 > vol20 * 1.1) patterns.push('拉升');
+  return patterns.length ? { patterns: patterns, pct5: pct5 } : null;
+}
+async function refreshMarketScan(){
+  var list = document.getElementById('ms-list');
+  if (!list) { alert('未找到形态扫描模块'); return; }
+  list.innerHTML = '<div class="ms-empty">🔄 刷新重扫中，请稍候...</div>';
+  // 收集候选代码:页面涨停梯队 + 观察池
+  var codes = new Set();
+  document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
+  document.querySelectorAll('.wl-row').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
+  if (codes.size < 5) {
+    document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
+  }
+  var arr = Array.from(codes).slice(0, 80);
+  var picks = [];
+  for (var i = 0; i < arr.length; i++) {
+    var code = arr[i];
+    var c0 = code.charAt(0);
+    var full = c0 === '6' ? 'sh' + code : 'sz' + code;
+    var kl = await fetchKlineF(full, 70);
+    if (!kl || !kl.length) continue;
+    var det = detectPatternsF(kl);
+    if (!det) continue;
+    picks.push({ code: code, name: code, pct: Math.round(det.pct5*100)/100, patterns: det.patterns, score: Math.min(90, 50 + det.patterns.length*10) });
+  }
+  if (!picks.length) { list.innerHTML = '<div class="ms-empty">刷新完成，未识别到形态个股（数据源可能仍不可达）</div>'; return; }
+  var html = picks.map(function(p, i){ return '<div class="ms-row"><span class="ms-rank">' + (i+1) + '</span><a class="da-stock ms-name" data-code="' + p.code + '" onclick="openStockResearch(this.dataset.code)">' + p.code + '</a><span class="ms-code">' + p.code + '</span><span class="ms-patterns">' + p.patterns.map(function(x){ return '<span class="ms-pattern">' + x + '</span>'; }).join('') + '</span><span class="ms-score">' + p.score + '</span><button class="wl-btn ms-add" data-code="' + p.code + '" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>'; }).join('');
+  list.innerHTML = html;
+  alert('刷新完成，识别 ' + picks.length + ' 只形态个股');
 }
 async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
