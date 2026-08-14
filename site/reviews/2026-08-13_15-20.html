@@ -203,6 +203,44 @@
 .gate-src{font-size:9px;color:#999;line-height:1.4}
 .da-stock{color:#c33;font-weight:700;text-decoration:underline;cursor:pointer}
 .da-stock{color:#c33;font-weight:700;text-decoration:underline;cursor:pointer}
+.ms-card{padding:14px 12px}
+.ms-note{font-size:10px;color:#888;margin-bottom:8px;line-height:1.5}
+.ms-gate{font-size:11px;font-weight:700;padding:8px 10px;border-radius:6px;margin-bottom:10px}
+.ms-gate.ok{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.ms-gate.red{background:#fee;color:#c33;border:1px solid #fcc}
+.ms-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.ms-row{display:flex;align-items:center;gap:8px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:8px 10px;font-size:11px;flex-wrap:wrap}
+.ms-rank{background:#c33;color:#fff;border-radius:3px;padding:1px 6px;font-weight:700;font-size:10px}
+.ms-name{font-weight:700;color:#c33;text-decoration:underline;cursor:pointer}
+.ms-code{color:#999;font-size:9px}
+.ms-pct{font-weight:700;font-size:11px}
+.ms-pct.up{color:#c33}
+.ms-pct.down{color:#185FA5}
+.ms-patterns{display:flex;gap:4px;flex-wrap:wrap}
+.ms-pattern{background:#fff7e6;color:#d49000;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600}
+.ms-score{background:#f5f5f5;color:#333;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;margin-left:auto}
+.ms-add{font-size:10px;padding:3px 10px}
+.ms-addall{margin-top:4px;width:100%;padding:8px;font-size:12px;border-radius:8px}
+.ms-empty{font-size:11px;color:#999;padding:12px;text-align:center}
+.ms-card{padding:14px 12px}
+.ms-note{font-size:10px;color:#888;margin-bottom:8px;line-height:1.5}
+.ms-gate{font-size:11px;font-weight:700;padding:8px 10px;border-radius:6px;margin-bottom:10px}
+.ms-gate.ok{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+.ms-gate.red{background:#fee;color:#c33;border:1px solid #fcc}
+.ms-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.ms-row{display:flex;align-items:center;gap:8px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:8px 10px;font-size:11px;flex-wrap:wrap}
+.ms-rank{background:#c33;color:#fff;border-radius:3px;padding:1px 6px;font-weight:700;font-size:10px}
+.ms-name{font-weight:700;color:#c33;text-decoration:underline;cursor:pointer}
+.ms-code{color:#999;font-size:9px}
+.ms-pct{font-weight:700;font-size:11px}
+.ms-pct.up{color:#c33}
+.ms-pct.down{color:#185FA5}
+.ms-patterns{display:flex;gap:4px;flex-wrap:wrap}
+.ms-pattern{background:#fff7e6;color:#d49000;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600}
+.ms-score{background:#f5f5f5;color:#333;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;margin-left:auto}
+.ms-add{font-size:10px;padding:3px 10px}
+.ms-addall{margin-top:4px;width:100%;padding:8px;font-size:12px;border-radius:8px}
+.ms-empty{font-size:11px;color:#999;padding:12px;text-align:center}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -535,6 +573,14 @@
     <div class="gate-src">数据源:①成交额(东财沪深接口/降级时显示--)/ ②60日新高(东财涨停池代理,基于1板+涨幅≥5%数量 = 0只/总涨停0只,真实接口数据更准)
       <span class="da-score">准确性 6/10(代理指标)</span>
     </div>
+  </div>
+  <div class="card ms-card">
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+    <div class="ms-note">扫描范围：--（0 只候选，剔除 ST/新股）→ 识别 0 只形态启动个股</div>
+    <div class="ms-gate red">反转闸门：红 · 禁开新仓（埋伏名单豁免） → 仅埋伏名单可操作，新仓需谨慎</div>
+    <div class="ms-list"><div class="ms-empty">暂无形态识别结果（数据源不可达或当日无形态个股）</div></div>
+    
+    <div class="da-src">数据源：-- + 腾讯/东财K线 形态识别（启动/老鸭头/拉升）<span class="da-score">准确性 7/10（技术形态自动识别）</span></div>
   </div>
   <div class="card da-card">
     <div class="card-title">AI 数据分析 · 八步复盘</div>
@@ -1052,6 +1098,19 @@ async function addFetchedToWatchlist(code){
   var el=document.querySelector('.wl-row[data-code="'+code+'"]');
   if(el)el.style.background="#e8f5e9";
   alert("已加入观察池:"+data.name);
+}
+async function addAllPicks(){
+  var buttons = document.querySelectorAll('.ms-add');
+  var added = 0;
+  for (var i = 0; i < buttons.length; i++) {
+    var code = buttons[i].getAttribute('data-code');
+    if (!code) continue;
+    if (document.querySelector('.wl-row[data-code="'+code+'"]')) continue;
+    var data = await fetchStockData(code);
+    if (data) { addToWatchlistUI(data); added++; }
+  }
+  saveWatchlist();
+  alert('已加入 ' + added + ' 只形态个股到观察池');
 }
 async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
