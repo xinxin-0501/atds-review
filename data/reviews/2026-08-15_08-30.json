@@ -4,7 +4,7 @@
     "time": "08:30",
     "type": "premarket",
     "typeLabel": "盘前简报",
-    "generatedAt": "2026-08-15 00:23:55",
+    "generatedAt": "2026-08-15 00:40:02",
     "market": "A股",
     "dataSource": "腾讯行情 + 东方财富公开接口",
     "dataAsOfDate": "2026-08-14",
@@ -50,9 +50,115 @@
     "scanned": 5004,
     "candidates": 66,
     "source": "全市场 5004 只 → 精准筛选 66 只(优先排序)",
-    "klineOk": 0,
-    "klineFail": 66,
-    "picks": []
+    "klineOk": 24,
+    "klineFail": 42,
+    "picks": [
+      {
+        "code": "300705",
+        "name": "�ŵ���ҩ",
+        "pct": 7.96,
+        "patterns": [
+          "启动",
+          "老鸭头",
+          "拉升"
+        ],
+        "score": 64,
+        "reason": "启动+老鸭头+拉升·量比2.0·5日涨11.2%"
+      },
+      {
+        "code": "601579",
+        "name": "���ɽ",
+        "pct": 7.05,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 50,
+        "reason": "拉升·量比2.0·5日涨24.1%"
+      },
+      {
+        "code": "600602",
+        "name": "��������",
+        "pct": 6.2,
+        "patterns": [
+          "老鸭头"
+        ],
+        "score": 50,
+        "reason": "老鸭头·量比2.0·5日涨14.7%"
+      },
+      {
+        "code": "300345",
+        "name": "����ɷ�",
+        "pct": 7.85,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 50,
+        "reason": "拉升·量比2.0·5日涨28.2%"
+      },
+      {
+        "code": "688167",
+        "name": "���Ƽ�",
+        "pct": 5.9,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 50,
+        "reason": "拉升·量比2.0·5日涨22.7%"
+      },
+      {
+        "code": "601890",
+        "name": "����ê��",
+        "pct": 6.87,
+        "patterns": [
+          "启动",
+          "拉升"
+        ],
+        "score": 47,
+        "reason": "启动+拉升·量比2.0·5日涨8.3%"
+      },
+      {
+        "code": "603496",
+        "name": "��Ϊ�Ƽ�",
+        "pct": 5.46,
+        "patterns": [
+          "启动",
+          "老鸭头"
+        ],
+        "score": 43,
+        "reason": "启动+老鸭头·量比2.0·5日涨7.1%"
+      },
+      {
+        "code": "300004",
+        "name": "�Ϸ�ɷ�",
+        "pct": 6.83,
+        "patterns": [
+          "启动",
+          "拉升"
+        ],
+        "score": 39,
+        "reason": "启动+拉升·量比2.0·5日涨5.6%"
+      },
+      {
+        "code": "300052",
+        "name": "���౦",
+        "pct": 7.15,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 33,
+        "reason": "拉升·量比2.0·5日涨6.4%"
+      },
+      {
+        "code": "300738",
+        "name": "�·�����",
+        "pct": 7.08,
+        "patterns": [
+          "启动"
+        ],
+        "score": 29,
+        "reason": "启动·量比2.0·5日涨5.1%"
+      }
+    ]
   },
   "regimeGate": {
     "totalAmount": 0,
@@ -4403,31 +4509,31 @@
   "intlMkt": {
     "us.DJI": {
       "name": "道琼斯",
-      "price": 53725.98,
-      "change": -114.01,
-      "changePct": -0.21,
-      "time": "2026-08-14 12:25:40"
+      "price": 53744.11,
+      "change": -95.88,
+      "changePct": -0.18,
+      "time": "2026-08-14 12:42:00"
     },
     "us.IXIC": {
       "name": "纳斯达克",
-      "price": 26710.69,
-      "change": -92.34,
-      "changePct": -0.34,
-      "time": "2026-08-14 12:25:41"
+      "price": 26690.47,
+      "change": -112.56,
+      "changePct": -0.42,
+      "time": "2026-08-14 12:42:00"
     },
     "hf_CL": {
       "name": "纽约原油",
       "price": 81.72,
-      "change": 0.57,
-      "changePct": 0.7,
-      "time": "00:25:01"
+      "change": 0.58,
+      "changePct": 0.71,
+      "time": "00:42:06"
     },
     "hf_GC": {
       "name": "纽约黄金",
-      "price": 4447.57,
-      "change": 0.61,
+      "price": 4445.22,
+      "change": 0.56,
       "changePct": 0.01,
-      "time": "00:25:02"
+      "time": "00:42:06"
     }
   },
   "closeEmotion": {
