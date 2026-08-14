@@ -591,18 +591,25 @@ function buildStockRow(s, i) {
   const riskName = deriveRiskLevel(s.pct).name;
   const horizonTone = deriveTimeHorizon(s.pct, s.turnover).tone;
   const adviceTone = deriveAdvice(s.pct, atds, riskTone).tone;
-  return `<tr class="wl-row" data-code="${esc(code)}">
+  const main = `<tr class="wl-row" data-code="${esc(code)}">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><div><div class="wl-name">${esc(s.name)}</div><div class="wl-code">${esc(code)}</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price ${cls}">${fmtNum(s.price)}</div></td>
-    <td class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</div>
+    <td class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</td>
     <td class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</td>
     <td class="wl-cell wl-cell-atds">${atds}</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-${sig.tone}">${esc(sig.name)}</span></td>
-    <td class="wl-cell wl-cell-risk"><div class="risk-tag risk-${riskTone}">${esc(riskName)}</div><div class="cell-lines">${riskLines.map(l=>'<div class="cell-line">' + esc(l) + '</div>').join('')}</div></td>
-    <td class="wl-cell wl-cell-horizon"><div class="horizon-tag horizon-${horizonTone}">${esc(deriveTimeHorizon(s.pct, s.turnover).name)}</div><div class="cell-lines">${horizons.map(h=>'<div class="horizon-line"><b>' + esc(h.k) + ':</b>' + esc(h.v) + '</div>').join('')}</div></td>
-    <td class="wl-cell wl-cell-advice"><div class="advice-tag advice-${adviceTone}">${esc(deriveAdvice(s.pct, atds, riskTone).name)}</div><div class="cell-lines"><div class="cell-line">${esc(adviceText)}</div></div></td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="showResearch(this.dataset.code)">全面分析</button></td>
   </tr>`;
+  const detail = `<tr class="wl-detail-row" data-detail-code="${esc(code)}">
+    <td colspan="7" class="wl-detail-cell">
+      <div class="detail-grid">
+        <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-${riskTone}">${esc(riskName)}</span></div>${riskLines.map(l=>'<div class="detail-line">' + esc(l) + '</div>').join('')}</div>
+        <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-${horizonTone}">${esc(deriveTimeHorizon(s.pct, s.turnover).name)}</span></div>${horizons.map(h=>'<div class="detail-line"><b>' + esc(h.k) + '</b>' + esc(h.v) + '</div>').join('')}</div>
+        <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-${adviceTone}">${esc(deriveAdvice(s.pct, atds, riskTone).name)}</span></div><div class="detail-line">${esc(adviceText)}</div></div>
+      </div>
+    </td>
+  </tr>`;
+  return main + detail;
 }
 
 function buildStockModal(s) {
