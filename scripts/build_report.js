@@ -56,7 +56,7 @@ function renderHero(report) {
   const desc = m.type === 'premarket'
     ? '基于上一交易日数据 · 今日开盘前参考 · 非买卖建议'
     : m.type === 'midday'
-      ? '实时盘中快照 · 数据截至 ' + (m.time || '11:35')
+      ? '实时盘中快照 · 实时更新中'
       : '收盘静态快照 · 数据截至 15:00';
   return '<div class="hero">' +
     '<div class="hero-eyebrow">A 股每日复盘 · ' + (esc(m.typeLabel || '')) + '</div>' +
@@ -356,7 +356,7 @@ function renderCloseEmotion(report) {
 
   return '<div class="close-emotion">' +
     '<div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div>' +
-    '<div class="ce-title">' + esc(m.date || '') + ' ' + esc(m.typeLabel || '') + ' · 数据截至 ' + esc(m.time || '15:00') + '</div>' +
+    '<div class="ce-title">' + esc(m.date || '') + ' ' + esc(m.typeLabel || '') + (m.type === 'midday' ? ' · 实时更新中' : ' · 数据截至 ' + esc(m.time || '15:00')) + '</div>' +
     topPanel +
     emotion +
     broadBlock +
@@ -924,8 +924,6 @@ ${renderHero(report)}
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="hint">市场综述 + AUTO REFRESH</div>
   </div>
-  ${renderRegimeGate(report)}
-  ${renderMarketScan(report)}
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
   ${renderDragonPool(report)}
