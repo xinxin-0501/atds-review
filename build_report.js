@@ -56,7 +56,7 @@ function renderHero(report) {
   const desc = m.type === 'premarket'
     ? '基于上一交易日数据 · 今日开盘前参考 · 非买卖建议'
     : m.type === 'midday'
-      ? '实时盘中快照 · 数据截至 ' + (m.time || '11:35')
+      ? '实时盘中快照 · 实时更新中'
       : '收盘静态快照 · 数据截至 15:00';
   return '<div class="hero">' +
     '<div class="hero-eyebrow">A 股每日复盘 · ' + (esc(m.typeLabel || '')) + '</div>' +
@@ -356,7 +356,7 @@ function renderCloseEmotion(report) {
 
   return '<div class="close-emotion">' +
     '<div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div>' +
-    '<div class="ce-title">' + esc(m.date || '') + ' ' + esc(m.typeLabel || '') + ' · 数据截至 ' + esc(m.time || '15:00') + '</div>' +
+    '<div class="ce-title">' + esc(m.date || '') + ' ' + esc(m.typeLabel || '') + (m.type === 'midday' ? ' · 实时更新中' : ' · 数据截至 ' + esc(m.time || '15:00')) + '</div>' +
     topPanel +
     emotion +
     broadBlock +
@@ -513,8 +513,8 @@ function renderRegimeGate(report) {
         <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标</div>
         <div class="gate-diff ${taOk ? 'ok' : 'red'}">${ta ? (taOk ? '✓ 超过 ' + taDiff + ' 亿' : '✗ 差 ' + (29650 - ta).toFixed(0) + ' 亿 (' + taPct + '%)') : '数据获取中'}</div>
       </div>
-      <div class="gate-block">
-        <div class="gate-h">② 60日新高个股数</div>
+      <div class="gate-block gate-click" onclick="openRegimeNHList()">
+        <div class="gate-h">② 60日新高个股数 <span class="gate-link">📋 点击查看</span></div>
         <div class="gate-value ${nhOk ? 'ok' : 'red'}">${nh} 只</div>
         <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
         <div class="gate-diff ${nhOk ? 'ok' : 'red'}">${nh ? (nhOk ? '✓ 超过 ' + nhDiff + ' 只' : '✗ 差 ' + (-nhDiff) + ' 只 (' + nhPct + '%)') : '--'}</div>
@@ -546,10 +546,10 @@ function renderMarketScan(report) {
       <button class="wl-btn ms-add" data-code="${esc(p.code)}" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
     </div>`).join('');
   return `<div class="card ms-card">
-    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升 <button class="wl-tool ms-refresh" onclick="refreshMarketScan()">🔄 刷新重扫</button></div>
     <div class="ms-note">扫描范围：${esc(ms.source || '--')}（${ms.candidates || 0} 只候选，剔除 ST/新股）→ 识别 ${picks.length} 只形态启动个股</div>
     <div class="ms-gate ${gateOpen ? 'ok' : 'red'}">反转闸门：${gateOpen ? '绿 · 放行' : '红 · 禁开新仓（埋伏名单豁免）'}${gateOpen ? ' → 以下可考虑加入观察池' : ' → 仅埋伏名单可操作，新仓需谨慎'}</div>
-    <div class="ms-list">${rows || `<div class="ms-empty">${(ms.klineFail || 0) > 0 && !(ms.klineOk || 0) ? 'K线数据源当前不可达（' + (ms.klineFail || 0) + ' 只候选 K 线获取失败），形态识别未执行。网络恢复后自动生效。' : '当日无形态识别结果（数据源不可达或当日无启动形态个股）'}</div>`}</div>
+    <div class="ms-list" id="ms-list">${rows || `<div class="ms-empty">${(ms.klineFail || 0) > 0 && !(ms.klineOk || 0) ? 'K线数据源当前不可达（' + (ms.klineFail || 0) + ' 只候选 K 线获取失败），形态识别未执行。网络恢复后自动生效。' : '当日无形态识别结果（数据源不可达或当日无启动形态个股）'}</div>`}</div>
     ${picks.length ? '<button class="wl-tool wl-tool-red ms-addall" onclick="addAllPicks()">一键全部加入观察池</button>' : ''}
     <div class="da-src">数据源：${esc(ms.source || '--')} + 腾讯/东财K线 形态识别（启动/老鸭头/拉升）<span class="da-score">准确性 7/10（技术形态自动识别）</span></div>
   </div>`;
@@ -791,6 +791,9 @@ function buildStockRow(s, i) {
   const riskName = deriveRiskLevel(s.pct).name;
   const horizonTone = deriveTimeHorizon(s.pct, s.turnover).tone;
   const adviceTone = deriveAdvice(s.pct, atds, riskTone).tone;
+  const stopLoss = (s.price * 0.95).toFixed(2);
+  const support = (s.price * 0.92).toFixed(2);
+  const pressure = (s.price * 1.08).toFixed(2);
   const main = `<tr class="wl-row" data-code="${esc(code)}">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><div><div class="wl-name">${esc(s.name)}</div><div class="wl-code">${esc(code)}</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price ${cls}">${fmtNum(s.price)}</div></td>
@@ -798,18 +801,22 @@ function buildStockRow(s, i) {
     <td class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</td>
     <td class="wl-cell wl-cell-atds">${atds}</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-${sig.tone}">${esc(sig.name)}</span></td>
-    <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="showResearch(this.dataset.code)">全面分析</button></td>
+    <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="showResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="${esc(code)}" onclick="removeWatchlistRow(this.dataset.code)" style="margin-left:4px;font-size:10px;padding:3px 8px;">删除</button></td>
   </tr>`;
-  const detail = `<tr class="wl-detail-row" data-detail-code="${esc(code)}">
-    <td colspan="7" class="wl-detail-cell">
-      <div class="detail-grid">
-        <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-${riskTone}">${esc(riskName)}</span></div>${riskLines.map(l=>'<div class="detail-line">' + esc(l) + '</div>').join('')}</div>
-        <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-${horizonTone}">${esc(deriveTimeHorizon(s.pct, s.turnover).name)}</span></div>${horizons.map(h=>'<div class="detail-line"><b>' + esc(h.k) + '</b>' + esc(h.v) + '</div>').join('')}</div>
-        <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-${adviceTone}">${esc(deriveAdvice(s.pct, atds, riskTone).name)}</span></div><div class="detail-line">${esc(adviceText)}</div></div>
-      </div>
-    </td>
-  </tr>`;
-  return main + detail;
+  // 详情卡独立 div,放在主行表格外,避免受 .wl-table max-content 撑大影响 detail-spb 三项被裁
+  const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
+    <div class="detail-grid">
+      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-${riskTone}">${esc(riskName)}</span></div>${riskLines.map(l=>'<div class="detail-line">' + esc(l) + '</div>').join('')}</div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-${horizonTone}">${esc(deriveTimeHorizon(s.pct, s.turnover).name)}</span></div>${horizons.map(h=>'<div class="detail-line"><b>' + esc(h.k) + '</b>' + esc(h.v) + '</div>').join('')}</div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-${adviceTone}">${esc(deriveAdvice(s.pct, atds, riskTone).name)}</span></div><div class="detail-line">${esc(adviceText)}</div></div>
+    </div>
+    <div class="detail-spb">
+      <span><b>止损</b>${stopLoss}</span>
+      <span><b>支撑</b>${support}</span>
+      <span><b>压力</b>${pressure}</span>
+    </div>
+  </div>`;
+  return { main, detail };
 }
 
 function buildStockModal(s) {
@@ -835,7 +842,9 @@ function buildStockModal(s) {
 function renderWatchlist(report) {
   const list = report.watchlist || [];
   const time = (report.meta && report.meta.generatedAt) || '';
-  const mds = list.map(buildStockRow).join('');
+  const built = list.map(buildStockRow);
+  const mds = built.map(b => b.main).join('');
+  const details = built.map(b => b.detail).join('');
   const head = '<div class="card watchlist-card">' +
     '<div class="wl-header">' +
       '<div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● ' + esc(time) + '</span></div>' +
@@ -846,8 +855,9 @@ function renderWatchlist(report) {
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
       '</div>' +
     '</div>' +
-    '<div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>风险</th><th>风控</th><th>建议</th><th>操作</th></tr></thead></div>' +
+    '<div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>操作</th></tr></thead></div>' +
     '<div class="wl-table-body"><table class="wl-table"><tbody>' + mds + '</tbody></table></div>' +
+    '<div class="wl-details">' + details + '</div>' +
     '</div>';
   const modals = list.map(buildStockModal).join('');
   const knowledge = '<div class="card knowledge-card">' +
@@ -920,19 +930,16 @@ function renderPremarketReport(report, nav) {
 ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
+  ${renderWatchlist(report)}
   <div class="card">
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="hint">市场综述 + AUTO REFRESH</div>
   </div>
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
-  ${renderDragonPool(report)}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
-  ${renderWatchlist(report)}
   ${renderStockResearch(report)}
-  ${renderSectors(report)}
-  ${renderLimitUp(report)}
   ${renderIntlEvents(report)}
   ${renderIntlMkt(report)}
   ${renderNewsDigest(report)}
@@ -1012,6 +1019,18 @@ function renderIndex(reports) {
     const label = `${d} ${t} · ${esc(r.meta.typeLabel || '')}`;
     return `<a class="report-card" href="${url}"><div class="rc-title">${label}</div><div class="rc-meta">${esc((r.indices || []).slice(0,3).map(i => i.name + ' ' + fmtPct(i.changePct)).join(' / '))}</div></a>`;
   }).join('');
+  // 动态取最新盘前/午盘/收盘
+  const urlOf = r => `reviews/${r.meta.date}_${String(r.meta.time).replace(':', '-')}.html`;
+  const pre = reports.find(r => r.meta.type === 'premarket');
+  const mid = reports.find(r => r.meta.type === 'midday');
+  const clo = reports.find(r => r.meta.type === 'close');
+  const preUrl = pre ? urlOf(pre) : 'main-rank.html';
+  const midUrl = mid ? urlOf(mid) : 'main-rank.html';
+  const cloUrl = clo ? urlOf(clo) : 'main-rank.html';
+  const preLabel = pre ? `${pre.meta.date} 08:30 简报` : '暂无盘前数据';
+  const midLabel = mid ? `${mid.meta.date} 11:35 快照` : '暂无盘中数据';
+  const cloLabel = clo ? `${clo.meta.date} 15:20 复盘` : '暂无收盘数据';
+
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1036,9 +1055,9 @@ function renderIndex(reports) {
 </div>
 <div class="section">
   <div class="tools">
-    <a class="tool-btn" href="reviews/2026-08-13_08-30.html">盘前 08:30 简报</a>
-    <a class="tool-btn" href="reviews/2026-08-12_11-35.html">盘中 11:35 快照</a>
-    <a class="tool-btn" href="reviews/2026-08-12_15-20.html">收盘 15:20 复盘</a>
+    <a class="tool-btn" href="${preUrl}">盘前 08:30 简报 · ${pre.meta ? pre.meta.date : ''}</a>
+    <a class="tool-btn" href="${midUrl}">盘中 11:35 快照 · ${mid ? mid.meta.date : ''}</a>
+    <a class="tool-btn" href="${cloUrl}">收盘 15:20 复盘 · ${clo ? clo.meta.date : ''}</a>
     <a class="tool-btn" href="main-rank.html">主线实时校准</a>
     <button class="tool-btn qr-btn" onclick="showQr()">手机扫码打开</button>
   </div>
@@ -1093,7 +1112,7 @@ function build() {
     const m = report.meta;
     const sameDay = byDate[m.date] || {};
     const nav = {
-      home: '../index.html',
+      home: 'index.html',
       midday: stripReviews(sameDay.midday) || latestOfType('midday') || '../index.html',
       close: stripReviews(sameDay.close) || latestOfType('close') || '../index.html',
       latest: stripReviews(latest)
