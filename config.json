@@ -1,23 +1,42 @@
 {
   "watchlist": [
-    { "code": "600487", "name": "亨通光电", "setcode": "1" },
-    { "code": "600392", "name": "盛和资源", "setcode": "1" },
-    { "code": "300285", "name": "国瓷材料", "setcode": "0" },
-    { "code": "300308", "name": "中际旭创", "setcode": "0" },
-    { "code": "603538", "name": "美诺华", "setcode": "1" },
-    { "code": "300342", "name": "天银机电", "setcode": "0" },
-    { "code": "300607", "name": "拓斯达", "setcode": "0" }
+    {
+      "code": "600392",
+      "name": "盛和资源",
+      "setcode": "1"
+    }
   ],
   "indices": [
-    { "code": "000001", "name": "上证指数", "setcode": "1" },
-    { "code": "399001", "name": "深证成指", "setcode": "0" },
-    { "code": "399006", "name": "创业板指", "setcode": "0" }
+    {
+      "code": "000001",
+      "name": "上证指数",
+      "setcode": "1"
+    },
+    {
+      "code": "399001",
+      "name": "深证成指",
+      "setcode": "0"
+    },
+    {
+      "code": "399006",
+      "name": "创业板指",
+      "setcode": "0"
+    }
   ],
   "dataDir": "data/reviews",
   "siteDir": "site",
   "reportTypes": {
-    "premarket": { "label": "盘前简报", "time": "08:30" },
-    "midday": { "label": "午盘快照", "time": "11:35" },
-    "close": { "label": "收盘复盘", "time": "15:20" }
+    "premarket": {
+      "label": "盘前简报",
+      "time": "08:30"
+    },
+    "midday": {
+      "label": "午盘快照",
+      "time": "11:35"
+    },
+    "close": {
+      "label": "收盘复盘",
+      "time": "15:20"
+    }
   }
 }
