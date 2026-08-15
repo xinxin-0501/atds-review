@@ -852,7 +852,7 @@ async function refreshRegimeNH(){
 }
 function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
 
-async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
+async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();window.__atdsUnlocked=true;if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
 function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
@@ -864,6 +864,9 @@ function escHtmlF(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/
 function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
   if(!card)return;
+  var body=card.querySelector(".wl-table-body");
+  if(!body){body=card;}
+  var tbody=body.querySelector("tbody")||body;
   var n=card.querySelectorAll(".wl-row").length+1;
   var v=Number(s.pct)||0;
   var cls=v>=0?"up":"down";
@@ -875,53 +878,46 @@ function addToWatchlistUI(s){
   else if(v>=-3){sigLabel="走势承压";sigTone="press";}
   else{sigLabel="弱势回调";sigTone="weak";}
   var atds=70+Math.min(25,Math.max(-15,Math.round(v*2+(Number(s.turnover)||0)*0.5)));
-  var row=document.createElement("div");
+  var stopLoss=(Number(s.price)*0.95).toFixed(2);
+  var support=(Number(s.price)*0.92).toFixed(2);
+  var pressure=(Number(s.price)*1.08).toFixed(2);
+  var row=document.createElement("tr");
   row.className="wl-row wl-row-new";
   row.setAttribute("data-code",s.code);
-  var rank=document.createElement("div");
-  rank.className="wl-cell wl-cell-rank";
-  var no=document.createElement("span");no.className="rank-no";no.textContent=n;
-  var nmBox=document.createElement("div");
-  var nm=document.createElement("div");nm.className="wl-name";nm.textContent=s.name;
-  var cd=document.createElement("div");cd.className="wl-code";cd.textContent=s.code;
-  nmBox.appendChild(nm);nmBox.appendChild(cd);
-  rank.appendChild(no);rank.appendChild(nmBox);
-  var price=document.createElement("div");price.className="wl-cell wl-cell-price";
-  var pv=document.createElement("div");pv.className="price "+cls;pv.textContent=Number(s.price).toFixed(2);
-  price.appendChild(pv);
-  var pct=document.createElement("div");pct.className="wl-cell wl-cell-pct "+cls;pct.textContent=(v>0?"+":"")+v.toFixed(2)+"%";
-  var amt=document.createElement("div");amt.className="wl-cell wl-cell-amt";amt.textContent=s.amount;
-  var atdsEl=document.createElement("div");atdsEl.className="wl-cell wl-cell-atds";atdsEl.textContent=atds;
-  var sigEl=document.createElement("div");sigEl.className="wl-cell wl-cell-sig";
-  var sigSp=document.createElement("span");sigSp.className="sig sig-"+sigTone;sigSp.textContent=sigLabel;
-  sigEl.appendChild(sigSp);
-  var act=document.createElement("div");act.className="wl-cell wl-cell-act";
-  var b1=document.createElement("button");b1.className="wl-btn wl-btn-primary";b1.textContent="全面分析";
-  b1.onclick=function(){showResearch(s.code);};
-  var b2=document.createElement("button");b2.className="wl-btn";b2.textContent="删除自选";
-  b2.onclick=function(){removeWatchlistRow(s.code);};
-  act.appendChild(b1);act.appendChild(b2);
-  row.appendChild(rank);row.appendChild(price);row.appendChild(pct);row.appendChild(amt);row.appendChild(atdsEl);row.appendChild(sigEl);row.appendChild(act);
-  var head=card.querySelector(".wl-table-head");
-  if(head)head.insertAdjacentElement("afterend",row);
+  row.innerHTML =
+    '<td class="wl-cell wl-cell-rank"><span class="rank-no">'+n+'</span><div><div class="wl-name">'+escHtmlF(s.name)+'</div><div class="wl-code">'+escHtmlF(s.code)+'</div></div></td>'+
+    '<td class="wl-cell wl-cell-price"><div class="price '+cls+'">'+Number(s.price).toFixed(2)+'</div></td>'+
+    '<td class="wl-cell wl-cell-pct '+cls+'">'+(v>0?"+":"")+v.toFixed(2)+'%</td>'+
+    '<td class="wl-cell wl-cell-amt">'+escHtmlF(s.amount||'--')+'</td>'+
+    '<td class="wl-cell wl-cell-atds">'+atds+'</td>'+
+    '<td class="wl-cell wl-cell-sig"><span class="sig sig-'+sigTone+'">'+sigLabel+'</span></td>'+
+    '<td class="wl-cell wl-cell-stop" data-stop="'+escHtmlF(s.code)+'">'+stopLoss+'</td>'+
+    '<td class="wl-cell wl-cell-support" data-sup="'+escHtmlF(s.code)+'">'+support+'</td>'+
+    '<td class="wl-cell wl-cell-pressure" data-pre="'+escHtmlF(s.code)+'">'+pressure+'</td>'+
+    '<td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="'+escHtmlF(s.code)+'" onclick="showResearch(this.dataset.code)">全面分析</button><button class="wl-btn" data-code="'+escHtmlF(s.code)+'" onclick="removeWatchlistRow(this.dataset.code)" style="margin-left:4px;">删除</button></td>';
+  tbody.appendChild(row);
 
-  // 同时插入详情行(风险/风控/建议)
-  var pct=Number(s.pct)||0,turnover=Number(s.turnover)||0;
-  var atds=70+Math.min(25,Math.max(-15,Math.round(pct*2+turnover*0.5)));
-  var riskL=deriveRiskLevelF(pct),horizonL=deriveTimeHorizonF(pct,turnover),adviceL=deriveAdviceF(pct,atds,riskL.tone);
-  var riskLines=deriveRiskTextF(pct,turnover);
-  var horizons=deriveHorizonLinesF(pct,turnover);
-  var adviceText=deriveAdviceTextF(pct,atds,riskL.tone);
+  // 详情行(风险/风控/建议)—— 与后端 buildStockRow 一致
+  var turnover=Number(s.turnover)||0;
+  var riskL=deriveRiskLevelF(v),horizonL=deriveTimeHorizonF(v,turnover),adviceL=deriveAdviceF(v,atds,riskL.tone);
+  var riskLines=deriveRiskTextF(v,turnover);
+  var horizons=deriveHorizonLinesF(v,turnover);
+  var adviceText=deriveAdviceTextF(v,atds,riskL.tone);
   var detail=document.createElement('tr');
   detail.className='wl-detail-row';
   detail.setAttribute('data-detail-code',s.code);
-  detail.innerHTML='<td colspan="7" class="wl-detail-cell"><div class="detail-grid">'+
+  detail.innerHTML='<td colspan="10" class="wl-detail-cell"><div class="detail-grid">'+
     '<div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-'+riskL.tone+'">'+escHtmlF(riskL.name)+'</span></div>'+riskLines.map(function(l){return '<div class="detail-line">'+escHtmlF(l)+'</div>';}).join('')+'</div>'+
     '<div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-'+horizonL.tone+'">'+escHtmlF(horizonL.name)+'</span></div>'+horizons.map(function(h){return '<div class="detail-line"><b>'+escHtmlF(h.k)+'</b>'+escHtmlF(h.v)+'</div>';}).join('')+'</div>'+
     '<div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-'+adviceL.tone+'">'+escHtmlF(adviceL.name)+'</span></div><div class="detail-line">'+escHtmlF(adviceText)+'</div></div>'+
     '</div></td>';
   row.insertAdjacentElement('afterend',detail);
+  // 创建对应 modal(让"全面分析"按钮能弹出模态)
+  if (typeof showDynamicResearch === 'function' && !document.getElementById('modal-'+s.code)) {
+    try { showDynamicResearch(s); } catch(e) {}
+  }
 }
+
 function removeWatchlistRow(code){var r=document.querySelector('.wl-row[data-code="'+code+'"]');if(r)r.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();}
 function saveWatchlist(){try{var codes=[];document.querySelectorAll(".wl-row").forEach(function(r){var cd=r.getAttribute("data-code");if(cd)codes.push(cd);});localStorage.setItem("atds_watchlist",JSON.stringify(codes));}catch(e){}}
 function renderStockModalFront(s){
@@ -972,10 +968,16 @@ function downloadMd(){var el=document.getElementById("knowledge-md");if(!el){ale
 function copyMd(){var el=document.getElementById("knowledge-md");if(!el||!navigator.clipboard){alert("复制失败");return;}navigator.clipboard.writeText(el.textContent).then(function(){alert("已复制到剪贴板");});}
 function loadSavedWatchlist(){try{var raw=localStorage.getItem("atds_watchlist");return raw?JSON.parse(raw):[];}catch(e){return [];}}
 function restoreSavedWatchlist(){
+  // 默认启动过滤:只保留盛和资源(600392);后续用户自选增加不再过滤
   var codes=loadSavedWatchlist().filter(function(cd){
+    if (!window.__atdsUnlocked) return String(cd) === '600392';
     var existing=document.querySelector('.wl-row[data-code="'+cd+'"]');
     return !existing;
   });
+  // 若 localStorage 已有非盛和资源代码,清理之(下次自选不再受影响)
+  if (!window.__atdsUnlocked) {
+    try { localStorage.setItem('atds_watchlist', JSON.stringify(codes)); } catch(e) {}
+  }
   if(!codes.length)return;
   (async function(){
     for(var i=0;i<codes.length;i++){
