@@ -351,6 +351,16 @@
 .intl-style-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:6px}
 .intl-style-body{font-size:11px;color:#333;line-height:1.5}
 .intl-missing{font-size:10px;color:#999;line-height:1.5;padding:8px 10px;background:#fafafa;border-radius:8px}
+.intl-detail{margin-top:10px;background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.intl-detail-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:4px}
+.intl-detail-asof{font-size:10px;color:#999;margin-bottom:8px;line-height:1.4}
+.intl-detail-table{width:100%;border-collapse:collapse;font-size:11px}
+.intl-detail-table th{background:#f6f8fb;color:#666;font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid #eee;font-size:10px}
+.intl-detail-table td{padding:6px 8px;border-bottom:1px solid #f5f5f5;color:#333;vertical-align:top}
+.intl-group-row td{background:#fafcff;color:#185FA5;font-weight:700;font-size:11px;padding:8px 8px 4px}
+.intl-dt-time{font-size:10px;color:#999}
+.intl-dt-src{font-size:10px;color:#999}
+.intl-dt-note{font-size:10px;color:#666;line-height:1.5;background:#fafcff}
 /* Hero 头部区 */
 .hero{background:linear-gradient(135deg,#fff8f5 0%,#fef3ed 50%,#fff 100%);padding:18px 16px 16px;border-radius:0 0 14px 14px;margin-bottom:8px;border-bottom:1px solid #f5e6dc}
 .hero-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
@@ -559,7 +569,7 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-08-14_11-35.html">午盘</a><a href="2026-08-14_15-20.html">收盘</a><a href="2026-08-15_08-30.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-08-14_11-35.html">午盘</a><a href="2026-08-14_15-20.html">收盘</a><a href="2026-08-14_15-20.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-08-14 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
@@ -726,18 +736,23 @@ async function fetchStockData(raw){
   if(!/^\d{6}$/.test(String(raw)))return null;
   var c0=String(raw).charAt(0);var sc;
   if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
-  try{
-    var res=await fetch("https://qt.gtimg.cn/q="+sc+raw);
-    var buf=await res.arrayBuffer();
-    var text=new TextDecoder("gbk").decode(buf);
-    var m=text.match(/="([^"]+)"/);if(!m)return null;
-    var f=m[1].split("~");if(f.length<40)return null;
-    var retCode=String(f[2]||"").trim();
-    if(retCode!==String(raw))return null;
-    var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
-    if(!data.name)return null;
-    return data;
-  }catch(e){return null;}
+  for(var attempt=0;attempt<3;attempt++){
+    try{
+      var res=await fetch("https://qt.gtimg.cn/q="+sc+raw,{cache:"no-store"});
+      if(!res.ok)continue;
+      var buf=await res.arrayBuffer();
+      var text=new TextDecoder("gbk").decode(buf);
+      var m=text.match(/="([^"]+)"/);if(!m)continue;
+      var f=m[1].split("~");if(f.length<40)continue;
+      var retCode=String(f[2]||"").trim();
+      if(retCode!==String(raw))continue;
+      var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
+      if(!data.name)continue;
+      return data;
+    }catch(e){}
+    if(attempt<2)await new Promise(function(r){setTimeout(r,500);});
+  }
+  return null;
 }
 async function openStockResearch(code){
   code=String(code||"").trim();
@@ -750,14 +765,27 @@ async function openStockResearch(code){
 }
 async function addFetchedToWatchlist(code){
   code=String(code||"").trim();
-  if(document.querySelector('.wl-row[data-code="'+code+'"]')){alert("已在观察池中");return;}
+  var modalEl=document.getElementById("modal-"+code);
+  var footer=modalEl?modalEl.querySelector(".modal-footer"):null;
+  // 检查是否已存在
+  if(document.querySelector('.wl-row[data-code="'+code+'"]')){
+    if(footer)footer.innerHTML='<span style="color:#d49000">⚠ 已在观察池中</span>';
+    if(modalEl){var r=modalEl.querySelector('.wl-row[data-code="'+code+'"]');if(r){r.style.background="#fff7e6";setTimeout(function(){r.style.background="";},1500);}}
+    return;
+  }
+  // 显示加载状态
+  if(footer)footer.innerHTML='<span style="color:#888">⏳ 正在获取行情并加入观察池...</span>';
   var data=await fetchStockData(code);
-  if(!data){alert("获取行情失败");return;}
+  if(!data){
+    if(footer)footer.innerHTML='<span style="color:#c33">⚠ 获取行情失败,请重试</span>';
+    return;
+  }
   addToWatchlistUI(data);
   saveWatchlist();
   var el=document.querySelector('.wl-row[data-code="'+code+'"]');
-  if(el)el.style.background="#e8f5e9";
-  alert("已加入观察池:"+data.name);
+  if(el){el.style.background="#e8f5e9";setTimeout(function(){el.style.background="";},1500);}
+  if(footer)footer.innerHTML='<span style="color:#2e7d32">✓ 已加入观察池: '+data.name+'</span>';
+  setTimeout(function(){closeModal(code);},1500);
 }
 async function addAllPicks(){
   var buttons = document.querySelectorAll('.ms-add');
@@ -937,7 +965,7 @@ async function refreshRegimeNH(){
 }
 function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
 
-async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();window.__atdsUnlocked=true;if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{addToWatchlistUI(data);showDynamicResearch(data);saveWatchlist();}input.value="";}catch(e){alert("网络异常："+e.message);}}
+async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();window.__atdsUnlocked=true;if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{showDynamicResearch(data);}input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
 function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
@@ -1053,16 +1081,15 @@ function downloadMd(){var el=document.getElementById("knowledge-md");if(!el){ale
 function copyMd(){var el=document.getElementById("knowledge-md");if(!el||!navigator.clipboard){alert("复制失败");return;}navigator.clipboard.writeText(el.textContent).then(function(){alert("已复制到剪贴板");});}
 function loadSavedWatchlist(){try{var raw=localStorage.getItem("atds_watchlist");return raw?JSON.parse(raw):[];}catch(e){return [];}}
 function restoreSavedWatchlist(){
-  // 默认启动过滤:只保留盛和资源(600392);后续用户自选增加不再过滤
+  // 默认启动过滤:只保留盛和资源(600392);用户首次手动搜索加入其他股票时 __atdsUnlocked=true,后续不再过滤
   var codes=loadSavedWatchlist().filter(function(cd){
-    if (!window.__atdsUnlocked) return String(cd) === '600392';
-    var existing=document.querySelector('.wl-row[data-code="'+cd+'"]');
-    return !existing;
+    if (window.__atdsUnlocked) return true;
+    return String(cd) === '600392';
   });
-  // 若 localStorage 已有非盛和资源代码,清理之(下次自选不再受影响)
-  if (!window.__atdsUnlocked) {
+  if (!window.__atdsUnlocked && codes.length !== loadSavedWatchlist().length) {
     try { localStorage.setItem('atds_watchlist', JSON.stringify(codes)); } catch(e) {}
   }
+}
   if(!codes.length)return;
   (async function(){
     for(var i=0;i<codes.length;i++){
