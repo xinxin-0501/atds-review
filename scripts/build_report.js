@@ -791,6 +791,9 @@ function buildStockRow(s, i) {
   const riskName = deriveRiskLevel(s.pct).name;
   const horizonTone = deriveTimeHorizon(s.pct, s.turnover).tone;
   const adviceTone = deriveAdvice(s.pct, atds, riskTone).tone;
+  const stopLoss = (s.price * 0.95).toFixed(2);
+  const support = (s.price * 0.92).toFixed(2);
+  const pressure = (s.price * 1.08).toFixed(2);
   const main = `<tr class="wl-row" data-code="${esc(code)}">
     <td class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><div><div class="wl-name">${esc(s.name)}</div><div class="wl-code">${esc(code)}</div></div></td>
     <td class="wl-cell wl-cell-price"><div class="price ${cls}">${fmtNum(s.price)}</div></td>
@@ -798,10 +801,13 @@ function buildStockRow(s, i) {
     <td class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</td>
     <td class="wl-cell wl-cell-atds">${atds}</td>
     <td class="wl-cell wl-cell-sig"><span class="sig sig-${sig.tone}">${esc(sig.name)}</span></td>
+    <td class="wl-cell wl-cell-stop">${stopLoss}</td>
+    <td class="wl-cell wl-cell-support">${support}</td>
+    <td class="wl-cell wl-cell-pressure">${pressure}</td>
     <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="showResearch(this.dataset.code)">全面分析</button></td>
   </tr>`;
   const detail = `<tr class="wl-detail-row" data-detail-code="${esc(code)}">
-    <td colspan="7" class="wl-detail-cell">
+    <td colspan="10" class="wl-detail-cell">
       <div class="detail-grid">
         <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-${riskTone}">${esc(riskName)}</span></div>${riskLines.map(l=>'<div class="detail-line">' + esc(l) + '</div>').join('')}</div>
         <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-${horizonTone}">${esc(deriveTimeHorizon(s.pct, s.turnover).name)}</span></div>${horizons.map(h=>'<div class="detail-line"><b>' + esc(h.k) + '</b>' + esc(h.v) + '</div>').join('')}</div>
@@ -846,7 +852,7 @@ function renderWatchlist(report) {
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
       '</div>' +
     '</div>' +
-    '<div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>风险</th><th>风控</th><th>建议</th><th>操作</th></tr></thead></div>' +
+    '<div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>止损</th><th>支撑</th><th>压力</th><th>操作</th></tr></thead></div>' +
     '<div class="wl-table-body"><table class="wl-table"><tbody>' + mds + '</tbody></table></div>' +
     '</div>';
   const modals = list.map(buildStockModal).join('');
@@ -965,6 +971,7 @@ ${renderHero(report)}
   ${renderMarketStats(report)}
   ${renderSectors(report)}
   ${renderLimitUp(report)}
+  ${renderWatchlist(report)}
   ${renderPlaybook(report)}
   ${renderVerdict(report)}
   ${renderIntlEvents(report)}
