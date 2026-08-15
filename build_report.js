@@ -794,16 +794,16 @@ function buildStockRow(s, i) {
   const stopLoss = (s.price * 0.95).toFixed(2);
   const support = (s.price * 0.92).toFixed(2);
   const pressure = (s.price * 1.08).toFixed(2);
-  const main = `<tr class="wl-row" data-code="${esc(code)}">
-    <td class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><div><div class="wl-name">${esc(s.name)}</div><div class="wl-code">${esc(code)}</div></div></td>
-    <td class="wl-cell wl-cell-price"><div class="price ${cls}">${fmtNum(s.price)}</div></td>
-    <td class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</td>
-    <td class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</td>
-    <td class="wl-cell wl-cell-atds">${atds}</td>
-    <td class="wl-cell wl-cell-sig"><span class="sig sig-${sig.tone}">${esc(sig.name)}</span></td>
-    <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="showResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="${esc(code)}" onclick="removeWatchlistRow(this.dataset.code)" style="margin-left:4px;font-size:10px;padding:3px 8px;">删除</button></td>
-  </tr>`;
-  // 详情卡独立 div,放在主行表格外,避免受 .wl-table max-content 撑大影响 detail-spb 三项被裁
+  // 每只股票独立卡片 .wl-stock:主行 .wl-stock-row(横向 flex 可滚) + 详情 .wl-detail 紧跟下方
+  const main = `<div class="wl-stock-row" data-code="${esc(code)}">
+    <span class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><span class="wl-name">${esc(s.name)}</span><span class="wl-code">${esc(code)}</span></span>
+    <span class="wl-cell wl-cell-price"><span class="price ${cls}">${fmtNum(s.price)}</span></span>
+    <span class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</span>
+    <span class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</span>
+    <span class="wl-cell wl-cell-atds">${atds}</span>
+    <span class="wl-cell wl-cell-sig"><span class="sig sig-${sig.tone}">${esc(sig.name)}</span></span>
+    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="${esc(code)}" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
+  </div>`;
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
     <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-${riskTone}">${esc(riskName)}</span></div>${riskLines.map(l=>'<div class="detail-line">' + esc(l) + '</div>').join('')}</div>
@@ -816,7 +816,7 @@ function buildStockRow(s, i) {
       <span><b>压力</b>${pressure}</span>
     </div>
   </div>`;
-  return { main, detail };
+  return `<div class="wl-stock" data-stock-code="${esc(code)}">${main}${detail}</div>`;
 }
 
 function buildStockModal(s) {
@@ -842,9 +842,8 @@ function buildStockModal(s) {
 function renderWatchlist(report) {
   const list = report.watchlist || [];
   const time = (report.meta && report.meta.generatedAt) || '';
-  const built = list.map(buildStockRow);
-  const mds = built.map(b => b.main).join('');
-  const details = built.map(b => b.detail).join('');
+  const stocks = list.map((s, idx) => buildStockRow(s, idx)).join('');
+  const headRow = '<div class="wl-stock-row wl-stock-head"><span class="wl-cell wl-cell-rank"><b>排名/标的</b></span><span class="wl-cell wl-cell-price"><b>最新价</b></span><span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span><span class="wl-cell wl-cell-amt"><b>成交额</b></span><span class="wl-cell wl-cell-atds"><b>ATDS</b></span><span class="wl-cell wl-cell-sig"><b>策略信号</b></span><span class="wl-cell wl-cell-act"><b>操作</b></span></div>';
   const head = '<div class="card watchlist-card">' +
     '<div class="wl-header">' +
       '<div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● ' + esc(time) + '</span></div>' +
@@ -855,11 +854,12 @@ function renderWatchlist(report) {
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
       '</div>' +
     '</div>' +
-    '<div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>操作</th></tr></thead></div>' +
-    '<div class="wl-table-body"><table class="wl-table"><tbody>' + mds + '</tbody></table></div>' +
-    '<div class="wl-details">' + details + '</div>' +
+    '<div class="wl-scroll-hint">← 左右滑动查看全部列 →</div>' +
+    '<div class="wl-stocks-head">' + headRow + '</div>' +
+    '<div class="wl-stocks">' + stocks + '</div>' +
+    '<div class="wl-details"></div>' +
     '</div>';
-  const modals = list.map(buildStockModal).join('');
+  const modals = '';  // v12b: 不再静态生成个股 modal,统一由 openStockResearch/showDynamicResearch 动态生成,避免 id 重复导致关闭失效
   const knowledge = '<div class="card knowledge-card">' +
     '<div class="knowledge-title">KNOWLEDGE SYNC</div>' +
     '<div class="knowledge-h">沉淀到 Obsidian</div>' +
@@ -877,6 +877,49 @@ function renderWatchlist(report) {
     '</div>' +
     '</div>';
   return head + knowledge + modals;
+}
+
+// 波背离选股模块(仅午盘:全A剔除ST扫描,优先排序 TOP30,点击弹个股,可刷新行情)
+function renderWaveDivergence(report) {
+  const w = report.waveDivergence;
+  if (!w || !Array.isArray(w.list) || !w.list.length) return '';
+  const list = w.list;
+  const rows = list.map(x => {
+    const cls = upDownClass(x.pct);
+    const sig = deriveStockStrategy(x.pct);
+    return `<div class="wave-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">${x.rank}</span>
+        <span class="wave-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
+        <span class="wave-price ${cls}">${fmtNum(x.price)}</span>
+        <span class="wave-pct ${cls}">${fmtPct(x.pct)}</span>
+        <span class="wave-score">${x.score}</span>
+        <span class="wave-sig sig sig-${sig.tone}">${esc(x.signalType)}</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>${x.waveGain}%</b></span>
+        <span>调整 <b>${x.adjDays}日 ${x.adjPct}%</b></span>
+        <span>量比 <b>${x.volRatio}</b></span>
+        <span>KDJ 金叉 <b class="${x.kdjGold ? 'ok' : 'no'}">${x.kdjGold ? '✓' : '✗'}</b> 背离 <b class="${x.kdjDivergence ? 'ok' : 'no'}">${x.kdjDivergence ? '✓' : '✗'}</b></span>
+        <span>支撑 <b>${x.support}</b></span>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="card wave-card">
+    <div class="wave-header">
+      <div class="wave-title">🌊 波背离选股 TOP30</div>
+      <div class="wave-sub">前期强势一波 → 缩量调整 → KDJ背离金叉 · 盘中扫描全A剔除ST</div>
+    </div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">${esc(w.source || '全A扫描')}</span>
+      <button id="wave-refresh-btn" class="wl-btn wl-btn-primary" onclick="refreshWaveQuotes()">↻ 刷新行情</button>
+    </div>
+    <div class="wave-list">
+      <div class="wave-row wave-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span><span>信号</span></div>
+      ${rows}
+    </div>
+    <div class="wave-hint">点击个股可查看深度分析 · 评分=一波涨幅/调整缩量/KDJ金叉背离/支撑/止跌/均线综合</div>
+  </div>`;
 }
 
 function renderPremarketStrategy(report) {
@@ -975,7 +1018,8 @@ ${renderHero(report)}
   ${renderMarketStats(report)}
   ${renderSectors(report)}
   ${renderLimitUp(report)}
-  ${renderWatchlist(report)}
+  ${report.meta && report.meta.type === 'midday' ? '' : renderWatchlist(report)}
+  ${renderWaveDivergence(report)}
   ${renderPlaybook(report)}
   ${renderVerdict(report)}
   ${renderIntlEvents(report)}

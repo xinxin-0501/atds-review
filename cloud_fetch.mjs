@@ -30,7 +30,11 @@ async function fetchTencent(codes) {
   try {
     const url = `https://qt.gtimg.cn/q=${codes.join(',')}`;
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-    const text = await res.text();
+    // 腾讯行情接口返回 GBK 编码,必须用 gbk 解码,否则中文名称乱码
+    const buf = await res.arrayBuffer();
+    let text;
+    try { text = new TextDecoder('gbk').decode(buf); }
+    catch (e) { text = new TextDecoder('gb18030').decode(buf); }
     const out = [];
     for (const line of text.trim().split(';')) {
       const m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/);
@@ -183,6 +187,7 @@ async function fetchKline(code, count = 250) {
       const r = await fetchT(host === 'https' ? url.replace('http://', 'https://') : url, { 'User-Agent': 'Mozilla/5.0', 'Referer': 'http://gu.qq.com/' });
       const buf = await r.arrayBuffer();
       const t = new TextDecoder('gbk').decode(buf);
+      if (t.trim().startsWith('<') || t.trim().startsWith('<!')) continue; // 限流/错误页
       const j = JSON.parse(t);
       const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
       if (Array.isArray(series) && series.length) return series;
@@ -193,7 +198,7 @@ async function fetchKline(code, count = 250) {
     const mkt = code.indexOf('sh') === 0 ? '1' : '0';
     const num = code.slice(2);
     const emUrl = `https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=${mkt}.${num}&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=20200101&end=20991231`;
-    const r = await fetchT(emUrl);
+    const r = await fetchT(emUrl, { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' });
     const j = await r.json();
     const kl = (j && j.data && j.data.klines) || [];
     if (Array.isArray(kl) && kl.length) {
@@ -201,6 +206,41 @@ async function fetchKline(code, count = 250) {
         const p = line.split(',');
         return [p[0], parseFloat(p[1]), parseFloat(p[2]), parseFloat(p[3]), parseFloat(p[4]), parseFloat(p[5])];
       });
+    }
+  } catch (e) { /* ignore */ }
+  // 新浪备用(JSONP):{day,open,high,low,close,volume}
+  try {
+    const sinaUrl = `https://quotes.sina.cn/cn/api/jsonp_v2.php/var%20_=/CN_MarketDataService.getKLineData?symbol=${code}&scale=240&ma=no&datalen=${Math.min(count, 300)}`;
+    const r = await fetchT(sinaUrl, { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://finance.sina.com.cn/' });
+    const txt = await r.text();
+    const m = txt.match(/(\[[\s\S]*\])\)?\s*;?\s*$/);
+    if (m) {
+      const arr = JSON.parse(m[1]);
+      if (Array.isArray(arr) && arr.length) {
+        return arr.slice(-count).map(it => [it.day, parseFloat(it.open), parseFloat(it.close), parseFloat(it.high), parseFloat(it.low), parseFloat(it.volume || it.vol || 0)]);
+      }
+    }
+  } catch (e) { /* ignore */ }
+  // 同花顺备用(JSONP 日K):data 每行 date,open,high,low,close,volume,amount,turnover
+  try {
+    const num = code.replace(/^(sh|sz|bj)/, '');
+    const thsUrl = `https://d.10jqka.com.cn/v6/line/hs_${num}/11/last.js`;
+    const r = await fetchT(thsUrl, { 'User-Agent': 'Mozilla/5.0', 'Referer': `http://stockpage.10jqka.com.cn/${num}/` });
+    const txt = await r.text();
+    const m = txt.match(/\((\{[\s\S]*\})\)/);
+    if (m) {
+      const j = JSON.parse(m[1]);
+      const data = j && j.data;
+      if (typeof data === 'string' && data.length) {
+        const rows = data.split(';').filter(Boolean);
+        if (rows.length) {
+          return rows.slice(-count).map(line => {
+            const p = line.split(',');
+            const d = String(p[0] || '').replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+            return [d, parseFloat(p[1]), parseFloat(p[4]), parseFloat(p[2]), parseFloat(p[3]), parseFloat(p[5] || 0)];
+          });
+        }
+      }
     }
   } catch (e) { /* ignore */ }
   return [];
@@ -576,6 +616,188 @@ async function fetchAllMarket() {
   return { total: all.length, candidates: norm };
 }
 
+/* ============ 波背离选股(盘中扫描全A,剔除ST,TOP30) ============ */
+// 基于《波背离》战法:前期强势一波上涨 → 调整(横盘/回调) → 缩量 → KDJ背离金叉 → 不破大阳支撑 → 止跌/量窒息 → 三线开花
+function waveScore(klines) {
+  if (!Array.isArray(klines) || klines.length < 45) return null;
+  const closes = klines.map(k => parseFloat(k[2])).filter(n => !isNaN(n));
+  const highs = klines.map(k => parseFloat(k[3]) || 0);
+  const lows = klines.map(k => parseFloat(k[4]) || 0);
+  const vols = klines.map(k => parseFloat(k[5]) || 0);
+  if (closes.length < 45) return null;
+  const n = closes.length;
+  const last = closes[n - 1];
+  // KDJ(9,3,3)
+  let K = 50, D = 50, J = 50;
+  const kArr = [], dArr = [], jArr = [];
+  for (let i = 0; i < n; i++) {
+    const s = Math.max(0, i - 8);
+    let hh = -Infinity, ll = Infinity;
+    for (let j = s; j <= i; j++) { if (highs[j] > hh) hh = highs[j]; if (lows[j] < ll) ll = lows[j]; }
+    const rsv = (hh - ll) > 0 ? (closes[i] - ll) / (hh - ll) * 100 : 50;
+    K = 2 / 3 * K + 1 / 3 * rsv;
+    D = 2 / 3 * D + 1 / 3 * K;
+    J = 3 * K - 2 * D;
+    kArr.push(K); dArr.push(D); jArr.push(J);
+  }
+  // 1) 检测最近一波强势上涨:近60日最高收盘为峰
+  const windowStart = Math.max(0, n - 60);
+  let peakIdx = windowStart;
+  for (let i = windowStart; i < n; i++) if (closes[i] > closes[peakIdx]) peakIdx = i;
+  if (peakIdx < 5) return null; // 峰太靠前
+  // 启动低点:峰前 25 日内最低
+  let troughIdx = Math.max(0, peakIdx - 25);
+  for (let i = troughIdx; i <= peakIdx; i++) if (closes[i] < closes[troughIdx]) troughIdx = i;
+  const firstWaveGain = (closes[peakIdx] - closes[troughIdx]) / closes[troughIdx];
+  if (firstWaveGain < 0.15) return null; // 一波涨幅不足,排除
+  // 2) 调整段
+  const adjDays = n - 1 - peakIdx;
+  if (adjDays < 2 || adjDays > 30) return null;
+  const adjPct = (last - closes[peakIdx]) / closes[peakIdx];
+  if (adjPct < -0.30 || adjPct > 0.08) return null; // 调整太深(破位)或已突破新高
+  // 3) 缩量:调整期均量 / 上涨段均量
+  let sumAdj = 0, sumWave = 0;
+  for (let i = peakIdx + 1; i < n; i++) sumAdj += vols[i];
+  for (let i = troughIdx; i <= peakIdx; i++) sumWave += vols[i];
+  const avgAdj = sumAdj / Math.max(1, adjDays);
+  const avgWave = sumWave / Math.max(1, peakIdx - troughIdx + 1);
+  const volRatio = avgWave > 0 ? avgAdj / avgWave : 1;
+  // 4) 不破大阳支撑:上涨段中最大单日阳线的收盘价(前复权)
+  let bigYangClose = null, maxGain = -Infinity;
+  for (let i = troughIdx + 1; i <= peakIdx; i++) {
+    const g = (closes[i] - closes[i - 1]) / closes[i - 1];
+    if (g > maxGain) { maxGain = g; bigYangClose = closes[i]; }
+  }
+  const support = bigYangClose != null ? bigYangClose : closes[troughIdx];
+  const notBreakSupport = last > support * 0.97;
+  // 5) KDJ 金叉(近5日)+ 底背离(价格近前低,KDJ不创新低)
+  let kdjGold = false;
+  for (let i = n - 5; i < n - 1; i++) {
+    if (kArr[i] <= dArr[i] && kArr[i + 1] > dArr[i + 1]) { kdjGold = true; break; }
+  }
+  let kdjDivergence = false;
+  {
+    // 找近60日两个低点(前低/当前低)
+    let lowA = Infinity, lowAIdx = -1, lowB = Infinity, lowBIdx = -1;
+    for (let i = windowStart; i < n; i++) {
+      if (lows[i] < lowA) { lowA = lows[i]; lowAIdx = i; }
+    }
+    if (lowAIdx > 0) {
+      for (let i = lowAIdx + 3; i < n; i++) if (lows[i] < lowB) { lowB = lows[i]; lowBIdx = i; }
+      if (lowBIdx > 0 && kArr[lowAIdx] > 0 && kArr[lowBIdx] > 0) {
+        const priceNear = lowB <= lowA * 1.06;   // 价格接近/略高于前低
+        const kNotLower = kArr[lowBIdx] > kArr[lowAIdx] + 3; // KDJ 抬高(底背离)
+        if (priceNear && kNotLower) kdjDivergence = true;
+      }
+    }
+  }
+  // 6) 量窒息:近5日最低量 / 上涨段均量
+  let minVol5 = Infinity;
+  for (let i = n - 5; i < n; i++) if (vols[i] < minVol5) minVol5 = vols[i];
+  const volTrap = avgWave > 0 ? minVol5 / avgWave : 1;
+  // 7) 止跌:最近2日收阳或未创新低
+  const stabilize = (closes[n - 1] >= closes[n - 2]) || (lows[n - 1] > lows[n - 2]);
+  // 8) 三线开花
+  const mean = (arr, s, e) => { let t = 0; for (let i = s; i <= e; i++) t += arr[i]; return t / (e - s + 1); };
+  const ma5 = mean(closes, n - 5, n - 1), ma10 = mean(closes, n - 10, n - 1), ma20 = mean(closes, n - 20, n - 1);
+  const maAlign = ma5 > ma10 && ma10 > ma20;
+  // 打分
+  let score = 0;
+  if (firstWaveGain >= 0.20) score += 25; else if (firstWaveGain >= 0.15) score += 15;
+  if (adjPct >= -0.05) score += 20; else if (adjPct >= -0.15) score += 15; else score += 8;
+  if (volRatio <= 0.5) score += 15; else if (volRatio <= 0.75) score += 10;
+  if (kdjGold) score += 15;
+  if (kdjDivergence) score += 10;
+  if (notBreakSupport) score += 10;
+  if (stabilize) score += 5;
+  if (maAlign) score += 5;
+  if (score < 45) return null;
+  return {
+    score,
+    waveGain: Math.round(firstWaveGain * 1000) / 10,
+    adjPct: Math.round(adjPct * 1000) / 10,
+    adjDays,
+    volRatio: Math.round(volRatio * 100) / 100,
+    volTrap: Math.round(volTrap * 100) / 100,
+    kdjGold, kdjDivergence, maAlign, notBreakSupport, stabilize,
+    signalType: adjPct >= -0.05 ? '横盘强调整' : '回调弱调整',
+    prevHigh: closes[peakIdx],
+    support: Math.round(support * 100) / 100
+  };
+}
+
+async function scanWaveDivergence() {
+  // 读取全 A 列表(已剔除 ST/北交所)
+  let symbols = [];
+  try {
+    const raw = fs.readFileSync(path.join(ROOT, 'data/stock_list.json'), 'utf8');
+    const j = JSON.parse(raw);
+    symbols = Array.isArray(j.symbols) ? j.symbols : [];
+  } catch (e) { symbols = []; }
+  if (!symbols.length) return { total: 0, list: [], scanned: 0, source: '无股票列表' };
+  // 1) 全市场批量行情(每批 80),筛选活跃候选
+  const quotes = [];
+  const BATCH = 80;
+  for (let i = 0; i < symbols.length; i += BATCH) {
+    const batch = symbols.slice(i, i + BATCH);
+    try {
+      const data = await fetchTencent(batch);
+      if (data && data.length) quotes.push(...data);
+    } catch (e) { /* skip */ }
+    if (i + BATCH < symbols.length) await new Promise(r => setTimeout(r, 120));
+  }
+  // 候选:成交额>=1.2亿 且 换手>=0.5% 且 今日涨幅-6%~9.5%(活跃、非暴跌、非涨停封锁),保证流动性与覆盖面
+  const cands = quotes.filter(x => {
+    const pct = Number(x.pct) || 0;
+    const turn = Number(x.turnover) || 0;
+    const amt = Number(x.amountWan) || 0;
+    return pct > -6 && pct < 9.5 && turn >= 0.5 && turn <= 35 && amt >= 12000;
+  });
+  // 2) 并发拉 K 线(120日)扫描波背离
+  const results = [];
+  const CONC = 16;
+  let done = 0;
+  const fullCode = (raw) => {
+    const c = String(raw || '');
+    if (/^(sh|sz|bj)/i.test(c)) return c.toLowerCase();
+    const c0 = c.charAt(0);
+    if (c0 === '6') return 'sh' + c;
+    if (c0 === '4' || c0 === '8' || c0 === '92') return 'bj' + c;
+    return 'sz' + c;
+  };
+  for (let i = 0; i < cands.length; i += CONC) {
+    const slice = cands.slice(i, i + CONC);
+    const batchRes = await Promise.all(slice.map(async x => {
+      try {
+        const kl = await fetchKline(fullCode(x.code), 120);
+        if (!kl || kl.length < 45) return null;
+        const w = waveScore(kl);
+        if (!w) return null;
+        return { ...x, ...w };
+      } catch (e) { return null; }
+    }));
+    for (const r of batchRes) if (r) results.push(r);
+    done += slice.length;
+    if (done % 300 === 0) console.log(`  波背离扫描进度: ${done}/${cands.length}, 命中 ${results.length}`);
+  }
+  results.sort((a, b) => b.score - a.score);
+  const list = results.slice(0, 30).map((x, i) => ({
+    rank: i + 1,
+    code: x.code.replace(/^(sh|sz|bj)/, ''),
+    name: x.name,
+    price: x.price,
+    pct: x.pct,
+    amount: fmtAmount(x.amountWan),
+    turnover: x.turnover,
+    score: x.score,
+    waveGain: x.waveGain, adjPct: x.adjPct, adjDays: x.adjDays,
+    volRatio: x.volRatio, volTrap: x.volTrap,
+    kdjGold: x.kdjGold, kdjDivergence: x.kdjDivergence, maAlign: x.maAlign,
+    signalType: x.signalType, prevHigh: x.prevHigh, support: x.support
+  }));
+  return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
+}
+
 // 形态识别(基于腾讯K线: [[date, open, close, high, low, vol], ...])
 function detectPatterns(klines) {
   if (!Array.isArray(klines) || klines.length < 65) return null;
@@ -750,53 +972,69 @@ async function main() {
     if (s.lianban > v.maxLB) { v.maxLB = s.lianban; v.leadStock = s.name; }
     v.inflow += s.sealWan;
   }
-  let mainRank;
-  if (sectorsAll.length) {
-    mainRank = sectorsAll.map(s => {
-      const z = ztByHybk.get(s.name);
-      const count = z ? z.count : 0;
-      const maxLB = z ? z.maxLB : 0;
-      const leadStock = z ? z.leadStock : '--';
-      const score = s.changePct * 15 + count * 5;
-      let status = '正常', atds = 70;
-      if (s.changePct >= 2 && count >= 3) { status = '主线确认'; atds = 96; }
-      else if (s.changePct >= 1 && count >= 1) { status = '关注'; atds = 84; }
-      else if (s.changePct <= -1) { status = '偏弱等待'; atds = 55; }
-      else if (s.changePct < 0) { status = '弱势'; atds = 62; }
-      return {
-        rank: 0,
-        name: s.name,
-        mappedName: s.name,
-        changePct: Math.round(s.changePct * 100) / 100,
-        upDown: `${s.up} / ${s.down}`,
-        inflowYi: Math.round((s.inflow || 0) / 100000000 * 10) / 10,
-        limitUpMax: z ? `${count}家 / ${maxLB}板` : '--',
-        leadStock,
-        newsAdjust: count >= 3 ? '+1' : '0',
-        atds,
-        status,
-        _score: score
-      };
-    }).sort((a, b) => b._score - a._score).slice(0, 27).map((s, i) => { s.rank = i + 1; delete s._score; return s; });
-  } else {
-    // Fallback: 板块 API 不可用时，从涨停池按 hybk 聚合生成
-    mainRank = [...ztByHybk.entries()].map(([name, v]) => {
-      const score = (v.pctSum / v.count) * 15 + v.count * 5;
-      const avgPct = Math.round((v.pctSum / v.count) * 100) / 100;
-      let status = '正常', atds = 70;
-      if (avgPct >= 2 && v.count >= 3) { status = '主线确认'; atds = 96; }
-      else if (avgPct >= 1 && v.count >= 1) { status = '关注'; atds = 84; }
-      else if (avgPct <= -1) { status = '偏弱等待'; atds = 55; }
-      return {
-        rank: 0, name, mappedName: name, changePct: avgPct,
-        upDown: '-- / --', inflowYi: '--', limitUpMax: `${v.count}家 / ${v.maxLB}板`,
-        leadStock: v.leadStock, newsAdjust: v.count >= 3 ? '+1' : '0', atds, status,
-        _score: score
-      };
-    }).sort((a, b) => b._score - a._score).slice(0, 27).map((s, i) => { s.rank = i + 1; delete s._score; return s; });
+  // mainRank 合并策略:从 ztByHybk(涨停池)取所有有涨停的行业 + sectorsAll 中涨幅突出的行业
+  // 行业名模糊匹配:hotSectors 板块名(同花顺/通达信口径)与 hybk(东财口径)用关键词匹配
+  const usedKeys = new Set();
+  const rows = [];
+  // 1) 先加所有有涨停的行业(必然有完整 limitUpMax/leadStock)
+  for (const [name, v] of ztByHybk.entries()) {
+    if (v.count < 1) continue;
+    // 尝试模糊匹配 hotSectors 取涨幅
+    let hs = hotSectors.find(s => s.name === name);
+    if (!hs) hs = hotSectors.find(s => s.name.includes(name) || name.includes(s.name));
+    const avgPct = v.pctSum / v.count;
+    const changePct = hs ? hs.changePct : Math.round(avgPct * 100) / 100;
+    const score = v.count * 12 + v.maxLB * 20 + Math.min(changePct, 10) * 3;
+    rows.push({
+      name, mappedName: name,
+      changePct: Math.round(changePct * 100) / 100,
+      upDown: hs ? `${hs.up} / ${hs.down}` : '-- / --',
+      inflowYi: hs ? Math.round((hs.inflow || 0) / 100000000 * 10) / 10 : Math.round((v.inflow || 0) / 10000 / 10000 * 10) / 10,
+      limitUpMax: `${v.count}家 / ${v.maxLB}板`,
+      leadStock: v.leadStock || '--',
+      _score: score,
+      _hasZT: true
+    });
+    usedKeys.add(name);
+  }
+  // 2) 补加 hotSectors 中涨幅 ≥1% 但无涨停匹配的行业(确保涨幅榜前位都列出)
+  for (const s of hotSectors) {
+    if (s.changePct < 1) break;
+    const matched = rows.find(r => r.name === s.name || s.name.includes(r.name) || r.name.includes(s.name));
+    if (matched) { matched.changePct = s.changePct; matched.upDown = `${s.up} / ${s.down}`; matched.inflowYi = Math.round((s.inflow || 0) / 100000000 * 10) / 10; continue; }
+    rows.push({
+      name: s.name, mappedName: s.name,
+      changePct: Math.round(s.changePct * 100) / 100,
+      upDown: `${s.up} / ${s.down}`,
+      inflowYi: Math.round((s.inflow || 0) / 100000000 * 10) / 10,
+      limitUpMax: '0', leadStock: '--',
+      _score: s.changePct * 10,
+      _hasZT: false
+    });
+  }
+  // 3) 计算 status / atds 并排序
+  for (const r of rows) {
+    if (r.changePct >= 2 && r.limitUpMax !== '0') { r.status = '主线确认'; r.atds = 96; }
+    else if (r.changePct >= 1) { r.status = '关注'; r.atds = 84; }
+    else if (r.changePct <= -1) { r.status = '偏弱等待'; r.atds = 55; }
+    else if (r.changePct < 0) { r.status = '弱势'; r.atds = 62; }
+    else { r.status = '正常'; r.atds = 70; }
+    r.newsAdjust = (!r.limitUpMax.startsWith('0')) ? '+1' : '0';
+  }
+  const mainRank = rows.sort((a, b) => b._score - a._score).slice(0, 27).map((s, i) => { s.rank = i + 1; delete s._score; delete s._hasZT; return s });
+  if (!mainRank.length && ztByHybk.size === 0) {
+    // 终极兜底:数据完全缺失时给个空数组
   }
 
   const dataAsOfDate = isPre ? qdate : date;
+  // 波背离选股(仅午盘):全A扫描剔除ST,优先排序TOP30
+  let waveDivergence = null;
+  if (type === 'midday') {
+    console.log('开始波背离全市场扫描(午盘)...');
+    waveDivergence = await scanWaveDivergence();
+    console.log('波背离扫描完成:', waveDivergence ? waveDivergence.list.length : 0, '只');
+  }
+
   const report = {
     meta: {
       date, time, type, typeLabel: typeConf.label, generatedAt, market: 'A股',
@@ -818,6 +1056,7 @@ async function main() {
     limitUp,
     limitDown: [],
     watchlist,
+    waveDivergence,
     mainRank,
     dragonPool,
     intlMkt,

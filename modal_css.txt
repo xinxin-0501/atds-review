@@ -279,3 +279,71 @@
 .detail-spb span b{display:block;font-weight:700;color:#c33;margin-bottom:2px;font-size:10px}
 .wl-btn-del{background:#fff;border:1px solid #ddd;color:#888}
 .wl-btn-del:active{background:#fee}
+/* v11: 观察池表头+数据合并进 .wl-scroll 横向滑动容器,消除 width:100% 覆盖导致的列被压缩 */
+.wl-scroll-hint{font-size:9px;color:#999;text-align:right;padding:2px 4px 6px 0}
+.wl-scroll{display:block;overflow-x:auto;overflow-y:hidden;max-width:100%;-webkit-overflow-scrolling:touch;scrollbar-width:thin;margin-bottom:6px;border-bottom:1px solid #f0f0f0}
+.wl-scroll::-webkit-scrollbar{height:6px}
+.wl-scroll::-webkit-scrollbar-thumb{background:#c33;border-radius:3px}
+.wl-scroll::-webkit-scrollbar-track{background:#f2f2f2;border-radius:3px}
+.watchlist-card .wl-table{width:max-content;min-width:100%;max-width:none}
+/* v11b: 修复个股分析弹窗无样式导致背景透明+宽度超屏 */
+.modal-box{background:#fff;border-radius:20px;max-width:414px;width:92%;margin:0 auto;padding:0;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.15)}
+.modal-box .modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 10px}
+.modal-box .modal-eyebrow{font-size:10px;color:#c33;font-weight:700;letter-spacing:0.5px}
+.modal-box .modal-close{font-size:20px;color:#999;cursor:pointer;background:none;border:none;padding:0;line-height:1}
+.modal-box .modal-title{font-size:16px;color:#333;font-weight:700;padding:0 16px 6px}
+.modal-box .modal-info{background:#fafafa;border-radius:10px;padding:10px;font-size:11px;color:#333;line-height:1.6;margin:0 16px 6px}
+.modal-box .modal-meta{font-size:11px;color:#888;padding:0 16px 10px}
+.modal-box .modal-section{padding:0 16px 14px;margin:0}
+.modal-box .modal-h{font-size:12px;color:#c33;font-weight:700;margin-bottom:4px}
+.modal-box .modal-b{font-size:11px;color:#444;line-height:1.6;background:#fafafa;border-radius:8px;padding:8px 10px}
+.modal-box .modal-footer{background:#fafafa;padding:10px 16px;font-size:9px;color:#999;border-top:1px solid #f0f0f0;text-align:center}
+/* v12: 观察池每只股票独立卡片 .wl-stock(主行可横滑 + 详情紧跟下方) */
+.wl-stocks-head{display:flex;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;background:#fafafa;border-radius:8px 8px 0 0;border-bottom:1px solid #eee}
+.wl-stocks-head .wl-stock-row{background:#fafafa}
+.wl-stocks{display:flex;flex-direction:column;gap:10px}
+.wl-stock{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0}
+.wl-stock-row{display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:10px 6px;gap:0;background:#fff}
+.wl-stock-row::-webkit-scrollbar{height:4px}
+.wl-stock-row::-webkit-scrollbar-thumb{background:#c33;border-radius:2px}
+.wl-stock-row::-webkit-scrollbar-track{background:#f2f2f2}
+.wl-stock-row .wl-cell{flex-shrink:0;padding:0 8px;font-size:11px;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.wl-cell-rank{min-width:110px;display:flex !important;align-items:center;gap:6px}
+.wl-cell-rank .rank-no{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;background:#c33;color:#fff;border-radius:4px;font-size:10px;font-weight:700}
+.wl-cell-rank .wl-name{font-weight:600;color:#333}
+.wl-cell-rank .wl-code{font-size:9px;color:#999}
+.wl-cell-price{min-width:64px;justify-content:flex-end;font-weight:700}
+.wl-cell-pct{min-width:60px;justify-content:flex-end;font-weight:700}
+.wl-cell-amt{min-width:68px;justify-content:flex-end;color:#666}
+.wl-cell-atds{min-width:42px;justify-content:center;font-weight:700;color:#c33}
+.wl-cell-sig{min-width:80px;justify-content:center}
+.wl-cell-act{min-width:120px;justify-content:flex-end;gap:6px}
+.wl-stock-row.wl-stock-head .wl-cell{font-size:10px;color:#888;font-weight:600}
+.wl-stock-row.wl-stock-head .wl-cell-rank{font-weight:700;color:#333}
+/* v13: 波背离选股模块 */
+.wave-card{padding:12px}
+.wave-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.wave-title{font-size:13px;font-weight:700;color:#7b1fa2}
+.wave-sub{font-size:9px;color:#999;line-height:1.5;margin-bottom:6px}
+.wave-tools{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.wave-scan-info{font-size:9px;color:#999}
+#wave-refresh-btn{font-size:10px;padding:5px 10px}
+.wave-list{display:flex;flex-direction:column;gap:6px}
+.wave-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:6px 8px;cursor:pointer}
+.wave-item:active{background:#f5f0ff}
+.wave-row{display:flex;align-items:center;gap:4px;font-size:11px}
+.wave-row>span{white-space:nowrap}
+.wave-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#7b1fa2;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0}
+.wave-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
+.wave-name small{font-size:9px;color:#999;font-weight:400}
+.wave-price{width:56px;text-align:right;font-weight:700}
+.wave-pct{width:58px;text-align:right;font-weight:700}
+.wave-score{width:30px;text-align:center;font-weight:700;color:#7b1fa2;background:#f3e8ff;border-radius:4px;padding:1px 0}
+.wave-sig{font-size:9px;padding:2px 5px;border-radius:4px}
+.wave-row.wave-head{font-size:9px;color:#999;font-weight:600}
+.wave-row.wave-head .wave-rank{background:#ddd;color:#666}
+.wave-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:4px;padding-left:26px}
+.wave-meta b{color:#555}
+.wave-meta .ok{color:#2e7d32}
+.wave-meta .no{color:#c33}
+.wave-hint{font-size:9px;color:#aaa;margin-top:8px;text-align:center}
