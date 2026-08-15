@@ -44,7 +44,18 @@
 .modal-rating{display:flex;align-items:center;gap:6px;margin:8px 0}
 .modal-rating-stars{color:#c33;font-size:14px}
 .modal-rating-text{font-size:11px;color:#666}
-.watchlist-card{padding:14px 12px;margin:0}
+.watchlist-card{padding:14px 12px;margin:0;overflow:hidden;position:relative}
+.wl-table-body{display:block;overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+.wl-table{width:max-content;min-width:100%;max-width:100%;table-layout:auto;border-collapse:collapse}
+.wl-table td,.wl-table th{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;padding:8px 6px;border-bottom:1px dashed #f5f5f5;font-size:11px}
+.wl-cell-rank{white-space:normal;min-width:110px;max-width:130px}
+.wl-cell-price{min-width:60px}
+.wl-cell-pct{min-width:70px}
+.wl-cell-amt{min-width:70px}
+.wl-cell-atds{min-width:50px;text-align:center}
+.wl-cell-sig{min-width:70px}
+.wl-cell-stop,.wl-cell-support,.wl-cell-pressure{min-width:55px;text-align:right}
+.wl-cell-act{min-width:80px}
 .wl-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:10px;border-bottom:1px solid #f0f0f0}
 .wl-title{font-size:13px;font-weight:700;color:#333}
 .wl-time{font-size:10px;color:#999;font-weight:400;margin-left:6px}
@@ -131,6 +142,13 @@
 .detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .detail-line{font-size:9px;color:#555;line-height:1.5;margin-top:3px}
 .detail-line b{color:#7b1fa2;margin-right:4px;font-weight:600}
+/* v10: 详情卡独立 div,不再作为 wl-detail-row td,避免受 .wl-table max-content 撑大导致 detail-spb 三项被裁 */
+.wl-details{width:100%;box-sizing:border-box}
+.wl-detail{background:#fafafa;padding:0 8px 10px 8px;border-bottom:1px solid #f0f0f0;box-sizing:border-box;width:100%}
+.detail-block{background:#fff;border-radius:8px;padding:8px 10px;font-size:10px;color:#444;line-height:1.5;border:1px solid #f0f0f0}
+.detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.detail-line{font-size:9px;color:#555;line-height:1.5;margin-top:3px}
+.detail-line b{color:#7b1fa2;margin-right:4px;font-weight:600}
 .wl-detail-row{background:#fafafa}
 .wl-detail-row td{padding:0 8px 10px 8px !important;border-bottom:1px solid #f0f0f0}
 .detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 0 4px 0}
@@ -257,6 +275,16 @@
 .nh-summary{font-size:12px;color:#333;margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed #eee}
 .nh-list{display:flex;flex-direction:column;gap:4px;max-height:50vh;overflow-y:auto}
 .nh-item{font-size:11px;background:#fafafa;padding:6px 10px;border-radius:6px}
+.detail-spb{display:flex;justify-content:space-around;padding:8px 6px;margin-top:8px;background:#f9f9f9;border-radius:6px;font-size:11px}
+.detail-spb span{flex:1;text-align:center;color:#555}
+.detail-spb span b{display:block;font-weight:700;color:#c33;margin-bottom:2px;font-size:10px}
+.wl-btn-del{background:#fff;border:1px solid #ddd;color:#888}
+.wl-btn-del:active{background:#fee}
+.detail-spb{display:flex;justify-content:space-around;padding:8px 6px;margin-top:8px;background:#f9f9f9;border-radius:6px;font-size:11px}
+.detail-spb span{flex:1;text-align:center;color:#555}
+.detail-spb span b{display:block;font-weight:700;color:#c33;margin-bottom:2px;font-size:10px}
+.wl-btn-del{background:#fff;border:1px solid #ddd;color:#888}
+.wl-btn-del:active{background:#fee}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -559,7 +587,7 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-08-14_11-35.html">午盘</a><a href="2026-08-14_15-20.html">收盘</a><a href="2026-08-15_08-30.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-08-14_11-35.html">午盘</a><a href="2026-08-14_15-20.html">收盘</a><a href="2026-08-16_08-30.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-08-14 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
