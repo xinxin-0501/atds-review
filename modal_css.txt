@@ -371,3 +371,14 @@
 .sc-meta b{color:#555}
 .sc-meta .ok{color:#2e7d32}
 .sc-meta .no{color:#c33}
+/* v14b: 60日新高弹窗名单(nh-item 增强: 名称/现价/涨跌/元数据行) */
+.nh-item{font-size:11px;background:#fafafa;padding:6px 10px;border-radius:6px;cursor:pointer}
+.nh-item:active{background:#fff8f8}
+.nh-row{display:flex;align-items:center;gap:6px}
+.nh-row>span{white-space:nowrap}
+.nh-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
+.nh-name small{font-size:9px;color:#999;font-weight:400}
+.nh-price{width:56px;text-align:right;font-weight:700}
+.nh-pct{width:58px;text-align:right;font-weight:700}
+.nh-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:3px}
+.nh-meta b{color:#555}

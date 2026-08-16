@@ -425,9 +425,22 @@ async function fetchNewHighCount(dateArg) {
     const j = await res.json();
     const pool = (j.data && j.data.pool) || [];
     // 用 lbc=1(首板)+ pct>=5% 近似"今日创新高"代理指标
-    const proxy = pool.filter(s => (s.lbc || 1) === 1 && (s.zdp || 0) >= 5).length;
-    return { count: proxy, total: pool.length, source: '东财涨停池代理' };
-  } catch (e) { console.error('fetchNewHighCount 失败:', e.message); return { count: 0, total: 0, source: '接口失败' }; }
+    const proxy = pool.filter(s => (s.lbc || 1) === 1 && (s.zdp || 0) >= 5);
+    return {
+      count: proxy.length,
+      total: pool.length,
+      source: '东财涨停池代理',
+      list: proxy.map(s => ({
+        code: String(s.c), name: s.n,
+        price: (s.p || 0) / 1000,
+        pct: Math.round((s.zdp || 0) * 100) / 100,
+        lbc: s.lbc || 1,
+        hybk: s.hybk || '',
+        sealWan: Math.round((s.fund || 0) / 10000),
+        firstTime: String(s.fbt || ''), lastTime: String(s.lbt || '')
+      }))
+    };
+  } catch (e) { console.error('fetchNewHighCount 失败:', e.message); return { count: 0, total: 0, source: '接口失败', list: [] }; }
 }
 
 

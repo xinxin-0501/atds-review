@@ -32,6 +32,15 @@ function upDownClass(pct) {
   return v > 0 ? 'up' : 'down';
 }
 
+// 万 → 亿/万 显示
+function fmtAmount(wan) {
+  const v = Number(wan);
+  if (isNaN(v) || !v) return '--';
+  if (v >= 10000) return (v / 10000).toFixed(1) + '亿';
+  if (v >= 1000) return (v / 1000).toFixed(1) + '千万';
+  return v.toFixed(0) + '万';
+}
+
 function renderHeader(report, nav) {
   const m = report.meta || {};
   return `<div class="header">
@@ -526,6 +535,48 @@ function renderRegimeGate(report) {
     </div>
     <div class="gate-src">数据源:①成交额(东财沪深接口/降级时显示--)/ ②60日新高(东财涨停池代理,基于1板+涨幅≥5%数量 = ${nh}只/总涨停${totalZ}只,真实接口数据更准)
       <span class="da-score">准确性 6/10(代理指标)</span>
+    </div>
+  </div>${renderRegimeNHModal(report)}`;
+}
+
+// 60日新高个股清单弹窗(后端渲染名单,前端刷新仅更新行情)
+function renderRegimeNHModal(report) {
+  const gate = report.regimeGate || {};
+  const nh = report.newHigh || {};
+  const list = nh.list || [];
+  if (!list.length) return '';
+  const rows = list.map((x, i) => {
+    const cls = upDownClass(x.pct);
+    return `<div class="nh-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+      <div class="nh-row">
+        <span class="ms-rank">${i + 1}</span>
+        <span class="nh-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
+        <span class="nh-price ${cls}">${fmtNum(x.price)}</span>
+        <span class="nh-pct ${cls}">${fmtPct(x.pct)}</span>
+      </div>
+      <div class="nh-meta">
+        <span>首板</span>
+        <span>封单 <b>${fmtAmount(x.sealWan)}</b></span>
+        <span>板块 <b>${esc(x.hybk || '--')}</b></span>
+        <span>首封 <b>${esc(x.firstTime || '--')}</b></span>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="modal-mask" id="regime-nh-modal" onclick="if(event.target===this)closeRegimeNH()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">60日新高个股清单 · 首板+涨幅≥5%</div>
+        <span class="modal-close" onclick="closeRegimeNH()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">60日新高个股 <b>${list.length}</b> 只 / 阈值 100 · 点击行可查看个股分析</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="addAllNHToWatchlist()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="nh-refresh-btn" onclick="refreshRegimeNH()">↻ 刷新行情</button>
+        </div>
+        <div class="nh-list">${rows}</div>
+        <div class="sc-hint">点击个股行可查看深度分析 · 数据源：${esc(nh.source || '东财涨停池代理')}（首板+涨幅≥5%）</div>
+      </div>
     </div>
   </div>`;
 }
@@ -1110,15 +1161,15 @@ ${renderHero(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
   ${report.meta && report.meta.type === 'midday' ? renderShortCore(report) : ''}
   ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
-  ${renderIntlMkt(report)}
-  ${renderTechAnalysis(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderIntlMkt(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderTechAnalysis(report)}
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
   ${renderStatusBar(report)}
   ${renderMarketStats(report)}
-  ${renderSectors(report)}
-  ${renderLimitUp(report)}
-  ${report.meta && report.meta.type === 'midday' ? '' : renderWatchlist(report)}
+  ${report.meta && report.meta.type === 'midday' ? '' : renderSectors(report)}
+  ${report.meta && report.meta.type === 'midday' ? '' : renderLimitUp(report)}
+  ${report.meta && report.meta.type === 'midday' || report.meta && report.meta.type === 'close' ? '' : renderWatchlist(report)}
   ${renderPlaybook(report)}
   ${renderVerdict(report)}
   ${renderIntlEvents(report)}
