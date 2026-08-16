@@ -711,12 +711,30 @@
     </div>
   </div>
   <div class="card ms-card">
-    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升 <button class="wl-tool ms-refresh" onclick="refreshMarketScan()">🔄 刷新重扫</button></div>
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
     <div class="ms-note">扫描范围：--（0 只候选，剔除 ST/新股）→ 识别 0 只形态启动个股</div>
     <div class="ms-gate red">反转闸门：红 · 禁开新仓（埋伏名单豁免） → 仅埋伏名单可操作，新仓需谨慎</div>
-    <div class="ms-list" id="ms-list"><div class="ms-empty">当日无形态识别结果（数据源不可达或当日无启动形态个股）</div></div>
-    
-    <div class="da-src">数据源：-- + 腾讯/东财K线 形态识别（启动/老鸭头/拉升）<span class="da-score">准确性 7/10（技术形态自动识别）</span></div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">-- + 腾讯/东财K线 形态识别</span>
+      <button id="ms-open-btn" class="wl-btn wl-btn-primary" onclick="openMarketScanModal()">📋 打开形态扫描名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看完整形态个股名单 · 支持刷新重扫与一键全部加入观察池</div>
+  </div><div class="modal-mask" id="market-scan-modal" onclick="if(event.target===this)closeMarketScanModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+        <span class="modal-close" onclick="closeMarketScanModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：--（0 只候选，剔除 ST/新股）→ 识别 0 只形态启动个股</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="bulkAddAllPicks()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="ms-refresh-btn" onclick="refreshMarketScan()">🔄 刷新重扫</button>
+        </div>
+        <div class="ms-list" id="ms-list"><div class="ms-empty">当日无形态识别结果（数据源不可达或当日无启动形态个股）</div></div>
+        <div class="sc-hint">点击股票名称可查看深度分析 · 形态识别（启动/老鸭头/拉升）准确性 7/10</div>
+      </div>
+    </div>
   </div>
   
   
@@ -1544,6 +1562,39 @@ function bulkAddShortCoreToWatchlist(){
   var codes = [];
   document.querySelectorAll('#short-core-modal .sc-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
   bulkAddToWatchlist(codes, ' 超短核心个股');
+}
+
+/* ============ 形态扫描 / 波背离 弹窗模式 ============ */
+function openMarketScanModal(){
+  var m = document.getElementById('market-scan-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeMarketScanModal(){
+  var m = document.getElementById('market-scan-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+function openWaveDivergenceModal(){
+  var m = document.getElementById('wave-divergence-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeWaveDivergenceModal(){
+  var m = document.getElementById('wave-divergence-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+function bulkAddAllPicks(){
+  var codes = [];
+  document.querySelectorAll('#market-scan-modal .ms-row [data-code], #market-scan-modal .ms-row').forEach(function(el){
+    var c = el.getAttribute('data-code');
+    if (c && codes.indexOf(c) < 0) codes.push(c);
+  });
+  if (!codes.length) { alert('当前形态扫描名单为空'); return; }
+  bulkAddToWatchlist(codes, ' 形态扫描个股');
 }
 </script>
 <script>

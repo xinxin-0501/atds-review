@@ -1484,6 +1484,39 @@ function bulkAddShortCoreToWatchlist(){
   document.querySelectorAll('#short-core-modal .sc-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
   bulkAddToWatchlist(codes, ' 超短核心个股');
 }
+
+/* ============ 形态扫描 / 波背离 弹窗模式 ============ */
+function openMarketScanModal(){
+  var m = document.getElementById('market-scan-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeMarketScanModal(){
+  var m = document.getElementById('market-scan-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+function openWaveDivergenceModal(){
+  var m = document.getElementById('wave-divergence-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeWaveDivergenceModal(){
+  var m = document.getElementById('wave-divergence-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+function bulkAddAllPicks(){
+  var codes = [];
+  document.querySelectorAll('#market-scan-modal .ms-row [data-code], #market-scan-modal .ms-row').forEach(function(el){
+    var c = el.getAttribute('data-code');
+    if (c && codes.indexOf(c) < 0) codes.push(c);
+  });
+  if (!codes.length) { alert('当前形态扫描名单为空'); return; }
+  bulkAddToWatchlist(codes, ' 形态扫描个股');
+}
 </script>
 <script>
 /* minimal qrcode */
