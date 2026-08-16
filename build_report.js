@@ -7,7 +7,7 @@ const ROOT = path.resolve(__dirname, '..');
 const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'config.json'), 'utf8'));
 const DATA_DIR = path.join(ROOT, config.dataDir);
 const SITE_DIR = path.join(ROOT, config.siteDir);
-const REVIEWS_DIR = path.join(SITE_DIR, 'reviews');
+const REVIEWS_DIR = SITE_DIR; // 扁平结构:报告直接输出到 site/ 根目录,与 GitHub Pages/CloudStudio 部署一致
 
 function esc(s) {
   return String(s == null ? '' : s)
@@ -1269,12 +1269,12 @@ function renderIndex(reports) {
   const list = reports.map(r => {
     const d = r.meta.date;
     const t = r.meta.time;
-    const url = `reviews/${d}_${String(t).replace(':', '-')}.html`;
+    const url = `${d}_${String(t).replace(':', '-')}.html`;
     const label = `${d} ${t} · ${esc(r.meta.typeLabel || '')}`;
     return `<a class="report-card" href="${url}"><div class="rc-title">${label}</div><div class="rc-meta">${esc((r.indices || []).slice(0,3).map(i => i.name + ' ' + fmtPct(i.changePct)).join(' / '))}</div></a>`;
   }).join('');
   // 动态取最新盘前/午盘/收盘
-  const urlOf = r => `reviews/${r.meta.date}_${String(r.meta.time).replace(':', '-')}.html`;
+  const urlOf = r => `${r.meta.date}_${String(r.meta.time).replace(':', '-')}.html`;
   const pre = reports.find(r => r.meta.type === 'premarket');
   const mid = reports.find(r => r.meta.type === 'midday');
   const clo = reports.find(r => r.meta.type === 'close');
@@ -1383,9 +1383,9 @@ function build() {
   if (rankReport) {
     const rankNav = {
       home: 'index.html',
-      midday: byDate[rankReport.meta.date] && byDate[rankReport.meta.date].midday || 'index.html',
-      close: byDate[rankReport.meta.date] && byDate[rankReport.meta.date].close || 'index.html',
-      latest: latest
+      midday: stripReviews(byDate[rankReport.meta.date] && byDate[rankReport.meta.date].midday) || stripReviews(latestOfType('midday')) || 'index.html',
+      close: stripReviews(byDate[rankReport.meta.date] && byDate[rankReport.meta.date].close) || stripReviews(latestOfType('close')) || 'index.html',
+      latest: stripReviews(latest) || 'index.html'
     };
     fs.writeFileSync(path.join(SITE_DIR, 'main-rank.html'), renderMainRankPage(rankReport, rankNav), 'utf8');
     console.log('已生成: main-rank.html');
