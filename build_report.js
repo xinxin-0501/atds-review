@@ -545,14 +545,35 @@ function renderMarketScan(report) {
       <span class="ms-score">${p.score}</span>
       <button class="wl-btn ms-add" data-code="${esc(p.code)}" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
     </div>`).join('');
-  return `<div class="card ms-card">
-    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升 <button class="wl-tool ms-refresh" onclick="refreshMarketScan()">🔄 刷新重扫</button></div>
+  const emptyBlock = `<div class="ms-empty">${(ms.klineFail || 0) > 0 && !(ms.klineOk || 0) ? 'K线数据源当前不可达（' + (ms.klineFail || 0) + ' 只候选 K 线获取失败），形态识别未执行。网络恢复后自动生效。' : '当日无形态识别结果（数据源不可达或当日无启动形态个股）'}</div>`;
+  const card = `<div class="card ms-card">
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
     <div class="ms-note">扫描范围：${esc(ms.source || '--')}（${ms.candidates || 0} 只候选，剔除 ST/新股）→ 识别 ${picks.length} 只形态启动个股</div>
     <div class="ms-gate ${gateOpen ? 'ok' : 'red'}">反转闸门：${gateOpen ? '绿 · 放行' : '红 · 禁开新仓（埋伏名单豁免）'}${gateOpen ? ' → 以下可考虑加入观察池' : ' → 仅埋伏名单可操作，新仓需谨慎'}</div>
-    <div class="ms-list" id="ms-list">${rows || `<div class="ms-empty">${(ms.klineFail || 0) > 0 && !(ms.klineOk || 0) ? 'K线数据源当前不可达（' + (ms.klineFail || 0) + ' 只候选 K 线获取失败），形态识别未执行。网络恢复后自动生效。' : '当日无形态识别结果（数据源不可达或当日无启动形态个股）'}</div>`}</div>
-    ${picks.length ? '<button class="wl-tool wl-tool-red ms-addall" onclick="addAllPicks()">一键全部加入观察池</button>' : ''}
-    <div class="da-src">数据源：${esc(ms.source || '--')} + 腾讯/东财K线 形态识别（启动/老鸭头/拉升）<span class="da-score">准确性 7/10（技术形态自动识别）</span></div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">${esc(ms.source || '--')} + 腾讯/东财K线 形态识别</span>
+      <button id="ms-open-btn" class="wl-btn wl-btn-primary" onclick="openMarketScanModal()">📋 打开形态扫描名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看完整形态个股名单 · 支持刷新重扫与一键全部加入观察池</div>
   </div>`;
+  const modal = `<div class="modal-mask" id="market-scan-modal" onclick="if(event.target===this)closeMarketScanModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+        <span class="modal-close" onclick="closeMarketScanModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：${esc(ms.source || '--')}（${ms.candidates || 0} 只候选，剔除 ST/新股）→ 识别 ${picks.length} 只形态启动个股</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="bulkAddAllPicks()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="ms-refresh-btn" onclick="refreshMarketScan()">🔄 刷新重扫</button>
+        </div>
+        <div class="ms-list" id="ms-list">${rows || emptyBlock}</div>
+        <div class="sc-hint">点击股票名称可查看深度分析 · 形态识别（启动/老鸭头/拉升）准确性 7/10</div>
+      </div>
+    </div>
+  </div>`;
+  return card + modal;
 }
 
 function renderDataAnalysis(report) {
@@ -905,21 +926,38 @@ function renderWaveDivergence(report) {
       </div>
     </div>`;
   }).join('');
-  return `<div class="card wave-card">
+  const card = `<div class="card wave-card">
     <div class="wave-header">
       <div class="wave-title">🌊 波背离选股 TOP30</div>
       <div class="wave-sub">前期强势一波 → 缩量调整 → KDJ背离金叉 · 盘中扫描全A剔除ST</div>
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(w.source || '全A扫描')}</span>
-      <span><button class="wl-btn" onclick="bulkAddWaveToWatchlist()" style="margin-right:4px;">⚡ 一键加入观察池</button><button id="wave-refresh-btn" class="wl-btn wl-btn-primary" onclick="refreshWaveQuotes()">↻ 刷新行情</button></span>
+      <button id="wave-open-btn" class="wl-btn wl-btn-primary" onclick="openWaveDivergenceModal()">📋 打开波背离名单</button>
     </div>
-    <div class="wave-list">
-      <div class="wave-row wave-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span><span>信号</span></div>
-      ${rows}
-    </div>
-    <div class="wave-hint">点击个股可查看深度分析 · 评分=一波涨幅/调整缩量/KDJ金叉背离/支撑/止跌/均线综合</div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 30 只波背离股票 · 支持刷新行情与一键加入观察池</div>
   </div>`;
+  const modal = `<div class="modal-mask" id="wave-divergence-modal" onclick="if(event.target===this)closeWaveDivergenceModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">🌊 波背离选股 TOP30 · 全A剔除ST</div>
+        <span class="modal-close" onclick="closeWaveDivergenceModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：${esc(w.source || '全A剔除ST')}</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="bulkAddWaveToWatchlist()">⚡ 一键加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="wave-refresh-btn" onclick="refreshWaveQuotes()">↻ 刷新行情</button>
+        </div>
+        <div class="wave-list">
+          <div class="wave-row wave-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span><span>信号</span></div>
+          ${rows}
+        </div>
+        <div class="sc-hint">点击个股行可查看深度分析 · 评分=一波涨幅/调整缩量/KDJ金叉背离/支撑/止跌/均线综合</div>
+      </div>
+    </div>
+  </div>`;
+  return card + modal;
 }
 
 function renderShortCore(report) {
