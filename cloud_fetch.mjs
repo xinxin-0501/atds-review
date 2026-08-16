@@ -798,6 +798,133 @@ async function scanWaveDivergence() {
   return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
 }
 
+/* ==================== 超短核心选股(基于超短核心战法: 确定开什么仓) ==================== */
+// klines: [[date, open, close, high, low, vol], ...], quote: 腾讯行情 {pct, turnover, amountWan}
+function shortCoreScore(klines, quote) {
+  if (!Array.isArray(klines) || klines.length < 40) return null;
+  const closes = klines.map(k => parseFloat(k[2])).filter(n => !isNaN(n));
+  const vols = klines.map(k => parseFloat(k[5]) || 0);
+  const n = closes.length;
+  if (n < 40) return null;
+  // 1) 涨停基因:近30日涨停次数(涨幅>=9.5%)
+  let ztCount = 0, lianban = 0;
+  for (let i = Math.max(1, n - 30); i < n; i++) {
+    const prev = closes[i - 1];
+    if (prev > 0 && (closes[i] - prev) / prev >= 0.095) ztCount++;
+  }
+  // 2) 连板:从最近往前数连续涨停天数
+  for (let i = n - 1; i > 0; i--) {
+    const prev = closes[i - 1];
+    if (prev > 0 && (closes[i] - prev) / prev >= 0.095) lianban++;
+    else break;
+  }
+  // 3) 今日量比:今日成交量 / 前5日均量
+  let sum5 = 0, cnt5 = 0;
+  for (let i = Math.max(0, n - 6); i < n - 1; i++) { sum5 += vols[i]; cnt5++; }
+  const avg5 = cnt5 ? sum5 / cnt5 : 0;
+  const volRatio = avg5 > 0 ? vols[n - 1] / avg5 : 1;
+  // 4) 均线多头 MA5>MA10>MA20
+  const mean = (s, e) => { let t = 0; for (let i = s; i <= e; i++) t += closes[i]; return t / (e - s + 1); };
+  const ma5 = mean(n - 5, n - 1), ma10 = mean(n - 10, n - 1), ma20 = mean(n - 20, n - 1);
+  const maAlign = ma5 > ma10 && ma10 > ma20;
+  // 5) 突破压力:今日收盘 >= 近20日最高收盘
+  let peak20 = -Infinity;
+  for (let i = n - 20; i < n; i++) if (closes[i] > peak20) peak20 = closes[i];
+  const newHigh = closes[n - 1] >= peak20;
+  // 6) 趋势:20日涨幅
+  const gain20 = n >= 21 ? (closes[n - 1] - closes[n - 21]) / closes[n - 21] * 100 : 0;
+  // 7) 今日强度
+  const pct = Number(quote && quote.pct) || 0;
+  const turnover = Number(quote && quote.turnover) || 0;
+  // 评分
+  let score = 0;
+  if (ztCount >= 3) score += 25; else if (ztCount === 2) score += 18; else if (ztCount === 1) score += 10;
+  if (lianban >= 4) score += 32; else if (lianban === 3) score += 25; else if (lianban === 2) score += 15; else if (lianban === 1) score += 8;
+  if (pct >= 7) score += 20; else if (pct >= 3) score += 12; else if (pct > 0) score += 5;
+  if (volRatio >= 2.5) score += 15; else if (volRatio >= 1.5) score += 10; else if (volRatio >= 1.0) score += 5;
+  if (turnover >= 3 && turnover <= 20) score += 10; else if ((turnover >= 1 && turnover < 3) || (turnover > 20 && turnover <= 30)) score += 5;
+  if (maAlign) score += 10;
+  if (newHigh) score += 10;
+  if (gain20 >= 15) score += 10;
+  // 超短核心必须有涨停基因/连板(强势属性),否则不算核心
+  if (ztCount === 0 && lianban === 0) return null;
+  return {
+    score, ztCount, lianban, volRatio: Math.round(volRatio * 100) / 100,
+    maAlign, newHigh, gain20: Math.round(gain20 * 10) / 10,
+    turnover, pct
+  };
+}
+
+async function scanShortCore() {
+  // 读取全 A 列表(已剔除 ST/北交所)
+  let symbols = [];
+  try {
+    const raw = fs.readFileSync(path.join(ROOT, 'data/stock_list.json'), 'utf8');
+    const j = JSON.parse(raw);
+    symbols = Array.isArray(j.symbols) ? j.symbols : [];
+  } catch (e) { symbols = []; }
+  if (!symbols.length) return { total: 0, list: [], scanned: 0, source: '无股票列表' };
+  // 1) 全市场批量行情(每批 80),筛选活跃候选(超短核心要求更强的流动性/活跃度)
+  const quotes = [];
+  const BATCH = 80;
+  for (let i = 0; i < symbols.length; i += BATCH) {
+    const batch = symbols.slice(i, i + BATCH);
+    try {
+      const data = await fetchTencent(batch);
+      if (data && data.length) quotes.push(...data);
+    } catch (e) { /* skip */ }
+    if (i + BATCH < symbols.length) await new Promise(r => setTimeout(r, 120));
+  }
+  const cands = quotes.filter(x => {
+    const pct = Number(x.pct) || 0;
+    const turn = Number(x.turnover) || 0;
+    const amt = Number(x.amountWan) || 0;
+    return pct > -3 && pct < 9.8 && turn >= 0.8 && turn <= 40 && amt >= 8000;
+  });
+  // 2) 并发拉 K 线(60日)扫描超短核心
+  const results = [];
+  const CONC = 16;
+  let done = 0;
+  const fullCode = (raw) => {
+    const c = String(raw || '');
+    if (/^(sh|sz|bj)/i.test(c)) return c.toLowerCase();
+    const c0 = c.charAt(0);
+    if (c0 === '6') return 'sh' + c;
+    if (c0 === '4' || c0 === '8' || c0 === '92') return 'bj' + c;
+    return 'sz' + c;
+  };
+  for (let i = 0; i < cands.length; i += CONC) {
+    const slice = cands.slice(i, i + CONC);
+    const batchRes = await Promise.all(slice.map(async x => {
+      try {
+        const kl = await fetchKline(fullCode(x.code), 60);
+        if (!kl || kl.length < 40) return null;
+        const sc = shortCoreScore(kl, x);
+        if (!sc || sc.score < 55) return null;
+        return { ...x, ...sc };
+      } catch (e) { return null; }
+    }));
+    for (const r of batchRes) if (r) results.push(r);
+    done += slice.length;
+    if (done % 300 === 0) console.log(`  超短核心扫描进度: ${done}/${cands.length}, 命中 ${results.length}`);
+  }
+  results.sort((a, b) => b.score - a.score);
+  const list = results.slice(0, 30).map((x, i) => ({
+    rank: i + 1,
+    code: x.code.replace(/^(sh|sz|bj)/, ''),
+    name: x.name,
+    price: x.price,
+    pct: x.pct,
+    amount: fmtAmount(x.amountWan),
+    turnover: x.turnover,
+    score: x.score,
+    ztCount: x.ztCount, lianban: x.lianban, volRatio: x.volRatio,
+    maAlign: x.maAlign, newHigh: x.newHigh, gain20: x.gain20,
+    signalType: x.lianban >= 2 ? (x.lianban + '连板') : (x.ztCount >= 2 ? '多涨停' : '强势涨停')
+  }));
+  return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
+}
+
 // 形态识别(基于腾讯K线: [[date, open, close, high, low, vol], ...])
 function detectPatterns(klines) {
   if (!Array.isArray(klines) || klines.length < 65) return null;
@@ -1029,10 +1156,15 @@ async function main() {
   const dataAsOfDate = isPre ? qdate : date;
   // 波背离选股(仅午盘):全A扫描剔除ST,优先排序TOP30
   let waveDivergence = null;
+  // 超短核心选股(仅午盘):全A扫描剔除ST,优先排序TOP30
+  let shortCore = null;
   if (type === 'midday') {
     console.log('开始波背离全市场扫描(午盘)...');
     waveDivergence = await scanWaveDivergence();
     console.log('波背离扫描完成:', waveDivergence ? waveDivergence.list.length : 0, '只');
+    console.log('开始超短核心全市场扫描(午盘)...');
+    shortCore = await scanShortCore();
+    console.log('超短核心扫描完成:', shortCore ? shortCore.list.length : 0, '只');
   }
 
   const report = {
@@ -1057,6 +1189,7 @@ async function main() {
     limitDown: [],
     watchlist,
     waveDivergence,
+    shortCore,
     mainRank,
     dragonPool,
     intlMkt,

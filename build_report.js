@@ -922,6 +922,67 @@ function renderWaveDivergence(report) {
   </div>`;
 }
 
+function renderShortCore(report) {
+  const sc = report.shortCore;
+  if (!sc || !Array.isArray(sc.list) || !sc.list.length) return '';
+  const list = sc.list;
+  const rows = list.map(x => {
+    const cls = upDownClass(x.pct);
+    const sigTone = x.lianban >= 2 ? 'break' : (x.ztCount >= 2 ? 'strong' : 'up');
+    const sigText = x.lianban >= 2 ? (x.lianban + '连板') : (x.ztCount >= 3 ? '多涨停' : (x.ztCount === 2 ? '双涨停' : '强势股'));
+    return `<div class="sc-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+      <div class="sc-row">
+        <span class="sc-rank">${x.rank}</span>
+        <span class="sc-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
+        <span class="sc-price ${cls}">${fmtNum(x.price)}</span>
+        <span class="sc-pct ${cls}">${fmtPct(x.pct)}</span>
+        <span class="sc-score">${x.score}</span>
+        <span class="sc-sig sig sig-${sigTone}">${esc(sigText)}</span>
+      </div>
+      <div class="sc-meta">
+        <span>涨停 <b>${x.ztCount}次</b></span>
+        <span>连板 <b>${x.lianban}</b></span>
+        <span>量比 <b>${x.volRatio}</b></span>
+        <span>20日 <b class="${x.gain20 >= 15 ? 'ok' : 'no'}">+${x.gain20}%</b></span>
+        <span>突破 <b class="${x.newHigh ? 'ok' : 'no'}">${x.newHigh ? '✓' : '✗'}</b></span>
+        <span>均线多头 <b class="${x.maAlign ? 'ok' : 'no'}">${x.maAlign ? '✓' : '✗'}</b></span>
+      </div>
+    </div>`;
+  }).join('');
+  const card = `<div class="card sc-card">
+    <div class="wave-header">
+      <div class="wave-title">⚡ 超短核心 TOP30</div>
+      <div class="wave-sub">竞价最强 · 开盘换手 · 连板梯度 · 量价共振 · 盘中扫描全A剔除ST</div>
+    </div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">${esc(sc.source || '全A扫描')}</span>
+      <button id="sc-open-btn" class="wl-btn wl-btn-primary" onclick="openShortCoreModal()">📋 打开超短核心名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 30 个超短核心股票 · 支持刷新行情与一键全部加入观察池</div>
+  </div>`;
+  const modal = `<div class="modal-mask" id="short-core-modal" onclick="if(event.target===this)closeShortCoreModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">⚡ 超短核心 TOP30 · 全A剔除ST</div>
+        <span class="modal-close" onclick="closeShortCoreModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary sc-summary">扫描范围：${esc(sc.source || '全A剔除ST')}</div>
+        <div class="sc-tools">
+          <button class="wl-btn wl-btn-primary" onclick="bulkAddShortCoreToWatchlist()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn" id="sc-refresh-btn" onclick="refreshShortCoreQuotes()">↻ 刷新行情</button>
+        </div>
+        <div class="sc-list">
+          <div class="sc-row sc-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span><span>信号</span></div>
+          ${rows}
+        </div>
+        <div class="sc-hint">点击个股行可查看深度分析 · 评分=涨停基因/连板/今日强度/量能/换手/均线多头/突破压力/趋势</div>
+      </div>
+    </div>
+  </div>`;
+  return card + modal;
+}
+
 function renderPremarketStrategy(report) {
   return `<div class="card">
     <div class="card-title">策略状态</div>
@@ -1009,6 +1070,7 @@ ${renderHero(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderRegimeGate(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
+  ${report.meta && report.meta.type === 'midday' ? renderShortCore(report) : ''}
   ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
   ${renderIntlMkt(report)}
   ${renderTechAnalysis(report)}
