@@ -521,3 +521,50 @@ function bulkAddAllPicks(){
   if (!codes.length) { alert('当前形态扫描名单为空'); return; }
   bulkAddToWatchlist(codes, ' 形态扫描个股');
 }
+
+/* ============ 强势股选股(午盘): 弹窗 / 刷新 / 一键加入 ============ */
+function openStrongStockModal(){
+  var m = document.getElementById('strong-stock-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeStrongStockModal(){
+  var m = document.getElementById('strong-stock-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+async function refreshStrongStockQuotes(){
+  var items = document.querySelectorAll('#strong-stock-modal .ss-item[data-code]');
+  if (!items.length) return;
+  var btn = document.getElementById('ss-refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  var codes = []; var map = {};
+  items.forEach(function(it){ var c = it.getAttribute('data-code'); if (c) { codes.push(c); map[c] = it; } });
+  try {
+    var batch = [];
+    codes.forEach(function(raw){ var c0 = raw.charAt(0); if (c0 === '6') batch.push('sh' + raw); else if (c0 === '4' || c0 === '8' || c0 === '92') batch.push('bj' + raw); else batch.push('sz' + raw); });
+    var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var buf = await res.arrayBuffer();
+    var text = new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
+      var f = m[1].split('~'); if (f.length < 40) return;
+      var code = String(f[2] || '').trim(); if (!map[code]) return;
+      var price = parseFloat(f[3]) || 0, pct = parseFloat(f[32]) || 0;
+      var it = map[code];
+      var cls = pct >= 0 ? 'up' : 'down';
+      var priceEl = it.querySelector('.ss-price');
+      if (priceEl) { priceEl.className = 'ss-price ' + cls; priceEl.textContent = price.toFixed(2); }
+      var pctEl = it.querySelector('.ss-pct');
+      if (pctEl) { pctEl.className = 'ss-pct ' + cls; pctEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'; }
+    });
+  } catch(e) {}
+  if (btn) { btn.disabled = false; btn.textContent = '↻ 刷新行情'; }
+}
+function bulkAddStrongStockToWatchlist(){
+  var codes = [];
+  document.querySelectorAll('#strong-stock-modal .ss-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
+  bulkAddToWatchlist(codes, ' 强势股个股');
+}

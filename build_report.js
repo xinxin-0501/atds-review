@@ -1072,6 +1072,65 @@ function renderShortCore(report) {
   return card + modal;
 }
 
+function renderStrongStock(report) {
+  const ss = report.strongStock;
+  if (!ss || !Array.isArray(ss.list) || !ss.list.length) return '';
+  const list = ss.list;
+  const rows = list.map(x => {
+    const cls = upDownClass(x.pct);
+    return `<div class="ss-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+      <div class="ss-row">
+        <span class="ss-rank">${x.rank}</span>
+        <span class="ss-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
+        <span class="ss-price ${cls}">${fmtNum(x.price)}</span>
+        <span class="ss-pct ${cls}">${fmtPct(x.pct)}</span>
+        <span class="ss-score">${x.score}</span>
+      </div>
+      <div class="ss-meta">
+        <span>信号 <b class="ok">${esc(x.signalType)}</b></span>
+        <span>缺口 <b class="${x.gapFound ? 'ok' : 'no'}">${x.gapFound ? '✓' + (x.gapDays || '') + '日' : '✗'}</b></span>
+        <span>二波 <b class="${x.wave2 ? 'ok' : 'no'}">${x.wave2 ? '✓' : '✗'}</b></span>
+        <span>突破 <b class="${x.breakout ? 'ok' : 'no'}">${x.breakout ? '✓' : '✗'}</b></span>
+        <span>KDJ <b class="${x.kdjGold ? 'ok' : 'no'}">${x.kdjGold ? '金叉' : '--'}</b></span>
+        <span>量比 <b>${x.volRatio}</b></span>
+        <span>涨停 <b>${x.ztCount}次</b></span>
+      </div>
+    </div>`;
+  }).join('');
+  const card = `<div class="card ss-card">
+    <div class="wave-header">
+      <div class="wave-title">🔥 强势股选股 TOP30</div>
+      <div class="wave-sub">缺口不回补 · 二波启动 · 突破起爆点 · KDJ(8,2,2)金叉 · 盘中扫描全A剔除ST</div>
+    </div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">${esc(ss.source || '全A扫描')}</span>
+      <button id="ss-open-btn" class="wl-btn wl-btn-primary" onclick="openStrongStockModal()">📋 打开强势股名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 30 只强势股 · 支持刷新行情与一键全部加入观察池</div>
+  </div>`;
+  const modal = `<div class="modal-mask" id="strong-stock-modal" onclick="if(event.target===this)closeStrongStockModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">🔥 强势股选股 TOP30 · 全A剔除ST</div>
+        <span class="modal-close" onclick="closeStrongStockModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：${esc(ss.source || '全A剔除ST')}</div>
+        <div class="sc-tools">
+          <button class="wl-btn wl-btn-primary" onclick="bulkAddStrongStockToWatchlist()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn" id="ss-refresh-btn" onclick="refreshStrongStockQuotes()">↻ 刷新行情</button>
+        </div>
+        <div class="ss-list">
+          <div class="ss-row ss-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span></div>
+          ${rows}
+        </div>
+        <div class="sc-hint">点击个股行可查看深度分析 · 评分=缺口战法/首板基因/二波启动/KDJ金叉/突破前高/缩量回调/量能回升/均线多头</div>
+      </div>
+    </div>
+  </div>`;
+  return card + modal;
+}
+
 function renderPremarketStrategy(report) {
   return `<div class="card">
     <div class="card-title">策略状态</div>
@@ -1160,6 +1219,7 @@ ${renderHero(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
   ${report.meta && report.meta.type === 'midday' ? renderShortCore(report) : ''}
+  ${report.meta && report.meta.type === 'midday' ? renderStrongStock(report) : ''}
   ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderIntlMkt(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderTechAnalysis(report)}

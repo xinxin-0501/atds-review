@@ -382,3 +382,22 @@
 .nh-pct{width:58px;text-align:right;font-weight:700}
 .nh-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:3px}
 .nh-meta b{color:#555}
+/* v15: 强势股选股模块(午盘) */
+.ss-card{margin-bottom:10px}
+.ss-list{display:flex;flex-direction:column;gap:6px}
+.ss-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:6px 8px;cursor:pointer}
+.ss-item:active{background:#fff8f8}
+.ss-row{display:flex;align-items:center;gap:4px;font-size:11px}
+.ss-row>span{white-space:nowrap}
+.ss-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#e65100;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0}
+.ss-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
+.ss-name small{font-size:9px;color:#999;font-weight:400}
+.ss-price{width:56px;text-align:right;font-weight:700}
+.ss-pct{width:58px;text-align:right;font-weight:700}
+.ss-score{width:30px;text-align:center;font-weight:700;color:#e65100;background:#fff3e0;border-radius:4px;padding:1px 0}
+.ss-row.ss-head{font-size:9px;color:#999;font-weight:600}
+.ss-row.ss-head .ss-rank{background:#ddd;color:#666}
+.ss-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:4px;padding-left:26px}
+.ss-meta b{color:#555}
+.ss-meta .ok{color:#2e7d32}
+.ss-meta .no{color:#c33}
