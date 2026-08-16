@@ -694,55 +694,7 @@
     
     <div class="da-src">数据源：-- + 腾讯/东财K线 形态识别（启动/老鸭头/拉升）<span class="da-score">准确性 7/10（技术形态自动识别）</span></div>
   </div>
-  <div class="card da-card">
-    <div class="card-title">AI 数据分析 · 八步复盘</div>
-    <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
-    <div class="da-block">
-    <div class="da-h">第一步 · 市场定调</div>
-    <div class="da-line">指数：上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div>
-    <div class="da-line">涨跌家数：涨 3103 / 跌 3365 / 平 216（红盘率 46%）</div>
-    <div class="da-line">涨停 63 家 · 炸板 19 家 · 最高连板 5 板（蓝盾光电）</div>
-    <div class="da-src">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score">准确性 9/10</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第二步 · 情绪周期</div>
-    <div class="da-line">情绪温度 89° → 阶段判定：<b class="da-cycle">分歧</b></div>
-    <div class="da-line">操作基调：高位分歧加大，控制仓位，低吸不追高</div>
-    <div class="da-src">数据源：由东财涨停/炸板/连板数据推导<span class="da-score">准确性 7/10（逻辑推演）</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第三步 · 主线识别</div>
-    <div class="da-sub">涨停题材分布</div>
-    <div class="da-line">• 通信设备：涨停 4 家 / 最高 2 板，领涨 <a class="da-stock" data-code="603118" onclick="openStockResearch(this.dataset.code)">共进股份</a></div><div class="da-line">• 汽车零部：涨停 3 家 / 最高 3 板，领涨 <a class="da-stock" data-code="001260" onclick="openStockResearch(this.dataset.code)">坤泰股份</a></div><div class="da-line">• 环境治理：涨停 3 家 / 最高 1 板，领涨 德创环保</div><div class="da-line">• 化学纤维：涨停 2 家 / 最高 3 板，领涨 <a class="da-stock" data-code="000936" onclick="openStockResearch(this.dataset.code)">华西股份</a></div>
-    <div class="da-line">连续 2-3 天上榜方向：蓝盾光电（5板）、华西股份（3板）、坤泰股份（3板）</div>
-    <div class="da-line">结构判断：龙头带队，有明确领涨梯队</div>
-    <div class="da-line">明日最可能机会方向（1-2个）：通信设备、汽车零部</div>
-    <div class="da-src">数据源：东方财富涨停池分类聚合<span class="da-score">准确性 8/10</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第四步 · 核心个股拆解（Top5 涨停）</div>
-    <div class="da-line"><b><a class="da-stock" data-code="000936" onclick="openStockResearch(this.dataset.code)">华西股份</a>（000936）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b><a class="da-stock" data-code="001260" onclick="openStockResearch(this.dataset.code)">坤泰股份</a>（001260）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b><a class="da-stock" data-code="002172" onclick="openStockResearch(this.dataset.code)">澳洋健康</a>（002172）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b><a class="da-stock" data-code="002907" onclick="openStockResearch(this.dataset.code)">华森制药</a>（002907）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b><a class="da-stock" data-code="300684" onclick="openStockResearch(this.dataset.code)">中石科技</a>（300684）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>
-    <div class="da-src">数据源：东财涨停池 + 逻辑推演（启动/加速/分歧为推断，需结合K线人工验证）<span class="da-score">准确性 6/10</span></div>
-  </div><div class="da-block da-trade">
-    <div class="da-h">第五步 · 交易复盘</div>
-    <div class="da-line">待提供今日逐笔交易记录（股票、买点K线位置、买入理由、是否符合系统、卖出原因）后自动生成分析。</div>
-    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
-  </div><div class="da-block da-trade">
-    <div class="da-h">第六步 · 交易行为复盘</div>
-    <div class="da-line">待提供每笔交易数据后，分析追高/杀跌/持仓周期/情绪化交易等行为偏差与优化规则。</div>
-    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第七步 · 强势股共性模板</div>
-    <div class="da-line">当前市场最高连板 5 板。强势股共性：底部放量首板 → 缩量/换手连板加速 → 首次分歧不破位 → 承接有力再上攻。</div>
-    <div class="da-line">模板要点：① 首板看量能 ② 连板看换手 ③ 分歧看承接 ④ 只有承接验证通过的方向才值得次日跟进。</div>
-    <div class="da-src">数据源：逻辑推演（基于连板梯队）<span class="da-score">准确性 6/10</span></div>
-  </div><div class="da-block">
-    <div class="da-h">第八步 · 主线资金复盘</div>
-    <div class="da-line">今日涨停题材分布：通信设备(4家)、汽车零部(3家)、环境治理(3家)、化学纤维(2家)、医疗服务(2家)、装修装饰(2家)</div>
-    <div class="da-line">重复上榜（连续2-3天）方向：蓝盾光电（5板）、华西股份（3板）、坤泰股份（3板）</div>
-    <div class="da-line">结构：龙头带队，处于高位加速</div>
-    <div class="da-line">明日最可能机会方向：通信设备、汽车零部</div>
-    <div class="da-line">明日基调：<b class="da-stance">收缩</b></div>
-    <div class="da-src">数据源：东方财富涨停池 + 板块统计<span class="da-score">准确性 8/10</span></div>
-  </div>
-  </div>
+  
   <div class="intl-mkt">
     <div class="intl-header"><span class="intl-eyebrow">GLOBAL LINKAGE · 4 MIN REFRESH</span><span class="intl-title">🌐 盘中信息 · 国际联动</span></div>
     <div class="intl-cards"><div class="card intl-card"><div class="intl-head"><span class="intl-name">道琼斯</span><span class="intl-unit"></span></div><div class="intl-price up">53,839.99</div><div class="intl-change up">+0.13%</div><div class="intl-time">2026-08-13 16:39:34</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纳斯达克</span><span class="intl-unit"></span></div><div class="intl-price up">26,803.03</div><div class="intl-change up">+0.81%</div><div class="intl-time">2026-08-13 17:15:59</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约原油</span><span class="intl-unit">$/bbl</span></div><div class="intl-price up">81.65</div><div class="intl-change up">+0.60%</div><div class="intl-time">18:23:59</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约黄金</span><span class="intl-unit">$/oz</span></div><div class="intl-price flat">4411.21</div><div class="intl-change flat">0.00%</div><div class="intl-time">18:24:03</div></div></div>
