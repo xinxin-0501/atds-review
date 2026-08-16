@@ -353,6 +353,30 @@
 .wave-meta .ok{color:#2e7d32}
 .wave-meta .no{color:#c33}
 .wave-hint{font-size:9px;color:#aaa;margin-top:8px;text-align:center}
+/* v14: 超短核心选股模块(午盘) */
+.sc-card{margin-bottom:10px}
+.sc-hint{font-size:9px;color:#aaa;margin-top:8px;text-align:center;line-height:1.5}
+.sc-summary{font-size:9px;color:#999;margin-bottom:6px}
+.sc-tools{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:8px}
+.sc-tools .wl-btn{font-size:10px;padding:5px 8px;white-space:nowrap}
+.sc-list{display:flex;flex-direction:column;gap:6px}
+.sc-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:6px 8px;cursor:pointer}
+.sc-item:active{background:#fff8f8}
+.sc-row{display:flex;align-items:center;gap:4px;font-size:11px}
+.sc-row>span{white-space:nowrap}
+.sc-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#c33;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0}
+.sc-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
+.sc-name small{font-size:9px;color:#999;font-weight:400}
+.sc-price{width:56px;text-align:right;font-weight:700}
+.sc-pct{width:58px;text-align:right;font-weight:700}
+.sc-score{width:30px;text-align:center;font-weight:700;color:#c33;background:#ffecec;border-radius:4px;padding:1px 0}
+.sc-sig{font-size:9px;padding:2px 5px;border-radius:4px}
+.sc-row.sc-head{font-size:9px;color:#999;font-weight:600}
+.sc-row.sc-head .sc-rank{background:#ddd;color:#666}
+.sc-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:4px;padding-left:26px}
+.sc-meta b{color:#555}
+.sc-meta .ok{color:#2e7d32}
+.sc-meta .no{color:#c33}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -1381,6 +1405,53 @@ function bulkAddWaveToWatchlist(){
   var codes = [];
   document.querySelectorAll('.wave-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
   bulkAddToWatchlist(codes, ' 波背离个股');
+}
+
+/* ============ 超短核心选股(午盘): 弹窗 / 刷新 / 一键加入 ============ */
+function openShortCoreModal(){
+  var m = document.getElementById('short-core-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeShortCoreModal(){
+  var m = document.getElementById('short-core-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+async function refreshShortCoreQuotes(){
+  var items = document.querySelectorAll('#short-core-modal .sc-item[data-code]');
+  if (!items.length) return;
+  var btn = document.getElementById('sc-refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  var codes = []; var map = {};
+  items.forEach(function(it){ var c = it.getAttribute('data-code'); if (c) { codes.push(c); map[c] = it; } });
+  try {
+    var batch = [];
+    codes.forEach(function(raw){ var c0 = raw.charAt(0); if (c0 === '6') batch.push('sh' + raw); else if (c0 === '4' || c0 === '8' || c0 === '92') batch.push('bj' + raw); else batch.push('sz' + raw); });
+    var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var buf = await res.arrayBuffer();
+    var text = new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
+      var f = m[1].split('~'); if (f.length < 40) return;
+      var code = String(f[2] || '').trim(); if (!map[code]) return;
+      var price = parseFloat(f[3]) || 0, pct = parseFloat(f[32]) || 0;
+      var it = map[code];
+      var cls = pct >= 0 ? 'up' : 'down';
+      var priceEl = it.querySelector('.sc-price');
+      if (priceEl) { priceEl.className = 'sc-price ' + cls; priceEl.textContent = price.toFixed(2); }
+      var pctEl = it.querySelector('.sc-pct');
+      if (pctEl) { pctEl.className = 'sc-pct ' + cls; pctEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'; }
+    });
+  } catch(e) {}
+  if (btn) { btn.disabled = false; btn.textContent = '↻ 刷新行情'; }
+}
+function bulkAddShortCoreToWatchlist(){
+  var codes = [];
+  document.querySelectorAll('#short-core-modal .sc-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
+  bulkAddToWatchlist(codes, ' 超短核心个股');
 }
 </script>
 <script>
