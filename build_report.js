@@ -338,7 +338,7 @@ function renderCloseEmotion(report) {
   const ladderBlock = '<div class="card"><div class="card-title">04 情绪高度(连板梯队)</div>' +
     '<div class="ce-ladder">' + ladderItems + '</div></div>';
 
-  // 05 明日观察锚点
+  // 05 明日观察锚点（午盘隐藏，收盘展示）
   const anchors = [
     { icon: '🎯', title: '主线持续性', desc: '观察中际旭创 / 新易盛 / 天孚通信能否继续表态' },
     { icon: '⚠️', title: '情绪退潮阈值', desc: '炸板率 > 40% 或晋级率 < 50% 需警惕' },
@@ -348,7 +348,7 @@ function renderCloseEmotion(report) {
   const anchorCards = anchors.map(a => {
     return '<div class="ce-anchor-card"><div class="ce-anchor-h">' + a.icon + ' ' + esc(a.title) + '</div><div class="ce-anchor-desc">' + esc(a.desc) + '</div></div>';
   }).join('');
-  const anchorBlock = '<div class="card"><div class="card-title">05 明日观察锚点</div>' +
+  const anchorBlock = m.type === 'midday' ? '' : '<div class="card"><div class="card-title">05 明日观察锚点</div>' +
     '<div class="ce-anchor-grid">' + anchorCards + '</div></div>';
 
   // 底部强调横幅
@@ -912,7 +912,7 @@ function renderWaveDivergence(report) {
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(w.source || '全A扫描')}</span>
-      <button id="wave-refresh-btn" class="wl-btn wl-btn-primary" onclick="refreshWaveQuotes()">↻ 刷新行情</button>
+      <span><button class="wl-btn" onclick="bulkAddWaveToWatchlist()" style="margin-right:4px;">⚡ 一键加入观察池</button><button id="wave-refresh-btn" class="wl-btn wl-btn-primary" onclick="refreshWaveQuotes()">↻ 刷新行情</button></span>
     </div>
     <div class="wave-list">
       <div class="wave-row wave-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span><span>信号</span></div>
@@ -1008,6 +1008,7 @@ ${renderHero(report)}
   ${renderCloseEmotion(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderRegimeGate(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
   ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
   ${renderIntlMkt(report)}
   ${renderTechAnalysis(report)}
@@ -1018,7 +1019,6 @@ ${renderHero(report)}
   ${renderSectors(report)}
   ${renderLimitUp(report)}
   ${report.meta && report.meta.type === 'midday' ? '' : renderWatchlist(report)}
-  ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
   ${renderPlaybook(report)}
   ${renderVerdict(report)}
   ${renderIntlEvents(report)}
