@@ -388,6 +388,25 @@
 .nh-pct{width:58px;text-align:right;font-weight:700}
 .nh-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:3px}
 .nh-meta b{color:#555}
+/* v15: 强势股选股模块(午盘) */
+.ss-card{margin-bottom:10px}
+.ss-list{display:flex;flex-direction:column;gap:6px}
+.ss-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:6px 8px;cursor:pointer}
+.ss-item:active{background:#fff8f8}
+.ss-row{display:flex;align-items:center;gap:4px;font-size:11px}
+.ss-row>span{white-space:nowrap}
+.ss-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#e65100;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0}
+.ss-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
+.ss-name small{font-size:9px;color:#999;font-weight:400}
+.ss-price{width:56px;text-align:right;font-weight:700}
+.ss-pct{width:58px;text-align:right;font-weight:700}
+.ss-score{width:30px;text-align:center;font-weight:700;color:#e65100;background:#fff3e0;border-radius:4px;padding:1px 0}
+.ss-row.ss-head{font-size:9px;color:#999;font-weight:600}
+.ss-row.ss-head .ss-rank{background:#ddd;color:#666}
+.ss-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:4px;padding-left:26px}
+.ss-meta b{color:#555}
+.ss-meta .ok{color:#2e7d32}
+.ss-meta .no{color:#c33}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -696,15 +715,15 @@
 </div>
 <div class="section">
   <div class="tools">
-    <a class="tool-btn" href="reviews/2026-08-16_08-30.html">盘前 08:30 简报 · 2026-08-16</a>
+    <a class="tool-btn" href="reviews/2026-08-17_08-30.html">盘前 08:30 简报 · 2026-08-17</a>
     <a class="tool-btn" href="reviews/2026-08-14_11-35.html">盘中 11:35 快照 · 2026-08-14</a>
     <a class="tool-btn" href="reviews/2026-08-14_15-20.html">收盘 15:20 复盘 · 2026-08-14</a>
     <a class="tool-btn" href="main-rank.html">主线实时校准</a>
     <button class="tool-btn qr-btn" onclick="showQr()">手机扫码打开</button>
   </div>
   <div class="card">
-    <div class="card-title">历史复盘 (1991)</div>
-    <div class="report-list"><a class="report-card" href="reviews/2026-08-16_08-30.html"><div class="rc-title">2026-08-16 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-15_08-30.html"><div class="rc-title">2026-08-15 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-14_15-20.html"><div class="rc-title">2026-08-14 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-14_11-35.html"><div class="rc-title">2026-08-14 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-14_08-30.html"><div class="rc-title">2026-08-14 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-13_15-20.html"><div class="rc-title">2026-08-13 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="reviews/2026-08-13_11-35.html"><div class="rc-title">2026-08-13 11:35 · 午盘快照</div><div class="rc-meta">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="reviews/2026-08-13_08-30.html"><div class="rc-title">2026-08-13 08:30 · 盘前简报</div><div class="rc-meta">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="reviews/2026-08-12_15-20.html"><div class="rc-title">2026-08-12 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a><a class="report-card" href="reviews/2026-08-12_11-35.html"><div class="rc-title">2026-08-12 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a><a class="report-card" href="reviews/2026-08-12_08-30.html"><div class="rc-title">2026-08-12 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a></div>
+    <div class="card-title">历史复盘 (2172)</div>
+    <div class="report-list"><a class="report-card" href="reviews/2026-08-17_08-30.html"><div class="rc-title">2026-08-17 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-16_08-30.html"><div class="rc-title">2026-08-16 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-15_08-30.html"><div class="rc-title">2026-08-15 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-14_15-20.html"><div class="rc-title">2026-08-14 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-14_11-35.html"><div class="rc-title">2026-08-14 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-14_08-30.html"><div class="rc-title">2026-08-14 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="reviews/2026-08-13_15-20.html"><div class="rc-title">2026-08-13 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="reviews/2026-08-13_11-35.html"><div class="rc-title">2026-08-13 11:35 · 午盘快照</div><div class="rc-meta">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="reviews/2026-08-13_08-30.html"><div class="rc-title">2026-08-13 08:30 · 盘前简报</div><div class="rc-meta">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="reviews/2026-08-12_15-20.html"><div class="rc-title">2026-08-12 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a><a class="report-card" href="reviews/2026-08-12_11-35.html"><div class="rc-title">2026-08-12 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a><a class="report-card" href="reviews/2026-08-12_08-30.html"><div class="rc-title">2026-08-12 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a></div>
   </div>
 </div>
 <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
@@ -1232,6 +1251,53 @@ function bulkAddAllPicks(){
   });
   if (!codes.length) { alert('当前形态扫描名单为空'); return; }
   bulkAddToWatchlist(codes, ' 形态扫描个股');
+}
+
+/* ============ 强势股选股(午盘): 弹窗 / 刷新 / 一键加入 ============ */
+function openStrongStockModal(){
+  var m = document.getElementById('strong-stock-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeStrongStockModal(){
+  var m = document.getElementById('strong-stock-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+async function refreshStrongStockQuotes(){
+  var items = document.querySelectorAll('#strong-stock-modal .ss-item[data-code]');
+  if (!items.length) return;
+  var btn = document.getElementById('ss-refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  var codes = []; var map = {};
+  items.forEach(function(it){ var c = it.getAttribute('data-code'); if (c) { codes.push(c); map[c] = it; } });
+  try {
+    var batch = [];
+    codes.forEach(function(raw){ var c0 = raw.charAt(0); if (c0 === '6') batch.push('sh' + raw); else if (c0 === '4' || c0 === '8' || c0 === '92') batch.push('bj' + raw); else batch.push('sz' + raw); });
+    var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var buf = await res.arrayBuffer();
+    var text = new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
+      var f = m[1].split('~'); if (f.length < 40) return;
+      var code = String(f[2] || '').trim(); if (!map[code]) return;
+      var price = parseFloat(f[3]) || 0, pct = parseFloat(f[32]) || 0;
+      var it = map[code];
+      var cls = pct >= 0 ? 'up' : 'down';
+      var priceEl = it.querySelector('.ss-price');
+      if (priceEl) { priceEl.className = 'ss-price ' + cls; priceEl.textContent = price.toFixed(2); }
+      var pctEl = it.querySelector('.ss-pct');
+      if (pctEl) { pctEl.className = 'ss-pct ' + cls; pctEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'; }
+    });
+  } catch(e) {}
+  if (btn) { btn.disabled = false; btn.textContent = '↻ 刷新行情'; }
+}
+function bulkAddStrongStockToWatchlist(){
+  var codes = [];
+  document.querySelectorAll('#strong-stock-modal .ss-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
+  bulkAddToWatchlist(codes, ' 强势股个股');
 }
 </script>
 <script>
