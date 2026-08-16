@@ -984,7 +984,6 @@ ${renderHero(report)}
   ${renderMainRank(report)}
   ${renderStockResearch(report)}
   ${renderIntlEvents(report)}
-  ${renderIntlMkt(report)}
   ${renderNewsDigest(report)}
 </div>
 <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
@@ -1007,9 +1006,9 @@ ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
   ${renderCloseEmotion(report)}
-  ${renderRegimeGate(report)}
-  ${renderMarketScan(report)}
-  ${renderDataAnalysis(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderRegimeGate(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
+  ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
   ${renderIntlMkt(report)}
   ${renderTechAnalysis(report)}
   ${renderPremarketStrategy(report)}
@@ -1019,7 +1018,7 @@ ${renderHero(report)}
   ${renderSectors(report)}
   ${renderLimitUp(report)}
   ${report.meta && report.meta.type === 'midday' ? '' : renderWatchlist(report)}
-  ${renderWaveDivergence(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
   ${renderPlaybook(report)}
   ${renderVerdict(report)}
   ${renderIntlEvents(report)}
