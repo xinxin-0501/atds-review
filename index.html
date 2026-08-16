@@ -377,6 +377,17 @@
 .sc-meta b{color:#555}
 .sc-meta .ok{color:#2e7d32}
 .sc-meta .no{color:#c33}
+/* v14b: 60日新高弹窗名单(nh-item 增强: 名称/现价/涨跌/元数据行) */
+.nh-item{font-size:11px;background:#fafafa;padding:6px 10px;border-radius:6px;cursor:pointer}
+.nh-item:active{background:#fff8f8}
+.nh-row{display:flex;align-items:center;gap:6px}
+.nh-row>span{white-space:nowrap}
+.nh-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
+.nh-name small{font-size:9px;color:#999;font-weight:400}
+.nh-price{width:56px;text-align:right;font-weight:700}
+.nh-pct{width:58px;text-align:right;font-weight:700}
+.nh-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:3px}
+.nh-meta b{color:#555}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -831,69 +842,43 @@ async function refreshMarketScan(){
   list.innerHTML = html;
   alert('刷新完成，识别 ' + picks.length + ' 只形态个股');
 }
-async function openRegimeNHList(){
-  var existing = document.getElementById('regime-nh-modal');
-  if (existing) { existing.classList.add('show'); refreshRegimeNH(); return; }
-  var modal = document.createElement('div');
-  modal.className = 'modal-mask show';
-  modal.id = 'regime-nh-modal';
-  modal.onclick = function(e){ if (e.target === modal) closeRegimeNH(); };
-  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">'+
-    '<div class="modal-header"><div class="modal-eyebrow">60日新高个股清单</div><span class="modal-close" onclick="closeRegimeNH()">×</span></div>'+
-    '<div class="modal-body"><div class="nh-summary" id="regime-nh-body">加载中...</div>'+
-    '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="addAllNHToWatchlist()" style="margin-left:4px;">⚡ 一键全部加入观察池</button> <button class="wl-btn" onclick="closeRegimeNH()" style="margin-left:4px;">关闭</button></div></div>'+
-    '</div></div>';
-  document.body.appendChild(modal);
+function openRegimeNHList(){
+  // 弹窗由后端 renderRegimeNHModal 渲染(名单固定),前端只负责打开与刷新行情
+  var m = document.getElementById('regime-nh-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
   refreshRegimeNH();
 }
 async function refreshRegimeNH(){
-  var body = document.getElementById('regime-nh-body');
-  if (!body) return;
-  body.innerHTML = '<div style="text-align:center;color:#888">🔄 正在抓取60日K线...</div>';
-  var codes = new Set();
-  document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
-  if (codes.size < 5) {
-    document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
-    document.querySelectorAll('.wl-stock-row[data-code]').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
-  }
-  var arr = Array.from(codes).slice(0, 80);
-  var list = [];
-  for (var i = 0; i < arr.length; i++) {
-    var code = arr[i];
-    var c0 = code.charAt(0);
-    var full = c0 === '6' ? 'sh' + code : 'sz' + code;
-    var kl = await fetchKlineF(full, 65);
-    if (!kl || kl.length < 30) continue;
-    var highs = kl.map(function(k){ return parseFloat(k[3]); });
-    var peak60 = Math.max.apply(null, highs);
-    var last = parseFloat(kl[kl.length-1][2]);
-    if (last >= peak60 * 0.98) list.push({ code: code, last: last, peak60: peak60 });
-  }
-  // 批量拉取股票名称(腾讯批量行情)
+  // 仅批量拉取名单内个股的实时行情,更新现价/涨跌幅(不再重新检测K线)
+  var items = document.querySelectorAll('#regime-nh-modal .nh-item[data-code]');
+  if (!items.length) return;
+  var btn = document.getElementById('nh-refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  var codes = []; var map = {};
+  items.forEach(function(it){ var c = it.getAttribute('data-code'); if (c) { codes.push(c); map[c] = it; } });
   try {
-    var batch = list.map(function(x){ var c0 = x.code.charAt(0); return (c0==='6' ? 'sh' : (c0==='4'||c0==='8'||c0==='92' ? 'bj' : 'sz')) + x.code; });
-    if (batch.length) {
-      var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
-      var buf = await res.arrayBuffer();
-      var txt = new TextDecoder('gbk').decode(buf);
-      txt.split(';').forEach(function(line){
-        var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
-        var f = m[1].split('~'); if (f.length < 5) return;
-        var c = String(f[2] || '').trim();
-        for (var j = 0; j < list.length; j++) { if (list[j].code === c) { list[j].name = f[1]; break; } }
-      });
-    }
-  } catch(e){}
-  var html = '<div class="nh-summary">60日新高个股 <b>' + list.length + '</b> 只 / 阈值 100 · 点击行可查看个股分析</div>';
-  if (list.length) {
-    html += '<div class="nh-list">' + list.map(function(x, i){
-      return '<div class="nh-item" data-code="' + escHtmlF(x.code) + '" onclick="openStockResearch(this.dataset.code)"><span class="ms-rank">' + (i+1) + '</span> <b>' + escHtmlF(x.name || x.code) + '</b> <small>' + x.code + '</small> 现价 ' + x.last.toFixed(2) + ' (峰值 ' + x.peak60.toFixed(2) + ')</div>';
-    }).join('') + '</div>';
-  } else {
-    html += '<div class="ms-empty">当前候选中未识别到60日新高个股</div>';
-  }
-  html += '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="addAllNHToWatchlist()" style="margin-left:4px;">⚡ 一键全部加入观察池</button> <button class="wl-btn" onclick="closeRegimeNH()" style="margin-left:4px;">关闭</button></div>';
-  body.innerHTML = html;
+    var batch = [];
+    codes.forEach(function(raw){ var c0 = raw.charAt(0); if (c0 === '6') batch.push('sh' + raw); else if (c0 === '4' || c0 === '8' || c0 === '92') batch.push('bj' + raw); else batch.push('sz' + raw); });
+    var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var buf = await res.arrayBuffer();
+    var text = new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
+      var f = m[1].split('~'); if (f.length < 40) return;
+      var code = String(f[2] || '').trim(); if (!map[code]) return;
+      var price = parseFloat(f[3]) || 0, pct = parseFloat(f[32]) || 0;
+      var it = map[code];
+      var cls = pct >= 0 ? 'up' : 'down';
+      var priceEl = it.querySelector('.nh-price');
+      if (priceEl) { priceEl.className = 'nh-price ' + cls; priceEl.textContent = price.toFixed(2); }
+      var pctEl = it.querySelector('.nh-pct');
+      if (pctEl) { pctEl.className = 'nh-pct ' + cls; pctEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'; }
+    });
+  } catch(e) {}
+  if (btn) { btn.disabled = false; btn.textContent = '↻ 刷新行情'; }
 }
 function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
 function addAllNHToWatchlist(){

@@ -377,6 +377,17 @@
 .sc-meta b{color:#555}
 .sc-meta .ok{color:#2e7d32}
 .sc-meta .no{color:#c33}
+/* v14b: 60日新高弹窗名单(nh-item 增强: 名称/现价/涨跌/元数据行) */
+.nh-item{font-size:11px;background:#fafafa;padding:6px 10px;border-radius:6px;cursor:pointer}
+.nh-item:active{background:#fff8f8}
+.nh-row{display:flex;align-items:center;gap:6px}
+.nh-row>span{white-space:nowrap}
+.nh-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
+.nh-name small{font-size:9px;color:#999;font-weight:400}
+.nh-price{width:56px;text-align:right;font-weight:700}
+.nh-pct{width:58px;text-align:right;font-weight:700}
+.nh-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:3px}
+.nh-meta b{color:#555}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -795,140 +806,8 @@
       <div class="status-item">成交额<strong>--</strong></div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-title">板块热点</div>
-    <table class="table"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>涨停</th><th>领涨</th></tr></thead><tbody><tr>
-      <td>1</td>
-      <td>专用设备</td>
-      <td class="up">+13.31%</td>
-      <td>6</td>
-      <td>润邦股份</td>
-    </tr><tr>
-      <td>2</td>
-      <td>通用设备</td>
-      <td class="up">+12.00%</td>
-      <td>5</td>
-      <td>蓝盾光电</td>
-    </tr><tr>
-      <td>3</td>
-      <td>软件开发</td>
-      <td class="up">+12.49%</td>
-      <td>4</td>
-      <td>云赛智联</td>
-    </tr><tr>
-      <td>4</td>
-      <td>房地产开</td>
-      <td class="up">+10.15%</td>
-      <td>4</td>
-      <td>京投发展</td>
-    </tr><tr>
-      <td>5</td>
-      <td>汽车零部</td>
-      <td class="up">+10.01%</td>
-      <td>4</td>
-      <td>秦安股份</td>
-    </tr><tr>
-      <td>6</td>
-      <td>IT服务Ⅱ</td>
-      <td class="up">+9.96%</td>
-      <td>3</td>
-      <td>城地香江</td>
-    </tr></tbody></table>
-  </div>
-  <div class="card">
-    <div class="card-title">涨停梯队 · 15 只</div>
-    <div class="stock-row">
-      <div class="stock-info"><div class="stock-name">1. 北京文化 <span class="rank-tag">3天3板</span></div>
-        <div class="stock-code">000802 · 影视院线</div>
-        <div class="stock-code">封单 2.43 亿 · 开板 1 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">5.69</div><div class="pct up">+10.06%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">2. 润邦股份 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">002483 · 专用设备</div>
-        <div class="stock-code">封单 1.03 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">5.75</div><div class="pct up">+9.94%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">3. 龙洲股份 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">002682 · 物流</div>
-        <div class="stock-code">封单 0.72 亿 · 开板 1 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">5.03</div><div class="pct up">+10.07%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">4. 蓝盾光电 <span class="rank-tag">3天3板</span></div>
-        <div class="stock-code">300862 · 通用设备</div>
-        <div class="stock-code">封单 6.38 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">32.84</div><div class="pct up">+19.99%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">5. 云赛智联 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">600602 · 软件开发</div>
-        <div class="stock-code">封单 3.36 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">20.25</div><div class="pct up">+9.99%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">6. 京投发展 <span class="rank-tag">3天3板</span></div>
-        <div class="stock-code">600683 · 房地产开</div>
-        <div class="stock-code">封单 1.23 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">11.75</div><div class="pct up">+10.02%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">7. 秦安股份 <span class="rank-tag">4天4板</span></div>
-        <div class="stock-code">603758 · 汽车零部</div>
-        <div class="stock-code">封单 2.71 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">13.95</div><div class="pct up">+10.02%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">8. 同力天启 <span class="rank-tag">3天3板</span></div>
-        <div class="stock-code">605286 · 专用设备</div>
-        <div class="stock-code">封单 0.93 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">30.99</div><div class="pct up">+10.01%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">9. 城地香江 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">603887 · IT服务Ⅱ</div>
-        <div class="stock-code">封单 2.13 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">11.35</div><div class="pct up">+9.98%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">10. 鸿博股份 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">002229 · IT服务Ⅱ</div>
-        <div class="stock-code">封单 2.79 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">12.91</div><div class="pct up">+9.97%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">11. 华东数控 <span class="rank-tag">3天3板</span></div>
-        <div class="stock-code">002248 · 通用设备</div>
-        <div class="stock-code">封单 0.87 亿 · 开板 7 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">12.17</div><div class="pct up">+10.04%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">12. 巨轮智能 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">002031 · 专用设备</div>
-        <div class="stock-code">封单 3.07 亿 · 开板 1 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">6.42</div><div class="pct up">+9.93%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">13. 江河集团 <span class="rank-tag">3天2板</span></div>
-        <div class="stock-code">601886 · 装修装饰</div>
-        <div class="stock-code">封单 0.22 亿 · 开板 3 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">10.48</div><div class="pct up">+9.97%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">14. 宝鹰股份 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">002047 · 装修装饰</div>
-        <div class="stock-code">封单 0.78 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">3.92</div><div class="pct up">+10.11%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">15. 百合股份 <span class="rank-tag">4天2板</span></div>
-        <div class="stock-code">603102 · 食品加工</div>
-        <div class="stock-code">封单 0.23 亿 · 开板 2 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">42.05</div><div class="pct up">+9.99%</div></div>
-    </div>
-  </div>
+  
+  
   
   <div class="playbook-card"><div class="pb-header"><span class="pb-eyebrow">PLAYBOOK · 风险判断及重点关注方向</span><span class="pb-title">🎯 风险判断及重点关注方向</span></div><div class="pb-grid"><div class="pb-sec pb-offense"><div class="pb-sec-h">⚔️ 进攻方向(2-3 个)</div><div class="pb-item"><div class="pb-name">专用设备<span class="pb-count">6家 / 3板</span><span class="pb-lead">龙头 同力天启</span></div><div class="pb-logic"></div><div class="pb-scenario">适用场景:</div></div><div class="pb-item"><div class="pb-name">通用设备<span class="pb-count">5家 / 3板</span><span class="pb-lead">龙头 蓝盾光电</span></div><div class="pb-logic"></div><div class="pb-scenario">适用场景:</div></div><div class="pb-item"><div class="pb-name">汽车零部<span class="pb-count">4家 / 4板</span><span class="pb-lead">龙头 秦安股份</span></div><div class="pb-logic"></div><div class="pb-scenario">适用场景:</div></div></div><div class="pb-sec pb-defense"><div class="pb-sec-h">🛡️ 防御方向(2-3 个)</div><div class="pb-item"><div class="pb-name">高股息红利</div><div class="pb-logic">低波动+稳定分红</div><div class="pb-scenario">适用场景:若市场风险偏好下行或风格切换</div></div><div class="pb-item"><div class="pb-name">公用事业</div><div class="pb-logic">现金流稳定+刚性需求</div><div class="pb-scenario">适用场景:外盘走弱+量能萎缩</div></div><div class="pb-item"><div class="pb-name">银行(大行)</div><div class="pb-logic">高股息+低估值</div><div class="pb-scenario">适用场景:高位板块兑现+避险情绪升温</div></div></div><div class="pb-sec pb-themes"><div class="pb-sec-h">🎯 主题方向</div><div class="pb-item"><div class="pb-name">影视<span class="pb-stocks">映射标的:北京文化</span></div></div><div class="pb-item"><div class="pb-name">半导体<span class="pb-stocks">映射标的:至纯科技、炬光科技</span></div></div></div><div class="pb-sec pb-pitfall"><div class="pb-sec-h">⚠️ 避坑方向(2-3 个)</div><div class="pb-item"><div class="pb-name">高位连板股(连板≥4)</div><div class="pb-logic">当前连板≥4 共 2 只,承接强度需复核</div><div class="pb-scenario">适用场景:若 11:30 后炸板率上升</div></div><div class="pb-item"><div class="pb-name">当日炸板股</div><div class="pb-logic">近 0 只炸板,分歧加大</div><div class="pb-scenario">适用场景:缩量回踩阶段避免追高</div></div><div class="pb-item"><div class="pb-name">北证/微盘股</div><div class="pb-logic">波动放大+流动性敏感</div><div class="pb-scenario">适用场景:外盘系统性风险时易补跌</div></div></div></div><div class="card"><div class="card-title">操作节奏</div><div class="rhythm-item"><span class="rhythm-time">早盘 9:30-10:30</span><span class="rhythm-rule">"高开不追、低开看承接":基于外盘+开盘竞价,若高开 ≥0.5% 谨防冲高回落;若低开 ≤-0.5% 关注早盘 30 分钟承接力度</span></div><div class="rhythm-item"><span class="rhythm-time">午盘 10:30-14:00</span><span class="rhythm-rule">基于上午量能+板块轮动:若上午成交已达 5 日均量 50% 以上 + 板块轮动有序,可继续持有;若上午缩量+龙头炸板,逢高减仓</span></div><div class="rhythm-item"><span class="rhythm-time">尾盘 14:00-15:00</span><span class="rhythm-rule">基于全天走势定型:定型向上则持有或加仓主线,定型向下则规避高位股+减仓至建议仓位</span></div><div class="rhythm-pos"><b>仓位管理建议</b>:当前市场环境下建议仓位区间 <b>40%-60%</b>,加减仓触发条件:放量突破 MA60 + 板块带动 ≥3 板 → 加仓至 60%;缩量回踩 MA20 + 龙头炸板 → 减仓至 40%</div></div></div>
   <div class="verdict-card"><div class="vd-header"><span class="vd-eyebrow">VERDICT · 综合研判输出</span><span class="vd-title">📋 综合研判输出</span></div><div class="card vd-card vd-offense"><div class="vd-h">⚔️ 进攻线</div><div class="vd-body">关注 <b>专用设备 / 通用设备</b> 的持续性与龙头承接,概率倾向:板块带动效应延续的可能性较高</div></div><div class="card vd-card vd-defense"><div class="vd-h">🛡️ 防守线</div><div class="vd-body">若市场风险偏好下行,配置可考虑 <b>高股息红利 / 公用事业</b>,此类标的波动较低、分红稳定</div></div><div class="card vd-card vd-pitfall"><div class="vd-h">⚠️ 避坑线</div><div class="vd-body">回避 <b>高位连板股(连板≥4) / 当日炸板股</b>,尤其在外盘走弱或高位板块炸板时风险上升</div></div><div class="card"><div class="card-title">关键变量提醒(今日待落地)</div><div class="var-item">🇺🇸 <b>美国 CPI / 美联储讲话</b> → 关注通胀与利率路径,影响北向资金与全球风险偏好</div><div class="var-item">🇨🇳 <b>国内经济数据 / 央行公开市场操作</b> → 关注社融、PMI、利率决议,影响流动性预期</div><div class="var-item">🌐 <b>外盘重要事件</b> → 欧股开盘、美股期货走势、地缘冲突</div><div class="hint">具体发布时间需联网实时确认(由 ATDS 11:35 automation 联网补充)</div></div><div class="card"><div class="card-title">风险提示(综合)</div><div class="vd-risk">高位连板股(连板≥4)——当前连板≥4 共 2 只,承接强度需复核</div><div class="vd-risk">当日炸板股——近 0 只炸板,分歧加大</div></div><div class="vd-disclaimer">约束条件:所有数据来自联网实时检索;所有判断为概率倾向,不使用绝对化表述;技术位是概率参考而非确定买卖点;若某类别无重大变化,输出"本类暂无重大变化",不编造;A 股真正走势由内资承接力度、国内政策催化、板块轮动节奏决定</div></div>
@@ -1076,69 +955,43 @@ async function refreshMarketScan(){
   list.innerHTML = html;
   alert('刷新完成，识别 ' + picks.length + ' 只形态个股');
 }
-async function openRegimeNHList(){
-  var existing = document.getElementById('regime-nh-modal');
-  if (existing) { existing.classList.add('show'); refreshRegimeNH(); return; }
-  var modal = document.createElement('div');
-  modal.className = 'modal-mask show';
-  modal.id = 'regime-nh-modal';
-  modal.onclick = function(e){ if (e.target === modal) closeRegimeNH(); };
-  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">'+
-    '<div class="modal-header"><div class="modal-eyebrow">60日新高个股清单</div><span class="modal-close" onclick="closeRegimeNH()">×</span></div>'+
-    '<div class="modal-body"><div class="nh-summary" id="regime-nh-body">加载中...</div>'+
-    '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="addAllNHToWatchlist()" style="margin-left:4px;">⚡ 一键全部加入观察池</button> <button class="wl-btn" onclick="closeRegimeNH()" style="margin-left:4px;">关闭</button></div></div>'+
-    '</div></div>';
-  document.body.appendChild(modal);
+function openRegimeNHList(){
+  // 弹窗由后端 renderRegimeNHModal 渲染(名单固定),前端只负责打开与刷新行情
+  var m = document.getElementById('regime-nh-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
   refreshRegimeNH();
 }
 async function refreshRegimeNH(){
-  var body = document.getElementById('regime-nh-body');
-  if (!body) return;
-  body.innerHTML = '<div style="text-align:center;color:#888">🔄 正在抓取60日K线...</div>';
-  var codes = new Set();
-  document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
-  if (codes.size < 5) {
-    document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
-    document.querySelectorAll('.wl-stock-row[data-code]').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
-  }
-  var arr = Array.from(codes).slice(0, 80);
-  var list = [];
-  for (var i = 0; i < arr.length; i++) {
-    var code = arr[i];
-    var c0 = code.charAt(0);
-    var full = c0 === '6' ? 'sh' + code : 'sz' + code;
-    var kl = await fetchKlineF(full, 65);
-    if (!kl || kl.length < 30) continue;
-    var highs = kl.map(function(k){ return parseFloat(k[3]); });
-    var peak60 = Math.max.apply(null, highs);
-    var last = parseFloat(kl[kl.length-1][2]);
-    if (last >= peak60 * 0.98) list.push({ code: code, last: last, peak60: peak60 });
-  }
-  // 批量拉取股票名称(腾讯批量行情)
+  // 仅批量拉取名单内个股的实时行情,更新现价/涨跌幅(不再重新检测K线)
+  var items = document.querySelectorAll('#regime-nh-modal .nh-item[data-code]');
+  if (!items.length) return;
+  var btn = document.getElementById('nh-refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  var codes = []; var map = {};
+  items.forEach(function(it){ var c = it.getAttribute('data-code'); if (c) { codes.push(c); map[c] = it; } });
   try {
-    var batch = list.map(function(x){ var c0 = x.code.charAt(0); return (c0==='6' ? 'sh' : (c0==='4'||c0==='8'||c0==='92' ? 'bj' : 'sz')) + x.code; });
-    if (batch.length) {
-      var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
-      var buf = await res.arrayBuffer();
-      var txt = new TextDecoder('gbk').decode(buf);
-      txt.split(';').forEach(function(line){
-        var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
-        var f = m[1].split('~'); if (f.length < 5) return;
-        var c = String(f[2] || '').trim();
-        for (var j = 0; j < list.length; j++) { if (list[j].code === c) { list[j].name = f[1]; break; } }
-      });
-    }
-  } catch(e){}
-  var html = '<div class="nh-summary">60日新高个股 <b>' + list.length + '</b> 只 / 阈值 100 · 点击行可查看个股分析</div>';
-  if (list.length) {
-    html += '<div class="nh-list">' + list.map(function(x, i){
-      return '<div class="nh-item" data-code="' + escHtmlF(x.code) + '" onclick="openStockResearch(this.dataset.code)"><span class="ms-rank">' + (i+1) + '</span> <b>' + escHtmlF(x.name || x.code) + '</b> <small>' + x.code + '</small> 现价 ' + x.last.toFixed(2) + ' (峰值 ' + x.peak60.toFixed(2) + ')</div>';
-    }).join('') + '</div>';
-  } else {
-    html += '<div class="ms-empty">当前候选中未识别到60日新高个股</div>';
-  }
-  html += '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="addAllNHToWatchlist()" style="margin-left:4px;">⚡ 一键全部加入观察池</button> <button class="wl-btn" onclick="closeRegimeNH()" style="margin-left:4px;">关闭</button></div>';
-  body.innerHTML = html;
+    var batch = [];
+    codes.forEach(function(raw){ var c0 = raw.charAt(0); if (c0 === '6') batch.push('sh' + raw); else if (c0 === '4' || c0 === '8' || c0 === '92') batch.push('bj' + raw); else batch.push('sz' + raw); });
+    var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var buf = await res.arrayBuffer();
+    var text = new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
+      var f = m[1].split('~'); if (f.length < 40) return;
+      var code = String(f[2] || '').trim(); if (!map[code]) return;
+      var price = parseFloat(f[3]) || 0, pct = parseFloat(f[32]) || 0;
+      var it = map[code];
+      var cls = pct >= 0 ? 'up' : 'down';
+      var priceEl = it.querySelector('.nh-price');
+      if (priceEl) { priceEl.className = 'nh-price ' + cls; priceEl.textContent = price.toFixed(2); }
+      var pctEl = it.querySelector('.nh-pct');
+      if (pctEl) { pctEl.className = 'nh-pct ' + cls; pctEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'; }
+    });
+  } catch(e) {}
+  if (btn) { btn.disabled = false; btn.textContent = '↻ 刷新行情'; }
 }
 function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
 function addAllNHToWatchlist(){
