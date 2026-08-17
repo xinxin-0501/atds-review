@@ -76,18 +76,21 @@ async function fetchZB(dateArg) {
 }
 
 async function fetchBreadth() {
-  // 东财沪深指数上涨/下跌/平盘家数(f104/f105/f106)。HTTPS + 超时,兼容 GitHub Actions 境外环境
+  // 东财沪深指数上涨/下跌/平盘家数(f104/f105/f106)。HTTPS + 超时 + 最多3次重试,兼容 GitHub Actions 境外环境
   const url = 'https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f1,f2,f3,f104,f105,f106&secids=1.000001,0.399001,0.399006';
-  try {
-    const ac = new AbortController();
-    const timer = setTimeout(() => ac.abort(), 8000);
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ac.signal }).finally(() => clearTimeout(timer));
-    const j = await res.json();
-    const diff = (j.data && j.data.diff) || [];
-    let up = 0, down = 0, flat = 0;
-    for (const it of diff) { up += it.f104 || 0; down += it.f105 || 0; flat += it.f106 || 0; }
-    if (up || down || flat) return { up, down, flat };
-  } catch (e) { console.error('fetchBreadth 失败:', e.message); }
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const ac = new AbortController();
+      const timer = setTimeout(() => ac.abort(), 10000);
+      const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ac.signal }).finally(() => clearTimeout(timer));
+      const j = await res.json();
+      const diff = (j.data && j.data.diff) || [];
+      let up = 0, down = 0, flat = 0;
+      for (const it of diff) { up += it.f104 || 0; down += it.f105 || 0; flat += it.f106 || 0; }
+      if (up || down || flat) return { up, down, flat };
+    } catch (e) { console.error('fetchBreadth 失败(第' + (attempt + 1) + '次):', e.message); }
+    await new Promise(r => setTimeout(r, 600));
+  }
   return { up: 0, down: 0, flat: 0 };
 }
 
