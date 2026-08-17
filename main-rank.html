@@ -1401,6 +1401,55 @@ function bulkAddStrongStockToWatchlist(){
     };
   }
 })();
+
+/* ============ 午盘/收盘实时刷新:核心指数 + 顶部实时时间 ============ */
+function pad2F(n){return (n<10?'0':'')+n;}
+function bjTimeF(d){d=d||new Date();return pad2F(d.getHours())+':'+pad2F(d.getMinutes());}
+async function refreshCoreQuotes(){
+  var items=document.querySelectorAll('.index-item[data-code]');
+  if(!items.length)return;
+  var codes=[];var map={};
+  items.forEach(function(it){
+    var c=it.getAttribute('data-code');if(!c)return;
+    var p=it.getAttribute('data-prefix')||'sh';
+    codes.push(p+c);map[c]=it;   // 腾讯返回 f[2] 是 6 位代码,map 用纯数字作 key
+  });
+  try{
+    var res=await fetch('https://qt.gtimg.cn/q='+codes.join(','),{cache:'no-store'});
+    var buf=await res.arrayBuffer();
+    var text=new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m=line.trim().match(/^v_[a-z]+\d+="(.*)"$/);if(!m)return;
+      var f=m[1].split('~');if(f.length<40)return;
+      var full=String(f[2]||'').trim();
+      var it=map[full];if(!it)return;
+      var price=parseFloat(f[3])||0,pct=parseFloat(f[32])||0;
+      var cls=pct>=0?'up':'down';
+      var vEl=it.querySelector('.index-value');
+      if(vEl){vEl.className='index-value '+cls;vEl.textContent=price.toFixed(2);}
+      var cEl=it.querySelector('.index-change');
+      if(cEl){cEl.className='index-change '+cls;cEl.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';}
+    });
+  }catch(e){}
+}
+function initRealtimeClock(){
+  var t=document.getElementById('rt-hero-time');
+  if(t){var tick=function(){t.textContent=bjTimeF();};tick();setInterval(tick,1000);}
+}
+function initRealtimeRefresh(){
+  initRealtimeClock();
+  // 午盘/收盘页面每 60 秒刷新核心指数
+  if(document.querySelector('.index-item[data-code]')){
+    setTimeout(refreshCoreQuotes,800);
+    setInterval(refreshCoreQuotes,60000);
+  }
+}
+(function(){
+  if(document.querySelector('#rt-hero-time')||document.querySelector('.index-item[data-code]')){
+    if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initRealtimeRefresh,300);}
+    else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initRealtimeRefresh,300);});}
+  }
+})();
 </script>
 <script>
 /* minimal qrcode */
