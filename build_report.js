@@ -1156,11 +1156,44 @@ function renderDragonPool(report) {
 }
 
 function renderMainDirection(report) {
-  return `<div class="card"><div class="card-title">当前最强主线方向</div><div class="hint">数据详见盘前报告</div></div>`;
+  const list = (report.mainRank || []).slice(0, 5);
+  if (!list.length) return `<div class="card"><div class="card-title">当前最强主线方向</div><div class="hint">暂无主线方向数据</div></div>`;
+  const rows = list.map((s, i) => {
+    const cls = upDownClass(s.changePct);
+    return `<div class="md-item">
+      <div class="md-rank">${i + 1}</div>
+      <div class="md-main">
+        <div class="md-name">${esc(s.mappedName || s.name)} <span class="md-status ${s.status === '主线确认' ? 'ok' : 'no'}">${esc(s.status || '')}</span></div>
+        <div class="md-sub">涨停 ${esc(s.limitUpMax || '--')} · 领涨 ${esc(s.leadStock || '--')} · ATDS ${s.atds || '--'}</div>
+      </div>
+      <div class="md-pct ${cls}">${fmtPct(s.changePct)}</div>
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="card-title">当前最强主线方向</div>
+    <div class="md-list">${rows}</div>
+  </div>`;
 }
 
 function renderStockResearch(report) {
-  return `<div class="card"><div class="card-title">个股研究摘要</div><div class="hint">数据详见盘前报告</div></div>`;
+  const picks = (report.marketScan && report.marketScan.picks || []).slice(0, 5);
+  const lus = (report.limitUp || []).slice(0, 5);
+  const items = (picks.length ? picks : lus).map((s, i) => {
+    const cls = upDownClass(s.pct);
+    const reason = s.reason || (s.boardInfo ? s.boardInfo + ' · ' + (s.reason || '') : (s.reason || ''));
+    return `<div class="sr-item" data-code="${esc(s.code || '')}" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-rank">${i + 1}</div>
+      <div class="sr-main">
+        <div class="sr-name">${esc(s.name || '--')} <small>${esc(s.code || '')}</small></div>
+        <div class="sr-reason">${esc(reason || '--')}</div>
+      </div>
+      <div class="sr-pct ${cls}">${fmtPct(s.pct)}</div>
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="card-title">个股研究摘要</div>
+    <div class="sr-list">${items || '<div class="hint">暂无个股研究数据</div>'}</div>
+  </div>`;
 }
 
 function renderMainRank(report) {
@@ -1205,8 +1238,6 @@ ${renderHero(report)}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
   ${renderStockResearch(report)}
-  ${renderSectors(report)}
-  ${renderLimitUp(report)}
   ${renderIntlEvents(report)}
   ${renderNewsDigest(report)}
 </div>
