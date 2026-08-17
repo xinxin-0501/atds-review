@@ -866,7 +866,16 @@ function buildStockRow(s, i) {
   const stopLoss = (s.price * 0.95).toFixed(2);
   const support = (s.price * 0.92).toFixed(2);
   const pressure = (s.price * 1.08).toFixed(2);
-  // 每只股票独立卡片 .wl-stock:主行 .wl-stock-row(横向 flex 可滚) + 详情 .wl-detail 紧跟下方
+  // 每只股票独立卡片:表头行 + 数据行(同一横滑容器)+ 详情卡
+  const headRow = `<div class="wl-stock-row wl-stock-head">
+    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
+    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
+    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
+    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
+    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
+    <span class="wl-cell wl-cell-act"><b>操作</b></span>
+  </div>`;
   const main = `<div class="wl-stock-row" data-code="${esc(code)}">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><span class="wl-name">${esc(s.name)}</span><span class="wl-code">${esc(code)}</span></span>
     <span class="wl-cell wl-cell-price"><span class="price ${cls}">${fmtNum(s.price)}</span></span>
@@ -888,7 +897,7 @@ function buildStockRow(s, i) {
       <span><b>压力</b>${pressure}</span>
     </div>
   </div>`;
-  return `<div class="wl-stock" data-stock-code="${esc(code)}">${main}${detail}</div>`;
+  return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;
 }
 
 function buildStockModal(s) {
@@ -915,7 +924,6 @@ function renderWatchlist(report) {
   const list = report.watchlist || [];
   const time = (report.meta && report.meta.generatedAt) || '';
   const stocks = list.map((s, idx) => buildStockRow(s, idx)).join('');
-  const headRow = '<div class="wl-stock-row wl-stock-head"><span class="wl-cell wl-cell-rank"><b>排名/标的</b></span><span class="wl-cell wl-cell-price"><b>最新价</b></span><span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span><span class="wl-cell wl-cell-amt"><b>成交额</b></span><span class="wl-cell wl-cell-atds"><b>ATDS</b></span><span class="wl-cell wl-cell-sig"><b>策略信号</b></span><span class="wl-cell wl-cell-act"><b>操作</b></span></div>';
   const head = '<div class="card watchlist-card">' +
     '<div class="wl-header">' +
       '<div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● ' + esc(time) + '</span></div>' +
@@ -927,7 +935,6 @@ function renderWatchlist(report) {
       '</div>' +
     '</div>' +
     '<div class="wl-scroll-hint">← 左右滑动查看全部列 →</div>' +
-    '<div class="wl-stocks-head">' + headRow + '</div>' +
     '<div class="wl-stocks">' + stocks + '</div>' +
     '<div class="wl-details"></div>' +
     '</div>';
@@ -1175,7 +1182,7 @@ function renderPremarketReport(report, nav) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ATDS PRO · 盘前简报</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>ATDS PRO · 盘前简报</title>
 </head>
 <body>
 <div class="phone">

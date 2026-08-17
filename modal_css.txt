@@ -298,15 +298,15 @@
 .modal-box .modal-h{font-size:12px;color:#c33;font-weight:700;margin-bottom:4px}
 .modal-box .modal-b{font-size:11px;color:#444;line-height:1.6;background:#fafafa;border-radius:8px;padding:8px 10px}
 .modal-box .modal-footer{background:#fafafa;padding:10px 16px;font-size:9px;color:#999;border-top:1px solid #f0f0f0;text-align:center}
-/* v12: 观察池每只股票独立卡片 .wl-stock(主行可横滑 + 详情紧跟下方) */
-.wl-stocks-head{display:flex;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;background:#fafafa;border-radius:8px 8px 0 0;border-bottom:1px solid #eee}
-.wl-stocks-head .wl-stock-row{background:#fafafa}
+/* v16: 每只股票独立卡片(自带表头+数据+拉杆+详情) */
 .wl-stocks{display:flex;flex-direction:column;gap:10px}
 .wl-stock{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0}
-.wl-stock-row{display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:10px 6px;gap:0;background:#fff}
-.wl-stock-row::-webkit-scrollbar{height:4px}
-.wl-stock-row::-webkit-scrollbar-thumb{background:#c33;border-radius:2px}
-.wl-stock-row::-webkit-scrollbar-track{background:#f2f2f2}
+.wl-stock-scroll{display:block;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%}
+.wl-stock-scroll::-webkit-scrollbar{height:5px}
+.wl-stock-scroll::-webkit-scrollbar-thumb{background:#c33;border-radius:3px}
+.wl-stock-scroll::-webkit-scrollbar-track{background:#f2f2f2}
+.wl-stock-row{display:flex;align-items:center;padding:8px 6px;gap:0;background:#fff}
+.wl-stock-row.wl-stock-head{background:#fafafa;border-bottom:1px solid #eee;font-size:10px;color:#888;font-weight:600}
 .wl-stock-row .wl-cell{flex-shrink:0;padding:0 8px;font-size:11px;display:flex;align-items:center;gap:4px;white-space:nowrap}
 .wl-cell-rank{min-width:110px;display:flex !important;align-items:center;gap:6px}
 .wl-cell-rank .rank-no{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;background:#c33;color:#fff;border-radius:4px;font-size:10px;font-weight:700}

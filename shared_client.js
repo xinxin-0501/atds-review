@@ -216,7 +216,18 @@ function addToWatchlistUI(s){
   var stock=document.createElement('div');
   stock.className='wl-stock';
   stock.setAttribute('data-stock-code',s.code);
-  stock.innerHTML='<div class="wl-stock-row" data-code="'+escHtmlF(s.code)+'">'+
+  var headRowHtml='<div class="wl-stock-row wl-stock-head">'+
+    '<span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>'+
+    '<span class="wl-cell wl-cell-price"><b>最新价</b></span>'+
+    '<span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>'+
+    '<span class="wl-cell wl-cell-amt"><b>成交额</b></span>'+
+    '<span class="wl-cell wl-cell-atds"><b>ATDS</b></span>'+
+    '<span class="wl-cell wl-cell-sig"><b>策略信号</b></span>'+
+    '<span class="wl-cell wl-cell-act"><b>操作</b></span>'+
+    '</div>';
+  stock.innerHTML='<div class="wl-stock-scroll">'+
+    headRowHtml+
+    '<div class="wl-stock-row" data-code="'+escHtmlF(s.code)+'">'+
     '<span class="wl-cell wl-cell-rank"><span class="rank-no">'+n+'</span><span class="wl-name">'+escHtmlF(s.name)+'</span><span class="wl-code">'+escHtmlF(s.code)+'</span></span>'+
     '<span class="wl-cell wl-cell-price"><span class="price '+cls+'">'+Number(s.price).toFixed(2)+'</span></span>'+
     '<span class="wl-cell wl-cell-pct '+cls+'">'+(v>0?"+":"")+v.toFixed(2)+'%</span>'+
@@ -224,6 +235,7 @@ function addToWatchlistUI(s){
     '<span class="wl-cell wl-cell-atds">'+atds+'</span>'+
     '<span class="wl-cell wl-cell-sig"><span class="sig sig-'+sigTone+'">'+sigLabel+'</span></span>'+
     '<span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="'+escHtmlF(s.code)+'" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="'+escHtmlF(s.code)+'" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>'+
+    '</div>'+
     '</div>'+
     '<div class="wl-detail" data-detail-code="'+escHtmlF(s.code)+'">'+
     '<div class="detail-grid">'+
@@ -568,3 +580,41 @@ function bulkAddStrongStockToWatchlist(){
   document.querySelectorAll('#strong-stock-modal .ss-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
   bulkAddToWatchlist(codes, ' 强势股个股');
 }
+
+/* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
+(function bindWatchlistScrollSync(){
+  function bind(){
+    var head = document.querySelector('.wl-stocks-head .wl-stock-row');
+    var rows = document.querySelectorAll('.wl-stocks .wl-stock-row');
+    if (!head || !rows.length) return false;
+    var syncing = false;
+    function syncFrom(src){
+      if (syncing) return;
+      syncing = true;
+      var x = src.scrollLeft;
+      if (head !== src && head.scrollLeft !== x) head.scrollLeft = x;
+      for (var i = 0; i < rows.length; i++){
+        if (rows[i] !== src && rows[i].scrollLeft !== x) rows[i].scrollLeft = x;
+      }
+      syncing = false;
+    }
+    head.addEventListener('scroll', function(){ syncFrom(head); });
+    for (var i = 0; i < rows.length; i++) rows[i].addEventListener('scroll', (function(r){ return function(){ syncFrom(r); }; })(rows[i]));
+    return true;
+  }
+  function tryBind(){
+    if (bind()) return;
+    setTimeout(tryBind, 400);
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(tryBind, 300);
+  else document.addEventListener('DOMContentLoaded', function(){ setTimeout(tryBind, 300); });
+  // addToWatchlistUI 新增股票后重新绑定
+  var _orig = window.addToWatchlistUI;
+  if (typeof _orig === 'function'){
+    window.addToWatchlistUI = function(){
+      var r = _orig.apply(this, arguments);
+      setTimeout(bind, 50);
+      return r;
+    };
+  }
+})();
