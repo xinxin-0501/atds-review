@@ -425,6 +425,16 @@
 .sr-name small{font-size:9px;color:#999;font-weight:400}
 .sr-reason{font-size:9px;color:#888;margin-top:2px}
 .sr-pct{font-size:11px;font-weight:700;flex-shrink:0}
+/* v17b: 盘前驾驶舱 + 策略状态数据化 */
+.cp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cp-item{background:#fafafa;border-radius:8px;padding:8px}
+.cp-k{font-size:9px;color:#888;margin-bottom:2px}
+.cp-v{font-size:11px;font-weight:700;color:#333}
+.str-block{margin-top:8px}
+.str-h{font-size:10px;font-weight:700;color:#c33;margin-bottom:4px}
+.str-line{font-size:10px;color:#444;line-height:1.7;background:#fafafa;border-radius:6px;padding:5px 8px;margin-bottom:4px}
+.str-line b{color:#333}
+.str-line.pit b{color:#c33}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -791,7 +801,15 @@
   
   <div class="card">
     <div class="card-title">策略状态</div>
-    <div class="hint">多线轮动 / 风险预算 60% / 建议仓位 40-60%</div>
+    <div class="str-block">
+      <div class="str-h">⚔️ 进攻方向</div><div class="str-line"><b>创新药/医药</b> 涨停 15家 / 3板 · 领涨 亚泰集团</div><div class="str-line"><b>算力/数据中心</b> 涨停 13家 / 3板 · 领涨 城地香江</div>
+    </div>
+    <div class="str-block">
+      <div class="str-h">🛡️ 防守方向</div><div class="str-line"><b>电力/绿电</b> 全国用电负荷创历史新高，电力板块防御属性+旺季景气</div><div class="str-line"><b>消费/食品</b> CPI同比+0.5%回升，消费复苏预期升温</div>
+    </div>
+    <div class="str-block">
+      <div class="str-h">⚠️ 风险提示</div><div class="str-line pit"><b>高位连板股</b> 市场普跌、炸板率39%，5板高度接力风险上升</div><div class="str-line pit"><b>ST/微盘股</b> 跌停4家集中于高位题材股，ST股封单偏弱</div>
+    </div>
   </div>
   <div class="card">
     <div class="card-title">核心指数</div>

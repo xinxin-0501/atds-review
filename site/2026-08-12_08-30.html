@@ -425,6 +425,16 @@
 .sr-name small{font-size:9px;color:#999;font-weight:400}
 .sr-reason{font-size:9px;color:#888;margin-top:2px}
 .sr-pct{font-size:11px;font-weight:700;flex-shrink:0}
+/* v17b: 盘前驾驶舱 + 策略状态数据化 */
+.cp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cp-item{background:#fafafa;border-radius:8px;padding:8px}
+.cp-k{font-size:9px;color:#888;margin-bottom:2px}
+.cp-v{font-size:11px;font-weight:700;color:#333}
+.str-block{margin-top:8px}
+.str-h{font-size:10px;font-weight:700;color:#c33;margin-bottom:4px}
+.str-line{font-size:10px;color:#444;line-height:1.7;background:#fafafa;border-radius:6px;padding:5px 8px;margin-bottom:4px}
+.str-line b{color:#333}
+.str-line.pit b{color:#c33}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -768,11 +778,19 @@ tags: [ATDS, 交易复盘]
 </pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
   <div class="card">
     <div class="card-title">盘前交易驾驶舱</div>
-    <div class="hint">市场综述 + AUTO REFRESH</div>
+    <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">--° ·  · </div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">92 家 · 最高 7 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">百花医药</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">-- 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">--</div></div></div>
   </div>
   <div class="card">
     <div class="card-title">策略状态</div>
-    <div class="hint">多线轮动 / 风险预算 60% / 建议仓位 40-60%</div>
+    <div class="str-block">
+      <div class="str-h">⚔️ 进攻方向</div><div class="hint">暂无进攻方向</div>
+    </div>
+    <div class="str-block">
+      <div class="str-h">🛡️ 防守方向</div><div class="hint">暂无防守方向</div>
+    </div>
+    <div class="str-block">
+      <div class="str-h">⚠️ 风险提示</div><div class="hint">暂无风险提示</div>
+    </div>
   </div>
   <div class="card">
     <div class="card-title">核心指数</div>

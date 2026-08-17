@@ -425,6 +425,16 @@
 .sr-name small{font-size:9px;color:#999;font-weight:400}
 .sr-reason{font-size:9px;color:#888;margin-top:2px}
 .sr-pct{font-size:11px;font-weight:700;flex-shrink:0}
+/* v17b: 盘前驾驶舱 + 策略状态数据化 */
+.cp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cp-item{background:#fafafa;border-radius:8px;padding:8px}
+.cp-k{font-size:9px;color:#888;margin-bottom:2px}
+.cp-v{font-size:11px;font-weight:700;color:#333}
+.str-block{margin-top:8px}
+.str-h{font-size:10px;font-weight:700;color:#c33;margin-bottom:4px}
+.str-line{font-size:10px;color:#444;line-height:1.7;background:#fafafa;border-radius:6px;padding:5px 8px;margin-bottom:4px}
+.str-line b{color:#333}
+.str-line.pit b{color:#c33}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -3720,7 +3730,7 @@
   
   <div class="intl-mkt">
     <div class="intl-header"><span class="intl-eyebrow">GLOBAL LINKAGE · 4 MIN REFRESH</span><span class="intl-title">🌐 盘中信息 · 国际联动</span></div>
-    <div class="intl-cards"><div class="card intl-card"><div class="intl-head"><span class="intl-name">道琼斯</span><span class="intl-unit"></span></div><div class="intl-price down">53,732.41</div><div class="intl-change down">-0.20%</div><div class="intl-time">2026-08-14 16:41:05</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纳斯达克</span><span class="intl-unit"></span></div><div class="intl-price down">26,729.16</div><div class="intl-change down">-0.28%</div><div class="intl-time">2026-08-14 17:15:59</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约原油</span><span class="intl-unit">$/bbl</span></div><div class="intl-price up">81.84</div><div class="intl-change up">+0.55%</div><div class="intl-time">17:33:55</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约黄金</span><span class="intl-unit">$/oz</span></div><div class="intl-price up">4454.45</div><div class="intl-change up">+0.01%</div><div class="intl-time">17:34:07</div></div></div>
+    <div class="intl-cards"><div class="card intl-card"><div class="intl-head"><span class="intl-name">道琼斯</span><span class="intl-unit"></span></div><div class="intl-price down">53,732.41</div><div class="intl-change down">-0.20%</div><div class="intl-time">2026-08-14 16:41:05</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纳斯达克</span><span class="intl-unit"></span></div><div class="intl-price down">26,729.16</div><div class="intl-change down">-0.28%</div><div class="intl-time">2026-08-14 17:15:59</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约原油</span><span class="intl-unit">$/bbl</span></div><div class="intl-price up">82.03</div><div class="intl-change up">+0.83%</div><div class="intl-time">17:45:03</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约黄金</span><span class="intl-unit">$/oz</span></div><div class="intl-price up">4452.82</div><div class="intl-change up">+0.01%</div><div class="intl-time">17:45:05</div></div></div>
     <div class="intl-style"><div class="intl-style-h">📌 今日 A 股风格倾向（外盘推导）</div><div class="intl-style-body">数据待补充，建议结合盘前/盘中走势综合判断</div></div>
     
     <div class="intl-missing">数据源：腾讯公开 API（道指/纳指/原油/黄金实时）+ 联网检索（欧股/标普/费半/英伟达/AMD/VIX/CNY）。A 股真正走势由内资承接和国内政策决定，外盘仅定开盘风格底色。</div>
@@ -3728,7 +3738,15 @@
   <div class="tech-card"><div class="ta-header"><span class="ta-eyebrow">TECHNICAL ANALYSIS · 盘前/盘中技术研判</span><span class="ta-title">📐 今日技术研判</span></div><div class="card"><div class="card-title">1. 关键支撑位 / 压力位(由近及远)</div><table class="ta-table"><thead><tr><th>指数 / 最新价</th><th>关键支撑</th><th>关键压力</th><th>均线结构</th></tr></thead><tbody><tr><td class="ta-name">上证指数<br><span class="ta-last">3982.65</span></td><td class="ta-supports"><div class="ta-level ta-support"><b>3974.46</b><span class="ta-label">250日均线·年线</span></div><div class="ta-level ta-support"><b>3943.51</b><span class="ta-label">5日均线·短期</span></div></td><td class="ta-pressures"><div class="ta-level ta-pressure"><b>3983.65</b><span class="ta-label">60日均线·季线</span></div><div class="ta-level ta-pressure"><b>4000.00</b><span class="ta-label">整数关口</span></div></td><td class="ta-ma-cell"><div class="ta-ma"><span>MA5 3943.5</span><span>MA10 3922.5</span><span>MA20 3879.7</span><span>MA60 3983.6</span></div></td></tr><tr><td class="ta-name">深证成指<br><span class="ta-last">14704.27</span></td><td class="ta-supports"><div class="ta-level ta-support"><b>14700.00</b><span class="ta-label">整数关口</span></div><div class="ta-level ta-support"><b>14500.00</b><span class="ta-label">整数关口</span></div></td><td class="ta-pressures"><div class="ta-level ta-pressure"><b>14753.00</b><span class="ta-label">120日均线·半年线</span></div><div class="ta-level ta-pressure"><b>14800.00</b><span class="ta-label">整数关口</span></div></td><td class="ta-ma-cell"><div class="ta-ma"><span>MA5 14404.4</span><span>MA10 14279.0</span><span>MA20 14032.2</span><span>MA60 14947.3</span></div></td></tr><tr><td class="ta-name">创业板指<br><span class="ta-last">3740.16</span></td><td class="ta-supports"><div class="ta-level ta-support"><b>3700.00</b><span class="ta-label">整数关口</span></div><div class="ta-level ta-support"><b>3668.15</b><span class="ta-label">120日均线·半年线</span></div></td><td class="ta-pressures"><div class="ta-level ta-pressure"><b>3800.00</b><span class="ta-label">整数关口</span></div><div class="ta-level ta-pressure"><b>3837.55</b><span class="ta-label">60日均线·季线</span></div></td><td class="ta-ma-cell"><div class="ta-ma"><span>MA5 3620.7</span><span>MA10 3574.4</span><span>MA20 3512.0</span><span>MA60 3837.6</span></div></td></tr></tbody></table><div class="hint">支撑/压力按"由近及远"排序,标注技术含义(5 日均线/10 日均线/月线/季线/半年线/年线/整数关口)</div></div><div class="card"><div class="card-title">2. 量能关键</div><div class="vol-item">全天上证成交额预期: <b>4 亿 ~ 6 亿</b>(基于近 5 日均值 ±15%)</div><div class="vol-item">早盘 30 分钟成交预期: <b>0 亿 ~ 1 亿</b>(占全天 7%-12%)</div><div class="vol-item">量能验证标准: <b>有量有价</b>(成交 ≥ 5 日均量) → 突破可期; <b>无量诱多</b>(成交 &lt; 5 日均量 70%) → 谨防冲高回落</div></div><div class="card"><div class="card-title">3. 走势预判(概率倾向)</div><div class="trend-list"><div class="trend-item"><span class="trend-pct">35%</span><span class="trend-text">先抑后扬,震荡修复</span></div><div class="trend-item"><span class="trend-pct">25%</span><span class="trend-text">放量突破 MA60(季线)</span></div><div class="trend-item"><span class="trend-pct">20%</span><span class="trend-text">放量突破整数关口</span></div><div class="trend-item"><span class="trend-pct">15%</span><span class="trend-text">缩量下跌至前期缺口</span></div></div><div class="hint">所有判断为概率倾向(参考量、非买卖点),实际盘中需结合实时走势验证</div></div><div class="card"><div class="card-title">4. 核心风险(3-5 项)</div><div class="risk-list"><div class="risk-item"><span class="risk-name">外盘突发利空</span><span class="risk-desc">美股夜盘跳水或地缘冲突升级将传导 A 股开盘</span></div><div class="risk-item"><span class="risk-name">高位板块获利兑现</span><span class="risk-desc">连板梯队炸板率上升,资金切出高位股</span></div><div class="risk-item"><span class="risk-name">关键压力位攻关失败</span><span class="risk-desc">上证 3992(MA60)或深证 14746(半年线)若缩量冲关失败,易形成头部</span></div><div class="risk-item"><span class="risk-name">量能持续萎缩</span><span class="risk-desc">全日成交 &lt; 5 日均量 80% 时,任何上攻都缺乏持续性</span></div><div class="risk-item"><span class="risk-name">重要数据/政策发布</span><span class="risk-desc">美国 CPI、美联储讲话、国内经济数据若超预期,可能引发波动放大</span></div></div></div></div>
   <div class="card">
     <div class="card-title">策略状态</div>
-    <div class="hint">多线轮动 / 风险预算 60% / 建议仓位 40-60%</div>
+    <div class="str-block">
+      <div class="str-h">⚔️ 进攻方向</div><div class="str-line"><b>化学制品</b> 涨停 4家 / 2板 · 领涨 圣达生物</div><div class="str-line"><b>塑料</b> 涨停 3家 / 4板 · 领涨 天洋新材</div><div class="str-line"><b>化学制药</b> 涨停 3家 / 3板 · 领涨 神奇制药</div>
+    </div>
+    <div class="str-block">
+      <div class="str-h">🛡️ 防守方向</div><div class="str-line"><b>高股息红利</b> 低波动+稳定分红</div><div class="str-line"><b>公用事业</b> 现金流稳定+刚性需求</div><div class="str-line"><b>银行(大行)</b> 高股息+低估值</div>
+    </div>
+    <div class="str-block">
+      <div class="str-h">⚠️ 风险提示</div><div class="str-line pit"><b>高位连板股(连板≥4)</b> 当前连板≥4 共 3 只,承接强度需复核</div><div class="str-line pit"><b>当日炸板股</b> 近 0 只炸板,分歧加大</div><div class="str-line pit"><b>北证/微盘股</b> 波动放大+流动性敏感</div>
+    </div>
   </div>
   <div class="card">
     <div class="card-title">核心指数</div>
@@ -3746,7 +3764,7 @@
       <div class="index-change up">+3.14%</div>
     </div></div>
     <div class="status-row">
-      <div class="status-item">生成时间<strong>2026-08-17 17:33:26</strong></div>
+      <div class="status-item">生成时间<strong>2026-08-17 17:45:03</strong></div>
       <div class="status-item">数据源<strong>通达信实时</strong></div>
       <div class="status-item">类型<strong>午盘快照</strong></div>
     </div>
