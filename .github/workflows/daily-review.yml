@@ -5,17 +5,17 @@ on:
     - cron: '30 0 * * 1-5'   # 08:30 北京 盘前
     - cron: '35 3 * * 1-5'   # 11:35 北京 午盘
     - cron: '20 7 * * 1-5'   # 15:20 北京 收盘
-    workflow_dispatch:
+  workflow_dispatch:
     inputs:
       type:
         description: '报告类型'
-        type: choice
+        required: false
         default: 'midday'
+        type: choice
         options:
           - premarket
           - midday
           - close
-
 
 permissions:
   contents: write
@@ -51,12 +51,11 @@ jobs:
           fi
           echo "Type: input=[$INPUT_TYPE] -> ${{ steps.type.outputs.type }}"
 
-      - name: Sync latest code from repo root to scripts (GitHub web upload 到根目录)
+      - name: Sync latest code from repo root to scripts
         run: |
           for f in cloud_fetch.mjs build_report.js shared_client.js modal_css.txt inject_client.js; do
             if [ -f "$f" ]; then cp -f "$f" "scripts/$f"; echo "synced scripts/$f"; fi
           done
-          # 全A股票列表在仓库根目录,脚本读取 data/stock_list.json,需同步
           if [ -f "stock_list.json" ]; then cp -f "stock_list.json" "data/stock_list.json"; echo "synced data/stock_list.json"; fi
 
       - name: Fetch market data
@@ -74,14 +73,11 @@ jobs:
           import re, glob, shutil, os
           shutil.copy('site/index.html', 'index.html')
           shutil.copy('site/main-rank.html', 'main-rank.html')
-          # 扁平结构:报告直接在 site/ 根目录(REVIEWS_DIR=SITE_DIR)
           for f in glob.glob('site/*.html'):
               if os.path.basename(f) not in ('index.html', 'main-rank.html'):
                   shutil.copy(f, os.path.basename(f))
-          # 兼容旧 site/reviews/ 残留
           for f in glob.glob('site/reviews/*.html'):
               shutil.copy(f, os.path.basename(f))
-          # 重写 index.html 内 reviews/xxx.html -> xxx.html
           c = open('index.html', encoding='utf-8').read()
           for m in re.findall(r'reviews/[\w\-]+\.html', c):
               c = c.replace(m, m.replace('reviews/', ''))
