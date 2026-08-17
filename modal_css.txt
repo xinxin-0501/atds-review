@@ -419,3 +419,13 @@
 .sr-name small{font-size:9px;color:#999;font-weight:400}
 .sr-reason{font-size:9px;color:#888;margin-top:2px}
 .sr-pct{font-size:11px;font-weight:700;flex-shrink:0}
+/* v17b: 盘前驾驶舱 + 策略状态数据化 */
+.cp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cp-item{background:#fafafa;border-radius:8px;padding:8px}
+.cp-k{font-size:9px;color:#888;margin-bottom:2px}
+.cp-v{font-size:11px;font-weight:700;color:#333}
+.str-block{margin-top:8px}
+.str-h{font-size:10px;font-weight:700;color:#c33;margin-bottom:4px}
+.str-line{font-size:10px;color:#444;line-height:1.7;background:#fafafa;border-radius:6px;padding:5px 8px;margin-bottom:4px}
+.str-line b{color:#333}
+.str-line.pit b{color:#c33}

@@ -1145,9 +1145,44 @@ function renderStrongStock(report) {
 }
 
 function renderPremarketStrategy(report) {
+  const pb = report.playbook || {};
+  const off = (pb.offense || []).slice(0, 4);
+  const def = (pb.defense || []).slice(0, 3);
+  const pit = (pb.pitfall || []).slice(0, 3);
+  const offRows = off.map(o => `<div class="str-line"><b>${esc(o.name)}</b> 涨停 ${o.count || 0}家 / ${o.maxLB || 0}板 · 领涨 ${esc(o.leadStock || '--')}</div>`).join('') || '<div class="hint">暂无进攻方向</div>';
+  const defRows = def.map(d => `<div class="str-line"><b>${esc(d.name)}</b> ${esc(d.logic || '')}</div>`).join('') || '<div class="hint">暂无防守方向</div>';
+  const pitRows = pit.map(p => `<div class="str-line pit"><b>${esc(p.name)}</b> ${esc(p.logic || '')}</div>`).join('') || '<div class="hint">暂无风险提示</div>';
   return `<div class="card">
     <div class="card-title">策略状态</div>
-    <div class="hint">多线轮动 / 风险预算 60% / 建议仓位 40-60%</div>
+    <div class="str-block">
+      <div class="str-h">⚔️ 进攻方向</div>${offRows}
+    </div>
+    <div class="str-block">
+      <div class="str-h">🛡️ 防守方向</div>${defRows}
+    </div>
+    <div class="str-block">
+      <div class="str-h">⚠️ 风险提示</div>${pitRows}
+    </div>
+  </div>`;
+}
+
+function renderPremarketCockpit(report) {
+  const ms = report.marketStats || {};
+  const ce = report.closeEmotion || {};
+  const rg = report.regimeGate || {};
+  const off = (report.playbook && report.playbook.offense || []).slice(0, 3);
+  const offNames = off.map(o => o.name).join(' / ') || '--';
+  const rows = [
+    { k: '情绪温度', v: `${ce.tempScore || '--'}° · ${esc(ce.stage || '')} · ${esc(ce.tone || '')}` },
+    { k: '涨停家数', v: `${ce.ztTotal || ms.limitUpCount || '--'} 家 · 最高 ${ms.maxLianBan || ce.maxLB || '--'} 板` },
+    { k: '连板龙头', v: esc(ms.maxLianBanStock || ce.maxLB || '--') },
+    { k: '炸板家数', v: `${ce.zbTotal || ms.zhaBanCount || 0} 家` },
+    { k: '60日新高', v: `${rg.newHighCount || '--'} 只` },
+    { k: '进攻主线', v: esc(offNames) }
+  ].map(r => `<div class="cp-item"><div class="cp-k">${r.k}</div><div class="cp-v">${r.v}</div></div>`).join('');
+  return `<div class="card">
+    <div class="card-title">盘前交易驾驶舱</div>
+    <div class="cp-grid">${rows}</div>
   </div>`;
 }
 
@@ -1229,10 +1264,7 @@ ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
   ${renderWatchlist(report)}
-  <div class="card">
-    <div class="card-title">盘前交易驾驶舱</div>
-    <div class="hint">市场综述 + AUTO REFRESH</div>
-  </div>
+  ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
   ${renderMainDirection(report)}
