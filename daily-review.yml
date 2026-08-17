@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '30 0 * * 1-5'   # 08:30 北京 盘前
     - cron: '35 3 * * 1-5'   # 11:35 北京 午盘
-    - cron: '20 7 * * 1-5'   # 15:20 北京 收盘
+    - cron: '20 8 * * 1-5'   # 16:20 北京 收盘
   workflow_dispatch:
     inputs:
       type:

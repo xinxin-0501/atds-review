@@ -65,11 +65,14 @@ function renderHero(report) {
   const desc = m.type === 'premarket'
     ? '基于上一交易日数据 · 今日开盘前参考 · 非买卖建议'
     : m.type === 'midday'
-      ? '实时盘中快照 · 实时更新中'
-      : '收盘静态快照 · 数据截至 15:00';
+      ? '实时盘中数据 · 每 60 秒自动刷新'
+      : '收盘静态快照 · 数据截至 ' + ((config.reportTypes.close && config.reportTypes.close.time) || '15:20');
+  const timeHtml = m.type === 'midday'
+    ? '<span class="hero-time" id="rt-hero-time">' + (esc(m.time || '')) + '</span>'
+    : '<span class="hero-time">' + (esc(m.time || '')) + '</span>';
   return '<div class="hero">' +
     '<div class="hero-eyebrow">A 股每日复盘 · ' + (esc(m.typeLabel || '')) + '</div>' +
-    '<h1 class="hero-title">' + (esc(m.date || '')) + ' · <span class="hero-time">' + (esc(m.time || '')) + '</span></h1>' +
+    '<h1 class="hero-title">' + (esc(m.date || '')) + ' · ' + timeHtml + '</h1>' +
     '<div class="hero-sub">' + desc + '</div>' +
     (tempTag ? '<div class="hero-tags">' + tempTag + '</div>' : '') +
   '</div>';
@@ -78,7 +81,10 @@ function renderHero(report) {
 function renderIndices(report) {
   const items = (report.indices || []).map(idx => {
     const cls = upDownClass(idx.changePct);
-    return `<div class="index-item">
+    // 前缀按 config.indices 的 setcode 判定(1=sh, 0=sz),不能用 charAt(0) 因为指数代码不按此规则
+    const confIdx = (config.indices || []).find(i => String(i.code) === String(idx.code));
+    const prefix = confIdx && confIdx.setcode === '1' ? 'sh' : 'sz';
+    return `<div class="index-item" data-code="${esc(idx.code)}" data-prefix="${prefix}">
       <div class="index-name">${esc(idx.name)}</div>
       <div class="index-value ${cls}">${fmtNum(idx.price)}</div>
       <div class="index-change ${cls}">${fmtPct(idx.changePct)}</div>
@@ -1290,9 +1296,12 @@ function renderIndex(reports) {
   const preUrl = pre ? urlOf(pre) : 'main-rank.html';
   const midUrl = mid ? urlOf(mid) : 'main-rank.html';
   const cloUrl = clo ? urlOf(clo) : 'main-rank.html';
-  const preLabel = pre ? `${pre.meta.date} 08:30 简报` : '暂无盘前数据';
-  const midLabel = mid ? `${mid.meta.date} 11:35 快照` : '暂无盘中数据';
-  const cloLabel = clo ? `${clo.meta.date} 15:20 复盘` : '暂无收盘数据';
+  const preT = (config.reportTypes.premarket && config.reportTypes.premarket.time) || '08:30';
+  const midT = (config.reportTypes.midday && config.reportTypes.midday.time) || '11:35';
+  const cloT = (config.reportTypes.close && config.reportTypes.close.time) || '15:20';
+  const preLabel = pre ? `${pre.meta.date} ${preT} 简报` : '暂无盘前数据';
+  const midLabel = mid ? `${mid.meta.date} ${midT} 快照` : '暂无盘中数据';
+  const cloLabel = clo ? `${clo.meta.date} ${cloT} 复盘` : '暂无收盘数据';
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1314,13 +1323,13 @@ function renderIndex(reports) {
 </div>
 <div class="hero">
   <div class="hero-title">A股每日复盘工作台</div>
-  <div class="hero-sub">盘中 11:35 / 收盘 15:20 自动采集与渲染</div>
+  <div class="hero-sub">盘中 ${midT} / 收盘 ${cloT} 自动采集与渲染</div>
 </div>
 <div class="section">
   <div class="tools">
-    <a class="tool-btn" href="${preUrl}">盘前 08:30 简报 · ${pre ? pre.meta.date : ''}</a>
-    <a class="tool-btn" href="${midUrl}">盘中 11:35 快照 · ${mid ? mid.meta.date : ''}</a>
-    <a class="tool-btn" href="${cloUrl}">收盘 15:20 复盘 · ${clo ? clo.meta.date : ''}</a>
+    <a class="tool-btn" href="${preUrl}">盘前 ${preT} 简报 · ${pre ? pre.meta.date : ''}</a>
+    <a class="tool-btn" href="${midUrl}">盘中 ${midT} 快照 · ${mid ? mid.meta.date : ''}</a>
+    <a class="tool-btn" href="${cloUrl}">收盘 ${cloT} 复盘 · ${clo ? clo.meta.date : ''}</a>
     <a class="tool-btn" href="main-rank.html">主线实时校准</a>
     <button class="tool-btn qr-btn" onclick="showQr()">手机扫码打开</button>
   </div>
