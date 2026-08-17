@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ATDS PRO · 盘前简报</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>ATDS PRO · 盘前简报</title>
 <style>.modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0}
 .modal-mask.show{display:flex}
 .modal{background:#fff;border-radius:20px;max-width:414px;width:92%;margin:0 auto;padding:0;overflow:hidden}
@@ -304,15 +304,15 @@
 .modal-box .modal-h{font-size:12px;color:#c33;font-weight:700;margin-bottom:4px}
 .modal-box .modal-b{font-size:11px;color:#444;line-height:1.6;background:#fafafa;border-radius:8px;padding:8px 10px}
 .modal-box .modal-footer{background:#fafafa;padding:10px 16px;font-size:9px;color:#999;border-top:1px solid #f0f0f0;text-align:center}
-/* v12: 观察池每只股票独立卡片 .wl-stock(主行可横滑 + 详情紧跟下方) */
-.wl-stocks-head{display:flex;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;background:#fafafa;border-radius:8px 8px 0 0;border-bottom:1px solid #eee}
-.wl-stocks-head .wl-stock-row{background:#fafafa}
+/* v16: 每只股票独立卡片(自带表头+数据+拉杆+详情) */
 .wl-stocks{display:flex;flex-direction:column;gap:10px}
 .wl-stock{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0}
-.wl-stock-row{display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding:10px 6px;gap:0;background:#fff}
-.wl-stock-row::-webkit-scrollbar{height:4px}
-.wl-stock-row::-webkit-scrollbar-thumb{background:#c33;border-radius:2px}
-.wl-stock-row::-webkit-scrollbar-track{background:#f2f2f2}
+.wl-stock-scroll{display:block;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%}
+.wl-stock-scroll::-webkit-scrollbar{height:5px}
+.wl-stock-scroll::-webkit-scrollbar-thumb{background:#c33;border-radius:3px}
+.wl-stock-scroll::-webkit-scrollbar-track{background:#f2f2f2}
+.wl-stock-row{display:flex;align-items:center;padding:8px 6px;gap:0;background:#fff}
+.wl-stock-row.wl-stock-head{background:#fafafa;border-bottom:1px solid #eee;font-size:10px;color:#888;font-weight:600}
 .wl-stock-row .wl-cell{flex-shrink:0;padding:0 8px;font-size:11px;display:flex;align-items:center;gap:4px;white-space:nowrap}
 .wl-cell-rank{min-width:110px;display:flex !important;align-items:center;gap:6px}
 .wl-cell-rank .rank-no{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;background:#c33;color:#fff;border-radius:4px;font-size:10px;font-weight:700}
@@ -714,7 +714,15 @@
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
 <div class="section">
-  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-08-17 00:58:37</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 →</div><div class="wl-stocks-head"><div class="wl-stock-row wl-stock-head"><span class="wl-cell wl-cell-rank"><b>排名/标的</b></span><span class="wl-cell wl-cell-price"><b>最新价</b></span><span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span><span class="wl-cell wl-cell-amt"><b>成交额</b></span><span class="wl-cell wl-cell-atds"><b>ATDS</b></span><span class="wl-cell wl-cell-sig"><b>策略信号</b></span><span class="wl-cell wl-cell-act"><b>操作</b></span></div></div><div class="wl-stocks"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-row" data-code="600392">
+  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-08-17 00:58:37</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 →</div><div class="wl-stocks"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
+    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
+    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
+    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
+    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
+    <span class="wl-cell wl-cell-act"><b>操作</b></span>
+  </div><div class="wl-stock-row" data-code="600392">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">1</span><span class="wl-name">盛和资源</span><span class="wl-code">600392</span></span>
     <span class="wl-cell wl-cell-price"><span class="price up">23.90</span></span>
     <span class="wl-cell wl-cell-pct up">+4.60%</span>
@@ -722,7 +730,7 @@
     <span class="wl-cell wl-cell-atds">82</span>
     <span class="wl-cell wl-cell-sig"><span class="sig sig-strong">强势承接</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600392" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div><div class="wl-detail" data-detail-code="600392">
+  </div></div><div class="wl-detail" data-detail-code="600392">
     <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-mid">中风险</span></div><div class="detail-line">涨幅 2-5%,技术偏强</div><div class="detail-line">放量活跃</div></div>
       <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-short">短线</span></div><div class="detail-line"><b>短线</b>回踩 MA5 不破可继续,跌破减仓</div><div class="detail-line"><b>波段</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="detail-line"><b>长线</b>站上 MA120 偏多,关注 MA250 突破</div></div>
@@ -1199,7 +1207,18 @@ function addToWatchlistUI(s){
   var stock=document.createElement('div');
   stock.className='wl-stock';
   stock.setAttribute('data-stock-code',s.code);
-  stock.innerHTML='<div class="wl-stock-row" data-code="'+escHtmlF(s.code)+'">'+
+  var headRowHtml='<div class="wl-stock-row wl-stock-head">'+
+    '<span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>'+
+    '<span class="wl-cell wl-cell-price"><b>最新价</b></span>'+
+    '<span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>'+
+    '<span class="wl-cell wl-cell-amt"><b>成交额</b></span>'+
+    '<span class="wl-cell wl-cell-atds"><b>ATDS</b></span>'+
+    '<span class="wl-cell wl-cell-sig"><b>策略信号</b></span>'+
+    '<span class="wl-cell wl-cell-act"><b>操作</b></span>'+
+    '</div>';
+  stock.innerHTML='<div class="wl-stock-scroll">'+
+    headRowHtml+
+    '<div class="wl-stock-row" data-code="'+escHtmlF(s.code)+'">'+
     '<span class="wl-cell wl-cell-rank"><span class="rank-no">'+n+'</span><span class="wl-name">'+escHtmlF(s.name)+'</span><span class="wl-code">'+escHtmlF(s.code)+'</span></span>'+
     '<span class="wl-cell wl-cell-price"><span class="price '+cls+'">'+Number(s.price).toFixed(2)+'</span></span>'+
     '<span class="wl-cell wl-cell-pct '+cls+'">'+(v>0?"+":"")+v.toFixed(2)+'%</span>'+
@@ -1207,6 +1226,7 @@ function addToWatchlistUI(s){
     '<span class="wl-cell wl-cell-atds">'+atds+'</span>'+
     '<span class="wl-cell wl-cell-sig"><span class="sig sig-'+sigTone+'">'+sigLabel+'</span></span>'+
     '<span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="'+escHtmlF(s.code)+'" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="'+escHtmlF(s.code)+'" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>'+
+    '</div>'+
     '</div>'+
     '<div class="wl-detail" data-detail-code="'+escHtmlF(s.code)+'">'+
     '<div class="detail-grid">'+
@@ -1551,6 +1571,44 @@ function bulkAddStrongStockToWatchlist(){
   document.querySelectorAll('#strong-stock-modal .ss-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
   bulkAddToWatchlist(codes, ' 强势股个股');
 }
+
+/* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
+(function bindWatchlistScrollSync(){
+  function bind(){
+    var head = document.querySelector('.wl-stocks-head .wl-stock-row');
+    var rows = document.querySelectorAll('.wl-stocks .wl-stock-row');
+    if (!head || !rows.length) return false;
+    var syncing = false;
+    function syncFrom(src){
+      if (syncing) return;
+      syncing = true;
+      var x = src.scrollLeft;
+      if (head !== src && head.scrollLeft !== x) head.scrollLeft = x;
+      for (var i = 0; i < rows.length; i++){
+        if (rows[i] !== src && rows[i].scrollLeft !== x) rows[i].scrollLeft = x;
+      }
+      syncing = false;
+    }
+    head.addEventListener('scroll', function(){ syncFrom(head); });
+    for (var i = 0; i < rows.length; i++) rows[i].addEventListener('scroll', (function(r){ return function(){ syncFrom(r); }; })(rows[i]));
+    return true;
+  }
+  function tryBind(){
+    if (bind()) return;
+    setTimeout(tryBind, 400);
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(tryBind, 300);
+  else document.addEventListener('DOMContentLoaded', function(){ setTimeout(tryBind, 300); });
+  // addToWatchlistUI 新增股票后重新绑定
+  var _orig = window.addToWatchlistUI;
+  if (typeof _orig === 'function'){
+    window.addToWatchlistUI = function(){
+      var r = _orig.apply(this, arguments);
+      setTimeout(bind, 50);
+      return r;
+    };
+  }
+})();
 </script>
 <script>
 /* minimal qrcode */
