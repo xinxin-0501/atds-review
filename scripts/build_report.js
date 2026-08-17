@@ -1349,7 +1349,22 @@ function renderFooter(report) {
 }
 
 function renderIndex(reports) {
-  const list = reports.map(r => {
+  // 同一天同一类型只保留最新时间(如收盘 15:20 已改为 16:20,过滤旧时间残留)
+  const byKey = new Map();
+  const filtered = [];
+  for (const r of reports) {
+    const key = (r.meta && r.meta.date) + '|' + (r.meta && r.meta.type);
+    const cur = byKey.get(key);
+    if (!cur) {
+      byKey.set(key, r);
+      filtered.push(r);
+    } else if (r.meta.time > cur.meta.time) {
+      const idx = filtered.indexOf(cur);
+      filtered[idx] = r;
+      byKey.set(key, r);
+    }
+  }
+  const list = filtered.map(r => {
     const d = r.meta.date;
     const t = r.meta.time;
     const url = `${d}_${String(t).replace(':', '-')}.html`;
