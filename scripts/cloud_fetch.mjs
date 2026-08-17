@@ -76,15 +76,19 @@ async function fetchZB(dateArg) {
 }
 
 async function fetchBreadth() {
+  // 东财沪深指数上涨/下跌/平盘家数(f104/f105/f106)。HTTPS + 超时,兼容 GitHub Actions 境外环境
+  const url = 'https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f1,f2,f3,f104,f105,f106&secids=1.000001,0.399001,0.399006';
   try {
-    const url = 'http://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f1,f2,f3,f104,f105,f106&secids=1.000001,0.399001,0.399006';
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 8000);
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ac.signal }).finally(() => clearTimeout(timer));
     const j = await res.json();
     const diff = (j.data && j.data.diff) || [];
     let up = 0, down = 0, flat = 0;
     for (const it of diff) { up += it.f104 || 0; down += it.f105 || 0; flat += it.f106 || 0; }
-    return { up, down, flat };
-  } catch (e) { console.error('fetchBreadth 失败:', e.message); return { up: 0, down: 0, flat: 0 }; }
+    if (up || down || flat) return { up, down, flat };
+  } catch (e) { console.error('fetchBreadth 失败:', e.message); }
+  return { up: 0, down: 0, flat: 0 };
 }
 
 async function fetchDragonPool(today, yesterday) {
@@ -406,8 +410,20 @@ function fmtAmount(wan) {
 
 // 全市场成交额(沪深两市合计,单位:亿元)
 async function fetchTotalAmount() {
+  // 源1:东财 HTTPS push2 沪深指数 f6(成交额,元)——GitHub Actions 境外环境可用
   try {
-    // 腾讯行情接口:sh000001(上证) + sz399001(深证) 的 f[37]=成交额(万元)
+    const url = 'https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f6&secids=1.000001,0.399001';
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 8000);
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ac.signal }).finally(() => clearTimeout(timer));
+    const j = await res.json();
+    const diff = (j.data && j.data.diff) || [];
+    let total = 0;
+    for (const it of diff) total += (it.f6 || 0);  // f6 成交额(元)
+    if (total > 0) return total;  // 元,调用处 /1e8 = 亿元
+  } catch (e) { console.error('fetchTotalAmount(东财) 失败:', e.message); }
+  // 源2:腾讯行情接口 f[37]=成交额(万元)
+  try {
     const url = 'https://qt.gtimg.cn/q=sh000001,sz399001';
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), 8000);
@@ -422,8 +438,9 @@ async function fetchTotalAmount() {
       if (f.length < 40) continue;
       totalWan += parseFloat(f[37]) || 0;  // 成交额(万元)
     }
-    return totalWan * 1e4;  // 元,转亿需 /1e8(与调用处 totalAmountYi = /1e8 保持一致)
-  } catch (e) { console.error('fetchTotalAmount 失败:', e.message); return 0; }
+    if (totalWan > 0) return totalWan * 1e4;  // 元
+  } catch (e) { console.error('fetchTotalAmount(腾讯) 失败:', e.message); }
+  return 0;
 }
 
 // 60日新高个股数(基于东财涨停池 + 创新高近似估算;实际接口数据准确性 6/10)
