@@ -1,5 +1,3 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
 function getBaseUrl(){var h=location.href.split("#")[0];if(/index\.html/i.test(h)){return h.replace(/index\.html.*$/i,"");}if(h.slice(-1)==="/"){return h;}var i=h.lastIndexOf("/");return h.slice(0,i+1);}
 function showQr(){var u=getBaseUrl();document.getElementById("qr-mask").style.display="flex";document.getElementById("qr-sub").textContent=u;var el=document.getElementById("qrcode");el.innerHTML="";try{new QRCode(el,{text:u,width:200,height:200});}catch(e){el.innerHTML='<div style="font-size:12px;color:#999">二维码生成失败</div>';}}
 function hideQr(){document.getElementById("qr-mask").style.display="none";}
@@ -29,51 +27,47 @@ async function fetchStockData(raw){
 }
 async function openStockResearch(code){
   code=String(code||"").trim();
-  if(document.getElementById("modal-"+code)){showResearch(code);return;}
+  // 总是走动态版丰富弹窗(忽略静态 modal,统一体验)
+  closeAllModals();
   var data=await fetchStockData(code);
   if(!data){alert("未找到股票代码 "+code);return;}
   showDynamicResearch(data);
   var atds=70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
-  if(atds>=85 && !document.querySelector('.wl-row[data-code="'+code+'"]')){addToWatchlistUI(data);saveWatchlist();setTimeout(function(){var el=document.querySelector('.wl-row[data-code="'+code+'"]');if(el)el.style.background="#e8f5e9";},50);}
+  if(atds>=85 && !document.querySelector('.wl-stock-row[data-code="'+code+'"]')){addToWatchlistUI(data);saveWatchlist();setTimeout(function(){var el=document.querySelector('.wl-stock-row[data-code="'+code+'"]');if(el)el.style.background="#e8f5e9";},50);}
 }
 async function addFetchedToWatchlist(code){
   code=String(code||"").trim();
-  var modalEl=document.getElementById("modal-"+code);
-  var footer=modalEl?modalEl.querySelector(".modal-footer"):null;
+  if(!/^\d{6}$/.test(code)){
+    // 从打开的 modal 读 code(兼容性回退)
+    var openM=document.querySelector('.modal-mask.show[data-code]');
+    if(!openM)openM=document.querySelector('.modal-mask[id^="modal-"]');
+    if(openM){
+      var cm=openM.id.match(/modal-(\d+)/);if(cm)code=cm[1];
+      if(!code&&openM.dataset)code=openM.dataset.code;
+    }
+  }
+  if(!/^\d{6}$/.test(code)){alert("无效股票代码: "+code);return;}
   // 检查是否已存在
-  if(document.querySelector('.wl-row[data-code="'+code+'"]')){
-    if(footer)footer.innerHTML='<span style="color:#d49000">⚠ 已在观察池中</span>';
-    if(modalEl){var r=modalEl.querySelector('.wl-row[data-code="'+code+'"]');if(r){r.style.background="#fff7e6";setTimeout(function(){r.style.background="";},1500);}}
+  if(document.querySelector('.wl-stock-row[data-code="'+code+'"]')){
+    alert("已在观察池中");
+    var exist=document.querySelector('.wl-stock-row[data-code="'+code+'"]');
+    if(exist){exist.style.background="#fff7e6";setTimeout(function(){exist.style.background="";},1500);}
     return;
   }
-  // 显示加载状态
-  if(footer)footer.innerHTML='<span style="color:#888">⏳ 正在获取行情并加入观察池...</span>';
   var data=await fetchStockData(code);
-  if(!data){
-    if(footer)footer.innerHTML='<span style="color:#c33">⚠ 获取行情失败,请重试</span>';
-    return;
-  }
+  if(!data){alert("未能获取行情,请检查网络后重试");return;}
   addToWatchlistUI(data);
   saveWatchlist();
-  var el=document.querySelector('.wl-row[data-code="'+code+'"]');
+  var el=document.querySelector('.wl-stock-row[data-code="'+code+'"]');
   if(el){el.style.background="#e8f5e9";setTimeout(function(){el.style.background="";},1500);}
-  if(footer)footer.innerHTML='<span style="color:#2e7d32">✓ 已加入观察池: '+data.name+'</span>';
-  setTimeout(function(){closeModal(code);},1500);
+  // 滚动到观察池卡片,方便用户看到新增
+  var card=document.querySelector('.watchlist-card');
+  if(card&&card.scrollIntoView){try{card.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}}
+  alert("✓ 已加入观察池: "+data.name);
+  var mm=document.getElementById("modal-"+code);
+  if(mm)mm.classList.remove("show");
+  document.body.style.overflow="";
 }
-async function addAllPicks(){
-  var buttons = document.querySelectorAll('.ms-add');
-  var added = 0;
-  for (var i = 0; i < buttons.length; i++) {
-    var code = buttons[i].getAttribute('data-code');
-    if (!code) continue;
-    if (document.querySelector('.wl-row[data-code="'+code+'"]')) continue;
-    var data = await fetchStockData(code);
-    if (data) { addToWatchlistUI(data); added++; }
-  }
-  saveWatchlist();
-  alert('已加入 ' + added + ' 只形态个股到观察池');
-}
-// 前端形态识别(腾讯K线,支持CORS)
 async function fetchKlineF(code, count) {
   count = count || 70;
   try {
@@ -115,7 +109,7 @@ async function refreshMarketScan(){
   // 收集候选代码:页面涨停梯队 + 观察池
   var codes = new Set();
   document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
-  document.querySelectorAll('.wl-row').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
+  document.querySelectorAll('.wl-stock-row[data-code]').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
   if (codes.size < 5) {
     document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
   }
@@ -136,109 +130,55 @@ async function refreshMarketScan(){
   list.innerHTML = html;
   alert('刷新完成，识别 ' + picks.length + ' 只形态个股');
 }
-async function openRegimeNHList(){
-  var existing = document.getElementById('regime-nh-modal');
-  if (existing) { existing.classList.add('show'); refreshRegimeNH(); return; }
-  var modal = document.createElement('div');
-  modal.className = 'modal-mask show';
-  modal.id = 'regime-nh-modal';
-  modal.onclick = function(e){ if (e.target === modal) closeRegimeNH(); };
-  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">'+
-    '<div class="modal-header"><div class="modal-eyebrow">60日新高个股清单</div><span class="modal-close" onclick="closeRegimeNH()">×</span></div>'+
-    '<div class="modal-body"><div class="nh-summary" id="regime-nh-body">加载中...</div>'+
-    '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div></div>'+
-    '</div></div>';
-  document.body.appendChild(modal);
+function openRegimeNHList(){
+  // 弹窗由后端 renderRegimeNHModal 渲染(名单固定),前端只负责打开与刷新行情
+  var m = document.getElementById('regime-nh-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
   refreshRegimeNH();
 }
 async function refreshRegimeNH(){
-  var body = document.getElementById('regime-nh-body');
-  if (!body) return;
-  body.innerHTML = '<div style="text-align:center;color:#888">🔄 正在抓取60日K线...</div>';
-  var codes = new Set();
-  document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
-  if (codes.size < 5) {
-    document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
-    document.querySelectorAll('.wl-row').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
-  }
-  var arr = Array.from(codes).slice(0, 60);
-  var list = [];
-  for (var i = 0; i < arr.length; i++) {
-    var code = arr[i];
-    var c0 = code.charAt(0);
-    var full = c0 === '6' ? 'sh' + code : 'sz' + code;
-    var kl = await fetchKlineF(full, 65);
-    if (!kl || kl.length < 30) continue;
-    var highs = kl.map(function(k){ return parseFloat(k[3]); });
-    var peak60 = Math.max.apply(null, highs);
-    var last = parseFloat(kl[kl.length-1][2]);
-    if (last >= peak60 * 0.98) list.push({ code: code, last: last, peak60: peak60 });
-  }
-  var html = '<div class="nh-summary">60日新高个股 <b>' + list.length + '</b> 只 / 阈值 100</div>';
-  if (list.length) {
-    html += '<div class="nh-list">' + list.map(function(x, i){
-      return '<div class="nh-item"><span class="ms-rank">' + (i+1) + '</span> <b>' + x.code + '</b> 现价 ' + x.last.toFixed(2) + ' (峰值 ' + x.peak60.toFixed(2) + ')</div>';
-    }).join('') + '</div>';
-  } else {
-    html += '<div class="ms-empty">当前候选中未识别到60日新高个股</div>';
-  }
-  html += '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div>';
-  body.innerHTML = html;
+  // 仅批量拉取名单内个股的实时行情,更新现价/涨跌幅(不再重新检测K线)
+  var items = document.querySelectorAll('#regime-nh-modal .nh-item[data-code]');
+  if (!items.length) return;
+  var btn = document.getElementById('nh-refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  var codes = []; var map = {};
+  items.forEach(function(it){ var c = it.getAttribute('data-code'); if (c) { codes.push(c); map[c] = it; } });
+  try {
+    var batch = [];
+    codes.forEach(function(raw){ var c0 = raw.charAt(0); if (c0 === '6') batch.push('sh' + raw); else if (c0 === '4' || c0 === '8' || c0 === '92') batch.push('bj' + raw); else batch.push('sz' + raw); });
+    var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var buf = await res.arrayBuffer();
+    var text = new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
+      var f = m[1].split('~'); if (f.length < 40) return;
+      var code = String(f[2] || '').trim(); if (!map[code]) return;
+      var price = parseFloat(f[3]) || 0, pct = parseFloat(f[32]) || 0;
+      var it = map[code];
+      var cls = pct >= 0 ? 'up' : 'down';
+      var priceEl = it.querySelector('.nh-price');
+      if (priceEl) { priceEl.className = 'nh-price ' + cls; priceEl.textContent = price.toFixed(2); }
+      var pctEl = it.querySelector('.nh-pct');
+      if (pctEl) { pctEl.className = 'nh-pct ' + cls; pctEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'; }
+    });
+  } catch(e) {}
+  if (btn) { btn.disabled = false; btn.textContent = '↻ 刷新行情'; }
 }
 function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
-
-async function openRegimeNHList(){
-  var existing = document.getElementById('regime-nh-modal');
-  if (existing) { existing.classList.add('show'); refreshRegimeNH(); return; }
-  var modal = document.createElement('div');
-  modal.className = 'modal-mask show';
-  modal.id = 'regime-nh-modal';
-  modal.onclick = function(e){ if (e.target === modal) closeRegimeNH(); };
-  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">'+
-    '<div class="modal-header"><div class="modal-eyebrow">60日新高个股清单</div><span class="modal-close" onclick="closeRegimeNH()">×</span></div>'+
-    '<div class="modal-body"><div class="nh-summary" id="regime-nh-body">加载中...</div>'+
-    '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div></div>'+
-    '</div></div>';
-  document.body.appendChild(modal);
-  refreshRegimeNH();
+function addAllNHToWatchlist(){
+  var items = document.querySelectorAll('.nh-item[data-code]');
+  var codes = [];
+  for (var i = 0; i < items.length; i++) {
+    var c = items[i].getAttribute('data-code');
+    if (c && !document.querySelector('.wl-stock[data-stock-code="'+c+'"]')) codes.push(c);
+  }
+  bulkAddToWatchlist(codes, ' 60日新高个股');
 }
-async function refreshRegimeNH(){
-  var body = document.getElementById('regime-nh-body');
-  if (!body) return;
-  body.innerHTML = '<div style="text-align:center;color:#888">🔄 正在抓取60日K线...</div>';
-  var codes = new Set();
-  document.querySelectorAll('.stock-code').forEach(function(el){ var m = (el.textContent||'').match(/\d{6}/); if (m) codes.add(m[0]); });
-  if (codes.size < 5) {
-    document.querySelectorAll('.da-stock').forEach(function(a){ var c = a.getAttribute('data-code'); if (c) codes.add(c); });
-    document.querySelectorAll('.wl-row').forEach(function(r){ var c = r.getAttribute('data-code'); if (c) codes.add(c); });
-  }
-  var arr = Array.from(codes).slice(0, 60);
-  var list = [];
-  for (var i = 0; i < arr.length; i++) {
-    var code = arr[i];
-    var c0 = code.charAt(0);
-    var full = c0 === '6' ? 'sh' + code : 'sz' + code;
-    var kl = await fetchKlineF(full, 65);
-    if (!kl || kl.length < 30) continue;
-    var highs = kl.map(function(k){ return parseFloat(k[3]); });
-    var peak60 = Math.max.apply(null, highs);
-    var last = parseFloat(kl[kl.length-1][2]);
-    if (last >= peak60 * 0.98) list.push({ code: code, last: last, peak60: peak60 });
-  }
-  var html = '<div class="nh-summary">60日新高个股 <b>' + list.length + '</b> 只 / 阈值 100</div>';
-  if (list.length) {
-    html += '<div class="nh-list">' + list.map(function(x, i){
-      return '<div class="nh-item"><span class="ms-rank">' + (i+1) + '</span> <b>' + x.code + '</b> 现价 ' + x.last.toFixed(2) + ' (峰值 ' + x.peak60.toFixed(2) + ')</div>';
-    }).join('') + '</div>';
-  } else {
-    html += '<div class="ms-empty">当前候选中未识别到60日新高个股</div>';
-  }
-  html += '<div style="text-align:center;margin-top:10px"><button class="wl-btn wl-btn-primary" onclick="refreshRegimeNH()">🔄 重新检测</button> <button class="wl-btn" onclick="closeRegimeNH()">关闭</button></div>';
-  body.innerHTML = html;
-}
-function closeRegimeNH(){ var m = document.getElementById('regime-nh-modal'); if (m) m.classList.remove('show'); document.body.style.overflow=''; }
-
-async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();window.__atdsUnlocked=true;if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(document.getElementById("modal-"+data.code)){showResearch(data.code);}else{showDynamicResearch(data);}input.value="";}catch(e){alert("网络异常："+e.message);}}
+async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();window.__atdsUnlocked=true;if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(!document.querySelector('.wl-stock-row[data-code="'+data.code+'"]')){try{await addFetchedToWatchlist(data.code);}catch(e){}}showDynamicResearch(data);input.value="";}catch(e){alert("网络异常："+e.message);}}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
 function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
@@ -250,10 +190,11 @@ function escHtmlF(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/
 function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
   if(!card)return;
-  var body=card.querySelector(".wl-table-body");
-  if(!body){body=card;}
-  var tbody=body.querySelector("tbody")||body;
-  var n=card.querySelectorAll(".wl-row").length+1;
+  // 已存在则不重复添加(静态 HTML 已有 600392,恢复自选时避免重复行)
+  if(s&&s.code&&document.querySelector('.wl-stock[data-stock-code="'+String(s.code).replace(/"/g,'\\"')+'"]'))return;
+  var stocksWrap=card.querySelector(".wl-stocks");
+  if(!stocksWrap){stocksWrap=document.createElement("div");stocksWrap.className="wl-stocks";var head=card.querySelector(".wl-stocks-head");if(head&&head.nextSibling){card.insertBefore(stocksWrap,head.nextSibling);}else{card.appendChild(stocksWrap);}}
+  var n=stocksWrap.querySelectorAll(".wl-stock").length+1;
   var v=Number(s.pct)||0;
   var cls=v>=0?"up":"down";
   var sigLabel, sigTone;
@@ -267,45 +208,47 @@ function addToWatchlistUI(s){
   var stopLoss=(Number(s.price)*0.95).toFixed(2);
   var support=(Number(s.price)*0.92).toFixed(2);
   var pressure=(Number(s.price)*1.08).toFixed(2);
-  var row=document.createElement("tr");
-  row.className="wl-row wl-row-new";
-  row.setAttribute("data-code",s.code);
-  row.innerHTML =
-    '<td class="wl-cell wl-cell-rank"><span class="rank-no">'+n+'</span><div><div class="wl-name">'+escHtmlF(s.name)+'</div><div class="wl-code">'+escHtmlF(s.code)+'</div></div></td>'+
-    '<td class="wl-cell wl-cell-price"><div class="price '+cls+'">'+Number(s.price).toFixed(2)+'</div></td>'+
-    '<td class="wl-cell wl-cell-pct '+cls+'">'+(v>0?"+":"")+v.toFixed(2)+'%</td>'+
-    '<td class="wl-cell wl-cell-amt">'+escHtmlF(s.amount||'--')+'</td>'+
-    '<td class="wl-cell wl-cell-atds">'+atds+'</td>'+
-    '<td class="wl-cell wl-cell-sig"><span class="sig sig-'+sigTone+'">'+sigLabel+'</span></td>'+
-    '<td class="wl-cell wl-cell-stop" data-stop="'+escHtmlF(s.code)+'">'+stopLoss+'</td>'+
-    '<td class="wl-cell wl-cell-support" data-sup="'+escHtmlF(s.code)+'">'+support+'</td>'+
-    '<td class="wl-cell wl-cell-pressure" data-pre="'+escHtmlF(s.code)+'">'+pressure+'</td>'+
-    '<td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="'+escHtmlF(s.code)+'" onclick="showResearch(this.dataset.code)">全面分析</button><button class="wl-btn" data-code="'+escHtmlF(s.code)+'" onclick="removeWatchlistRow(this.dataset.code)" style="margin-left:4px;">删除</button></td>';
-  tbody.appendChild(row);
-
-  // 详情行(风险/风控/建议)—— 与后端 buildStockRow 一致
   var turnover=Number(s.turnover)||0;
   var riskL=deriveRiskLevelF(v),horizonL=deriveTimeHorizonF(v,turnover),adviceL=deriveAdviceF(v,atds,riskL.tone);
   var riskLines=deriveRiskTextF(v,turnover);
   var horizons=deriveHorizonLinesF(v,turnover);
   var adviceText=deriveAdviceTextF(v,atds,riskL.tone);
-  var detail=document.createElement('tr');
-  detail.className='wl-detail-row';
-  detail.setAttribute('data-detail-code',s.code);
-  detail.innerHTML='<td colspan="10" class="wl-detail-cell"><div class="detail-grid">'+
+  var stock=document.createElement('div');
+  stock.className='wl-stock';
+  stock.setAttribute('data-stock-code',s.code);
+  var headRowHtml='<div class="wl-stock-row wl-stock-head">'+
+    '<span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>'+
+    '<span class="wl-cell wl-cell-price"><b>最新价</b></span>'+
+    '<span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>'+
+    '<span class="wl-cell wl-cell-amt"><b>成交额</b></span>'+
+    '<span class="wl-cell wl-cell-atds"><b>ATDS</b></span>'+
+    '<span class="wl-cell wl-cell-sig"><b>策略信号</b></span>'+
+    '<span class="wl-cell wl-cell-act"><b>操作</b></span>'+
+    '</div>';
+  stock.innerHTML='<div class="wl-stock-scroll">'+
+    headRowHtml+
+    '<div class="wl-stock-row" data-code="'+escHtmlF(s.code)+'">'+
+    '<span class="wl-cell wl-cell-rank"><span class="rank-no">'+n+'</span><span class="wl-name">'+escHtmlF(s.name)+'</span><span class="wl-code">'+escHtmlF(s.code)+'</span></span>'+
+    '<span class="wl-cell wl-cell-price"><span class="price '+cls+'">'+Number(s.price).toFixed(2)+'</span></span>'+
+    '<span class="wl-cell wl-cell-pct '+cls+'">'+(v>0?"+":"")+v.toFixed(2)+'%</span>'+
+    '<span class="wl-cell wl-cell-amt">'+escHtmlF(s.amount||'--')+'</span>'+
+    '<span class="wl-cell wl-cell-atds">'+atds+'</span>'+
+    '<span class="wl-cell wl-cell-sig"><span class="sig sig-'+sigTone+'">'+sigLabel+'</span></span>'+
+    '<span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="'+escHtmlF(s.code)+'" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="'+escHtmlF(s.code)+'" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>'+
+    '</div>'+
+    '</div>'+
+    '<div class="wl-detail" data-detail-code="'+escHtmlF(s.code)+'">'+
+    '<div class="detail-grid">'+
     '<div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-'+riskL.tone+'">'+escHtmlF(riskL.name)+'</span></div>'+riskLines.map(function(l){return '<div class="detail-line">'+escHtmlF(l)+'</div>';}).join('')+'</div>'+
     '<div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-'+horizonL.tone+'">'+escHtmlF(horizonL.name)+'</span></div>'+horizons.map(function(h){return '<div class="detail-line"><b>'+escHtmlF(h.k)+'</b>'+escHtmlF(h.v)+'</div>';}).join('')+'</div>'+
     '<div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-'+adviceL.tone+'">'+escHtmlF(adviceL.name)+'</span></div><div class="detail-line">'+escHtmlF(adviceText)+'</div></div>'+
-    '</div></td>';
-  row.insertAdjacentElement('afterend',detail);
-  // 创建对应 modal(让"全面分析"按钮能弹出模态)
-  if (typeof showDynamicResearch === 'function' && !document.getElementById('modal-'+s.code)) {
-    try { showDynamicResearch(s); } catch(e) {}
-  }
+    '</div>'+
+    '<div class="detail-spb"><span><b>止损</b> '+stopLoss+'</span><span><b>支撑</b> '+support+'</span><span><b>压力</b> '+pressure+'</span></div>'+
+    '</div>';
+  stocksWrap.appendChild(stock);
 }
-
-function removeWatchlistRow(code){var r=document.querySelector('.wl-row[data-code="'+code+'"]');if(r)r.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();}
-function saveWatchlist(){try{var codes=[];document.querySelectorAll(".wl-row").forEach(function(r){var cd=r.getAttribute("data-code");if(cd)codes.push(cd);});localStorage.setItem("atds_watchlist",JSON.stringify(codes));}catch(e){}}
+function removeWatchlistRow(code){var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();saveWatchlist();}
+function saveWatchlist(){try{var codes=[];document.querySelectorAll(".wl-stock-row[data-code]").forEach(function(r){var cd=r.getAttribute("data-code");if(cd)codes.push(cd);});localStorage.setItem("atds_watchlist",JSON.stringify(codes));}catch(e){}}
 function renderStockModalFront(s){
   var pct=Number(s.pct)||0,turn=Number(s.turnover)||0;
   var atds=70+Math.min(25,Math.max(-15,Math.round(pct*2+turn*0.5)));
@@ -349,20 +292,13 @@ function renderStockModalFront(s){
     "</div></div>";
   return html;
 }
-function showDynamicResearch(s){var html=renderStockModalFront(s);var tmp=document.createElement("div");tmp.innerHTML=html;var modal=tmp.firstElementChild;document.body.appendChild(modal);modal.classList.add("show");document.body.style.overflow="hidden";}
+function showDynamicResearch(s){var old=document.getElementById("modal-"+(s.code||""));if(old)old.remove();var html=renderStockModalFront(s);var tmp=document.createElement("div");tmp.innerHTML=html;var modal=tmp.firstElementChild;document.body.appendChild(modal);modal.classList.add("show");document.body.style.overflow="hidden";}
 function downloadMd(){var el=document.getElementById("knowledge-md");if(!el){alert("暂无内容");return;}var blob=new Blob([el.textContent],{type:"text/markdown"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="atds-"+new Date().toISOString().slice(0,10)+".md";a.click();}
 function copyMd(){var el=document.getElementById("knowledge-md");if(!el||!navigator.clipboard){alert("复制失败");return;}navigator.clipboard.writeText(el.textContent).then(function(){alert("已复制到剪贴板");});}
 function loadSavedWatchlist(){try{var raw=localStorage.getItem("atds_watchlist");return raw?JSON.parse(raw):[];}catch(e){return [];}}
 function restoreSavedWatchlist(){
-  // 默认启动过滤:只保留盛和资源(600392);用户首次手动搜索加入其他股票时 __atdsUnlocked=true,后续不再过滤
-  var codes=loadSavedWatchlist().filter(function(cd){
-    if (window.__atdsUnlocked) return true;
-    return String(cd) === '600392';
-  });
-  if (!window.__atdsUnlocked && codes.length !== loadSavedWatchlist().length) {
-    try { localStorage.setItem('atds_watchlist', JSON.stringify(codes)); } catch(e) {}
-  }
-}
+  // 恢复用户加入的自选(如 localStorage 有数据则全量恢复,不再过滤掉非 600392,否则新增股票刷新后会消失)
+  var codes=loadSavedWatchlist();
   if(!codes.length)return;
   (async function(){
     for(var i=0;i<codes.length;i++){
@@ -377,10 +313,357 @@ function restoreSavedWatchlist(){
         var data={code:raw,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
         if(!data.name)continue;
         addToWatchlistUI(data);
-        // detail 行由 addToWatchlistUI 内部统一添加
       }catch(e){}
     }
   })();
 }
 if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(restoreSavedWatchlist,600);});}
-</script>
+
+/* ============ 观察池实时行情刷新(电脑关机后手机端仍可刷新) ============ */
+function escHtmlR(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function deriveSigR(v){if(v>=5)return{name:'强势突破',tone:'break'};if(v>=2)return{name:'强势承接',tone:'strong'};if(v>=0.5)return{name:'震荡上行',tone:'up'};if(v>=-1)return{name:'等待确认',tone:'wait'};if(v>=-3)return{name:'走势承压',tone:'press'};return{name:'弱势回调',tone:'weak'};}
+async function refreshWatchlistQuotes(){
+  var rows=document.querySelectorAll('.wl-stock-row[data-code]');
+  if(!rows.length)return;
+  var btn=document.getElementById('wl-refresh-btn');
+  if(btn){btn.disabled=true;btn.textContent='↻ 刷新中…';}
+  var codes=[];var map={};
+  rows.forEach(function(r){var c=r.getAttribute('data-code');if(c){codes.push(c);map[c]=r;}});
+  try{
+    // 批量腾讯行情:sh/sz/bj 前缀区分,一次请求多个
+    var batch=[];
+    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==='92'){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
+    var res=await fetch('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    var buf=await res.arrayBuffer();
+    var text=new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m=line.trim().match(/^v_[a-z]+\d+="(.*)"$/);if(!m)return;
+      var f=m[1].split('~');if(f.length<40)return;
+      var code=String(f[2]||'').trim();if(!map[code])return;
+      var price=parseFloat(f[3])||0,pct=parseFloat(f[32])||0;
+      var amount=((parseFloat(f[37])||0)/10000).toFixed(1)+'亿';
+      var turnover=f[38]||'--';
+      var r=map[code];
+      var cls=pct>=0?'up':'down';
+      var sig=deriveSigR(pct);
+      var atds=70+Math.min(25,Math.max(-15,Math.round(pct*2+(Number(turnover)||0)*0.5)));
+      var priceEl=r.querySelector('.wl-cell-price .price');
+      if(priceEl){priceEl.className='price '+cls;priceEl.textContent=price.toFixed(2);}
+      var pctEl=r.querySelector('.wl-cell-pct');
+      if(pctEl){pctEl.className='wl-cell wl-cell-pct '+cls;pctEl.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';}
+      var amtEl=r.querySelector('.wl-cell-amt');
+      if(amtEl)amtEl.textContent=amount;
+      var atdsEl=r.querySelector('.wl-cell-atds');
+      if(atdsEl)atdsEl.textContent=atds;
+      var sigEl=r.querySelector('.wl-cell-sig .sig');
+      if(sigEl){sigEl.className='sig sig-'+sig.tone;sigEl.textContent=sig.name;}
+      // detail-spb 止损/支撑/压力 基于最新价更新
+      var d=document.querySelector('.wl-detail[data-detail-code="'+code+'"]');
+      if(d){
+        var spb=d.querySelectorAll('.detail-spb span');
+        if(spb.length>=3){
+          var sl=spb[0].childNodes[1];var su=spb[1].childNodes[1];var pr=spb[2].childNodes[1];
+          if(sl)sl.textContent=(price*0.95).toFixed(2);
+          if(su)su.textContent=(price*0.92).toFixed(2);
+          if(pr)pr.textContent=(price*1.08).toFixed(2);
+        }
+      }
+    });
+    var timeEl=document.querySelector('.wl-time');
+    if(timeEl)timeEl.textContent='● '+new Date().toLocaleString('zh-CN',{hour12:false});
+  }catch(e){}
+  if(btn){btn.disabled=false;btn.textContent='↻ 刷新';}
+}
+function addWatchlistRefreshBtn(){
+  var tools=document.querySelector('.watchlist-card .wl-tools');
+  if(!tools||document.getElementById('wl-refresh-btn'))return;
+  var b=document.createElement('button');
+  b.id='wl-refresh-btn';b.className='wl-tool wl-tool-red';
+  b.textContent='↻ 刷新';
+  b.style.marginLeft='4px';
+  b.onclick=refreshWatchlistQuotes;
+  tools.appendChild(b);
+}
+function initWatchlistAutoRefresh(){
+  addWatchlistRefreshBtn();
+  setTimeout(refreshWatchlistQuotes,1500);            // 打开页面 1.5s 后自动刷一次
+  setInterval(refreshWatchlistQuotes,60000);          // 之后每 60 秒自动刷新
+}
+(function(){var card=document.querySelector('.watchlist-card');if(card){addWatchlistRefreshBtn();setTimeout(refreshWatchlistQuotes,1500);setInterval(refreshWatchlistQuotes,60000);}})();
+
+/* ============ 波背离选股:刷新行情 ============ */
+async function refreshWaveQuotes(){
+  var items=document.querySelectorAll('.wave-item[data-code]');
+  if(!items.length)return;
+  var btn=document.getElementById('wave-refresh-btn');
+  if(btn){btn.disabled=true;btn.textContent='↻ 刷新中…';}
+  var codes=[];var map={};
+  items.forEach(function(it){var c=it.getAttribute('data-code');if(c){codes.push(c);map[c]=it;}});
+  try{
+    var batch=[];
+    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==='92'){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
+    var res=await fetch('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    var buf=await res.arrayBuffer();
+    var text=new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m=line.trim().match(/^v_[a-z]+\d+="(.*)"$/);if(!m)return;
+      var f=m[1].split('~');if(f.length<40)return;
+      var code=String(f[2]||'').trim();if(!map[code])return;
+      var price=parseFloat(f[3])||0,pct=parseFloat(f[32])||0;
+      var it=map[code];
+      var cls=pct>=0?'up':'down';
+      var priceEl=it.querySelector('.wave-price');
+      if(priceEl){priceEl.className='wave-price '+cls;priceEl.textContent=price.toFixed(2);}
+      var pctEl=it.querySelector('.wave-pct');
+      if(pctEl){pctEl.className='wave-pct '+cls;pctEl.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';}
+    });
+  }catch(e){}
+  if(btn){btn.disabled=false;btn.textContent='↻ 刷新行情';}
+}
+/* ============ 一键批量加入观察池(波背离 / 60日新高通用) ============ */
+async function bulkAddToWatchlist(codes, label){
+  var hasCard = !!document.querySelector('.watchlist-card');
+  var added = 0;
+  for (var i = 0; i < codes.length; i++) {
+    var code = String(codes[i] || '').trim();
+    if (!/^\d{6}$/.test(code)) continue;
+    if (document.querySelector('.wl-stock[data-stock-code="'+code+'"]')) continue;
+    if (hasCard) {
+      try {
+        var d = await fetchStockData(code);
+        if (d) { addToWatchlistUI(d); added++; }
+      } catch(e){}
+    } else {
+      added++;
+    }
+  }
+  // 无论是否有观察池卡片,都写入 localStorage(午盘隐藏观察池时,收盘复盘会自动恢复)
+  try {
+    var existing = loadSavedWatchlist();
+    var merged = existing.slice();
+    codes.forEach(function(c){ if (/^\d{6}$/.test(String(c)) && merged.indexOf(String(c)) < 0) merged.push(String(c)); });
+    localStorage.setItem('atds_watchlist', JSON.stringify(merged));
+  } catch(e){}
+  alert('已加入 ' + added + ' 只' + (label || '') + '到观察池' + (hasCard ? '' : '（午盘已隐藏观察池卡片，收盘复盘中可查看）'));
+}
+function bulkAddWaveToWatchlist(){
+  var codes = [];
+  document.querySelectorAll('.wave-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
+  bulkAddToWatchlist(codes, ' 波背离个股');
+}
+
+/* ============ 超短核心选股(午盘): 弹窗 / 刷新 / 一键加入 ============ */
+function openShortCoreModal(){
+  var m = document.getElementById('short-core-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeShortCoreModal(){
+  var m = document.getElementById('short-core-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+async function refreshShortCoreQuotes(){
+  var items = document.querySelectorAll('#short-core-modal .sc-item[data-code]');
+  if (!items.length) return;
+  var btn = document.getElementById('sc-refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  var codes = []; var map = {};
+  items.forEach(function(it){ var c = it.getAttribute('data-code'); if (c) { codes.push(c); map[c] = it; } });
+  try {
+    var batch = [];
+    codes.forEach(function(raw){ var c0 = raw.charAt(0); if (c0 === '6') batch.push('sh' + raw); else if (c0 === '4' || c0 === '8' || c0 === '92') batch.push('bj' + raw); else batch.push('sz' + raw); });
+    var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var buf = await res.arrayBuffer();
+    var text = new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
+      var f = m[1].split('~'); if (f.length < 40) return;
+      var code = String(f[2] || '').trim(); if (!map[code]) return;
+      var price = parseFloat(f[3]) || 0, pct = parseFloat(f[32]) || 0;
+      var it = map[code];
+      var cls = pct >= 0 ? 'up' : 'down';
+      var priceEl = it.querySelector('.sc-price');
+      if (priceEl) { priceEl.className = 'sc-price ' + cls; priceEl.textContent = price.toFixed(2); }
+      var pctEl = it.querySelector('.sc-pct');
+      if (pctEl) { pctEl.className = 'sc-pct ' + cls; pctEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'; }
+    });
+  } catch(e) {}
+  if (btn) { btn.disabled = false; btn.textContent = '↻ 刷新行情'; }
+}
+function bulkAddShortCoreToWatchlist(){
+  var codes = [];
+  document.querySelectorAll('#short-core-modal .sc-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
+  bulkAddToWatchlist(codes, ' 超短核心个股');
+}
+
+/* ============ 形态扫描 / 波背离 弹窗模式 ============ */
+function openMarketScanModal(){
+  var m = document.getElementById('market-scan-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeMarketScanModal(){
+  var m = document.getElementById('market-scan-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+function openWaveDivergenceModal(){
+  var m = document.getElementById('wave-divergence-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeWaveDivergenceModal(){
+  var m = document.getElementById('wave-divergence-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+function bulkAddAllPicks(){
+  var codes = [];
+  document.querySelectorAll('#market-scan-modal .ms-row [data-code], #market-scan-modal .ms-row').forEach(function(el){
+    var c = el.getAttribute('data-code');
+    if (c && codes.indexOf(c) < 0) codes.push(c);
+  });
+  if (!codes.length) { alert('当前形态扫描名单为空'); return; }
+  bulkAddToWatchlist(codes, ' 形态扫描个股');
+}
+
+/* ============ 强势股选股(午盘): 弹窗 / 刷新 / 一键加入 ============ */
+function openStrongStockModal(){
+  var m = document.getElementById('strong-stock-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeStrongStockModal(){
+  var m = document.getElementById('strong-stock-modal');
+  if (m) m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+async function refreshStrongStockQuotes(){
+  var items = document.querySelectorAll('#strong-stock-modal .ss-item[data-code]');
+  if (!items.length) return;
+  var btn = document.getElementById('ss-refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  var codes = []; var map = {};
+  items.forEach(function(it){ var c = it.getAttribute('data-code'); if (c) { codes.push(c); map[c] = it; } });
+  try {
+    var batch = [];
+    codes.forEach(function(raw){ var c0 = raw.charAt(0); if (c0 === '6') batch.push('sh' + raw); else if (c0 === '4' || c0 === '8' || c0 === '92') batch.push('bj' + raw); else batch.push('sz' + raw); });
+    var res = await fetch('https://qt.gtimg.cn/q=' + batch.join(','), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var buf = await res.arrayBuffer();
+    var text = new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/); if (!m) return;
+      var f = m[1].split('~'); if (f.length < 40) return;
+      var code = String(f[2] || '').trim(); if (!map[code]) return;
+      var price = parseFloat(f[3]) || 0, pct = parseFloat(f[32]) || 0;
+      var it = map[code];
+      var cls = pct >= 0 ? 'up' : 'down';
+      var priceEl = it.querySelector('.ss-price');
+      if (priceEl) { priceEl.className = 'ss-price ' + cls; priceEl.textContent = price.toFixed(2); }
+      var pctEl = it.querySelector('.ss-pct');
+      if (pctEl) { pctEl.className = 'ss-pct ' + cls; pctEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%'; }
+    });
+  } catch(e) {}
+  if (btn) { btn.disabled = false; btn.textContent = '↻ 刷新行情'; }
+}
+function bulkAddStrongStockToWatchlist(){
+  var codes = [];
+  document.querySelectorAll('#strong-stock-modal .ss-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
+  bulkAddToWatchlist(codes, ' 强势股个股');
+}
+
+/* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
+(function bindWatchlistScrollSync(){
+  function bind(){
+    var head = document.querySelector('.wl-stocks-head .wl-stock-row');
+    var rows = document.querySelectorAll('.wl-stocks .wl-stock-row');
+    if (!head || !rows.length) return false;
+    var syncing = false;
+    function syncFrom(src){
+      if (syncing) return;
+      syncing = true;
+      var x = src.scrollLeft;
+      if (head !== src && head.scrollLeft !== x) head.scrollLeft = x;
+      for (var i = 0; i < rows.length; i++){
+        if (rows[i] !== src && rows[i].scrollLeft !== x) rows[i].scrollLeft = x;
+      }
+      syncing = false;
+    }
+    head.addEventListener('scroll', function(){ syncFrom(head); });
+    for (var i = 0; i < rows.length; i++) rows[i].addEventListener('scroll', (function(r){ return function(){ syncFrom(r); }; })(rows[i]));
+    return true;
+  }
+  function tryBind(){
+    if (bind()) return;
+    setTimeout(tryBind, 400);
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(tryBind, 300);
+  else document.addEventListener('DOMContentLoaded', function(){ setTimeout(tryBind, 300); });
+  // addToWatchlistUI 新增股票后重新绑定
+  var _orig = window.addToWatchlistUI;
+  if (typeof _orig === 'function'){
+    window.addToWatchlistUI = function(){
+      var r = _orig.apply(this, arguments);
+      setTimeout(bind, 50);
+      return r;
+    };
+  }
+})();
+
+/* ============ 午盘/收盘实时刷新:核心指数 + 顶部实时时间 ============ */
+function pad2F(n){return (n<10?'0':'')+n;}
+function bjTimeF(d){d=d||new Date();return pad2F(d.getHours())+':'+pad2F(d.getMinutes());}
+async function refreshCoreQuotes(){
+  var items=document.querySelectorAll('.index-item[data-code]');
+  if(!items.length)return;
+  var codes=[];var map={};
+  items.forEach(function(it){
+    var c=it.getAttribute('data-code');if(!c)return;
+    var p=it.getAttribute('data-prefix')||'sh';
+    codes.push(p+c);map[c]=it;   // 腾讯返回 f[2] 是 6 位代码,map 用纯数字作 key
+  });
+  try{
+    var res=await fetch('https://qt.gtimg.cn/q='+codes.join(','),{cache:'no-store'});
+    var buf=await res.arrayBuffer();
+    var text=new TextDecoder('gbk').decode(buf);
+    text.split(';').forEach(function(line){
+      var m=line.trim().match(/^v_[a-z]+\d+="(.*)"$/);if(!m)return;
+      var f=m[1].split('~');if(f.length<40)return;
+      var full=String(f[2]||'').trim();
+      var it=map[full];if(!it)return;
+      var price=parseFloat(f[3])||0,pct=parseFloat(f[32])||0;
+      var cls=pct>=0?'up':'down';
+      var vEl=it.querySelector('.index-value');
+      if(vEl){vEl.className='index-value '+cls;vEl.textContent=price.toFixed(2);}
+      var cEl=it.querySelector('.index-change');
+      if(cEl){cEl.className='index-change '+cls;cEl.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';}
+    });
+  }catch(e){}
+}
+function initRealtimeClock(){
+  var t=document.getElementById('rt-hero-time');
+  if(t){var tick=function(){t.textContent=bjTimeF();};tick();setInterval(tick,1000);}
+}
+function initRealtimeRefresh(){
+  initRealtimeClock();
+  // 午盘/收盘页面每 60 秒刷新核心指数
+  if(document.querySelector('.index-item[data-code]')){
+    setTimeout(refreshCoreQuotes,800);
+    setInterval(refreshCoreQuotes,60000);
+  }
+}
+(function(){
+  if(document.querySelector('#rt-hero-time')||document.querySelector('.index-item[data-code]')){
+    if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initRealtimeRefresh,300);}
+    else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initRealtimeRefresh,300);});}
+  }
+})();
