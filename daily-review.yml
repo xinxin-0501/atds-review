@@ -1,0 +1,92 @@
+name: ATDS Daily A-share Review
+
+on:
+  schedule:
+    - cron: '30 0 * * 1-5'   # 08:30 北京 盘前
+    - cron: '35 3 * * 1-5'   # 11:35 北京 午盘
+    - cron: '20 7 * * 1-5'   # 15:20 北京 收盘
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: atds-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Determine report type
+        id: type
+        run: |
+          HOUR=$(TZ='Asia/Shanghai' date +%H%M)
+          if [ "$HOUR" -lt "0900" ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
+          elif [ "$HOUR" -lt "1300" ]; then echo "type=midday" >> "$GITHUB_OUTPUT";
+          else echo "type=close" >> "$GITHUB_OUTPUT"; fi
+          echo "Type: $HOUR -> ${{ steps.type.outputs.type }}"
+
+      - name: Sync latest code from repo root to scripts (GitHub web upload 到根目录)
+        run: |
+          for f in cloud_fetch.mjs build_report.js shared_client.js modal_css.txt inject_client.js; do
+            if [ -f "$f" ]; then cp -f "$f" "scripts/$f"; echo "synced scripts/$f"; fi
+          done
+          # 全A股票列表在仓库根目录,脚本读取 data/stock_list.json,需同步
+          if [ -f "stock_list.json" ]; then cp -f "stock_list.json" "data/stock_list.json"; echo "synced data/stock_list.json"; fi
+
+      - name: Fetch market data
+        run: node --dns-result-order=ipv4first scripts/cloud_fetch.mjs ${{ steps.type.outputs.type }}
+
+      - name: Build report HTML
+        run: node scripts/build_report.js
+
+      - name: Inject CSS and shared client JS
+        run: node scripts/inject_client.js
+
+      - name: Flatten site to repository root (flat layout)
+        run: |
+          python3 - <<'PY'
+          import re, glob, shutil, os
+          shutil.copy('site/index.html', 'index.html')
+          shutil.copy('site/main-rank.html', 'main-rank.html')
+          # 扁平结构:报告直接在 site/ 根目录(REVIEWS_DIR=SITE_DIR)
+          for f in glob.glob('site/*.html'):
+              if os.path.basename(f) not in ('index.html', 'main-rank.html'):
+                  shutil.copy(f, os.path.basename(f))
+          # 兼容旧 site/reviews/ 残留
+          for f in glob.glob('site/reviews/*.html'):
+              shutil.copy(f, os.path.basename(f))
+          # 重写 index.html 内 reviews/xxx.html -> xxx.html
+          c = open('index.html', encoding='utf-8').read()
+          for m in re.findall(r'reviews/[\w\-]+\.html', c):
+              c = c.replace(m, m.replace('reviews/', ''))
+          open('index.html', 'w', encoding='utf-8').write(c)
+          print('flattened')
+          PY
+
+      - name: Commit updated data and site
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/reviews site index.html main-rank.html *.html
+          git commit -m "ATDS daily A-share review $(TZ='Asia/Shanghai' date +%Y-%m-%d-%H%M)" || echo "No changes to commit"
+          git push
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4

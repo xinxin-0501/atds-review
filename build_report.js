@@ -1192,6 +1192,8 @@ ${renderHero(report)}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
   ${renderStockResearch(report)}
+  ${renderSectors(report)}
+  ${renderLimitUp(report)}
   ${renderIntlEvents(report)}
   ${renderNewsDigest(report)}
 </div>
@@ -1309,7 +1311,7 @@ function renderIndex(reports) {
 </div>
 <div class="section">
   <div class="tools">
-    <a class="tool-btn" href="${preUrl}">盘前 08:30 简报 · ${pre.meta ? pre.meta.date : ''}</a>
+    <a class="tool-btn" href="${preUrl}">盘前 08:30 简报 · ${pre ? pre.meta.date : ''}</a>
     <a class="tool-btn" href="${midUrl}">盘中 11:35 快照 · ${mid ? mid.meta.date : ''}</a>
     <a class="tool-btn" href="${cloUrl}">收盘 15:20 复盘 · ${clo ? clo.meta.date : ''}</a>
     <a class="tool-btn" href="main-rank.html">主线实时校准</a>
