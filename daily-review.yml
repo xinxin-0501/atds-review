@@ -6,6 +6,17 @@ on:
     - cron: '35 3 * * 1-5'   # 11:35 北京 午盘
     - cron: '20 7 * * 1-5'   # 15:20 北京 收盘
   workflow_dispatch:
+    inputs:
+      type:
+        description: '报告类型(留空则按时间自动判断)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - premarket
+          - midday
+          - close
 
 permissions:
   contents: write
@@ -31,11 +42,15 @@ jobs:
       - name: Determine report type
         id: type
         run: |
-          HOUR=$(TZ='Asia/Shanghai' date +%H%M)
-          if [ "$HOUR" -lt "0900" ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
-          elif [ "$HOUR" -lt "1300" ]; then echo "type=midday" >> "$GITHUB_OUTPUT";
-          else echo "type=close" >> "$GITHUB_OUTPUT"; fi
-          echo "Type: $HOUR -> ${{ steps.type.outputs.type }}"
+          INPUT_TYPE="${{ github.event.inputs.type }}"
+          if [ -n "$INPUT_TYPE" ]; then echo "type=$INPUT_TYPE" >> "$GITHUB_OUTPUT";
+          else
+            HOUR=$(TZ='Asia/Shanghai' date +%H%M)
+            if [ "$HOUR" -lt "0900" ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
+            elif [ "$HOUR" -lt "1300" ]; then echo "type=midday" >> "$GITHUB_OUTPUT";
+            else echo "type=close" >> "$GITHUB_OUTPUT"; fi
+          fi
+          echo "Type: input=[$INPUT_TYPE] -> ${{ steps.type.outputs.type }}"
 
       - name: Sync latest code from repo root to scripts (GitHub web upload 到根目录)
         run: |
