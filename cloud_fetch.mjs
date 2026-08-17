@@ -29,7 +29,9 @@ function shanghaiNow() {
 async function fetchTencent(codes) {
   try {
     const url = `https://qt.gtimg.cn/q=${codes.join(',')}`;
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 8000);
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ac.signal }).finally(() => clearTimeout(timer));
     // 腾讯行情接口返回 GBK 编码,必须用 gbk 解码,否则中文名称乱码
     const buf = await res.arrayBuffer();
     let text;
@@ -405,14 +407,22 @@ function fmtAmount(wan) {
 // 全市场成交额(沪深两市合计,单位:亿元)
 async function fetchTotalAmount() {
   try {
-    // 东财沪深两市实时数据 push2.eastmoney.com → sh+sz 累计
-    const url = 'https://push2.eastmoney.com/api/qt/stock/get?fields=f43&secids=1.000001,0.399001';
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-    const j = await res.json();
-    const diff = (j.data && j.data.diff) || [];
-    let total = 0;
-    for (const it of diff) total += (it.f43 || 0);
-    return total;  // 元,转亿需 /1e8
+    // 腾讯行情接口:sh000001(上证) + sz399001(深证) 的 f[37]=成交额(万元)
+    const url = 'https://qt.gtimg.cn/q=sh000001,sz399001';
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 8000);
+    const res = await fetch(url, { cache: 'no-store', signal: ac.signal }).finally(() => clearTimeout(timer));
+    const buf = await res.arrayBuffer();
+    const text = new TextDecoder('gbk').decode(buf);
+    let totalWan = 0;
+    for (const line of text.trim().split(';')) {
+      const m = line.trim().match(/^v_[a-z]+\d+="(.*)"$/);
+      if (!m) continue;
+      const f = m[1].split('~');
+      if (f.length < 40) continue;
+      totalWan += parseFloat(f[37]) || 0;  // 成交额(万元)
+    }
+    return totalWan * 1e4;  // 元,转亿需 /1e8(与调用处 totalAmountYi = /1e8 保持一致)
   } catch (e) { console.error('fetchTotalAmount 失败:', e.message); return 0; }
 }
 

@@ -313,14 +313,19 @@ function renderCloseEmotion(report) {
   '</div>' +
   '<div class="ce-breadth-meta">' +
     '<span>红盘率 <b>' + (ce.redRate || '--') + '%</b></span>' +
-    '<span>成交额 <b>待补充</b>(早盘较昨日需联网)</span>' +
+    '<span>成交额 <b>' + esc(report.marketStats && report.marketStats.totalAmount || '--') + '</b> (沪深合计)</span>' +
   '</div>';
   const idxRows = indices.map(idx => {
     const cls = upDownClass(idx.changePct);
     return '<div class="ce-idx-row"><span class="ce-idx-name">' + esc(idx.name) + '</span><span class="ce-idx-val ' + cls + '">' + fmtPct(idx.changePct) + '</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill ' + cls + '" style="width:' + Math.min(100, Math.abs(idx.changePct || 0) * 30) + '%"></div></div></div>';
   }).join('');
   const indexHtml = '<div class="ce-index-block"><div class="ce-block-h">指数表现</div>' + idxRows +
-    '<div class="ce-block-hint">成长科技领涨,量能微缩但仍在 2 万亿上方</div></div>';
+    '<div class="ce-block-hint">' + (function(){
+      const amt = parseFloat((report.marketStats && report.marketStats.totalAmount) || 0);
+      if (amt >= 20000) return '量能维持在 2 万亿上方 (' + amt.toFixed(0) + ' 亿)';
+      if (amt > 0) return '量能 ' + (amt / 10000).toFixed(2) + ' 万亿 (' + amt.toFixed(0) + ' 亿)';
+      return '量能数据待更新';
+    })() + '</div></div>';
   const broadBlock = '<div class="card"><div class="card-title">02 市场广度与指数结构</div>' +
     '<div class="ce-broad-grid">' +
     '<div class="ce-broad-left">' + breadthHtml + '</div>' +
