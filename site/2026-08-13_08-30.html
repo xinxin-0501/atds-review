@@ -407,6 +407,24 @@
 .ss-meta b{color:#555}
 .ss-meta .ok{color:#2e7d32}
 .ss-meta .no{color:#c33}
+/* v17: 盘前主线方向 + 个股研究摘要 */
+.md-list,.sr-list{display:flex;flex-direction:column;gap:6px}
+.md-item,.sr-item{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:8px}
+.sr-item{cursor:pointer}
+.sr-item:active{background:#fff8f8}
+.md-rank,.sr-rank{width:20px;height:18px;line-height:18px;text-align:center;background:#1a5cff;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0}
+.sr-rank{background:#c33}
+.md-main,.sr-main{flex:1;min-width:0}
+.md-name{font-size:12px;font-weight:700;color:#333;display:flex;align-items:center;gap:6px}
+.md-status{font-size:9px;padding:1px 5px;border-radius:4px}
+.md-status.ok{background:#e8f5e9;color:#2e7d32}
+.md-status.no{background:#fff3e0;color:#e65100}
+.md-sub{font-size:9px;color:#888;margin-top:2px}
+.md-pct{font-size:12px;font-weight:700;flex-shrink:0}
+.sr-name{font-size:11px;font-weight:600;color:#333}
+.sr-name small{font-size:9px;color:#999;font-weight:400}
+.sr-reason{font-size:9px;color:#888;margin-top:2px}
+.sr-pct{font-size:11px;font-weight:700;flex-shrink:0}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -777,7 +795,45 @@ tags: [ATDS, 交易复盘]
       <div class="status-item">类型<strong>盘前简报</strong></div>
     </div>
   </div>
-  <div class="card"><div class="card-title">当前最强主线方向</div><div class="hint">数据详见盘前报告</div></div>
+  <div class="card">
+    <div class="card-title">当前最强主线方向</div>
+    <div class="md-list"><div class="md-item">
+      <div class="md-rank">1</div>
+      <div class="md-main">
+        <div class="md-name">汽车零部 <span class="md-status ok">主线确认</span></div>
+        <div class="md-sub">涨停 4家 / 5板 · 领涨 秦安股份 · ATDS 96</div>
+      </div>
+      <div class="md-pct up">+10.00%</div>
+    </div><div class="md-item">
+      <div class="md-rank">2</div>
+      <div class="md-main">
+        <div class="md-name">通用设备 <span class="md-status ok">主线确认</span></div>
+        <div class="md-sub">涨停 2家 / 4板 · 领涨 蓝盾光电 · ATDS 96</div>
+      </div>
+      <div class="md-pct up">+15.02%</div>
+    </div><div class="md-item">
+      <div class="md-rank">3</div>
+      <div class="md-main">
+        <div class="md-name">专用设备 <span class="md-status ok">主线确认</span></div>
+        <div class="md-sub">涨停 2家 / 4板 · 领涨 同力天启 · ATDS 96</div>
+      </div>
+      <div class="md-pct up">+10.03%</div>
+    </div><div class="md-item">
+      <div class="md-rank">4</div>
+      <div class="md-main">
+        <div class="md-name">饮料乳品 <span class="md-status ok">主线确认</span></div>
+        <div class="md-sub">涨停 2家 / 4板 · 领涨 皇氏集团 · ATDS 96</div>
+      </div>
+      <div class="md-pct up">+10.00%</div>
+    </div><div class="md-item">
+      <div class="md-rank">5</div>
+      <div class="md-main">
+        <div class="md-name">医疗服务 <span class="md-status ok">主线确认</span></div>
+        <div class="md-sub">涨停 5家 / 2板 · 领涨 澳洋健康 · ATDS 96</div>
+      </div>
+      <div class="md-pct up">+16.06%</div>
+    </div></div>
+  </div>
   <div class="card">
     <div class="card-title">全部方向实时强度排名 · 前 10 名</div>
     <table class="table"><thead><tr><th>#</th><th>主线</th><th>涨幅</th><th>涨停数</th><th>领涨</th></tr></thead><tbody><tr>
@@ -842,140 +898,44 @@ tags: [ATDS, 交易复盘]
       <td>城地香江</td>
     </tr></tbody></table>
   </div>
-  <div class="card"><div class="card-title">个股研究摘要</div><div class="hint">数据详见盘前报告</div></div>
   <div class="card">
-    <div class="card-title">板块热点</div>
-    <table class="table"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>涨停</th><th>领涨</th></tr></thead><tbody><tr>
-      <td>1</td>
-      <td>医疗服务</td>
-      <td class="up">+16.06%</td>
-      <td>5</td>
-      <td>澳洋健康</td>
-    </tr><tr>
-      <td>2</td>
-      <td>汽车零部</td>
-      <td class="up">+10.00%</td>
-      <td>4</td>
-      <td>坤泰股份</td>
-    </tr><tr>
-      <td>3</td>
-      <td>通信设备</td>
-      <td class="up">+9.99%</td>
-      <td>3</td>
-      <td>移远通信</td>
-    </tr><tr>
-      <td>4</td>
-      <td>电力</td>
-      <td class="up">+9.98%</td>
-      <td>3</td>
-      <td>金开新能</td>
-    </tr><tr>
-      <td>5</td>
-      <td>装修装饰</td>
-      <td class="up">+10.05%</td>
-      <td>2</td>
-      <td>金 螳 螂</td>
-    </tr><tr>
-      <td>6</td>
-      <td>饮料乳品</td>
-      <td class="up">+10.00%</td>
-      <td>2</td>
-      <td>皇氏集团</td>
-    </tr></tbody></table>
-  </div>
-  <div class="card">
-    <div class="card-title">涨停梯队 · 15 只</div>
-    <div class="stock-row">
-      <div class="stock-info"><div class="stock-name">1. 北京文化 <span class="rank-tag">4天4板</span></div>
-        <div class="stock-code">000802 · 影视院线</div>
-        <div class="stock-code">封单 1.68 亿 · 开板 1 次</div>
+    <div class="card-title">个股研究摘要</div>
+    <div class="sr-list"><div class="sr-item" data-code="000802" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-rank">1</div>
+      <div class="sr-main">
+        <div class="sr-name">北京文化 <small>000802</small></div>
+        <div class="sr-reason">影视院线</div>
       </div>
-      <div class="stock-price"><div class="price up">6.26</div><div class="pct up">+10.02%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">2. 坤泰股份 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">001260 · 汽车零部</div>
-        <div class="stock-code">封单 2.92 亿 · 开板 0 次</div>
+      <div class="sr-pct up">+10.02%</div>
+    </div><div class="sr-item" data-code="001260" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-rank">2</div>
+      <div class="sr-main">
+        <div class="sr-name">坤泰股份 <small>001260</small></div>
+        <div class="sr-reason">汽车零部</div>
       </div>
-      <div class="stock-price"><div class="price up">21.03</div><div class="pct up">+9.99%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">3. 金 螳 螂 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">002081 · 装修装饰</div>
-        <div class="stock-code">封单 3.15 亿 · 开板 0 次</div>
+      <div class="sr-pct up">+9.99%</div>
+    </div><div class="sr-item" data-code="002081" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-rank">3</div>
+      <div class="sr-main">
+        <div class="sr-name">金 螳 螂 <small>002081</small></div>
+        <div class="sr-reason">装修装饰</div>
       </div>
-      <div class="stock-price"><div class="price up">4.81</div><div class="pct up">+10.07%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">4. 澳洋健康 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">002172 · 医疗服务</div>
-        <div class="stock-code">封单 1.00 亿 · 开板 0 次</div>
+      <div class="sr-pct up">+10.07%</div>
+    </div><div class="sr-item" data-code="002172" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-rank">4</div>
+      <div class="sr-main">
+        <div class="sr-name">澳洋健康 <small>002172</small></div>
+        <div class="sr-reason">医疗服务</div>
       </div>
-      <div class="stock-price"><div class="price up">4.13</div><div class="pct up">+10.13%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">5. 理工能科 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">002322 · 软件开发</div>
-        <div class="stock-code">封单 0.78 亿 · 开板 0 次</div>
+      <div class="sr-pct up">+10.13%</div>
+    </div><div class="sr-item" data-code="002322" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-rank">5</div>
+      <div class="sr-main">
+        <div class="sr-name">理工能科 <small>002322</small></div>
+        <div class="sr-reason">软件开发</div>
       </div>
-      <div class="stock-price"><div class="price up">11.86</div><div class="pct up">+10.02%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">6. 皇氏集团 <span class="rank-tag">4天4板</span></div>
-        <div class="stock-code">002329 · 饮料乳品</div>
-        <div class="stock-code">封单 0.56 亿 · 开板 4 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">4.62</div><div class="pct up">+10.00%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">7. 群兴玩具 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">002575 · 综合Ⅱ</div>
-        <div class="stock-code">封单 1.19 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">6.08</div><div class="pct up">+9.95%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">8. 兆日科技 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">300333 · 计算机设</div>
-        <div class="stock-code">封单 1.82 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">10.64</div><div class="pct up">+19.95%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">9. 蓝盾光电 <span class="rank-tag">4天4板</span></div>
-        <div class="stock-code">300862 · 通用设备</div>
-        <div class="stock-code">封单 10.38 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">39.41</div><div class="pct up">+20.01%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">10. 同力天启 <span class="rank-tag">4天4板</span></div>
-        <div class="stock-code">605286 · 专用设备</div>
-        <div class="stock-code">封单 0.91 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">34.09</div><div class="pct up">+10.00%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">11. 城地香江 <span class="rank-tag">3天3板</span></div>
-        <div class="stock-code">603887 · IT服务Ⅱ</div>
-        <div class="stock-code">封单 2.71 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">12.49</div><div class="pct up">+10.04%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">12. 京投发展 <span class="rank-tag">4天4板</span></div>
-        <div class="stock-code">600683 · 房地产开</div>
-        <div class="stock-code">封单 1.64 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">12.93</div><div class="pct up">+10.04%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">13. 移远通信 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">603236 · 通信设备</div>
-        <div class="stock-code">封单 3.35 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">59.43</div><div class="pct up">+9.99%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">14. 秦安股份 <span class="rank-tag">5天5板</span></div>
-        <div class="stock-code">603758 · 汽车零部</div>
-        <div class="stock-code">封单 1.79 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">15.35</div><div class="pct up">+10.04%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">15. 中鼎股份 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">000887 · 汽车零部</div>
-        <div class="stock-code">封单 3.59 亿 · 开板 1 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">23.69</div><div class="pct up">+9.98%</div></div>
-    </div>
+      <div class="sr-pct up">+10.02%</div>
+    </div></div>
   </div>
   <div class="card">
     <div class="card-title">GLOBAL EVENT RADAR · 国际重大事件监控</div>
