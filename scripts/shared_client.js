@@ -667,3 +667,30 @@ function initRealtimeRefresh(){
     else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initRealtimeRefresh,300);});}
   }
 })();
+
+/* ============ 一键刷新最新数据(实时行情 + 报告日期检测) ============ */
+function pad2F(n){return (n<10?'0':'')+n;}
+async function refreshAllData(){
+  var btn = document.querySelector('.hero-refresh .wl-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  // 1) 刷新核心指数行情
+  try { await refreshCoreQuotes(); } catch(e){}
+  // 2) 刷新观察池行情(盘前)
+  try { await refreshWatchlistQuotes(); } catch(e){}
+  // 3) 刷新各选股模块行情(午盘)
+  try { await refreshWaveQuotes(); } catch(e){}
+  try { await refreshShortCoreQuotes(); } catch(e){}
+  try { await refreshStrongStockQuotes(); } catch(e){}
+  if (btn) { btn.disabled = false; btn.textContent = '🔄 一键刷新最新数据'; }
+  // 4) 检测报告日期是否今天
+  var hero = document.querySelector('.hero-title');
+  var dateTxt = hero ? hero.textContent : '';
+  var m = dateTxt.match(/(\d{4}-\d{2}-\d{2})/);
+  var now = new Date();
+  var todayStr = now.getFullYear() + '-' + pad2F(now.getMonth() + 1) + '-' + pad2F(now.getDate());
+  if (m && m[1] !== todayStr) {
+    alert('当前报告日期为 ' + m[1] + ',尚未更新到今日。\n请打开首页查看最新报告,或稍后再点一次。');
+  } else {
+    alert('已刷新最新行情数据 ✓\n(报告内容由每日定时任务更新,非交易日/收盘后可能仍为最近交易日数据)');
+  }
+}

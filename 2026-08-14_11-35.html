@@ -597,6 +597,10 @@
 
 /* 提示 */
 .hint{font-size:10px;color:#888;line-height:1.5;padding:6px 0}
+/* v18: 一键刷新按钮 */
+.hero-refresh{margin-top:8px;text-align:center}
+.hero-refresh .wl-btn{font-size:12px;padding:7px 16px;border-radius:16px}
+.hero-refresh .wl-btn:disabled{opacity:0.6}
 /* 收盘情绪复盘 */
 .close-emotion{margin:14px 16px}
 .ce-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700}
@@ -740,7 +744,7 @@
       <a href="index.html">盘前</a><a href="2026-08-14_11-35.html" class="active">午盘</a><a href="2026-08-14_15-20.html">收盘</a><a href="2026-08-18_16-20.html">复盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照</div><h1 class="hero-title">2026-08-14 · <span class="hero-time" id="rt-hero-time">11:35</span></h1><div class="hero-sub">实时盘中数据 · 每 60 秒自动刷新</div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 89°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照</div><h1 class="hero-title">2026-08-14 · <span class="hero-time" id="rt-hero-time">11:35</span></h1><div class="hero-sub">实时盘中数据 · 每 60 秒自动刷新</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 89°</span></div></div>
 <div class="section">
   <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-14 午盘快照 · 实时更新中</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">89°</div><div class="ce-stage">过热区 · 情绪极度亢奋</div><div class="ce-fact">主特征: 谨防高潮后分歧</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">46%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">63</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">63</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈77%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">5板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">22%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">3103</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">3365</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">216</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:3103"></div><div class="ce-bar-flat" style="flex:216"></div><div class="ce-bar-down" style="flex:3365"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>46%</b></span><span>成交额 <b>--</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val up">+0.01%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:0.3%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val up">+0.45%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:13.5%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val up">+1.12%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:33.6%"></div></div></div><div class="ce-block-hint">量能数据待更新</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">通信设备</span><span class="ce-ml-val up">+7.6%</span></div><div class="ce-ml-row"><span class="ce-ml-name">汽车零部</span><span class="ce-ml-val up">+6.9%</span></div><div class="ce-ml-row"><span class="ce-ml-name">环境治理</span><span class="ce-ml-val up">+5.3%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">通信设备</span><span class="ce-mi-val up">+7.6亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">汽车零部</span><span class="ce-mi-val up">+6.9亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">环境治理</span><span class="ce-mi-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学纤维</span><span class="ce-mi-val up">+5.4亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title">04 情绪高度(连板梯队)</div><div class="ce-ladder"><span class="ce-ladder-pill">5板 · 蓝盾光电</span><span class="ce-ladder-pill">3板 · 华西股份</span><span class="ce-ladder-pill">2板 · 神奇制药</span></div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
   <div class="card gate-card">
@@ -807,7 +811,7 @@
       <div class="intl-detail-asof">口径说明：美股/欧股/商品/VIX/半导体为美东8月13日收盘（北京时间8/14晨）；离岸人民币为8/13纽约尾盘</div>
       <table class="intl-detail-table">
         <thead><tr><th>指标</th><th>最新值</th><th>涨跌幅</th><th>来源时间</th><th>来源</th></tr></thead>
-        <tbody><tr class="intl-group-row"><td colspan="5" class="intl-group-td">🇺🇸 美股（美东8/12收盘）</td></tr><tr>
+        <tbody><tr class="intl-group-row"><td colspan="5" class="intl-group-td">🇺🇸 美股（美东最新收盘）</td></tr><tr>
         <td>道琼斯工业平均指数</td>
         <td class="up">53,839.99</td>
         <td class="up">+0.13%</td>
@@ -849,7 +853,7 @@
         <td class="up">+0.55%</td>
         <td class="intl-dt-time">2026-08-13收盘(盘中最低14.39创年内新低)</td>
         <td class="intl-dt-src">StreetStats/财联社</td>
-      </tr><tr class="intl-group-row"><td colspan="5" class="intl-group-td">🇪🇺 欧洲（8/12收盘）</td></tr><tr>
+      </tr><tr class="intl-group-row"><td colspan="5" class="intl-group-td">🇪🇺 欧洲（最新收盘）</td></tr><tr>
         <td>英国富时100</td>
         <td class="down">10,772.67</td>
         <td class="down">-0.56%</td>
@@ -1651,6 +1655,33 @@ function initRealtimeRefresh(){
     else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initRealtimeRefresh,300);});}
   }
 })();
+
+/* ============ 一键刷新最新数据(实时行情 + 报告日期检测) ============ */
+function pad2F(n){return (n<10?'0':'')+n;}
+async function refreshAllData(){
+  var btn = document.querySelector('.hero-refresh .wl-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ 刷新中…'; }
+  // 1) 刷新核心指数行情
+  try { await refreshCoreQuotes(); } catch(e){}
+  // 2) 刷新观察池行情(盘前)
+  try { await refreshWatchlistQuotes(); } catch(e){}
+  // 3) 刷新各选股模块行情(午盘)
+  try { await refreshWaveQuotes(); } catch(e){}
+  try { await refreshShortCoreQuotes(); } catch(e){}
+  try { await refreshStrongStockQuotes(); } catch(e){}
+  if (btn) { btn.disabled = false; btn.textContent = '🔄 一键刷新最新数据'; }
+  // 4) 检测报告日期是否今天
+  var hero = document.querySelector('.hero-title');
+  var dateTxt = hero ? hero.textContent : '';
+  var m = dateTxt.match(/(\d{4}-\d{2}-\d{2})/);
+  var now = new Date();
+  var todayStr = now.getFullYear() + '-' + pad2F(now.getMonth() + 1) + '-' + pad2F(now.getDate());
+  if (m && m[1] !== todayStr) {
+    alert('当前报告日期为 ' + m[1] + ',尚未更新到今日。\n请打开首页查看最新报告,或稍后再点一次。');
+  } else {
+    alert('已刷新最新行情数据 ✓\n(报告内容由每日定时任务更新,非交易日/收盘后可能仍为最近交易日数据)');
+  }
+}
 </script>
 <script>
 /* minimal qrcode */
