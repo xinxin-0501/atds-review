@@ -74,6 +74,7 @@ function renderHero(report) {
     '<div class="hero-eyebrow">A 股每日复盘 · ' + (esc(m.typeLabel || '')) + '</div>' +
     '<h1 class="hero-title">' + (esc(m.date || '')) + ' · ' + timeHtml + '</h1>' +
     '<div class="hero-sub">' + desc + '</div>' +
+    '<div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div>' +
     (tempTag ? '<div class="hero-tags">' + tempTag + '</div>' : '') +
   '</div>';
 }
@@ -215,8 +216,8 @@ function renderIntlMkt(report) {
   let detailHtml = '';
   const det = (report && report.intlDetail) || {};
   const groups = [
-    ['us', '🇺🇸 美股（美东8/12收盘）'],
-    ['europe', '🇪🇺 欧洲（8/12收盘）'],
+    ['us', '🇺🇸 美股（美东最新收盘）'],
+    ['europe', '🇪🇺 欧洲（最新收盘）'],
     ['commodities', '🛢️ 商品'],
     ['fx', '💱 汇率'],
     ['sentiment', '🧭 情绪与关键变量']
@@ -1275,6 +1276,8 @@ ${renderHero(report)}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
   ${renderStockResearch(report)}
+  ${renderSectors(report)}
+  ${renderLimitUp(report)}
   ${renderIntlEvents(report)}
   ${renderNewsDigest(report)}
 </div>

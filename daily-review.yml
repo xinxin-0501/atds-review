@@ -1,10 +1,10 @@
 name: ATDS Daily A-share Review
 
 on:
+  # 高频探测:工作日北京 08:00-16:59 每 10 分钟触发一次(UTC 0-8 时),窗口内且报告缺失才真正采集,大幅提高定时可靠性
   schedule:
-    - cron: '30 0 * * 1-5'   # 08:30 北京 盘前
-    - cron: '35 3 * * 1-5'   # 11:35 北京 午盘
-    - cron: '20 8 * * 1-5'   # 16:20 北京 收盘
+    - cron: '*/10 0-8 * * 1-5'   # 北京 08:00-16:59 每 10 分钟
+    - cron: '0 9 * * 1-5'        # 北京 17:00 收盘兜底
   workflow_dispatch:
     inputs:
       type:
@@ -46,62 +46,158 @@ jobs:
           if [ -n "$INPUT_TYPE" ]; then echo "type=$INPUT_TYPE" >> "$GITHUB_OUTPUT";
           else
             HOUR=$(TZ='Asia/Shanghai' date +%H%M)
-            if [ "$HOUR" -lt "0900" ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
-            elif [ "$HOUR" -lt "1300" ]; then echo "type=midday" >> "$GITHUB_OUTPUT";
+            HOUR=$((10#$HOUR))   # 去掉前导零,避免 bash 八进制解析错误
+            if [ "$HOUR" -lt 900 ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
+            elif [ "$HOUR" -lt 1300 ]; then echo "type=midday" >> "$GITHUB_OUTPUT";
             else echo "type=close" >> "$GITHUB_OUTPUT"; fi
           fi
           echo "Type: input=[$INPUT_TYPE] -> ${{ steps.type.outputs.type }}"
 
-      - name: Sync latest code from repo root to scripts (GitHub web upload 到根目录)
+      # 高频探测的窗口判断:仅 schedule 触发时生效;手动 Run 不受窗口限制
+      - name: Check time window (skip outside generation windows)
+        id: win
         run: |
-          for f in cloud_fetch.mjs build_report.js shared_client.js modal_css.txt inject_client.js; do
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "手动触发,不限制窗口"
+            echo "inwin=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          HOUR=$(TZ='Asia/Shanghai' date +%H%M)
+          HOUR=$((10#$HOUR))   # 去掉前导零,避免 bash 八进制解析错误
+          TYPE="${{ steps.type.outputs.type }}"
+          OK=0
+          case "$TYPE" in
+            premarket) [ "$HOUR" -ge 820 ] && [ "$HOUR" -le 859 ] && OK=1 ;;
+            midday) [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1230 ] && OK=1 ;;
+            close) [ "$HOUR" -ge 1610 ] && [ "$HOUR" -le 1730 ] && OK=1 ;;
+          esac
+          if [ "$OK" = "1" ]; then
+            echo "时间窗口命中: $TYPE @ $HOUR 北京,执行采集"
+            echo "inwin=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "时间窗口外: $TYPE @ $HOUR 北京,空转跳过"
+            echo "inwin=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip if today's report already exists (schedule only; manual run always re-generates)
+        id: check
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "手动触发,不跳过"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          TODAY=$(TZ='Asia/Shanghai' date +%Y-%m-%d)
+          case "${{ steps.type.outputs.type }}" in
+            premarket) FT="08:30";;
+            midday) FT="11:35";;
+            close) FT="16:20";;
+            *) FT="08:30";;
+          esac
+          FN="${TODAY}_${FT//:/-}.json"
+          if [ -f "data/reviews/${FN}" ]; then
+            echo "今天 ${TODAY} ${FT} 报告已存在,跳过采集"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "今天 ${TODAY} ${FT} 报告缺失,执行采集"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Sync latest code from repo root to scripts (GitHub web upload 到根目录)
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
+        run: |
+          for f in cloud_fetch.mjs build_report.js shared_client.js modal_css.txt inject_client.js hero_mobile.css; do
             if [ -f "$f" ]; then cp -f "$f" "scripts/$f"; echo "synced scripts/$f"; fi
           done
           # 全A股票列表在仓库根目录,脚本读取 data/stock_list.json,需同步
           if [ -f "stock_list.json" ]; then cp -f "stock_list.json" "data/stock_list.json"; echo "synced data/stock_list.json"; fi
 
       - name: Fetch market data
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
         run: node --dns-result-order=ipv4first scripts/cloud_fetch.mjs ${{ steps.type.outputs.type }}
 
       - name: Build report HTML
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
         run: node scripts/build_report.js
 
       - name: Inject CSS and shared client JS
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
         run: node scripts/inject_client.js
 
       - name: Flatten site to repository root (flat layout)
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
         run: |
           python3 - <<'PY'
           import re, glob, shutil, os
           shutil.copy('site/index.html', 'index.html')
           shutil.copy('site/main-rank.html', 'main-rank.html')
-          # 扁平结构:报告直接在 site/ 根目录(REVIEWS_DIR=SITE_DIR)
+          # 先列根目录已有 html
+          existing_root = set(os.path.basename(x) for x in glob.glob('*.html'))
+          site_basenames = set(os.path.basename(x) for x in glob.glob('site/*.html'))
+          # 删除根目录不属于 site/ 的旧 html(避免历史残留导致 size 不一致)
+          for old in list(existing_root):
+              if old in ('index.html', 'main-rank.html'):
+                  continue
+              if old not in site_basenames:
+                  print('remove stale root html:', old)
+                  try:
+                      os.remove(old)
+                  except Exception as e:
+                      print('remove fail:', old, e)
+          # 复制所有 site/*.html 到根目录
           for f in glob.glob('site/*.html'):
-              if os.path.basename(f) not in ('index.html', 'main-rank.html'):
-                  shutil.copy(f, os.path.basename(f))
-          # 兼容旧 site/reviews/ 残留
+              bn = os.path.basename(f)
+              if bn in ('index.html', 'main-rank.html'):
+                  continue
+              shutil.copy(f, bn)
+              print('flatten ->', bn, os.path.getsize(f))
+          # 兼容 site/reviews/ 残留(扁平化)
           for f in glob.glob('site/reviews/*.html'):
-              shutil.copy(f, os.path.basename(f))
+              bn = os.path.basename(f)
+              shutil.copy(f, bn)
+              print('flatten(reviews) ->', bn)
           # 重写 index.html 内 reviews/xxx.html -> xxx.html
           c = open('index.html', encoding='utf-8').read()
           for m in re.findall(r'reviews/[\w\-]+\.html', c):
               c = c.replace(m, m.replace('reviews/', ''))
           open('index.html', 'w', encoding='utf-8').write(c)
-          print('flattened')
+          # 软校验:打印 site/ 与根目录 size 对比,不 assert exit(避免 workflow fail)
+          mismatches = []
+          for f in glob.glob('site/*.html'):
+              bn = os.path.basename(f)
+              if bn in ('index.html', 'main-rank.html'):
+                  continue
+              if os.path.exists(bn):
+                  if os.path.getsize(f) != os.path.getsize(bn):
+                      mismatches.append((bn, os.path.getsize(f), os.path.getsize(bn)))
+          if mismatches:
+              print('MISMATCH detected:')
+              for bn, s, r in mismatches:
+                  print(f'  {bn} site={s} root={r}')
+              # 强制再次复制一次
+              for bn, s, r in mismatches:
+                  for sf in glob.glob('site/*.html'):
+                      if os.path.basename(sf) == bn:
+                          shutil.copy(sf, bn)
+                          print('  recopied:', bn, 'now root=', os.path.getsize(bn))
+          print('flattened OK')
           PY
 
       - name: Commit updated data and site
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/reviews site index.html main-rank.html *.html
+          git add -A
           git commit -m "ATDS daily A-share review $(TZ='Asia/Shanghai' date +%Y-%m-%d-%H%M)" || echo "No changes to commit"
           git push
 
       - name: Upload Pages artifact
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
 
       - name: Deploy to GitHub Pages
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
         uses: actions/deploy-pages@v4
