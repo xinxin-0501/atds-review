@@ -529,6 +529,16 @@
 .intl-style-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:6px}
 .intl-style-body{font-size:11px;color:#333;line-height:1.5}
 .intl-missing{font-size:10px;color:#999;line-height:1.5;padding:8px 10px;background:#fafafa;border-radius:8px}
+.intl-detail{margin-top:10px;background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.intl-detail-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:4px}
+.intl-detail-asof{font-size:10px;color:#999;margin-bottom:8px;line-height:1.4}
+.intl-detail-table{width:100%;border-collapse:collapse;font-size:11px}
+.intl-detail-table th{background:#f6f8fb;color:#666;font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid #eee;font-size:10px}
+.intl-detail-table td{padding:6px 8px;border-bottom:1px solid #f5f5f5;color:#333;vertical-align:top}
+.intl-group-row td{background:#fafcff;color:#185FA5;font-weight:700;font-size:11px;padding:8px 8px 4px}
+.intl-dt-time{font-size:10px;color:#999}
+.intl-dt-src{font-size:10px;color:#999}
+.intl-dt-note{font-size:10px;color:#666;line-height:1.5;background:#fafcff}
 /* Hero 头部区 */
 .hero{background:linear-gradient(135deg,#fff8f5 0%,#fef3ed 50%,#fff 100%);padding:18px 16px 16px;border-radius:0 0 14px 14px;margin-bottom:8px;border-bottom:1px solid #f5e6dc}
 .hero-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
@@ -741,12 +751,12 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-08-17_11-35.html">午盘</a><a href="2026-08-17_15-20.html">收盘</a><a href="2026-08-19_11-35.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-08-17_11-35.html">午盘</a><a href="2026-08-17_16-20.html">收盘</a><a href="2026-08-19_16-20.html">复盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 83°</span></div></div>
 <div class="section">
-  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-08-17 00:58:37</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 →</div><div class="wl-stocks"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-08-17 13:00:38</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 →</div><div class="wl-stocks"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -756,63 +766,63 @@
     <span class="wl-cell wl-cell-act"><b>操作</b></span>
   </div><div class="wl-stock-row" data-code="600392">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">1</span><span class="wl-name">盛和资源</span><span class="wl-code">600392</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">23.90</span></span>
-    <span class="wl-cell wl-cell-pct up">+4.60%</span>
-    <span class="wl-cell wl-cell-amt">22.6亿</span>
-    <span class="wl-cell wl-cell-atds">82</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-strong">强势承接</span></span>
+    <span class="wl-cell wl-cell-price"><span class="price down">23.58</span></span>
+    <span class="wl-cell wl-cell-pct down">-1.34%</span>
+    <span class="wl-cell wl-cell-amt">9.3亿</span>
+    <span class="wl-cell wl-cell-atds">68</span>
+    <span class="wl-cell wl-cell-sig"><span class="sig sig-press">走势承压</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600392" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600392">
     <div class="detail-grid">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-mid">中风险</span></div><div class="detail-line">涨幅 2-5%,技术偏强</div><div class="detail-line">放量活跃</div></div>
-      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-short">短线</span></div><div class="detail-line"><b>短线</b>回踩 MA5 不破可继续,跌破减仓</div><div class="detail-line"><b>波段</b>沿 MA20 运行,跌破 MA60 警惕走弱</div><div class="detail-line"><b>长线</b>站上 MA120 偏多,关注 MA250 突破</div></div>
-      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,等待放量催化</div></div>
+      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">回调 2-3%,观察支撑</div><div class="detail-line">量能温和</div></div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-long">长线</span></div><div class="detail-line"><b>短线</b>区间震荡,关注 MA10 方向选择</div><div class="detail-line"><b>波段</b>区间震荡,等待 MA20 方向选择</div><div class="detail-line"><b>长线</b>跌破 MA120,长线宜减仓观望</div></div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,关注量能配合</div></div>
     </div>
     <div class="detail-spb">
-      <span><b>止损</b>22.70</span>
-      <span><b>支撑</b>21.99</span>
-      <span><b>压力</b>25.81</span>
+      <span><b>止损</b>22.40</span>
+      <span><b>支撑</b>21.69</span>
+      <span><b>压力</b>25.47</span>
     </div>
   </div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报
 tags: [ATDS, 交易复盘]
 ---
 # 观察池
-- 盛和资源 (600392): 23.90 +4.60%
+- 盛和资源 (600392): 23.58 -1.34%
 </pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
   <div class="card">
     <div class="card-title">盘前交易驾驶舱</div>
-    <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">84° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">63 家 · 最高 5 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">蓝盾光电</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">52 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">通信设备 / 汽车零部 / 化学纤维</div></div></div>
+    <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">83° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">77 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">天洋新材</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">64 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">化学制品 / 塑料 / 化学制药</div></div></div>
   </div>
   <div class="card">
     <div class="card-title">策略状态</div>
     <div class="str-block">
-      <div class="str-h">⚔️ 进攻方向</div><div class="str-line"><b>通信设备</b> 涨停 4家 / 2板 · 领涨 共进股份</div><div class="str-line"><b>汽车零部</b> 涨停 3家 / 3板 · 领涨 坤泰股份</div><div class="str-line"><b>化学纤维</b> 涨停 2家 / 3板 · 领涨 华西股份</div>
+      <div class="str-h">⚔️ 进攻方向</div><div class="str-line"><b>化学制品</b> 涨停 4家 / 2板 · 领涨 圣达生物</div><div class="str-line"><b>塑料</b> 涨停 3家 / 4板 · 领涨 天洋新材</div><div class="str-line"><b>化学制药</b> 涨停 3家 / 3板 · 领涨 神奇制药</div>
     </div>
     <div class="str-block">
       <div class="str-h">🛡️ 防守方向</div><div class="str-line"><b>高股息红利</b> 低波动+稳定分红</div><div class="str-line"><b>公用事业</b> 现金流稳定+刚性需求</div><div class="str-line"><b>银行(大行)</b> 高股息+低估值</div>
     </div>
     <div class="str-block">
-      <div class="str-h">⚠️ 风险提示</div><div class="str-line pit"><b>高位连板股(连板≥4)</b> 当前连板≥4 共 1 只,承接强度需复核</div><div class="str-line pit"><b>当日炸板股</b> 近 0 只炸板,分歧加大</div><div class="str-line pit"><b>北证/微盘股</b> 波动放大+流动性敏感</div>
+      <div class="str-h">⚠️ 风险提示</div><div class="str-line pit"><b>高位连板股(连板≥4)</b> 当前连板≥4 共 3 只,承接强度需复核</div><div class="str-line pit"><b>当日炸板股</b> 近 0 只炸板,分歧加大</div><div class="str-line pit"><b>北证/微盘股</b> 波动放大+流动性敏感</div>
     </div>
   </div>
   <div class="card">
     <div class="card-title">核心指数</div>
     <div class="index-row"><div class="index-item" data-code="000001" data-prefix="sh">
       <div class="index-name">上证指数</div>
-      <div class="index-value up">3,927.18</div>
-      <div class="index-change up">+0.01%</div>
+      <div class="index-value up">3,958.62</div>
+      <div class="index-change up">+0.80%</div>
     </div><div class="index-item" data-code="399001" data-prefix="sz">
       <div class="index-name">深证成指</div>
-      <div class="index-value up">14,354.31</div>
-      <div class="index-change up">+0.45%</div>
+      <div class="index-value up">14,535.84</div>
+      <div class="index-change up">+1.26%</div>
     </div><div class="index-item" data-code="399006" data-prefix="sz">
       <div class="index-name">创业板指</div>
-      <div class="index-value up">3,626.30</div>
-      <div class="index-change up">+1.12%</div>
+      <div class="index-value up">3,676.95</div>
+      <div class="index-change up">+1.40%</div>
     </div></div>
     <div class="status-row">
-      <div class="status-item">生成时间<strong>2026-08-17 00:58:37</strong></div>
+      <div class="status-item">生成时间<strong>2026-08-17 13:00:38</strong></div>
       <div class="status-item">数据源<strong>通达信实时</strong></div>
       <div class="status-item">类型<strong>盘前简报</strong></div>
     </div>
@@ -822,36 +832,36 @@ tags: [ATDS, 交易复盘]
     <div class="md-list"><div class="md-item">
       <div class="md-rank">1</div>
       <div class="md-main">
-        <div class="md-name">通用设备 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 1家 / 5板 · 领涨 蓝盾光电 · ATDS 96</div>
+        <div class="md-name">塑料 <span class="md-status ok">主线确认</span></div>
+        <div class="md-sub">涨停 3家 / 4板 · 领涨 天洋新材 · ATDS 96</div>
       </div>
-      <div class="md-pct up">+19.99%</div>
+      <div class="md-pct up">+10.00%</div>
     </div><div class="md-item">
       <div class="md-rank">2</div>
       <div class="md-main">
-        <div class="md-name">汽车零部 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 3家 / 3板 · 领涨 坤泰股份 · ATDS 96</div>
+        <div class="md-name">化学制药 <span class="md-status ok">主线确认</span></div>
+        <div class="md-sub">涨停 3家 / 3板 · 领涨 神奇制药 · ATDS 96</div>
       </div>
-      <div class="md-pct up">+10.02%</div>
+      <div class="md-pct up">+9.99%</div>
     </div><div class="md-item">
       <div class="md-rank">3</div>
       <div class="md-main">
-        <div class="md-name">通信设备 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 4家 / 2板 · 领涨 共进股份 · ATDS 96</div>
+        <div class="md-name">装修装饰 <span class="md-status ok">主线确认</span></div>
+        <div class="md-sub">涨停 1家 / 4板 · 领涨 金 螳 螂 · ATDS 96</div>
       </div>
-      <div class="md-pct up">+12.50%</div>
+      <div class="md-pct up">+10.02%</div>
     </div><div class="md-item">
       <div class="md-rank">4</div>
       <div class="md-main">
         <div class="md-name">医疗服务 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 2家 / 3板 · 领涨 澳洋健康 · ATDS 96</div>
+        <div class="md-sub">涨停 1家 / 4板 · 领涨 澳洋健康 · ATDS 96</div>
       </div>
-      <div class="md-pct up">+14.97%</div>
+      <div class="md-pct up">+9.91%</div>
     </div><div class="md-item">
       <div class="md-rank">5</div>
       <div class="md-main">
-        <div class="md-name">装修装饰 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 2家 / 3板 · 领涨 金 螳 螂 · ATDS 96</div>
+        <div class="md-name">化学制品 <span class="md-status ok">主线确认</span></div>
+        <div class="md-sub">涨停 4家 / 2板 · 领涨 圣达生物 · ATDS 96</div>
       </div>
       <div class="md-pct up">+10.00%</div>
     </div></div>
@@ -860,237 +870,237 @@ tags: [ATDS, 交易复盘]
     <div class="card-title">全部方向实时强度排名 · 前 10 名</div>
     <table class="table"><thead><tr><th>#</th><th>主线</th><th>涨幅</th><th>涨停数</th><th>领涨</th></tr></thead><tbody><tr>
       <td>1</td>
-      <td>通用设备</td>
-      <td class="up">+19.99%</td>
-      <td>1家 / 5板</td>
-      <td>蓝盾光电</td>
+      <td>塑料</td>
+      <td class="up">+10.00%</td>
+      <td>3家 / 4板</td>
+      <td>天洋新材</td>
     </tr><tr>
       <td>2</td>
-      <td>汽车零部</td>
-      <td class="up">+10.02%</td>
+      <td>化学制药</td>
+      <td class="up">+9.99%</td>
       <td>3家 / 3板</td>
-      <td>坤泰股份</td>
+      <td>神奇制药</td>
     </tr><tr>
       <td>3</td>
-      <td>通信设备</td>
-      <td class="up">+12.50%</td>
-      <td>4家 / 2板</td>
-      <td>共进股份</td>
+      <td>装修装饰</td>
+      <td class="up">+10.02%</td>
+      <td>1家 / 4板</td>
+      <td>金 螳 螂</td>
     </tr><tr>
       <td>4</td>
       <td>医疗服务</td>
-      <td class="up">+14.97%</td>
-      <td>2家 / 3板</td>
+      <td class="up">+9.91%</td>
+      <td>1家 / 4板</td>
       <td>澳洋健康</td>
     </tr><tr>
       <td>5</td>
-      <td>装修装饰</td>
+      <td>化学制品</td>
       <td class="up">+10.00%</td>
-      <td>2家 / 3板</td>
-      <td>金 螳 螂</td>
+      <td>4家 / 2板</td>
+      <td>圣达生物</td>
     </tr><tr>
       <td>6</td>
-      <td>化学纤维</td>
-      <td class="up">+9.96%</td>
-      <td>2家 / 3板</td>
-      <td>华西股份</td>
+      <td>汽车零部</td>
+      <td class="up">+9.99%</td>
+      <td>3家 / 2板</td>
+      <td>正裕工业</td>
     </tr><tr>
       <td>7</td>
-      <td>塑料</td>
-      <td class="up">+9.99%</td>
+      <td>通信设备</td>
+      <td class="up">+10.02%</td>
       <td>1家 / 3板</td>
-      <td>天洋新材</td>
+      <td>共进股份</td>
     </tr><tr>
       <td>8</td>
-      <td>化学制药</td>
-      <td class="up">+14.97%</td>
+      <td>电子化学</td>
+      <td class="up">+15.01%</td>
       <td>2家 / 2板</td>
-      <td>神奇制药</td>
+      <td>中石科技</td>
     </tr><tr>
       <td>9</td>
-      <td>软件开发</td>
+      <td>元件</td>
       <td class="up">+10.00%</td>
       <td>2家 / 2板</td>
-      <td>理工能科</td>
+      <td>华正新材</td>
     </tr><tr>
       <td>10</td>
-      <td>环境治理</td>
-      <td class="up">+13.32%</td>
-      <td>3家 / 1板</td>
-      <td>德创环保</td>
+      <td>专用设备</td>
+      <td class="up">+9.96%</td>
+      <td>2家 / 2板</td>
+      <td>越剑智能</td>
     </tr></tbody></table>
   </div>
   <div class="card">
     <div class="card-title">个股研究摘要</div>
-    <div class="sr-list"><div class="sr-item" data-code="301015" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+    <div class="sr-list"><div class="sr-item" data-code="601609" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">1</div>
       <div class="sr-main">
-        <div class="sr-name">百洋医药 <small>301015</small></div>
-        <div class="sr-reason">启动+老鸭头+拉升·量比2.0·5日涨12.7%</div>
+        <div class="sr-name">金田股份 <small>601609</small></div>
+        <div class="sr-reason">启动+拉升·量比2.0·5日涨12.9%</div>
       </div>
-      <div class="sr-pct up">+6.71%</div>
-    </div><div class="sr-item" data-code="300705" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-pct up">+7.03%</div>
+    </div><div class="sr-item" data-code="002724" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">2</div>
       <div class="sr-main">
-        <div class="sr-name">九典制药 <small>300705</small></div>
-        <div class="sr-reason">启动+老鸭头+拉升·量比2.0·5日涨11.2%</div>
+        <div class="sr-name">海洋王 <small>002724</small></div>
+        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨30.6%</div>
       </div>
-      <div class="sr-pct up">+7.96%</div>
-    </div><div class="sr-item" data-code="600126" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-pct up">+5.16%</div>
+    </div><div class="sr-item" data-code="600186" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">3</div>
       <div class="sr-main">
-        <div class="sr-name">杭钢股份 <small>600126</small></div>
-        <div class="sr-reason">启动+拉升·量比2.0·5日涨13.4%</div>
+        <div class="sr-name">莲花控股 <small>600186</small></div>
+        <div class="sr-reason">拉升·量比2.0·5日涨19.0%</div>
       </div>
-      <div class="sr-pct up">+5.88%</div>
-    </div><div class="sr-item" data-code="601579" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-pct up">+7.74%</div>
+    </div><div class="sr-item" data-code="688167" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">4</div>
       <div class="sr-main">
-        <div class="sr-name">会稽山 <small>601579</small></div>
-        <div class="sr-reason">拉升·量比2.0·5日涨24.1%</div>
+        <div class="sr-name">炬光科技 <small>688167</small></div>
+        <div class="sr-reason">拉升·量比2.0·5日涨42.6%</div>
       </div>
-      <div class="sr-pct up">+7.05%</div>
-    </div><div class="sr-item" data-code="600602" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-pct up">+6.78%</div>
+    </div><div class="sr-item" data-code="003031" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">5</div>
       <div class="sr-main">
-        <div class="sr-name">云赛智联 <small>600602</small></div>
-        <div class="sr-reason">老鸭头·量比2.0·5日涨14.7%</div>
+        <div class="sr-name">中瓷电子 <small>003031</small></div>
+        <div class="sr-reason">拉升·量比2.0·5日涨24.2%</div>
       </div>
-      <div class="sr-pct up">+6.20%</div>
+      <div class="sr-pct up">+7.86%</div>
     </div></div>
   </div>
   <div class="card">
     <div class="card-title">板块热点</div>
     <table class="table"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>涨停</th><th>领涨</th></tr></thead><tbody><tr>
       <td>1</td>
-      <td>通信设备</td>
-      <td class="up">+12.50%</td>
+      <td>化学制品</td>
+      <td class="up">+10.00%</td>
       <td>4</td>
-      <td>共进股份</td>
+      <td>圣达生物</td>
     </tr><tr>
       <td>2</td>
+      <td>塑料</td>
+      <td class="up">+10.00%</td>
+      <td>3</td>
+      <td>天洋新材</td>
+    </tr><tr>
+      <td>3</td>
       <td>汽车零部</td>
-      <td class="up">+10.02%</td>
+      <td class="up">+9.99%</td>
       <td>3</td>
-      <td>坤泰股份</td>
-    </tr><tr>
-      <td>3</td>
-      <td>环境治理</td>
-      <td class="up">+13.32%</td>
-      <td>3</td>
-      <td>德创环保</td>
+      <td>今飞凯达</td>
     </tr><tr>
       <td>4</td>
-      <td>化学纤维</td>
-      <td class="up">+9.96%</td>
-      <td>2</td>
-      <td>华西股份</td>
+      <td>化学制药</td>
+      <td class="up">+9.99%</td>
+      <td>3</td>
+      <td>神奇制药</td>
     </tr><tr>
       <td>5</td>
-      <td>医疗服务</td>
-      <td class="up">+14.97%</td>
+      <td>电子化学</td>
+      <td class="up">+15.01%</td>
       <td>2</td>
-      <td>澳洋健康</td>
+      <td>中石科技</td>
     </tr><tr>
       <td>6</td>
-      <td>化学制药</td>
-      <td class="up">+14.97%</td>
+      <td>元件</td>
+      <td class="up">+10.00%</td>
       <td>2</td>
-      <td>神奇制药</td>
+      <td>华正新材</td>
     </tr></tbody></table>
   </div>
   <div class="card">
     <div class="card-title">涨停梯队 · 15 只</div>
     <div class="stock-row">
-      <div class="stock-info"><div class="stock-name">1. 华西股份 <span class="rank-tag">3天3板</span></div>
-        <div class="stock-code">000936 · 化学纤维</div>
-        <div class="stock-code">封单 0.44 亿 · 开板 7 次</div>
+      <div class="stock-info"><div class="stock-name">1. 桂发祥 <span class="rank-tag">2天2板</span></div>
+        <div class="stock-code">002820 · 休闲食品</div>
+        <div class="stock-code">封单 1.71 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price"><div class="price up">6.97</div><div class="pct up">+9.94%</div></div>
+      <div class="stock-price"><div class="price up">11.15</div><div class="pct up">+9.96%</div></div>
     </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">2. 坤泰股份 <span class="rank-tag">3天3板</span></div>
-        <div class="stock-code">001260 · 汽车零部</div>
-        <div class="stock-code">封单 3.37 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">23.13</div><div class="pct up">+9.99%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">3. 澳洋健康 <span class="rank-tag">3天3板</span></div>
-        <div class="stock-code">002172 · 医疗服务</div>
-        <div class="stock-code">封单 1.36 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">4.54</div><div class="pct up">+9.93%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">4. 华森制药 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">002907 · 中药Ⅱ</div>
-        <div class="stock-code">封单 1.32 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">15.26</div><div class="pct up">+10.02%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">5. 中石科技 <span class="rank-tag">1天1板</span></div>
+      <div class="stock-info"><div class="stock-name">2. 中石科技 <span class="rank-tag">2天2板</span></div>
         <div class="stock-code">300684 · 电子化学</div>
-        <div class="stock-code">封单 10.43 亿 · 开板 0 次</div>
+        <div class="stock-code">封单 14.03 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price"><div class="price up">67.36</div><div class="pct up">+20.01%</div></div>
+      <div class="stock-price"><div class="price up">80.83</div><div class="pct up">+20.00%</div></div>
     </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">6. 神奇制药 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">600613 · 化学制药</div>
-        <div class="stock-code">封单 1.49 亿 · 开板 0 次</div>
+      <div class="stock-info"><div class="stock-name">3. 华正新材 <span class="rank-tag">10天5板</span></div>
+        <div class="stock-code">603186 · 元件</div>
+        <div class="stock-code">封单 5.44 亿 · 开板 1 次</div>
       </div>
-      <div class="stock-price"><div class="price up">6.41</div><div class="pct up">+9.95%</div></div>
+      <div class="stock-price"><div class="price up">184.31</div><div class="pct up">+10.00%</div></div>
     </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">7. 海洋王 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">002724 · 照明设备</div>
-        <div class="stock-code">封单 1.00 亿 · 开板 0 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">6.78</div><div class="pct up">+10.06%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">8. 中源协和 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">600645 · 生物制品</div>
-        <div class="stock-code">封单 0.36 亿 · 开板 2 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">22.33</div><div class="pct up">+10.00%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">9. 大豪科技 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">603025 · 自动化设</div>
-        <div class="stock-code">封单 0.41 亿 · 开板 1 次</div>
-      </div>
-      <div class="stock-price"><div class="price up">15.18</div><div class="pct up">+10.00%</div></div>
-    </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">10. 天洋新材 <span class="rank-tag">3天3板</span></div>
+      <div class="stock-info"><div class="stock-name">4. 天洋新材 <span class="rank-tag">4天4板</span></div>
         <div class="stock-code">603330 · 塑料</div>
-        <div class="stock-code">封单 0.94 亿 · 开板 0 次</div>
+        <div class="stock-code">封单 2.69 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price"><div class="price up">10.68</div><div class="pct up">+9.99%</div></div>
+      <div class="stock-price"><div class="price up">11.75</div><div class="pct up">+10.02%</div></div>
     </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">11. 康盛股份 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">002418 · 家电零部</div>
-        <div class="stock-code">封单 0.33 亿 · 开板 1 次</div>
+      <div class="stock-info"><div class="stock-name">5. 金健米业 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">600127 · 农产品加</div>
+        <div class="stock-code">封单 1.86 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price"><div class="price up">4.07</div><div class="pct up">+10.00%</div></div>
+      <div class="stock-price"><div class="price up">6.46</div><div class="pct up">+10.05%</div></div>
     </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">12. 理工能科 <span class="rank-tag">2天2板</span></div>
-        <div class="stock-code">002322 · 软件开发</div>
-        <div class="stock-code">封单 0.40 亿 · 开板 1 次</div>
+      <div class="stock-info"><div class="stock-name">6. 圣达生物 <span class="rank-tag">2天2板</span></div>
+        <div class="stock-code">603079 · 化学制品</div>
+        <div class="stock-code">封单 0.97 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price"><div class="price up">13.05</div><div class="pct up">+10.03%</div></div>
+      <div class="stock-price"><div class="price up">14.75</div><div class="pct up">+9.99%</div></div>
     </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">13. 共进股份 <span class="rank-tag">2天2板</span></div>
+      <div class="stock-info"><div class="stock-name">7. 今飞凯达 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">002863 · 汽车零部</div>
+        <div class="stock-code">封单 0.23 亿 · 开板 6 次</div>
+      </div>
+      <div class="stock-price"><div class="price up">4.99</div><div class="pct up">+9.91%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">8. 共进股份 <span class="rank-tag">3天3板</span></div>
         <div class="stock-code">603118 · 通信设备</div>
-        <div class="stock-code">封单 0.92 亿 · 开板 6 次</div>
+        <div class="stock-code">封单 1.70 亿 · 开板 11 次</div>
       </div>
-      <div class="stock-price"><div class="price up">17.56</div><div class="pct up">+10.03%</div></div>
+      <div class="stock-price"><div class="price up">19.32</div><div class="pct up">+10.02%</div></div>
     </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">14. 金时科技 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">002951 · 其他电源</div>
-        <div class="stock-code">封单 0.41 亿 · 开板 2 次</div>
+      <div class="stock-info"><div class="stock-name">9. 神奇制药 <span class="rank-tag">3天3板</span></div>
+        <div class="stock-code">600613 · 化学制药</div>
+        <div class="stock-code">封单 2.98 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price"><div class="price up">18.14</div><div class="pct up">+10.01%</div></div>
+      <div class="stock-price"><div class="price up">7.05</div><div class="pct up">+9.98%</div></div>
     </div><div class="stock-row">
-      <div class="stock-info"><div class="stock-name">15. 天安新材 <span class="rank-tag">1天1板</span></div>
-        <div class="stock-code">603725 · 家居用品</div>
-        <div class="stock-code">封单 0.54 亿 · 开板 1 次</div>
+      <div class="stock-info"><div class="stock-name">10. 正裕工业 <span class="rank-tag">2天2板</span></div>
+        <div class="stock-code">603089 · 汽车零部</div>
+        <div class="stock-code">封单 0.36 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price"><div class="price up">12.23</div><div class="pct up">+9.98%</div></div>
+      <div class="stock-price"><div class="price up">10.73</div><div class="pct up">+10.05%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">11. 金 螳 螂 <span class="rank-tag">4天4板</span></div>
+        <div class="stock-code">002081 · 装修装饰</div>
+        <div class="stock-code">封单 1.34 亿 · 开板 9 次</div>
+      </div>
+      <div class="stock-price"><div class="price up">5.82</div><div class="pct up">+10.02%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">12. 旭光电子 <span class="rank-tag">2天2板</span></div>
+        <div class="stock-code">600353 · 其他电子</div>
+        <div class="stock-code">封单 2.34 亿 · 开板 2 次</div>
+      </div>
+      <div class="stock-price"><div class="price up">34.13</div><div class="pct up">+9.99%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">13. 深深房Ａ <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">000029 · 房地产开</div>
+        <div class="stock-code">封单 2.43 亿 · 开板 1 次</div>
+      </div>
+      <div class="stock-price"><div class="price up">24.42</div><div class="pct up">+10.00%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">14. 百合股份 <span class="rank-tag">4天2板</span></div>
+        <div class="stock-code">603102 · 食品加工</div>
+        <div class="stock-code">封单 0.71 亿 · 开板 1 次</div>
+      </div>
+      <div class="stock-price"><div class="price up">43.41</div><div class="pct up">+10.01%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">15. 哈森股份 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">603958 · 服装家纺</div>
+        <div class="stock-code">封单 0.50 亿 · 开板 0 次</div>
+      </div>
+      <div class="stock-price"><div class="price up">16.78</div><div class="pct up">+10.03%</div></div>
     </div>
   </div>
   <div class="card">

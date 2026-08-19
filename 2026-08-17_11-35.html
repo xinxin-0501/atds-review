@@ -529,6 +529,16 @@
 .intl-style-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:6px}
 .intl-style-body{font-size:11px;color:#333;line-height:1.5}
 .intl-missing{font-size:10px;color:#999;line-height:1.5;padding:8px 10px;background:#fafafa;border-radius:8px}
+.intl-detail{margin-top:10px;background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.intl-detail-h{font-size:12px;font-weight:700;color:#185FA5;margin-bottom:4px}
+.intl-detail-asof{font-size:10px;color:#999;margin-bottom:8px;line-height:1.4}
+.intl-detail-table{width:100%;border-collapse:collapse;font-size:11px}
+.intl-detail-table th{background:#f6f8fb;color:#666;font-weight:600;text-align:left;padding:6px 8px;border-bottom:1px solid #eee;font-size:10px}
+.intl-detail-table td{padding:6px 8px;border-bottom:1px solid #f5f5f5;color:#333;vertical-align:top}
+.intl-group-row td{background:#fafcff;color:#185FA5;font-weight:700;font-size:11px;padding:8px 8px 4px}
+.intl-dt-time{font-size:10px;color:#999}
+.intl-dt-src{font-size:10px;color:#999}
+.intl-dt-note{font-size:10px;color:#666;line-height:1.5;background:#fafcff}
 /* Hero 头部区 */
 .hero{background:linear-gradient(135deg,#fff8f5 0%,#fef3ed 50%,#fff 100%);padding:18px 16px 16px;border-radius:0 0 14px 14px;margin-bottom:8px;border-bottom:1px solid #f5e6dc}
 .hero-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
@@ -741,7 +751,7 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-08-17_11-35.html" class="active">午盘</a><a href="2026-08-17_15-20.html">收盘</a><a href="2026-08-19_11-35.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-08-17_11-35.html" class="active">午盘</a><a href="2026-08-17_16-20.html">收盘</a><a href="2026-08-19_16-20.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照</div><h1 class="hero-title">2026-08-17 · <span class="hero-time" id="rt-hero-time">11:35</span></h1><div class="hero-sub">实时盘中数据 · 每 60 秒自动刷新</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 100°</span></div></div>
@@ -2192,10 +2202,10 @@
       </div>
       <div class="wave-meta">
         <span>一波 <b>40.2%</b></span>
-        <span>调整 <b>24日 -12.4%</b></span>
+        <span>调整 <b>24日 -12.5%</b></span>
         <span>量比 <b>0.7</b></span>
         <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
-        <span>支撑 <b>5.57</b></span>
+        <span>支撑 <b>5.58</b></span>
       </div>
     </div><div class="wave-item" data-code="603338" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
@@ -2277,25 +2287,9 @@
         <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
         <span>支撑 <b>7.77</b></span>
       </div>
-    </div><div class="wave-item" data-code="301051" onclick="openStockResearch(this.dataset.code)">
-      <div class="wave-row">
-        <span class="wave-rank">8</span>
-        <span class="wave-name">信濠光电<small>301051</small></span>
-        <span class="wave-price up">22.23</span>
-        <span class="wave-pct up">+5.86%</span>
-        <span class="wave-score">90</span>
-        <span class="wave-sig sig sig-break">回调弱调整</span>
-      </div>
-      <div class="wave-meta">
-        <span>一波 <b>52.6%</b></span>
-        <span>调整 <b>30日 -5.3%</b></span>
-        <span>量比 <b>0.49</b></span>
-        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
-        <span>支撑 <b>20.96</b></span>
-      </div>
     </div><div class="wave-item" data-code="301345" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">9</span>
+        <span class="wave-rank">8</span>
         <span class="wave-name">涛涛车业<small>301345</small></span>
         <span class="wave-price up">270.99</span>
         <span class="wave-pct up">+6.45%</span>
@@ -2311,7 +2305,7 @@
       </div>
     </div><div class="wave-item" data-code="301584" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">10</span>
+        <span class="wave-rank">9</span>
         <span class="wave-name">建发致新<small>301584</small></span>
         <span class="wave-price down">24.20</span>
         <span class="wave-pct down">-1.22%</span>
@@ -2327,7 +2321,7 @@
       </div>
     </div><div class="wave-item" data-code="600409" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">11</span>
+        <span class="wave-rank">10</span>
         <span class="wave-name">三友化工<small>600409</small></span>
         <span class="wave-price up">6.79</span>
         <span class="wave-pct up">+3.03%</span>
@@ -2343,7 +2337,7 @@
       </div>
     </div><div class="wave-item" data-code="600428" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">12</span>
+        <span class="wave-rank">11</span>
         <span class="wave-name">中远海特<small>600428</small></span>
         <span class="wave-price up">11.82</span>
         <span class="wave-pct up">+0.08%</span>
@@ -2351,31 +2345,15 @@
         <span class="wave-sig sig sig-wait">横盘强调整</span>
       </div>
       <div class="wave-meta">
-        <span>一波 <b>53.7%</b></span>
+        <span>一波 <b>47.6%</b></span>
         <span>调整 <b>3日 -2%</b></span>
         <span>量比 <b>0.53</b></span>
         <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
-        <span>支撑 <b>8.66</b></span>
-      </div>
-    </div><div class="wave-item" data-code="600583" onclick="openStockResearch(this.dataset.code)">
-      <div class="wave-row">
-        <span class="wave-rank">13</span>
-        <span class="wave-name">海油工程<small>600583</small></span>
-        <span class="wave-price up">5.61</span>
-        <span class="wave-pct up">+2.94%</span>
-        <span class="wave-score">85</span>
-        <span class="wave-sig sig sig-strong">横盘强调整</span>
-      </div>
-      <div class="wave-meta">
-        <span>一波 <b>18.3%</b></span>
-        <span>调整 <b>11日 -1.9%</b></span>
-        <span>量比 <b>0.61</b></span>
-        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
-        <span>支撑 <b>5.39</b></span>
+        <span>支撑 <b>8.99</b></span>
       </div>
     </div><div class="wave-item" data-code="601058" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">14</span>
+        <span class="wave-rank">12</span>
         <span class="wave-name">赛轮轮胎<small>601058</small></span>
         <span class="wave-price up">13.97</span>
         <span class="wave-pct up">+3.10%</span>
@@ -2389,41 +2367,9 @@
         <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
         <span>支撑 <b>12.95</b></span>
       </div>
-    </div><div class="wave-item" data-code="601766" onclick="openStockResearch(this.dataset.code)">
-      <div class="wave-row">
-        <span class="wave-rank">15</span>
-        <span class="wave-name">中国中车<small>601766</small></span>
-        <span class="wave-price up">5.97</span>
-        <span class="wave-pct up">+1.53%</span>
-        <span class="wave-score">85</span>
-        <span class="wave-sig sig sig-up">横盘强调整</span>
-      </div>
-      <div class="wave-meta">
-        <span>一波 <b>22.2%</b></span>
-        <span>调整 <b>12日 -3.9%</b></span>
-        <span>量比 <b>0.78</b></span>
-        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
-        <span>支撑 <b>5.91</b></span>
-      </div>
-    </div><div class="wave-item" data-code="603277" onclick="openStockResearch(this.dataset.code)">
-      <div class="wave-row">
-        <span class="wave-rank">16</span>
-        <span class="wave-name">银都股份<small>603277</small></span>
-        <span class="wave-price up">11.78</span>
-        <span class="wave-pct up">+3.88%</span>
-        <span class="wave-score">85</span>
-        <span class="wave-sig sig sig-strong">回调弱调整</span>
-      </div>
-      <div class="wave-meta">
-        <span>一波 <b>25.2%</b></span>
-        <span>调整 <b>2日 -5.7%</b></span>
-        <span>量比 <b>4.32</b></span>
-        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
-        <span>支撑 <b>11.64</b></span>
-      </div>
     </div><div class="wave-item" data-code="688207" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">17</span>
+        <span class="wave-rank">13</span>
         <span class="wave-name">格灵深瞳<small>688207</small></span>
         <span class="wave-price up">21.60</span>
         <span class="wave-pct up">+7.36%</span>
@@ -2439,7 +2385,7 @@
       </div>
     </div><div class="wave-item" data-code="688617" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">18</span>
+        <span class="wave-rank">14</span>
         <span class="wave-name">惠泰医疗<small>688617</small></span>
         <span class="wave-price down">215.13</span>
         <span class="wave-pct down">-1.23%</span>
@@ -2453,25 +2399,9 @@
         <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
         <span>支撑 <b>220.22</b></span>
       </div>
-    </div><div class="wave-item" data-code="002821" onclick="openStockResearch(this.dataset.code)">
-      <div class="wave-row">
-        <span class="wave-rank">19</span>
-        <span class="wave-name">凯莱英<small>002821</small></span>
-        <span class="wave-price up">177.12</span>
-        <span class="wave-pct up">+3.46%</span>
-        <span class="wave-score">85</span>
-        <span class="wave-sig sig sig-strong">回调弱调整</span>
-      </div>
-      <div class="wave-meta">
-        <span>一波 <b>77.8%</b></span>
-        <span>调整 <b>23日 -9.5%</b></span>
-        <span>量比 <b>1</b></span>
-        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
-        <span>支撑 <b>140.28</b></span>
-      </div>
     </div><div class="wave-item" data-code="603661" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">20</span>
+        <span class="wave-rank">15</span>
         <span class="wave-name">恒林股份<small>603661</small></span>
         <span class="wave-price up">33.06</span>
         <span class="wave-pct up">+3.70%</span>
@@ -2485,25 +2415,9 @@
         <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
         <span>支撑 <b>35.73</b></span>
       </div>
-    </div><div class="wave-item" data-code="301617" onclick="openStockResearch(this.dataset.code)">
-      <div class="wave-row">
-        <span class="wave-rank">21</span>
-        <span class="wave-name">博苑新材<small>301617</small></span>
-        <span class="wave-price up">50.74</span>
-        <span class="wave-pct up">+6.75%</span>
-        <span class="wave-score">83</span>
-        <span class="wave-sig sig sig-break">回调弱调整</span>
-      </div>
-      <div class="wave-meta">
-        <span>一波 <b>33.2%</b></span>
-        <span>调整 <b>29日 -24%</b></span>
-        <span>量比 <b>0.4</b></span>
-        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
-        <span>支撑 <b>65.4</b></span>
-      </div>
     </div><div class="wave-item" data-code="600201" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">22</span>
+        <span class="wave-rank">16</span>
         <span class="wave-name">生物股份<small>600201</small></span>
         <span class="wave-price down">13.51</span>
         <span class="wave-pct down">-0.15%</span>
@@ -2517,25 +2431,25 @@
         <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
         <span>支撑 <b>12.64</b></span>
       </div>
-    </div><div class="wave-item" data-code="600809" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="wave-item" data-code="601766" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">23</span>
-        <span class="wave-name">山西汾酒<small>600809</small></span>
-        <span class="wave-price down">118.94</span>
-        <span class="wave-pct down">-3.71%</span>
+        <span class="wave-rank">17</span>
+        <span class="wave-name">中国中车<small>601766</small></span>
+        <span class="wave-price up">5.97</span>
+        <span class="wave-pct up">+1.53%</span>
         <span class="wave-score">80</span>
-        <span class="wave-sig sig sig-weak">回调弱调整</span>
+        <span class="wave-sig sig sig-up">回调弱调整</span>
       </div>
       <div class="wave-meta">
-        <span>一波 <b>31.3%</b></span>
-        <span>调整 <b>12日 -8.1%</b></span>
-        <span>量比 <b>0.82</b></span>
+        <span>一波 <b>21.7%</b></span>
+        <span>调整 <b>12日 -5.7%</b></span>
+        <span>量比 <b>0.78</b></span>
         <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
-        <span>支撑 <b>111.69</b></span>
+        <span>支撑 <b>6.03</b></span>
       </div>
     </div><div class="wave-item" data-code="603766" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">24</span>
+        <span class="wave-rank">18</span>
         <span class="wave-name">隆鑫通用<small>603766</small></span>
         <span class="wave-price up">13.79</span>
         <span class="wave-pct up">+5.35%</span>
@@ -2551,7 +2465,7 @@
       </div>
     </div><div class="wave-item" data-code="000661" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">25</span>
+        <span class="wave-rank">19</span>
         <span class="wave-name">长春高新<small>000661</small></span>
         <span class="wave-price down">84.53</span>
         <span class="wave-pct down">-0.07%</span>
@@ -2567,7 +2481,7 @@
       </div>
     </div><div class="wave-item" data-code="002546" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">26</span>
+        <span class="wave-rank">20</span>
         <span class="wave-name">新联电子<small>002546</small></span>
         <span class="wave-price up">8.62</span>
         <span class="wave-pct up">+2.25%</span>
@@ -2583,7 +2497,7 @@
       </div>
     </div><div class="wave-item" data-code="002653" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">27</span>
+        <span class="wave-rank">21</span>
         <span class="wave-name">海思科<small>002653</small></span>
         <span class="wave-price up">70.11</span>
         <span class="wave-pct up">+1.05%</span>
@@ -2599,7 +2513,7 @@
       </div>
     </div><div class="wave-item" data-code="002728" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">28</span>
+        <span class="wave-rank">22</span>
         <span class="wave-name">特一药业<small>002728</small></span>
         <span class="wave-price up">9.56</span>
         <span class="wave-pct up">+1.70%</span>
@@ -2607,15 +2521,15 @@
         <span class="wave-sig sig sig-up">回调弱调整</span>
       </div>
       <div class="wave-meta">
-        <span>一波 <b>28.8%</b></span>
+        <span>一波 <b>28.4%</b></span>
         <span>调整 <b>22日 -6.9%</b></span>
-        <span>量比 <b>0.7</b></span>
+        <span>量比 <b>0.6</b></span>
         <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
         <span>支撑 <b>8.8</b></span>
       </div>
     </div><div class="wave-item" data-code="002841" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">29</span>
+        <span class="wave-rank">23</span>
         <span class="wave-name">视源股份<small>002841</small></span>
         <span class="wave-price up">51.12</span>
         <span class="wave-pct up">+2.80%</span>
@@ -2631,7 +2545,7 @@
       </div>
     </div><div class="wave-item" data-code="003032" onclick="openStockResearch(this.dataset.code)">
       <div class="wave-row">
-        <span class="wave-rank">30</span>
+        <span class="wave-rank">24</span>
         <span class="wave-name">传智教育<small>003032</small></span>
         <span class="wave-price up">12.51</span>
         <span class="wave-pct up">+2.04%</span>
@@ -2644,6 +2558,102 @@
         <span>量比 <b>2.22</b></span>
         <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
         <span>支撑 <b>6.02</b></span>
+      </div>
+    </div><div class="wave-item" data-code="300039" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">25</span>
+        <span class="wave-name">上海凯宝<small>300039</small></span>
+        <span class="wave-price up">6.16</span>
+        <span class="wave-pct up">+2.16%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>41.5%</b></span>
+        <span>调整 <b>2日 -0.8%</b></span>
+        <span>量比 <b>0.93</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
+        <span>支撑 <b>5.2</b></span>
+      </div>
+    </div><div class="wave-item" data-code="300676" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">26</span>
+        <span class="wave-name">华大基因<small>300676</small></span>
+        <span class="wave-price down">39.78</span>
+        <span class="wave-pct down">-2.12%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-press">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>20.7%</b></span>
+        <span>调整 <b>2日 -5.2%</b></span>
+        <span>量比 <b>1.04</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>39.96</b></span>
+      </div>
+    </div><div class="wave-item" data-code="301381" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">27</span>
+        <span class="wave-name">赛维时代<small>301381</small></span>
+        <span class="wave-price up">23.18</span>
+        <span class="wave-pct up">+2.61%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>30.9%</b></span>
+        <span>调整 <b>9日 -1.9%</b></span>
+        <span>量比 <b>0.54</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>21.5</b></span>
+      </div>
+    </div><div class="wave-item" data-code="301602" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">28</span>
+        <span class="wave-name">超研股份<small>301602</small></span>
+        <span class="wave-price down">18.85</span>
+        <span class="wave-pct down">-0.26%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-wait">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>49.7%</b></span>
+        <span>调整 <b>2日 -7.6%</b></span>
+        <span>量比 <b>3.54</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>18.38</b></span>
+      </div>
+    </div><div class="wave-item" data-code="600129" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">29</span>
+        <span class="wave-name">太极集团<small>600129</small></span>
+        <span class="wave-price down">16.96</span>
+        <span class="wave-pct down">-0.35%</span>
+        <span class="wave-score">75</span>
+        <span class="wave-sig sig sig-wait">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>51.6%</b></span>
+        <span>调整 <b>23日 -5.7%</b></span>
+        <span>量比 <b>1</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
+        <span>支撑 <b>13.05</b></span>
+      </div>
+    </div><div class="wave-item" data-code="600547" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">30</span>
+        <span class="wave-name">山东黄金<small>600547</small></span>
+        <span class="wave-price up">30.10</span>
+        <span class="wave-pct up">+2.59%</span>
+        <span class="wave-score">75</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>32.4%</b></span>
+        <span>调整 <b>5日 -4.4%</b></span>
+        <span>量比 <b>0.98</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>28.95</b></span>
       </div>
     </div>
         </div>
@@ -2959,7 +2969,7 @@
       <div class="sc-meta">
         <span>涨停 <b>4次</b></span>
         <span>连板 <b>0</b></span>
-        <span>量比 <b>1.01</b></span>
+        <span>量比 <b>1.02</b></span>
         <span>20日 <b class="ok">+42.6%</b></span>
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
@@ -3734,12 +3744,12 @@
   
   <div class="intl-mkt">
     <div class="intl-header"><span class="intl-eyebrow">GLOBAL LINKAGE · 4 MIN REFRESH</span><span class="intl-title">🌐 盘中信息 · 国际联动</span></div>
-    <div class="intl-cards"><div class="card intl-card"><div class="intl-head"><span class="intl-name">道琼斯</span><span class="intl-unit"></span></div><div class="intl-price down">53,732.41</div><div class="intl-change down">-0.20%</div><div class="intl-time">2026-08-14 16:41:05</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纳斯达克</span><span class="intl-unit"></span></div><div class="intl-price down">26,729.16</div><div class="intl-change down">-0.28%</div><div class="intl-time">2026-08-14 17:15:59</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约原油</span><span class="intl-unit">$/bbl</span></div><div class="intl-price up">81.70</div><div class="intl-change up">+0.34%</div><div class="intl-time">21:19:08</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约黄金</span><span class="intl-unit">$/oz</span></div><div class="intl-price flat">4440.14</div><div class="intl-change flat">0.00%</div><div class="intl-time">21:19:01</div></div></div>
-    <div class="intl-style"><div class="intl-style-h">📌 今日 A 股风格倾向（外盘推导）</div><div class="intl-style-body">数据待补充，建议结合盘前/盘中走势综合判断</div></div>
+    <div class="intl-cards"><div class="card intl-card"><div class="intl-head"><span class="intl-name">道琼斯</span><span class="intl-unit"></span></div><div class="intl-price down">53,732.41</div><div class="intl-change down">-0.20%</div><div class="intl-time">2026-08-14 16:41:05</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纳斯达克</span><span class="intl-unit"></span></div><div class="intl-price down">26,729.16</div><div class="intl-change down">-0.28%</div><div class="intl-time">2026-08-14 17:15:59</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约原油</span><span class="intl-unit">$/bbl</span></div><div class="intl-price up">82.25</div><div class="intl-change up">+1.18%</div><div class="intl-time">20:43:09</div></div><div class="card intl-card"><div class="intl-head"><span class="intl-name">纽约黄金</span><span class="intl-unit">$/oz</span></div><div class="intl-price flat">4435.12</div><div class="intl-change flat">0.00%</div><div class="intl-time">20:43:04</div></div></div>
+    <div class="intl-style"><div class="intl-style-h">📌 今日 A 股风格倾向（外盘推导）</div><div class="intl-style-body">原油强势 → 资源/能源板块或受关注</div></div>
     
     <div class="intl-missing">数据源：腾讯公开 API（道指/纳指/原油/黄金实时）+ 联网检索（欧股/标普/费半/英伟达/AMD/VIX/CNY）。A 股真正走势由内资承接和国内政策决定，外盘仅定开盘风格底色。</div>
   </div>
-  <div class="tech-card"><div class="ta-header"><span class="ta-eyebrow">TECHNICAL ANALYSIS · 盘前/盘中技术研判</span><span class="ta-title">📐 今日技术研判</span></div><div class="card"><div class="card-title">1. 关键支撑位 / 压力位(由近及远)</div><table class="ta-table"><thead><tr><th>指数 / 最新价</th><th>关键支撑</th><th>关键压力</th><th>均线结构</th></tr></thead><tbody><tr><td class="ta-name">上证指数<br><span class="ta-last">3982.65</span></td><td class="ta-supports"><div class="ta-level ta-support"><b>3974.46</b><span class="ta-label">250日均线·年线</span></div><div class="ta-level ta-support"><b>3943.51</b><span class="ta-label">5日均线·短期</span></div></td><td class="ta-pressures"><div class="ta-level ta-pressure"><b>3983.65</b><span class="ta-label">60日均线·季线</span></div><div class="ta-level ta-pressure"><b>4000.00</b><span class="ta-label">整数关口</span></div></td><td class="ta-ma-cell"><div class="ta-ma"><span>MA5 3943.5</span><span>MA10 3922.5</span><span>MA20 3879.7</span><span>MA60 3983.6</span></div></td></tr><tr><td class="ta-name">深证成指<br><span class="ta-last">14704.27</span></td><td class="ta-supports"><div class="ta-level ta-support"><b>14700.00</b><span class="ta-label">整数关口</span></div><div class="ta-level ta-support"><b>14500.00</b><span class="ta-label">整数关口</span></div></td><td class="ta-pressures"><div class="ta-level ta-pressure"><b>14753.00</b><span class="ta-label">120日均线·半年线</span></div><div class="ta-level ta-pressure"><b>14800.00</b><span class="ta-label">整数关口</span></div></td><td class="ta-ma-cell"><div class="ta-ma"><span>MA5 14404.4</span><span>MA10 14279.0</span><span>MA20 14032.2</span><span>MA60 14947.3</span></div></td></tr><tr><td class="ta-name">创业板指<br><span class="ta-last">3740.16</span></td><td class="ta-supports"><div class="ta-level ta-support"><b>3700.00</b><span class="ta-label">整数关口</span></div><div class="ta-level ta-support"><b>3668.15</b><span class="ta-label">120日均线·半年线</span></div></td><td class="ta-pressures"><div class="ta-level ta-pressure"><b>3800.00</b><span class="ta-label">整数关口</span></div><div class="ta-level ta-pressure"><b>3837.55</b><span class="ta-label">60日均线·季线</span></div></td><td class="ta-ma-cell"><div class="ta-ma"><span>MA5 3620.7</span><span>MA10 3574.4</span><span>MA20 3512.0</span><span>MA60 3837.6</span></div></td></tr></tbody></table><div class="hint">支撑/压力按"由近及远"排序,标注技术含义(5 日均线/10 日均线/月线/季线/半年线/年线/整数关口)</div></div><div class="card"><div class="card-title">2. 量能关键</div><div class="vol-item">全天上证成交额预期: <b>4 亿 ~ 6 亿</b>(基于近 5 日均值 ±15%)</div><div class="vol-item">早盘 30 分钟成交预期: <b>0 亿 ~ 1 亿</b>(占全天 7%-12%)</div><div class="vol-item">量能验证标准: <b>有量有价</b>(成交 ≥ 5 日均量) → 突破可期; <b>无量诱多</b>(成交 &lt; 5 日均量 70%) → 谨防冲高回落</div></div><div class="card"><div class="card-title">3. 走势预判(概率倾向)</div><div class="trend-list"><div class="trend-item"><span class="trend-pct">35%</span><span class="trend-text">先抑后扬,震荡修复</span></div><div class="trend-item"><span class="trend-pct">25%</span><span class="trend-text">放量突破 MA60(季线)</span></div><div class="trend-item"><span class="trend-pct">20%</span><span class="trend-text">放量突破整数关口</span></div><div class="trend-item"><span class="trend-pct">15%</span><span class="trend-text">缩量下跌至前期缺口</span></div></div><div class="hint">所有判断为概率倾向(参考量、非买卖点),实际盘中需结合实时走势验证</div></div><div class="card"><div class="card-title">4. 核心风险(3-5 项)</div><div class="risk-list"><div class="risk-item"><span class="risk-name">外盘突发利空</span><span class="risk-desc">美股夜盘跳水或地缘冲突升级将传导 A 股开盘</span></div><div class="risk-item"><span class="risk-name">高位板块获利兑现</span><span class="risk-desc">连板梯队炸板率上升,资金切出高位股</span></div><div class="risk-item"><span class="risk-name">关键压力位攻关失败</span><span class="risk-desc">上证 3992(MA60)或深证 14746(半年线)若缩量冲关失败,易形成头部</span></div><div class="risk-item"><span class="risk-name">量能持续萎缩</span><span class="risk-desc">全日成交 &lt; 5 日均量 80% 时,任何上攻都缺乏持续性</span></div><div class="risk-item"><span class="risk-name">重要数据/政策发布</span><span class="risk-desc">美国 CPI、美联储讲话、国内经济数据若超预期,可能引发波动放大</span></div></div></div></div>
+  <div class="tech-card"><div class="ta-header"><span class="ta-eyebrow">TECHNICAL ANALYSIS · 盘前/盘中技术研判</span><span class="ta-title">📐 今日技术研判</span></div><div class="card"><div class="card-title">1. 关键支撑位 / 压力位(由近及远)</div><table class="ta-table"><thead><tr><th>指数 / 最新价</th><th>关键支撑</th><th>关键压力</th><th>均线结构</th></tr></thead><tbody><tr><td class="ta-name">上证指数<br><span class="ta-last">3982.65</span></td><td class="ta-supports"><div class="ta-level ta-support"><b>3974.46</b><span class="ta-label">250日均线·年线</span></div><div class="ta-level ta-support"><b>3943.51</b><span class="ta-label">5日均线·短期</span></div></td><td class="ta-pressures"><div class="ta-level ta-pressure"><b>3983.65</b><span class="ta-label">60日均线·季线</span></div><div class="ta-level ta-pressure"><b>4000.00</b><span class="ta-label">整数关口</span></div></td><td class="ta-ma-cell"><div class="ta-ma"><span>MA5 3943.5</span><span>MA10 3922.5</span><span>MA20 3879.7</span><span>MA60 3983.6</span></div></td></tr><tr><td class="ta-name">深证成指<br><span class="ta-last">14704.27</span></td><td class="ta-supports"><div class="ta-level ta-support"><b>14700.00</b><span class="ta-label">整数关口</span></div><div class="ta-level ta-support"><b>14500.00</b><span class="ta-label">整数关口</span></div></td><td class="ta-pressures"><div class="ta-level ta-pressure"><b>14753.00</b><span class="ta-label">120日均线·半年线</span></div><div class="ta-level ta-pressure"><b>14800.00</b><span class="ta-label">整数关口</span></div></td><td class="ta-ma-cell"><div class="ta-ma"><span>MA5 14404.4</span><span>MA10 14279.0</span><span>MA20 14032.2</span><span>MA60 14947.3</span></div></td></tr><tr><td class="ta-name">创业板指<br><span class="ta-last">3740.16</span></td><td class="ta-supports"><div class="ta-level ta-support"><b>3700.00</b><span class="ta-label">整数关口</span></div><div class="ta-level ta-support"><b>3668.15</b><span class="ta-label">120日均线·半年线</span></div></td><td class="ta-pressures"><div class="ta-level ta-pressure"><b>3800.00</b><span class="ta-label">整数关口</span></div><div class="ta-level ta-pressure"><b>3837.55</b><span class="ta-label">60日均线·季线</span></div></td><td class="ta-ma-cell"><div class="ta-ma"><span>MA5 3620.7</span><span>MA10 3574.4</span><span>MA20 3512.0</span><span>MA60 3837.6</span></div></td></tr></tbody></table><div class="hint">支撑/压力按"由近及远"排序,标注技术含义(5 日均线/10 日均线/月线/季线/半年线/年线/整数关口)</div></div><div class="card"><div class="card-title">2. 量能关键</div><div class="vol-item">全天上证成交额预期: <b>441 亿 ~ 597 亿</b>(基于近 5 日均值 ±15%)</div><div class="vol-item">早盘 30 分钟成交预期: <b>36 亿 ~ 62 亿</b>(占全天 7%-12%)</div><div class="vol-item">量能验证标准: <b>有量有价</b>(成交 ≥ 5 日均量) → 突破可期; <b>无量诱多</b>(成交 &lt; 5 日均量 70%) → 谨防冲高回落</div></div><div class="card"><div class="card-title">3. 走势预判(概率倾向)</div><div class="trend-list"><div class="trend-item"><span class="trend-pct">35%</span><span class="trend-text">先抑后扬,震荡修复</span></div><div class="trend-item"><span class="trend-pct">25%</span><span class="trend-text">放量突破 MA60(季线)</span></div><div class="trend-item"><span class="trend-pct">20%</span><span class="trend-text">放量突破整数关口</span></div><div class="trend-item"><span class="trend-pct">15%</span><span class="trend-text">缩量下跌至前期缺口</span></div></div><div class="hint">所有判断为概率倾向(参考量、非买卖点),实际盘中需结合实时走势验证</div></div><div class="card"><div class="card-title">4. 核心风险(3-5 项)</div><div class="risk-list"><div class="risk-item"><span class="risk-name">外盘突发利空</span><span class="risk-desc">美股夜盘跳水或地缘冲突升级将传导 A 股开盘</span></div><div class="risk-item"><span class="risk-name">高位板块获利兑现</span><span class="risk-desc">连板梯队炸板率上升,资金切出高位股</span></div><div class="risk-item"><span class="risk-name">关键压力位攻关失败</span><span class="risk-desc">上证 3992(MA60)或深证 14746(半年线)若缩量冲关失败,易形成头部</span></div><div class="risk-item"><span class="risk-name">量能持续萎缩</span><span class="risk-desc">全日成交 &lt; 5 日均量 80% 时,任何上攻都缺乏持续性</span></div><div class="risk-item"><span class="risk-name">重要数据/政策发布</span><span class="risk-desc">美国 CPI、美联储讲话、国内经济数据若超预期,可能引发波动放大</span></div></div></div></div>
   <div class="card">
     <div class="card-title">策略状态</div>
     <div class="str-block">
@@ -3768,7 +3778,7 @@
       <div class="index-change up">+3.14%</div>
     </div></div>
     <div class="status-row">
-      <div class="status-item">生成时间<strong>2026-08-17 21:18:08</strong></div>
+      <div class="status-item">生成时间<strong>2026-08-17 20:42:50</strong></div>
       <div class="status-item">数据源<strong>通达信实时</strong></div>
       <div class="status-item">类型<strong>午盘快照</strong></div>
     </div>
