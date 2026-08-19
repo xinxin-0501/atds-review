@@ -14,7 +14,16 @@ echo  2. Generate new token (classic)
 echo  3. Check repo permission
 echo  4. Copy the token (starts with ghp_)
 echo.
-set /p TOKEN=Paste Token and press Enter: 
+echo 输入 Token 的方式(任选其一):
+echo   A. 在项目文件夹新建 gh_token.txt,粘贴 token 保存,本脚本自动读取
+echo   B. 直接在下行粘贴(Ctrl+V 或鼠标右键)
+echo.
+if exist "%~dp0gh_token.txt" (
+  set /p TOKEN=<"%~dp0gh_token.txt"
+  echo 已从 gh_token.txt 读取 Token
+) else (
+  set /p TOKEN=Paste Token and press Enter:
+)
 
 if "%TOKEN%"=="" (
   echo.
