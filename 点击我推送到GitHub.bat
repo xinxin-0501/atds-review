@@ -29,7 +29,8 @@ echo.
 
 "%GIT%" remote remove origin 2>nul
 "%GIT%" remote add origin "https://xinxin-0501:%TOKEN%@github.com/xinxin-0501/atds-review.git"
-"%GIT%" push -u origin HEAD:main
+echo 使用强制推送(-f)以解决远程历史分叉,以本地完整快照为准
+"%GIT%" push -f -u origin HEAD:main
 
 if errorlevel 1 (
   echo.
