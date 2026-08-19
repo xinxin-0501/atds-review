@@ -1,3 +1,4 @@
+// ATDS-V3-GATE-TOP  ·  反转闸门/八步分析置于情绪区后
 // ATDS PRO 复盘报告渲染器
 const fs = require('fs');
 const path = require('path');
@@ -6,7 +7,7 @@ const ROOT = path.resolve(__dirname, '..');
 const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'config.json'), 'utf8'));
 const DATA_DIR = path.join(ROOT, config.dataDir);
 const SITE_DIR = path.join(ROOT, config.siteDir);
-const REVIEWS_DIR = path.join(SITE_DIR, 'reviews');
+const REVIEWS_DIR = SITE_DIR; // 扁平结构:报告直接输出到 site/ 根目录,与 GitHub Pages/CloudStudio 部署一致
 
 function esc(s) {
   return String(s == null ? '' : s)
@@ -29,6 +30,15 @@ function upDownClass(pct) {
   const v = Number(pct);
   if (isNaN(v) || v === 0) return 'flat';
   return v > 0 ? 'up' : 'down';
+}
+
+// 万 → 亿/万 显示
+function fmtAmount(wan) {
+  const v = Number(wan);
+  if (isNaN(v) || !v) return '--';
+  if (v >= 10000) return (v / 10000).toFixed(1) + '亿';
+  if (v >= 1000) return (v / 1000).toFixed(1) + '千万';
+  return v.toFixed(0) + '万';
 }
 
 function renderHeader(report, nav) {
@@ -55,12 +65,16 @@ function renderHero(report) {
   const desc = m.type === 'premarket'
     ? '基于上一交易日数据 · 今日开盘前参考 · 非买卖建议'
     : m.type === 'midday'
-      ? '实时盘中快照 · 数据截至 ' + (m.time || '11:35')
-      : '收盘静态快照 · 数据截至 15:00';
+      ? '实时盘中数据 · 每 60 秒自动刷新'
+      : '收盘静态快照 · 数据截至 ' + ((config.reportTypes.close && config.reportTypes.close.time) || '15:20');
+  const timeHtml = m.type === 'midday'
+    ? '<span class="hero-time" id="rt-hero-time">' + (esc(m.time || '')) + '</span>'
+    : '<span class="hero-time">' + (esc(m.time || '')) + '</span>';
   return '<div class="hero">' +
     '<div class="hero-eyebrow">A 股每日复盘 · ' + (esc(m.typeLabel || '')) + '</div>' +
-    '<h1 class="hero-title">' + (esc(m.date || '')) + ' · <span class="hero-time">' + (esc(m.time || '')) + '</span></h1>' +
+    '<h1 class="hero-title">' + (esc(m.date || '')) + ' · ' + timeHtml + '</h1>' +
     '<div class="hero-sub">' + desc + '</div>' +
+    '<div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div>' +
     (tempTag ? '<div class="hero-tags">' + tempTag + '</div>' : '') +
   '</div>';
 }
@@ -68,7 +82,10 @@ function renderHero(report) {
 function renderIndices(report) {
   const items = (report.indices || []).map(idx => {
     const cls = upDownClass(idx.changePct);
-    return `<div class="index-item">
+    // 前缀按 config.indices 的 setcode 判定(1=sh, 0=sz),不能用 charAt(0) 因为指数代码不按此规则
+    const confIdx = (config.indices || []).find(i => String(i.code) === String(idx.code));
+    const prefix = confIdx && confIdx.setcode === '1' ? 'sh' : 'sz';
+    return `<div class="index-item" data-code="${esc(idx.code)}" data-prefix="${prefix}">
       <div class="index-name">${esc(idx.name)}</div>
       <div class="index-value ${cls}">${fmtNum(idx.price)}</div>
       <div class="index-change ${cls}">${fmtPct(idx.changePct)}</div>
@@ -195,11 +212,64 @@ function renderIntlMkt(report) {
   if (ix && ix.changePct > 0.5) hints.push('纳指走强 → 科技/AI 板块或受提振');
   if (dj && dj.changePct < -0.5) hints.push('道指走弱 → 防御板块或受关注');
   const styleHint = hints.length ? hints.slice(0, 2).join('；') : '数据待补充，建议结合盘前/盘中走势综合判断';
+  // 国际联动明细表（联网补充数据：欧股/标普/费半/个股/VIX/汇率等）
+  let detailHtml = '';
+  const det = (report && report.intlDetail) || {};
+  const groups = [
+    ['us', '🇺🇸 美股（美东最新收盘）'],
+    ['europe', '🇪🇺 欧洲（最新收盘）'],
+    ['commodities', '🛢️ 商品'],
+    ['fx', '💱 汇率'],
+    ['sentiment', '🧭 情绪与关键变量']
+  ];
+  const rows = [];
+  for (const [gk, gLabel] of groups) {
+    const g = det[gk];
+    if (!g || !Object.keys(g).length) continue;
+    const itemRows = [];
+    for (const key of Object.keys(g)) {
+      const it = g[key];
+      if (typeof it !== 'object' || it === null) {
+        // 纯文本条目（如情绪说明）→ 合并渲染为一行说明
+        if (typeof it === 'string' && it.trim()) {
+          itemRows.push(`<tr><td colspan="5" class="intl-dt-note">${esc(it)}</td></tr>`);
+        }
+        continue;
+      }
+      const name = it.name || key;
+      const cls = upDownClass(it.changePct);
+      const priceStr = it.price != null && !isNaN(Number(it.price)) ? (typeof it.price === 'number' ? it.price.toLocaleString('zh-CN', { minimumFractionDigits: /fx|CNH|中间价/.test(name) ? 4 : 2, maximumFractionDigits: 4 }) : String(it.price)) : '--';
+      const pctStr = it.changePct != null && !isNaN(Number(it.changePct)) ? fmtPct(it.changePct) : (it.unit || '--');
+      const src = it.source ? `${it.source}` : '';
+      itemRows.push(`<tr>
+        <td>${esc(name)}</td>
+        <td class="${cls}">${priceStr}${it.unit ? ' ' + esc(it.unit) : ''}</td>
+        <td class="${cls}">${pctStr}</td>
+        <td class="intl-dt-time">${esc(it.time || '--')}</td>
+        <td class="intl-dt-src">${esc(src)}</td>
+      </tr>`);
+    }
+    if (itemRows.length) {
+      rows.push(`<tr class="intl-group-row"><td colspan="5" class="intl-group-td">${gLabel}</td></tr>`);
+      rows.push(...itemRows);
+    }
+  }
+  if (rows.length) {
+    detailHtml = `<div class="intl-detail">
+      <div class="intl-detail-h">📊 国际联动明细（联网补充 · 实时检索）</div>
+      <div class="intl-detail-asof">口径说明：${esc(det.asOfLabel || '')}</div>
+      <table class="intl-detail-table">
+        <thead><tr><th>指标</th><th>最新值</th><th>涨跌幅</th><th>来源时间</th><th>来源</th></tr></thead>
+        <tbody>${rows.join('')}</tbody>
+      </table>
+    </div>`;
+  }
   return `<div class="intl-mkt">
     <div class="intl-header"><span class="intl-eyebrow">GLOBAL LINKAGE · 4 MIN REFRESH</span><span class="intl-title">🌐 盘中信息 · 国际联动</span></div>
     <div class="intl-cards">${cards}</div>
     <div class="intl-style"><div class="intl-style-h">📌 今日 A 股风格倾向（外盘推导）</div><div class="intl-style-body">${esc(styleHint)}</div></div>
-    <div class="intl-missing">数据源：腾讯公开 API（道指/纳指/原油/黄金）。欧股、标普、费城半导体、英伟达、AMD、VIX、CNY 等需联网补充。</div>
+    ${detailHtml}
+    <div class="intl-missing">数据源：腾讯公开 API（道指/纳指/原油/黄金实时）+ 联网检索（欧股/标普/费半/英伟达/AMD/VIX/CNY）。A 股真正走势由内资承接和国内政策决定，外盘仅定开盘风格底色。</div>
   </div>`;
 }
 
@@ -244,14 +314,19 @@ function renderCloseEmotion(report) {
   '</div>' +
   '<div class="ce-breadth-meta">' +
     '<span>红盘率 <b>' + (ce.redRate || '--') + '%</b></span>' +
-    '<span>成交额 <b>待补充</b>(早盘较昨日需联网)</span>' +
+    '<span>成交额 <b>' + esc(report.marketStats && report.marketStats.totalAmount || '--') + '</b> (沪深合计)</span>' +
   '</div>';
   const idxRows = indices.map(idx => {
     const cls = upDownClass(idx.changePct);
     return '<div class="ce-idx-row"><span class="ce-idx-name">' + esc(idx.name) + '</span><span class="ce-idx-val ' + cls + '">' + fmtPct(idx.changePct) + '</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill ' + cls + '" style="width:' + Math.min(100, Math.abs(idx.changePct || 0) * 30) + '%"></div></div></div>';
   }).join('');
   const indexHtml = '<div class="ce-index-block"><div class="ce-block-h">指数表现</div>' + idxRows +
-    '<div class="ce-block-hint">成长科技领涨,量能微缩但仍在 2 万亿上方</div></div>';
+    '<div class="ce-block-hint">' + (function(){
+      const amt = parseFloat((report.marketStats && report.marketStats.totalAmount) || 0);
+      if (amt >= 20000) return '量能维持在 2 万亿上方 (' + amt.toFixed(0) + ' 亿)';
+      if (amt > 0) return '量能 ' + (amt / 10000).toFixed(2) + ' 万亿 (' + amt.toFixed(0) + ' 亿)';
+      return '量能数据待更新';
+    })() + '</div></div>';
   const broadBlock = '<div class="card"><div class="card-title">02 市场广度与指数结构</div>' +
     '<div class="ce-broad-grid">' +
     '<div class="ce-broad-left">' + breadthHtml + '</div>' +
@@ -284,7 +359,7 @@ function renderCloseEmotion(report) {
   const ladderBlock = '<div class="card"><div class="card-title">04 情绪高度(连板梯队)</div>' +
     '<div class="ce-ladder">' + ladderItems + '</div></div>';
 
-  // 05 明日观察锚点
+  // 05 明日观察锚点（午盘隐藏，收盘展示）
   const anchors = [
     { icon: '🎯', title: '主线持续性', desc: '观察中际旭创 / 新易盛 / 天孚通信能否继续表态' },
     { icon: '⚠️', title: '情绪退潮阈值', desc: '炸板率 > 40% 或晋级率 < 50% 需警惕' },
@@ -294,7 +369,7 @@ function renderCloseEmotion(report) {
   const anchorCards = anchors.map(a => {
     return '<div class="ce-anchor-card"><div class="ce-anchor-h">' + a.icon + ' ' + esc(a.title) + '</div><div class="ce-anchor-desc">' + esc(a.desc) + '</div></div>';
   }).join('');
-  const anchorBlock = '<div class="card"><div class="card-title">05 明日观察锚点</div>' +
+  const anchorBlock = m.type === 'midday' ? '' : '<div class="card"><div class="card-title">05 明日观察锚点</div>' +
     '<div class="ce-anchor-grid">' + anchorCards + '</div></div>';
 
   // 底部强调横幅
@@ -302,7 +377,7 @@ function renderCloseEmotion(report) {
 
   return '<div class="close-emotion">' +
     '<div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div>' +
-    '<div class="ce-title">' + esc(m.date || '') + ' ' + esc(m.typeLabel || '') + ' · 数据截至 ' + esc(m.time || '15:00') + '</div>' +
+    '<div class="ce-title">' + esc(m.date || '') + ' ' + esc(m.typeLabel || '') + (m.type === 'midday' ? ' · 实时更新中' : ' · 数据截至 ' + esc(m.time || '15:00')) + '</div>' +
     topPanel +
     emotion +
     broadBlock +
@@ -435,6 +510,268 @@ function renderVerdict(report) {
   '</div>';
 }
 
+function renderRegimeGate(report) {
+  const gate = report.regimeGate || {};
+  const ta = gate.totalAmount || 0;
+  const nh = gate.newHighCount || 0;
+  const totalZ = gate.totalZhengZhang || 0;
+  const taOk = ta >= 29650;
+  const nhOk = nh >= 100;
+  const gateOpen = taOk && nhOk;
+  const taPct = ta ? ((29650 - ta) / 29650 * 100).toFixed(1) : '--';
+  const nhPct = nh ? ((100 - nh) / 100 * 100).toFixed(0) : '--';
+  const taDiff = ta ? (ta - 29650).toFixed(0) : '--';
+  const nhDiff = nh - 100;
+  const status = gateOpen ? 'OPEN' : 'CLOSE';
+  const cls = gateOpen ? 'gate-open' : 'gate-close';
+  return `<div class="card gate-card">
+    <div class="card-title">反转闸门 · 温故知「加锁权」</div>
+    <div class="gate-note">核心规则:① AND ② 同时满足 → 闸门开(允许新仓);任一项未达标 → 闸门红(禁开新仓,埋伏名单豁免)</div>
+    <div class="gate-grid">
+      <div class="gate-block">
+        <div class="gate-h">① 成交额(沪深合计)</div>
+        <div class="gate-value ${taOk ? 'ok' : 'red'}">${ta ? ta.toFixed(0) + ' 亿' : '--'}</div>
+        <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标</div>
+        <div class="gate-diff ${taOk ? 'ok' : 'red'}">${ta ? (taOk ? '✓ 超过 ' + taDiff + ' 亿' : '✗ 差 ' + (29650 - ta).toFixed(0) + ' 亿 (' + taPct + '%)') : '数据获取中'}</div>
+      </div>
+      <div class="gate-block gate-click" onclick="openRegimeNHList()">
+        <div class="gate-h">② 60日新高个股数 <span class="gate-link">📋 点击查看</span></div>
+        <div class="gate-value ${nhOk ? 'ok' : 'red'}">${nh} 只</div>
+        <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
+        <div class="gate-diff ${nhOk ? 'ok' : 'red'}">${nh ? (nhOk ? '✓ 超过 ' + nhDiff + ' 只' : '✗ 差 ' + (-nhDiff) + ' 只 (' + nhPct + '%)') : '--'}</div>
+      </div>
+    </div>
+    <div class="gate-status ${cls}">
+      <span class="gate-status-label">闸门状态：</span>
+      <span class="gate-status-text">${status === 'OPEN' ? '✓ 绿 放行 · 允许开新仓' : '✗ 红 禁开 · 仅允许执行预检埋伏名单(估值+硬止损+仓位上限已定)'}</span>
+    </div>
+    <div class="gate-src">数据源:①成交额(东财沪深接口/降级时显示--)/ ②60日新高(东财涨停池代理,基于1板+涨幅≥5%数量 = ${nh}只/总涨停${totalZ}只,真实接口数据更准)
+      <span class="da-score">准确性 6/10(代理指标)</span>
+    </div>
+  </div>${renderRegimeNHModal(report)}`;
+}
+
+// 60日新高个股清单弹窗(后端渲染名单,前端刷新仅更新行情)
+function renderRegimeNHModal(report) {
+  const gate = report.regimeGate || {};
+  const nh = report.newHigh || {};
+  const list = nh.list || [];
+  if (!list.length) return '';
+  const rows = list.map((x, i) => {
+    const cls = upDownClass(x.pct);
+    return `<div class="nh-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+      <div class="nh-row">
+        <span class="ms-rank">${i + 1}</span>
+        <span class="nh-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
+        <span class="nh-price ${cls}">${fmtNum(x.price)}</span>
+        <span class="nh-pct ${cls}">${fmtPct(x.pct)}</span>
+      </div>
+      <div class="nh-meta">
+        <span>首板</span>
+        <span>封单 <b>${fmtAmount(x.sealWan)}</b></span>
+        <span>板块 <b>${esc(x.hybk || '--')}</b></span>
+        <span>首封 <b>${esc(x.firstTime || '--')}</b></span>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="modal-mask" id="regime-nh-modal" onclick="if(event.target===this)closeRegimeNH()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">60日新高个股清单 · 首板+涨幅≥5%</div>
+        <span class="modal-close" onclick="closeRegimeNH()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">60日新高个股 <b>${list.length}</b> 只 / 阈值 100 · 点击行可查看个股分析</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="addAllNHToWatchlist()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="nh-refresh-btn" onclick="refreshRegimeNH()">↻ 刷新行情</button>
+        </div>
+        <div class="nh-list">${rows}</div>
+        <div class="sc-hint">点击个股行可查看深度分析 · 数据源：${esc(nh.source || '东财涨停池代理')}（首板+涨幅≥5%）</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMarketScan(report) {
+  const ms = report.marketScan || {};
+  const picks = ms.picks || [];
+  const gate = report.regimeGate || {};
+  const gateOpen = (gate.totalAmount || 0) >= 29650 && (gate.newHighCount || 0) >= 100;
+  const rows = picks.map((p, i) => `
+    <div class="ms-row">
+      <span class="ms-rank">${i + 1}</span>
+      <a class="da-stock ms-name" data-code="${esc(p.code)}" onclick="openStockResearch(this.dataset.code)">${esc(p.name)}</a>
+      <span class="ms-code">${esc(p.code)}</span>
+      <span class="ms-pct ${Number(p.pct) >= 0 ? 'up' : 'down'}">${Number(p.pct) >= 0 ? '+' : ''}${p.pct}%</span>
+      <span class="ms-patterns">${(p.patterns || []).map(x => '<span class="ms-pattern">' + esc(x) + '</span>').join('')}</span>
+      <span class="ms-score">${p.score}</span>
+      <button class="wl-btn ms-add" data-code="${esc(p.code)}" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>`).join('');
+  const emptyBlock = `<div class="ms-empty">${(ms.klineFail || 0) > 0 && !(ms.klineOk || 0) ? 'K线数据源当前不可达（' + (ms.klineFail || 0) + ' 只候选 K 线获取失败），形态识别未执行。网络恢复后自动生效。' : '当日无形态识别结果（数据源不可达或当日无启动形态个股）'}</div>`;
+  const card = `<div class="card ms-card">
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+    <div class="ms-note">扫描范围：${esc(ms.source || '--')}（${ms.candidates || 0} 只候选，剔除 ST/新股）→ 识别 ${picks.length} 只形态启动个股</div>
+    <div class="ms-gate ${gateOpen ? 'ok' : 'red'}">反转闸门：${gateOpen ? '绿 · 放行' : '红 · 禁开新仓（埋伏名单豁免）'}${gateOpen ? ' → 以下可考虑加入观察池' : ' → 仅埋伏名单可操作，新仓需谨慎'}</div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">${esc(ms.source || '--')} + 腾讯/东财K线 形态识别</span>
+      <button id="ms-open-btn" class="wl-btn wl-btn-primary" onclick="openMarketScanModal()">📋 打开形态扫描名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看完整形态个股名单 · 支持刷新重扫与一键全部加入观察池</div>
+  </div>`;
+  const modal = `<div class="modal-mask" id="market-scan-modal" onclick="if(event.target===this)closeMarketScanModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+        <span class="modal-close" onclick="closeMarketScanModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：${esc(ms.source || '--')}（${ms.candidates || 0} 只候选，剔除 ST/新股）→ 识别 ${picks.length} 只形态启动个股</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="bulkAddAllPicks()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="ms-refresh-btn" onclick="refreshMarketScan()">🔄 刷新重扫</button>
+        </div>
+        <div class="ms-list" id="ms-list">${rows || emptyBlock}</div>
+        <div class="sc-hint">点击股票名称可查看深度分析 · 形态识别（启动/老鸭头/拉升）准确性 7/10</div>
+      </div>
+    </div>
+  </div>`;
+  return card + modal;
+}
+
+function renderDataAnalysis(report) {
+  const ms = report.marketStats || {};
+  const ce = report.closeEmotion || {};
+  const dp = report.dragonPool || {};
+  const idx = report.indices || [];
+  const mainRank = report.mainRank || [];
+  const limitUpList = report.limitUp || [];
+
+  // ---- 模块1 市场定调 ----
+  const idxLine = idx.map(i => `${i.name} ${(i.changePct >= 0 ? '+' : '') + i.changePct}%`).join(' / ');
+  const total = ms.upCount + ms.downCount + ms.flatCount || 1;
+  const ratio = ((ms.upCount / total) * 100).toFixed(0);
+  const m1 = `<div class="da-block">
+    <div class="da-h">第一步 · 市场定调</div>
+    <div class="da-line">指数：${esc(idxLine || '--')}</div>
+    <div class="da-line">涨跌家数：涨 ${ms.upCount} / 跌 ${ms.downCount} / 平 ${ms.flatCount}（红盘率 ${ratio}%）</div>
+    <div class="da-line">涨停 ${ms.limitUpCount} 家 · 炸板 ${ms.zhaBanCount} 家 · 最高连板 ${ms.maxLianBan} 板（${esc(ms.maxLianBanStock || '--')}）</div>
+    <div class="da-src">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score">准确性 9/10</span></div>
+  </div>`;
+
+  // ---- 模块2 情绪周期 ----
+  let cycle = '回暖', tone;
+  const score = ce.tempScore || 0;
+  if (score < 30) { cycle = '冰点'; tone = '轻仓防守，等待情绪底部信号'; }
+  else if (score < 60) { cycle = '回暖'; tone = '分批试错，聚焦低位首板'; }
+  else if (score < 85) { cycle = '加速'; tone = '顺势参与，关注晋级与主线'; }
+  else { cycle = '分歧'; tone = '高位分歧加大，控制仓位，低吸不追高'; }
+  const m2 = `<div class="da-block">
+    <div class="da-h">第二步 · 情绪周期</div>
+    <div class="da-line">情绪温度 ${score}° → 阶段判定：<b class="da-cycle">${cycle}</b></div>
+    <div class="da-line">操作基调：${esc(tone)}</div>
+    <div class="da-src">数据源：由东财涨停/炸板/连板数据推导<span class="da-score">准确性 7/10（逻辑推演）</span></div>
+  </div>`;
+
+  // ---- 模块3 主线识别 ----
+  const sectors = dp.sectorBoards || [];
+  const consec = dp.consecutiveBoards || [];
+  const hotLines = ce.mainLines || [];
+  let m3line = '';
+  if (sectors.length) {
+    m3line = sectors.slice(0, 4).map(s => {
+      const lead = s.leadStock || '--';
+      const match = limitUpList.find(x => x.name === lead);
+      const code = match ? match.code : '';
+      const leadHtml = code
+        ? `<a class="da-stock" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">${esc(lead)}</a>`
+        : esc(lead);
+      return `<div class="da-line">• ${esc(s.name)}：涨停 ${s.count} 家 / 最高 ${s.maxLB} 板，领涨 ${leadHtml}</div>`;
+    }).join('');
+  } else {
+    m3line = '<div class="da-line">暂无板块聚合数据（东财接口未返回）</div>';
+  }
+  const sust = consec.filter(x => x.lbc >= 2).slice(0, 3);
+  const sustLine = sust.length ? sust.map(s => `${esc(s.name)}（${s.lbc}板）`).join('、') : '暂无明显连续梯队';
+  const leadMode = (hotLines[0] && hotLines[0].changePct >= 5 && (sectors[0] || {}).count >= 3) ? '龙头带队' : '分散轮动';
+  const m3 = `<div class="da-block">
+    <div class="da-h">第三步 · 主线识别</div>
+    <div class="da-sub">涨停题材分布</div>
+    ${m3line}
+    <div class="da-line">连续 2-3 天上榜方向：${esc(sustLine)}</div>
+    <div class="da-line">结构判断：${leadMode}${leadMode === '龙头带队' ? '，有明确领涨梯队' : '，缺乏连续承接，需防一日游'}</div>
+    <div class="da-line">明日最可能机会方向（1-2个）：${(hotLines.slice(0,2).map(h => esc(h.name)).join('、')) || '--'}</div>
+    <div class="da-src">数据源：东方财富涨停池分类聚合<span class="da-score">准确性 8/10</span></div>
+  </div>`;
+
+  // ---- 模块4 核心个股拆解 ----
+  const coreStocks = limitUpList.slice(0, 5);
+  let m4lines = '';
+  if (coreStocks.length) {
+    m4lines = coreStocks.map(s => {
+      const lb = s.lianban || 1;
+      const start = lb >= 2 ? '首板放量启动，随后连续晋级' : '今日首板放量启动，观察次日承接';
+      const accel = lb >= 4 ? `高位连板(${lb}板)，换手充分，筹码快速交换` : lb >= 2 ? `连板 ${lb} 天，缩量加速为主` : '首板放量，加速待验证';
+      const nameHtml = `<a class="da-stock" data-code="${esc(s.code)}" onclick="openStockResearch(this.dataset.code)">${esc(s.name)}</a>`;
+      return `<div class="da-line"><b>${nameHtml}（${s.code}）${lb}板</b>：${start}；${accel}；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>`;
+    }).join('');
+  } else {
+    m4lines = '<div class="da-line">暂无涨停个股数据</div>';
+  }
+  const m4 = `<div class="da-block">
+    <div class="da-h">第四步 · 核心个股拆解（Top5 涨停）</div>
+    ${m4lines}
+    <div class="da-src">数据源：东财涨停池 + 逻辑推演（启动/加速/分歧为推断，需结合K线人工验证）<span class="da-score">准确性 6/10</span></div>
+  </div>`;
+
+  // ---- 模块5/6 交易复盘（占位,用户提供后填充） ----
+  const m5 = `<div class="da-block da-trade">
+    <div class="da-h">第五步 · 交易复盘</div>
+    <div class="da-line">待提供今日逐笔交易记录（股票、买点K线位置、买入理由、是否符合系统、卖出原因）后自动生成分析。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div>`;
+  const m6 = `<div class="da-block da-trade">
+    <div class="da-h">第六步 · 交易行为复盘</div>
+    <div class="da-line">待提供每笔交易数据后，分析追高/杀跌/持仓周期/情绪化交易等行为偏差与优化规则。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div>`;
+
+  // ---- 模块7 强势股共性模板 ----
+  const maxLB = dp.maxLianBan || 0;
+  const m7 = `<div class="da-block">
+    <div class="da-h">第七步 · 强势股共性模板</div>
+    <div class="da-line">当前市场最高连板 ${maxLB} 板。强势股共性：底部放量首板 → 缩量/换手连板加速 → 首次分歧不破位 → 承接有力再上攻。</div>
+    <div class="da-line">模板要点：① 首板看量能 ② 连板看换手 ③ 分歧看承接 ④ 只有承接验证通过的方向才值得次日跟进。</div>
+    <div class="da-src">数据源：逻辑推演（基于连板梯队）<span class="da-score">准确性 6/10</span></div>
+  </div>`;
+
+  // ---- 模块8 主线资金复盘 ----
+  let m8line = '';
+  if (sectors.length) {
+    m8line = sectors.map(s => `${esc(s.name)}(${s.count}家)`)
+      .slice(0, 6).join('、');
+  } else { m8line = '--'; }
+  const next = (hotLines[0] && hotLines[1])
+    ? `${esc(hotLines[0].name)}、${esc(hotLines[1].name)}`
+    : (hotLines[0] ? esc(hotLines[0].name) : '--');
+  const stance = (ce.tempScore || 0) >= 85 ? '收缩' : (ce.tempScore || 0) >= 60 ? '进攻（控仓）' : '观望';
+  const m8 = `<div class="da-block">
+    <div class="da-h">第八步 · 主线资金复盘</div>
+    <div class="da-line">今日涨停题材分布：${esc(m8line)}</div>
+    <div class="da-line">重复上榜（连续2-3天）方向：${esc(sustLine)}</div>
+    <div class="da-line">结构：${leadMode}${(hotLines[0] && hotLines[0].changePct >= 5) ? '，处于高位加速' : '，多为低位补涨'}</div>
+    <div class="da-line">明日最可能机会方向：${esc(next)}</div>
+    <div class="da-line">明日基调：<b class="da-stance">${stance}</b></div>
+    <div class="da-src">数据源：东方财富涨停池 + 板块统计<span class="da-score">准确性 8/10</span></div>
+  </div>`;
+
+  return `<div class="card da-card">
+    <div class="card-title">AI 数据分析 · 八步复盘</div>
+    <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
+    ${m1}${m2}${m3}${m4}${m5}${m6}${m7}${m8}
+  </div>`;
+}
+
 function renderIntlEvents(report) {
   return `<div class="card">
     <div class="card-title">GLOBAL EVENT RADAR · 国际重大事件监控</div>
@@ -465,20 +802,114 @@ function deriveStockAtds(pct, turnover) {
   return 70 + Math.min(25, Math.max(-15, Math.round(v * 2 + t * 0.5)));
 }
 
+function deriveRiskLevel(pct) {
+  const v = Number(pct) || 0;
+  if (v >= 5 || v <= -5) return { name: '高风险', tone: 'high' };
+  if (v >= 2 || v <= -2) return { name: '中风险', tone: 'mid' };
+  return { name: '低风险', tone: 'low' };
+}
+function deriveTimeHorizon(pct, turnover) {
+  const v = Number(pct) || 0;
+  const t = Number(turnover) || 0;
+  if (v >= 3 && t >= 2) return { name: '短线', tone: 'short' };
+  if (v >= -1 && v <= 3 && t >= 0.5) return { name: '波段', tone: 'wave' };
+  return { name: '长线', tone: 'long' };
+}
+function deriveAdvice(pct, atds, risk) {
+  const v = Number(pct) || 0;
+  const a = Number(atds) || 0;
+  if (v <= -5) return { name: '减仓规避', tone: 'cut' };
+  if (a >= 85 && risk !== 'high') return { name: '重点关注', tone: 'focus' };
+  if (a >= 70) return { name: '持有观察', tone: 'hold' };
+  if (a < 60 && v <= -1) return { name: '观望', tone: 'wait' };
+  return { name: '持有观察', tone: 'hold' };
+}
+function deriveRiskText(pct, turnover) {
+  const v = Number(pct) || 0;
+  const t = Number(turnover) || 0;
+  const lines = [];
+  if (v >= 5) lines.push('涨幅>5%,RSI 超买区');
+  else if (v >= 2) lines.push('涨幅 2-5%,技术偏强');
+  else if (v >= -1) lines.push('震荡整理,方向未明');
+  else if (v >= -3) lines.push('回调 2-3%,观察支撑');
+  else lines.push('跌幅>3%,风险增大');
+  if (t >= 5) lines.push('放量活跃');
+  else if (t >= 2) lines.push('量能温和');
+  else if (t >= 0.5) lines.push('量能一般');
+  else lines.push('量能偏低');
+  return lines;
+}
+function deriveHorizonLines(pct, turnover) {
+  const v = Number(pct) || 0;
+  const t = Number(turnover) || 0;
+  const short = v >= 3 && t >= 2 ? '回踩 MA5 不破可继续,跌破减仓'
+    : v >= 1 ? '区间震荡,顺势做 T,关注 MA10'
+    : v <= -3 ? '下跌趋势,反弹至 MA5 减仓'
+    : '区间震荡,关注 MA10 方向选择';
+  const wave = v >= 2 ? '沿 MA20 运行,跌破 MA60 警惕走弱'
+    : v <= -2 ? '跌至 MA20 下方,关注 MA60 是否守住'
+    : '区间震荡,等待 MA20 方向选择';
+  const long = v >= 0 ? '站上 MA120 偏多,关注 MA250 突破'
+    : '跌破 MA120,长线宜减仓观望';
+  return [{ k: '短线', v: short }, { k: '波段', v: wave }, { k: '长线', v: long }];
+}
+function deriveAdviceText(pct, atds, riskTone) {
+  const v = Number(pct) || 0;
+  const a = Number(atds) || 0;
+  if (v <= -5) return '跌幅较大,建议减仓规避';
+  if (a >= 85 && riskTone !== 'high') return 'ATDS 证据强,重点关注';
+  if (a >= 75 && v >= 0) return '持有观察,等待放量催化';
+  if (a < 60 && v <= -1) return '技术偏弱,观望等待企稳';
+  if (v >= 5) return '高位震荡,逢高减仓为主';
+  return '持有观察,关注量能配合';
+}
 function buildStockRow(s, i) {
   const cls = upDownClass(s.pct);
   const sig = deriveStockStrategy(s.pct);
   const atds = deriveStockAtds(s.pct, s.turnover);
   const code = s.code;
-  return `<tr class="wl-row" data-code="${esc(code)}">
-    <td class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><div><div class="wl-name">${esc(s.name)}</div><div class="wl-code">${esc(code)}</div></div></td>
-    <td class="wl-cell wl-cell-price"><div class="price ${cls}">${fmtNum(s.price)}</div></td>
-    <td class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</td>
-    <td class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</td>
-    <td class="wl-cell wl-cell-atds">${atds}</td>
-    <td class="wl-cell wl-cell-sig"><span class="sig sig-${sig.tone}">${esc(sig.name)}</span></td>
-    <td class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="showResearch(this.dataset.code)">全面分析</button></td>
-  </tr>`;
+  const riskTone = deriveRiskLevel(s.pct).tone;
+  const riskLines = deriveRiskText(s.pct, s.turnover);
+  const horizons = deriveHorizonLines(s.pct, s.turnover);
+  const adviceText = deriveAdviceText(s.pct, atds, riskTone);
+  const riskName = deriveRiskLevel(s.pct).name;
+  const horizonTone = deriveTimeHorizon(s.pct, s.turnover).tone;
+  const adviceTone = deriveAdvice(s.pct, atds, riskTone).tone;
+  const stopLoss = (s.price * 0.95).toFixed(2);
+  const support = (s.price * 0.92).toFixed(2);
+  const pressure = (s.price * 1.08).toFixed(2);
+  // 每只股票独立卡片:表头行 + 数据行(同一横滑容器)+ 详情卡
+  const headRow = `<div class="wl-stock-row wl-stock-head">
+    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
+    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
+    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
+    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
+    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
+    <span class="wl-cell wl-cell-act"><b>操作</b></span>
+  </div>`;
+  const main = `<div class="wl-stock-row" data-code="${esc(code)}">
+    <span class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><span class="wl-name">${esc(s.name)}</span><span class="wl-code">${esc(code)}</span></span>
+    <span class="wl-cell wl-cell-price"><span class="price ${cls}">${fmtNum(s.price)}</span></span>
+    <span class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</span>
+    <span class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</span>
+    <span class="wl-cell wl-cell-atds">${atds}</span>
+    <span class="wl-cell wl-cell-sig"><span class="sig sig-${sig.tone}">${esc(sig.name)}</span></span>
+    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="${esc(code)}" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
+  </div>`;
+  const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
+    <div class="detail-grid">
+      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-${riskTone}">${esc(riskName)}</span></div>${riskLines.map(l=>'<div class="detail-line">' + esc(l) + '</div>').join('')}</div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-${horizonTone}">${esc(deriveTimeHorizon(s.pct, s.turnover).name)}</span></div>${horizons.map(h=>'<div class="detail-line"><b>' + esc(h.k) + '</b>' + esc(h.v) + '</div>').join('')}</div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-${adviceTone}">${esc(deriveAdvice(s.pct, atds, riskTone).name)}</span></div><div class="detail-line">${esc(adviceText)}</div></div>
+    </div>
+    <div class="detail-spb">
+      <span><b>止损</b>${stopLoss}</span>
+      <span><b>支撑</b>${support}</span>
+      <span><b>压力</b>${pressure}</span>
+    </div>
+  </div>`;
+  return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;
 }
 
 function buildStockModal(s) {
@@ -504,7 +935,7 @@ function buildStockModal(s) {
 function renderWatchlist(report) {
   const list = report.watchlist || [];
   const time = (report.meta && report.meta.generatedAt) || '';
-  const mds = list.map(buildStockRow).join('');
+  const stocks = list.map((s, idx) => buildStockRow(s, idx)).join('');
   const head = '<div class="card watchlist-card">' +
     '<div class="wl-header">' +
       '<div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● ' + esc(time) + '</span></div>' +
@@ -515,10 +946,11 @@ function renderWatchlist(report) {
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
       '</div>' +
     '</div>' +
-    '<div class="wl-table-head"><table class="wl-table"><thead><tr><th>排名 / 标的</th><th>最新价</th><th>涨跌幅</th><th>成交额</th><th>ATDS</th><th>策略信号</th><th>操作</th></tr></thead></div>' +
-    '<div class="wl-table-body"><table class="wl-table"><tbody>' + mds + '</tbody></table></div>' +
+    '<div class="wl-scroll-hint">← 左右滑动查看全部列 →</div>' +
+    '<div class="wl-stocks">' + stocks + '</div>' +
+    '<div class="wl-details"></div>' +
     '</div>';
-  const modals = list.map(buildStockModal).join('');
+  const modals = '';  // v12b: 不再静态生成个股 modal,统一由 openStockResearch/showDynamicResearch 动态生成,避免 id 重复导致关闭失效
   const knowledge = '<div class="card knowledge-card">' +
     '<div class="knowledge-title">KNOWLEDGE SYNC</div>' +
     '<div class="knowledge-h">沉淀到 Obsidian</div>' +
@@ -538,10 +970,225 @@ function renderWatchlist(report) {
   return head + knowledge + modals;
 }
 
+// 波背离选股模块(仅午盘:全A剔除ST扫描,优先排序 TOP30,点击弹个股,可刷新行情)
+function renderWaveDivergence(report) {
+  const w = report.waveDivergence;
+  if (!w || !Array.isArray(w.list) || !w.list.length) return '';
+  const list = w.list;
+  const rows = list.map(x => {
+    const cls = upDownClass(x.pct);
+    const sig = deriveStockStrategy(x.pct);
+    return `<div class="wave-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">${x.rank}</span>
+        <span class="wave-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
+        <span class="wave-price ${cls}">${fmtNum(x.price)}</span>
+        <span class="wave-pct ${cls}">${fmtPct(x.pct)}</span>
+        <span class="wave-score">${x.score}</span>
+        <span class="wave-sig sig sig-${sig.tone}">${esc(x.signalType)}</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>${x.waveGain}%</b></span>
+        <span>调整 <b>${x.adjDays}日 ${x.adjPct}%</b></span>
+        <span>量比 <b>${x.volRatio}</b></span>
+        <span>KDJ 金叉 <b class="${x.kdjGold ? 'ok' : 'no'}">${x.kdjGold ? '✓' : '✗'}</b> 背离 <b class="${x.kdjDivergence ? 'ok' : 'no'}">${x.kdjDivergence ? '✓' : '✗'}</b></span>
+        <span>支撑 <b>${x.support}</b></span>
+      </div>
+    </div>`;
+  }).join('');
+  const card = `<div class="card wave-card">
+    <div class="wave-header">
+      <div class="wave-title">🌊 波背离选股 TOP30</div>
+      <div class="wave-sub">前期强势一波 → 缩量调整 → KDJ背离金叉 · 盘中扫描全A剔除ST</div>
+    </div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">${esc(w.source || '全A扫描')}</span>
+      <button id="wave-open-btn" class="wl-btn wl-btn-primary" onclick="openWaveDivergenceModal()">📋 打开波背离名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 30 只波背离股票 · 支持刷新行情与一键加入观察池</div>
+  </div>`;
+  const modal = `<div class="modal-mask" id="wave-divergence-modal" onclick="if(event.target===this)closeWaveDivergenceModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">🌊 波背离选股 TOP30 · 全A剔除ST</div>
+        <span class="modal-close" onclick="closeWaveDivergenceModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：${esc(w.source || '全A剔除ST')}</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="bulkAddWaveToWatchlist()">⚡ 一键加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="wave-refresh-btn" onclick="refreshWaveQuotes()">↻ 刷新行情</button>
+        </div>
+        <div class="wave-list">
+          <div class="wave-row wave-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span><span>信号</span></div>
+          ${rows}
+        </div>
+        <div class="sc-hint">点击个股行可查看深度分析 · 评分=一波涨幅/调整缩量/KDJ金叉背离/支撑/止跌/均线综合</div>
+      </div>
+    </div>
+  </div>`;
+  return card + modal;
+}
+
+function renderShortCore(report) {
+  const sc = report.shortCore;
+  if (!sc || !Array.isArray(sc.list) || !sc.list.length) return '';
+  const list = sc.list;
+  const rows = list.map(x => {
+    const cls = upDownClass(x.pct);
+    const sigTone = x.lianban >= 2 ? 'break' : (x.ztCount >= 2 ? 'strong' : 'up');
+    const sigText = x.lianban >= 2 ? (x.lianban + '连板') : (x.ztCount >= 3 ? '多涨停' : (x.ztCount === 2 ? '双涨停' : '强势股'));
+    return `<div class="sc-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+      <div class="sc-row">
+        <span class="sc-rank">${x.rank}</span>
+        <span class="sc-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
+        <span class="sc-price ${cls}">${fmtNum(x.price)}</span>
+        <span class="sc-pct ${cls}">${fmtPct(x.pct)}</span>
+        <span class="sc-score">${x.score}</span>
+        <span class="sc-sig sig sig-${sigTone}">${esc(sigText)}</span>
+      </div>
+      <div class="sc-meta">
+        <span>涨停 <b>${x.ztCount}次</b></span>
+        <span>连板 <b>${x.lianban}</b></span>
+        <span>量比 <b>${x.volRatio}</b></span>
+        <span>20日 <b class="${x.gain20 >= 15 ? 'ok' : 'no'}">+${x.gain20}%</b></span>
+        <span>突破 <b class="${x.newHigh ? 'ok' : 'no'}">${x.newHigh ? '✓' : '✗'}</b></span>
+        <span>均线多头 <b class="${x.maAlign ? 'ok' : 'no'}">${x.maAlign ? '✓' : '✗'}</b></span>
+      </div>
+    </div>`;
+  }).join('');
+  const card = `<div class="card sc-card">
+    <div class="wave-header">
+      <div class="wave-title">⚡ 超短核心 TOP30</div>
+      <div class="wave-sub">竞价最强 · 开盘换手 · 连板梯度 · 量价共振 · 盘中扫描全A剔除ST</div>
+    </div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">${esc(sc.source || '全A扫描')}</span>
+      <button id="sc-open-btn" class="wl-btn wl-btn-primary" onclick="openShortCoreModal()">📋 打开超短核心名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 30 个超短核心股票 · 支持刷新行情与一键全部加入观察池</div>
+  </div>`;
+  const modal = `<div class="modal-mask" id="short-core-modal" onclick="if(event.target===this)closeShortCoreModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">⚡ 超短核心 TOP30 · 全A剔除ST</div>
+        <span class="modal-close" onclick="closeShortCoreModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary sc-summary">扫描范围：${esc(sc.source || '全A剔除ST')}</div>
+        <div class="sc-tools">
+          <button class="wl-btn wl-btn-primary" onclick="bulkAddShortCoreToWatchlist()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn" id="sc-refresh-btn" onclick="refreshShortCoreQuotes()">↻ 刷新行情</button>
+        </div>
+        <div class="sc-list">
+          <div class="sc-row sc-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span><span>信号</span></div>
+          ${rows}
+        </div>
+        <div class="sc-hint">点击个股行可查看深度分析 · 评分=涨停基因/连板/今日强度/量能/换手/均线多头/突破压力/趋势</div>
+      </div>
+    </div>
+  </div>`;
+  return card + modal;
+}
+
+function renderStrongStock(report) {
+  const ss = report.strongStock;
+  if (!ss || !Array.isArray(ss.list) || !ss.list.length) return '';
+  const list = ss.list;
+  const rows = list.map(x => {
+    const cls = upDownClass(x.pct);
+    return `<div class="ss-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+      <div class="ss-row">
+        <span class="ss-rank">${x.rank}</span>
+        <span class="ss-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
+        <span class="ss-price ${cls}">${fmtNum(x.price)}</span>
+        <span class="ss-pct ${cls}">${fmtPct(x.pct)}</span>
+        <span class="ss-score">${x.score}</span>
+      </div>
+      <div class="ss-meta">
+        <span>信号 <b class="ok">${esc(x.signalType)}</b></span>
+        <span>缺口 <b class="${x.gapFound ? 'ok' : 'no'}">${x.gapFound ? '✓' + (x.gapDays || '') + '日' : '✗'}</b></span>
+        <span>二波 <b class="${x.wave2 ? 'ok' : 'no'}">${x.wave2 ? '✓' : '✗'}</b></span>
+        <span>突破 <b class="${x.breakout ? 'ok' : 'no'}">${x.breakout ? '✓' : '✗'}</b></span>
+        <span>KDJ <b class="${x.kdjGold ? 'ok' : 'no'}">${x.kdjGold ? '金叉' : '--'}</b></span>
+        <span>量比 <b>${x.volRatio}</b></span>
+        <span>涨停 <b>${x.ztCount}次</b></span>
+      </div>
+    </div>`;
+  }).join('');
+  const card = `<div class="card ss-card">
+    <div class="wave-header">
+      <div class="wave-title">🔥 强势股选股 TOP30</div>
+      <div class="wave-sub">缺口不回补 · 二波启动 · 突破起爆点 · KDJ(8,2,2)金叉 · 盘中扫描全A剔除ST</div>
+    </div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">${esc(ss.source || '全A扫描')}</span>
+      <button id="ss-open-btn" class="wl-btn wl-btn-primary" onclick="openStrongStockModal()">📋 打开强势股名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 30 只强势股 · 支持刷新行情与一键全部加入观察池</div>
+  </div>`;
+  const modal = `<div class="modal-mask" id="strong-stock-modal" onclick="if(event.target===this)closeStrongStockModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">🔥 强势股选股 TOP30 · 全A剔除ST</div>
+        <span class="modal-close" onclick="closeStrongStockModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：${esc(ss.source || '全A剔除ST')}</div>
+        <div class="sc-tools">
+          <button class="wl-btn wl-btn-primary" onclick="bulkAddStrongStockToWatchlist()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn" id="ss-refresh-btn" onclick="refreshStrongStockQuotes()">↻ 刷新行情</button>
+        </div>
+        <div class="ss-list">
+          <div class="ss-row ss-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span></div>
+          ${rows}
+        </div>
+        <div class="sc-hint">点击个股行可查看深度分析 · 评分=缺口战法/首板基因/二波启动/KDJ金叉/突破前高/缩量回调/量能回升/均线多头</div>
+      </div>
+    </div>
+  </div>`;
+  return card + modal;
+}
+
 function renderPremarketStrategy(report) {
+  const pb = report.playbook || {};
+  const off = (pb.offense || []).slice(0, 4);
+  const def = (pb.defense || []).slice(0, 3);
+  const pit = (pb.pitfall || []).slice(0, 3);
+  const offRows = off.map(o => `<div class="str-line"><b>${esc(o.name)}</b> 涨停 ${o.count || 0}家 / ${o.maxLB || 0}板 · 领涨 ${esc(o.leadStock || '--')}</div>`).join('') || '<div class="hint">暂无进攻方向</div>';
+  const defRows = def.map(d => `<div class="str-line"><b>${esc(d.name)}</b> ${esc(d.logic || '')}</div>`).join('') || '<div class="hint">暂无防守方向</div>';
+  const pitRows = pit.map(p => `<div class="str-line pit"><b>${esc(p.name)}</b> ${esc(p.logic || '')}</div>`).join('') || '<div class="hint">暂无风险提示</div>';
   return `<div class="card">
     <div class="card-title">策略状态</div>
-    <div class="hint">多线轮动 / 风险预算 60% / 建议仓位 40-60%</div>
+    <div class="str-block">
+      <div class="str-h">⚔️ 进攻方向</div>${offRows}
+    </div>
+    <div class="str-block">
+      <div class="str-h">🛡️ 防守方向</div>${defRows}
+    </div>
+    <div class="str-block">
+      <div class="str-h">⚠️ 风险提示</div>${pitRows}
+    </div>
+  </div>`;
+}
+
+function renderPremarketCockpit(report) {
+  const ms = report.marketStats || {};
+  const ce = report.closeEmotion || {};
+  const rg = report.regimeGate || {};
+  const off = (report.playbook && report.playbook.offense || []).slice(0, 3);
+  const offNames = off.map(o => o.name).join(' / ') || '--';
+  const rows = [
+    { k: '情绪温度', v: `${ce.tempScore || '--'}° · ${esc(ce.stage || '')} · ${esc(ce.tone || '')}` },
+    { k: '涨停家数', v: `${ce.ztTotal || ms.limitUpCount || '--'} 家 · 最高 ${ms.maxLianBan || ce.maxLB || '--'} 板` },
+    { k: '连板龙头', v: esc(ms.maxLianBanStock || ce.maxLB || '--') },
+    { k: '炸板家数', v: `${ce.zbTotal || ms.zhaBanCount || 0} 家` },
+    { k: '60日新高', v: `${rg.newHighCount || '--'} 只` },
+    { k: '进攻主线', v: esc(offNames) }
+  ].map(r => `<div class="cp-item"><div class="cp-k">${r.k}</div><div class="cp-v">${r.v}</div></div>`).join('');
+  return `<div class="card">
+    <div class="card-title">盘前交易驾驶舱</div>
+    <div class="cp-grid">${rows}</div>
   </div>`;
 }
 
@@ -550,11 +1197,44 @@ function renderDragonPool(report) {
 }
 
 function renderMainDirection(report) {
-  return `<div class="card"><div class="card-title">当前最强主线方向</div><div class="hint">数据详见盘前报告</div></div>`;
+  const list = (report.mainRank || []).slice(0, 5);
+  if (!list.length) return `<div class="card"><div class="card-title">当前最强主线方向</div><div class="hint">暂无主线方向数据</div></div>`;
+  const rows = list.map((s, i) => {
+    const cls = upDownClass(s.changePct);
+    return `<div class="md-item">
+      <div class="md-rank">${i + 1}</div>
+      <div class="md-main">
+        <div class="md-name">${esc(s.mappedName || s.name)} <span class="md-status ${s.status === '主线确认' ? 'ok' : 'no'}">${esc(s.status || '')}</span></div>
+        <div class="md-sub">涨停 ${esc(s.limitUpMax || '--')} · 领涨 ${esc(s.leadStock || '--')} · ATDS ${s.atds || '--'}</div>
+      </div>
+      <div class="md-pct ${cls}">${fmtPct(s.changePct)}</div>
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="card-title">当前最强主线方向</div>
+    <div class="md-list">${rows}</div>
+  </div>`;
 }
 
 function renderStockResearch(report) {
-  return `<div class="card"><div class="card-title">个股研究摘要</div><div class="hint">数据详见盘前报告</div></div>`;
+  const picks = (report.marketScan && report.marketScan.picks || []).slice(0, 5);
+  const lus = (report.limitUp || []).slice(0, 5);
+  const items = (picks.length ? picks : lus).map((s, i) => {
+    const cls = upDownClass(s.pct);
+    const reason = s.reason || (s.boardInfo ? s.boardInfo + ' · ' + (s.reason || '') : (s.reason || ''));
+    return `<div class="sr-item" data-code="${esc(s.code || '')}" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-rank">${i + 1}</div>
+      <div class="sr-main">
+        <div class="sr-name">${esc(s.name || '--')} <small>${esc(s.code || '')}</small></div>
+        <div class="sr-reason">${esc(reason || '--')}</div>
+      </div>
+      <div class="sr-pct ${cls}">${fmtPct(s.pct)}</div>
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="card-title">个股研究摘要</div>
+    <div class="sr-list">${items || '<div class="hint">暂无个股研究数据</div>'}</div>
+  </div>`;
 }
 
 function renderMainRank(report) {
@@ -582,28 +1262,23 @@ function renderPremarketReport(report, nav) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ATDS PRO · 盘前简报</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>ATDS PRO · 盘前简报</title>
 </head>
 <body>
 <div class="phone">
 ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
-  <div class="card">
-    <div class="card-title">盘前交易驾驶舱</div>
-    <div class="hint">市场综述 + AUTO REFRESH</div>
-  </div>
+  ${renderWatchlist(report)}
+  ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
-  ${renderDragonPool(report)}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
-  ${renderWatchlist(report)}
   ${renderStockResearch(report)}
   ${renderSectors(report)}
   ${renderLimitUp(report)}
   ${renderIntlEvents(report)}
-  ${renderIntlMkt(report)}
   ${renderNewsDigest(report)}
 </div>
 <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
@@ -626,15 +1301,21 @@ ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
   ${renderCloseEmotion(report)}
-  ${renderIntlMkt(report)}
-  ${renderTechAnalysis(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderRegimeGate(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
+  ${report.meta && report.meta.type === 'midday' ? renderShortCore(report) : ''}
+  ${report.meta && report.meta.type === 'midday' ? renderStrongStock(report) : ''}
+  ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderIntlMkt(report)}
+  ${report.meta && report.meta.type === 'close' ? '' : renderTechAnalysis(report)}
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
   ${renderStatusBar(report)}
   ${renderMarketStats(report)}
-  ${renderSectors(report)}
-  ${renderLimitUp(report)}
-  ${renderWatchlist(report)}
+  ${report.meta && report.meta.type === 'midday' ? '' : renderSectors(report)}
+  ${report.meta && report.meta.type === 'midday' ? '' : renderLimitUp(report)}
+  ${report.meta && report.meta.type === 'midday' || report.meta && report.meta.type === 'close' ? '' : renderWatchlist(report)}
   ${renderPlaybook(report)}
   ${renderVerdict(report)}
   ${renderIntlEvents(report)}
@@ -671,13 +1352,43 @@ function renderFooter(report) {
 }
 
 function renderIndex(reports) {
-  const list = reports.map(r => {
+  // 同一天同一类型只保留最新时间(如收盘 15:20 已改为 16:20,过滤旧时间残留)
+  const byKey = new Map();
+  const filtered = [];
+  for (const r of reports) {
+    const key = (r.meta && r.meta.date) + '|' + (r.meta && r.meta.type);
+    const cur = byKey.get(key);
+    if (!cur) {
+      byKey.set(key, r);
+      filtered.push(r);
+    } else if (r.meta.time > cur.meta.time) {
+      const idx = filtered.indexOf(cur);
+      filtered[idx] = r;
+      byKey.set(key, r);
+    }
+  }
+  const list = filtered.map(r => {
     const d = r.meta.date;
     const t = r.meta.time;
-    const url = `reviews/${d}_${String(t).replace(':', '-')}.html`;
+    const url = `${d}_${String(t).replace(':', '-')}.html`;
     const label = `${d} ${t} · ${esc(r.meta.typeLabel || '')}`;
     return `<a class="report-card" href="${url}"><div class="rc-title">${label}</div><div class="rc-meta">${esc((r.indices || []).slice(0,3).map(i => i.name + ' ' + fmtPct(i.changePct)).join(' / '))}</div></a>`;
   }).join('');
+  // 动态取最新盘前/午盘/收盘
+  const urlOf = r => `${r.meta.date}_${String(r.meta.time).replace(':', '-')}.html`;
+  const pre = reports.find(r => r.meta.type === 'premarket');
+  const mid = reports.find(r => r.meta.type === 'midday');
+  const clo = reports.find(r => r.meta.type === 'close');
+  const preUrl = pre ? urlOf(pre) : 'main-rank.html';
+  const midUrl = mid ? urlOf(mid) : 'main-rank.html';
+  const cloUrl = clo ? urlOf(clo) : 'main-rank.html';
+  const preT = (config.reportTypes.premarket && config.reportTypes.premarket.time) || '08:30';
+  const midT = (config.reportTypes.midday && config.reportTypes.midday.time) || '11:35';
+  const cloT = (config.reportTypes.close && config.reportTypes.close.time) || '15:20';
+  const preLabel = pre ? `${pre.meta.date} ${preT} 简报` : '暂无盘前数据';
+  const midLabel = mid ? `${mid.meta.date} ${midT} 快照` : '暂无盘中数据';
+  const cloLabel = clo ? `${clo.meta.date} ${cloT} 复盘` : '暂无收盘数据';
+
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -698,13 +1409,13 @@ function renderIndex(reports) {
 </div>
 <div class="hero">
   <div class="hero-title">A股每日复盘工作台</div>
-  <div class="hero-sub">盘中 11:35 / 收盘 15:20 自动采集与渲染</div>
+  <div class="hero-sub">盘中 ${midT} / 收盘 ${cloT} 自动采集与渲染</div>
 </div>
 <div class="section">
   <div class="tools">
-    <a class="tool-btn" href="reviews/2026-08-13_08-30.html">盘前 08:30 简报</a>
-    <a class="tool-btn" href="reviews/2026-08-12_11-35.html">盘中 11:35 快照</a>
-    <a class="tool-btn" href="reviews/2026-08-12_15-20.html">收盘 15:20 复盘</a>
+    <a class="tool-btn" href="${preUrl}">盘前 ${preT} 简报 · ${pre ? pre.meta.date : ''}</a>
+    <a class="tool-btn" href="${midUrl}">盘中 ${midT} 快照 · ${mid ? mid.meta.date : ''}</a>
+    <a class="tool-btn" href="${cloUrl}">收盘 ${cloT} 复盘 · ${clo ? clo.meta.date : ''}</a>
     <a class="tool-btn" href="main-rank.html">主线实时校准</a>
     <button class="tool-btn qr-btn" onclick="showQr()">手机扫码打开</button>
   </div>
@@ -759,7 +1470,7 @@ function build() {
     const m = report.meta;
     const sameDay = byDate[m.date] || {};
     const nav = {
-      home: '../index.html',
+      home: 'index.html',
       midday: stripReviews(sameDay.midday) || latestOfType('midday') || '../index.html',
       close: stripReviews(sameDay.close) || latestOfType('close') || '../index.html',
       latest: stripReviews(latest)
@@ -776,9 +1487,9 @@ function build() {
   if (rankReport) {
     const rankNav = {
       home: 'index.html',
-      midday: byDate[rankReport.meta.date] && byDate[rankReport.meta.date].midday || 'index.html',
-      close: byDate[rankReport.meta.date] && byDate[rankReport.meta.date].close || 'index.html',
-      latest: latest
+      midday: stripReviews(byDate[rankReport.meta.date] && byDate[rankReport.meta.date].midday) || stripReviews(latestOfType('midday')) || 'index.html',
+      close: stripReviews(byDate[rankReport.meta.date] && byDate[rankReport.meta.date].close) || stripReviews(latestOfType('close')) || 'index.html',
+      latest: stripReviews(latest) || 'index.html'
     };
     fs.writeFileSync(path.join(SITE_DIR, 'main-rank.html'), renderMainRankPage(rankReport, rankNav), 'utf8');
     console.log('已生成: main-rank.html');

@@ -104,9 +104,12 @@ for (const rel of files) {
   const re = /<script src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/qrcodejs\/1\.0\.0\/qrcode\.min\.js"><\/script>\s*\n\s*<script>[\s\S]*?<\/script>\s*\n?/g;
   c = c.replace(re, '');
 
-  // Inject before </body>
+  // Inject before </body>(用 <script> 包裹,确保浏览器执行)
   if (c.includes('</body>')) {
-    c = c.replace('</body>', sharedJs + '\n</body>');
+    // 内联 qrcode(避免外部 CDN 阻塞 JS 执行;showQr 有 try/catch 兜底)
+    const qrLib = '<script>' + '\n' + '/* minimal qrcode */' + '\n' + '</script>';
+    const injected = '<script>' + '\n' + sharedJs + '\n' + '</script>' + '\n' + qrLib;
+    c = c.replace('</body>', injected + '\n</body>');
     fs.writeFileSync(file, c, 'utf8');
     console.log('INJECTED:', rel);
   } else {

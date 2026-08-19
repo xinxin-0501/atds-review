@@ -1,13 +1,66 @@
+# 依赖与本地数据
 node_modules/
 .workbuddy/
-push_batch_*.json
-push_deploy.sh
-files_b*.json
-*.tmp
-PRD_*.md
-push_batch*.json
-slice.js
+
+# 报告构建产物目录(本地测试输出,不推送)
+deploy/
+flat/
+github_pages/
+
+# 根目录脚本副本(正式版在 scripts/)
+/build_report.js
+/cloud_fetch.mjs
+/shared_client.js
+
+# 调试/临时 HTML 页面
+/c1[0-9].html
+/cv[0-9].html
+/chk[0-9].html
+/fin[0-9a-z]*.html
+/finalc.html
+/gh_*.html
+/hidx.html
+/home.html
+/idx.html
+/ok[0-9].html
+/page[0-9].html
+/raw*.html
+/resp_*.html
+/sync_close.html
+/v_index.html
+/v*.html
+/prototype_ATDS_PRO.html
 slices/
-prototype_ATDS_PRO.html
-test_resp*.json
-test_resp*.json
+push_batch*.json
+
+# 调试脚本
+/check_close*.mjs
+/rb3.js
+/rc*.mjs
+/repo_*.js
+/rsc.js
+/slice.js
+
+# 调试数据与日志
+/push_batch*.json
+/repo14.json
+/sina.json
+/*.txt
+/run_logs.zip
+
+# 截图
+/shot*.png
+
+# 部署辅助脚本
+/push_deploy.*
+/upload_to_github.py
+
+# 本地文档
+/README_云端部署.md
+PRD_*.md
+
+# workflow 目录下的临时文本
+.github/workflows/*.txt
+
+# 临时文件
+*.tmp
