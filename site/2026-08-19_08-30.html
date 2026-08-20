@@ -435,6 +435,14 @@
 .str-line{font-size:10px;color:#444;line-height:1.7;background:#fafafa;border-radius:6px;padding:5px 8px;margin-bottom:4px}
 .str-line b{color:#333}
 .str-line.pit b{color:#c33}
+
+/* 交易复盘 / 行为复盘 入口卡 */
+.trade-review-entry{margin-top:12px}
+.trade-review-title{font-size:14px;font-weight:700;color:#111}
+.trade-review-sub{font-size:11px;color:#888;margin-top:4px;line-height:1.6}
+.modal-score-stars.ok{color:#2e7d32}
+.modal-score-stars.mid{color:#e65100}
+.modal-score-stars.no{color:#c62828}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -1978,6 +1986,220 @@ async function refreshAllData(){
   } else {
     alert('已刷新最新行情数据 ✓\n(报告内容由每日定时任务更新,非交易日/收盘后可能仍为最近交易日数据)');
   }
+}
+
+/* ==================== 交易复盘 / 交易行为复盘 (2026-08-20) ==================== */
+function computeTechMetrics(klines){
+  if (!Array.isArray(klines) || klines.length < 20) return null;
+  var closes = klines.map(function(k){ return parseFloat(k[2]); });
+  var vols = klines.map(function(k){ return parseFloat(k[5]) || 0; });
+  var n = closes.length;
+  var sma = function(arr, m){ if (arr.length < m) return null; var s = 0; for (var i = arr.length - m; i < arr.length; i++) s += arr[i]; return s / m; };
+  var ma5 = sma(closes, 5), ma10 = sma(closes, 10), ma20 = sma(closes, 20), ma60 = sma(closes, 60);
+  var last = closes[n - 1];
+  var lastVol = vols[n - 1] || 0;
+  var vol20 = sma(vols, 20) || 0;
+  var pct5 = closes.length >= 6 ? (last / closes[n - 6] - 1) * 100 : 0;
+  var seg = closes.slice(-20);
+  var high20 = Math.max.apply(null, seg), low20 = Math.min.apply(null, seg);
+  var rangePos = high20 > low20 ? (last - low20) / (high20 - low20) * 100 : 50;
+  var amp20 = low20 > 0 ? (high20 - low20) / low20 * 100 : 0;
+  return {
+    last: last, ma5: ma5, ma10: ma10, ma20: ma20, ma60: ma60,
+    bias5: ma5 ? (last - ma5) / ma5 * 100 : null,
+    bias20: ma20 ? (last - ma20) / ma20 * 100 : null,
+    volRatio: vol20 ? lastVol / vol20 : null,
+    pct5: pct5, high20: high20, low20: low20, rangePos: rangePos, amp20: amp20,
+    bullArrange: ma5 && ma10 && ma20 && ma60 ? (ma5 > ma10 && ma10 > ma20 && ma20 > ma60) : false,
+    nearMa20: ma20 ? Math.abs(last - ma20) / ma20 * 100 <= 2 : false
+  };
+}
+function techPosText(t){
+  if (!t) return 'K线数据不足';
+  var p = [];
+  p.push('MA5 ' + (t.ma5 ? (t.last >= t.ma5 ? '上方' : '下方') : '--'));
+  p.push('MA10 ' + (t.ma10 ? (t.last >= t.ma10 ? '上方' : '下方') : '--'));
+  p.push('MA20 ' + (t.ma20 ? (t.last >= t.ma20 ? '上方' : '下方') : '--'));
+  p.push('MA60 ' + (t.ma60 ? (t.last >= t.ma60 ? '上方' : '下方') : '--'));
+  var zone = t.rangePos < 35 ? '低位区间' : (t.rangePos > 70 ? '高位区间' : '中位区间');
+  return p.join(' · ') + '；20日区间位置 ' + Math.round(t.rangePos) + '%（' + zone + '）';
+}
+function scoreSystemFit(t){
+  if (!t) return { score: 0, level: '数据不足', reasons: ['K线数据不足,无法完整评估'] };
+  var score = 0, reasons = [];
+  if (t.bullArrange) { score += 40; reasons.push('均线多头排列(+40)'); }
+  else if (t.ma10 && t.ma20 && t.ma10 > t.ma20) { score += 25; reasons.push('中短期均线向上(+25)'); }
+  else reasons.push('均线尚未多头排列(+0)');
+  if (t.rangePos >= 30 && t.rangePos <= 70) { score += 20; reasons.push('20日区间中段,位置适中(+20)'); }
+  else if (t.rangePos < 30) { score += 15; reasons.push('低位区间,位置偏低(+15)'); }
+  else reasons.push('位置偏高,追高风险(+5)');
+  if (t.volRatio && t.volRatio > 1.2) { score += 20; reasons.push('量能放大配合(+20)'); }
+  else if (t.volRatio && t.volRatio > 0.8) { score += 12; reasons.push('量能温和(+12)'); }
+  else reasons.push('量能不足(+0)');
+  if (t.bias20 != null && Math.abs(t.bias20) <= 8) { score += 20; reasons.push('乖离适中,回踩可控(+20)'); }
+  else if (t.bias20 != null && t.bias20 > 8) reasons.push('乖离过大,短期回吐压力(+5)');
+  else reasons.push('乖离过小,动能待观察(+10)');
+  var level = score >= 80 ? '符合' : (score >= 60 ? '部分符合' : '不符合');
+  return { score: score, level: level, reasons: reasons };
+}
+function genBuyReason(t, data){
+  if (!t) return 'K线数据不足,暂无法给出买点建议。';
+  var r = [];
+  if (t.bullArrange && t.rangePos > 50) r.push('趋势多头向上');
+  if (t.nearMa20) r.push('回踩至20日均线附近,属低吸区间');
+  else if (t.bias20 != null && t.bias20 > 8) r.push('短期乖离偏大,不宜追高,等待回踩');
+  else if (t.rangePos < 35) r.push('处于20日低位区间,具备低位布局条件');
+  if (t.volRatio && t.volRatio > 1.2 && t.pct5 > 0) r.push('量能放大配合上涨');
+  if (t.pct5 > 10) r.push('近5日涨幅已超10%,注意控制节奏');
+  return r.length ? r.join(';') + '。' : '当前量价信号中性,建议等待明确信号再介入。';
+}
+function genSellSignal(t, data){
+  if (!t) return 'K线数据不足,暂无法给出卖出信号。';
+  var r = [];
+  if (t.last < t.ma20) r.push('现价已跌破20日均线,趋势转弱,考虑减仓/止损');
+  if (t.bias20 != null && t.bias20 > 15) r.push('乖离率超15%,短期过热,可分批止盈');
+  if (t.volRatio && t.volRatio > 2 && t.pct5 < 0) r.push('放量下跌,警惕破位风险');
+  if (!r.length) r.push('趋势仍健康,持有观察;跌破20日均线或触及止损位再执行卖出');
+  return r.join(';') + '。';
+}
+function renderTradeReviewResult(data, t){
+  var fit = scoreSystemFit(t);
+  var fitCls = fit.level === '符合' ? 'ok' : (fit.level === '部分符合' ? 'mid' : 'no');
+  return '<div class="modal-section"><div class="modal-section-h">① 股票 <small>实时行情</small></div>' +
+    '<div class="modal-info">' + data.name + '（' + data.code + '）现价 ' + data.price + ' 元，' + (data.pct >= 0 ? '+' : '') + data.pct + '%；成交额 ' + data.amount + '，换手 ' + data.turnover + '%</div></div>' +
+    '<div class="modal-section"><div class="modal-section-h">② 买点K线位置 <small>技术位置</small></div>' +
+    '<div class="modal-card">' + techPosText(t) + '</div></div>' +
+    '<div class="modal-section"><div class="modal-section-h">③ 买入理由 <small>自动生成</small></div>' +
+    '<div class="modal-card">' + genBuyReason(t, data) + '</div></div>' +
+    '<div class="modal-section"><div class="modal-section-h">④ 是否符合系统 <small>ATDS 规则评分</small></div>' +
+    '<div class="modal-score"><div><div class="modal-score-num">' + fit.score + '</div><div class="modal-score-label">系统符合分</div></div>' +
+    '<div style="text-align:right;"><div class="modal-score-stars">' + fit.level + '</div><div class="modal-score-label ' + fitCls + '">' + (fit.score >= 80 ? '可执行' : (fit.score >= 60 ? '谨慎执行' : '暂不参与')) + '</div></div></div>' +
+    '<div class="modal-card">' + fit.reasons.join('；') + '</div></div>' +
+    '<div class="modal-section"><div class="modal-section-h">⑤ 卖出原因 <small>信号提示</small></div>' +
+    '<div class="modal-card">' + genSellSignal(t, data) + '</div></div>' +
+    '<div class="modal-section"><div class="modal-info" style="border-left:2px solid #c33;">仅供复盘参考,不构成投资建议。' + (t ? '' : 'K线获取失败,请检查网络后重试。') + '</div></div>';
+}
+function openTradeReview(){
+  var exists = document.getElementById('trade-review-modal');
+  if (exists) { exists.classList.add('show'); document.body.style.overflow = 'hidden'; return; }
+  var modal = document.createElement('div');
+  modal.className = 'modal-mask'; modal.id = 'trade-review-modal';
+  modal.onclick = function(e){ if (e.target === modal) closeTradeReview(); };
+  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">' +
+    '<div class="modal-header"><div class="modal-eyebrow">📒 交易复盘 · 个股分析</div><span class="modal-close" onclick="closeTradeReview()">×</span></div>' +
+    '<div class="modal-body">' +
+      '<div class="modal-section"><div class="modal-section-h">输入股票代码</div>' +
+        '<div class="modal-input-row"><input id="tr-code-input" class="modal-code-input" placeholder="如 600519" maxlength="6" onkeydown="if(event.key===\'Enter\')runTradeReview()"/><button class="wl-btn wl-btn-primary" onclick="runTradeReview()">开始分析</button></div>' +
+        '<div class="modal-info">自动生成：买点K线位置 / 买入理由 / 系统符合度 / 卖出原因</div>' +
+      '</div><div id="tr-result"></div>' +
+    '</div></div>';
+  document.body.appendChild(modal); modal.classList.add('show'); document.body.style.overflow = 'hidden';
+  setTimeout(function(){ var i = document.getElementById('tr-code-input'); if (i) i.focus(); }, 100);
+}
+function closeTradeReview(){ var m = document.getElementById('trade-review-modal'); if (m) { m.classList.remove('show'); document.body.style.overflow = ''; } }
+async function runTradeReview(){
+  var input = document.getElementById('tr-code-input');
+  var res = document.getElementById('tr-result');
+  if (!input || !res) return;
+  var code = (input.value || '').trim().replace(/\D/g, '');
+  if (!/^\d{6}$/.test(code)) { res.innerHTML = '<div class="modal-info">请输入 6 位股票代码</div>'; return; }
+  res.innerHTML = '<div class="modal-info">⏳ 正在获取行情与K线...</div>';
+  var data = await fetchStockData(code);
+  if (!data) { res.innerHTML = '<div class="modal-info">未找到该股票，请检查代码或网络</div>'; return; }
+  var c0 = code.charAt(0);
+  var full = (c0 === '6' ? 'sh' : (c0 === '4' || c0 === '8' || c0 === '9' ? 'bj' : 'sz')) + code;
+  var kl = await fetchKlineF(full, 70);
+  var t = computeTechMetrics(kl);
+  res.innerHTML = renderTradeReviewResult(data, t);
+}
+function openBehaviorReview(){
+  var exists = document.getElementById('behavior-review-modal');
+  if (exists) { exists.classList.add('show'); document.body.style.overflow = 'hidden'; return; }
+  var modal = document.createElement('div');
+  modal.className = 'modal-mask'; modal.id = 'behavior-review-modal';
+  modal.onclick = function(e){ if (e.target === modal) closeBehaviorReview(); };
+  modal.innerHTML = '<div class="modal" onclick="event.stopPropagation()">' +
+    '<div class="modal-header"><div class="modal-eyebrow">📊 交易行为复盘 · 行为偏差</div><span class="modal-close" onclick="closeBehaviorReview()">×</span></div>' +
+    '<div class="modal-body">' +
+      '<div class="modal-section"><div class="modal-section-h">输入股票与成本价 <small>成本价选填</small></div>' +
+        '<div class="modal-input-row"><input id="br-code-input" class="modal-code-input" placeholder="代码 如 600519" maxlength="6"/>' +
+        '<input id="br-cost-input" class="modal-code-input" style="width:88px" placeholder="成本价 选填" onkeydown="if(event.key===\'Enter\')runBehaviorReview()"/></div>' +
+        '<div style="margin-top:8px;"><button class="wl-btn wl-btn-primary" onclick="runBehaviorReview()">开始行为分析</button></div>' +
+        '<div class="modal-info">自动分析：追高 / 杀跌 / 持仓周期 / 情绪化交易 与优化规则</div>' +
+      '</div><div id="br-result"></div>' +
+    '</div></div>';
+  document.body.appendChild(modal); modal.classList.add('show'); document.body.style.overflow = 'hidden';
+  setTimeout(function(){ var i = document.getElementById('br-code-input'); if (i) i.focus(); }, 100);
+}
+function closeBehaviorReview(){ var m = document.getElementById('behavior-review-modal'); if (m) { m.classList.remove('show'); document.body.style.overflow = ''; } }
+function renderBehaviorResult(data, t, cost){
+  if (!t) return '<div class="modal-info">K线获取失败,请检查网络后重试。</div>';
+  var buyPos = null, loss = null;
+  if (cost && t.high20 > t.low20) buyPos = (cost - t.low20) / (t.high20 - t.low20) * 100;
+  if (cost) loss = (data.price / cost - 1) * 100;
+  // 追高
+  var chaseLevel, chaseTip;
+  var refPos = buyPos != null ? buyPos : t.rangePos;
+  if (refPos > 90) { chaseLevel = '严重追高'; chaseTip = '买入价位于20日区间极高位,风险大'; }
+  else if (refPos > 70) { chaseLevel = '偏高追高'; chaseTip = '买入价位于区间偏高位,注意回调'; }
+  else { chaseLevel = '正常'; chaseTip = '买入位置尚可'; }
+  // 杀跌
+  var killLevel = '无法评估', killTip = '未填成本价,无法评估盈亏与杀跌风险';
+  if (loss != null) {
+    if (loss <= -8) { killLevel = '深套区'; killTip = '当前浮亏约 ' + Math.round(loss) + '%,处于恐慌杀跌高风险区'; }
+    else if (loss <= -3) { killLevel = '浮亏区'; killTip = '当前浮亏约 ' + Math.round(loss) + '%,注意止损纪律'; }
+    else if (loss < 0) { killLevel = '微亏区'; killTip = '当前浮亏约 ' + Math.round(loss) + '%,关注企稳信号'; }
+    else { killLevel = '盈利区'; killTip = '当前盈利约 ' + Math.round(loss) + '%,可执行止盈规则'; }
+  }
+  // 持仓周期
+  var cycle = t.amp20 < 15 ? '波段/趋势' : (t.amp20 > 25 ? '短线为主' : '短线-波段兼顾');
+  var cycleTip = t.amp20 < 15 ? '20日振幅约 ' + Math.round(t.amp20) + '%,波动温和,适合波段持有,不宜频繁进出' :
+    (t.amp20 > 25 ? '20日振幅约 ' + Math.round(t.amp20) + '%,波动剧烈,短线机会多但必须严格止损' : '20日振幅约 ' + Math.round(t.amp20) + '%,中波动态,建议明确周期后按计划执行');
+  // 情绪化特征
+  var emo = [];
+  if (refPos > 85) emo.push('追高特征明显');
+  if (loss != null && loss <= -8) emo.push('深跌中易恐慌割肉');
+  if (t.volRatio && t.volRatio > 1.8 && t.pct5 < 2) emo.push('放量滞涨,情绪化交易迹象');
+  if (t.pct5 > 15) emo.push('近5日涨幅过大,存在情绪化追涨风险');
+  if (!emo.length) emo.push('未见明显情绪化特征,执行纪律较好');
+  // 优化规则
+  var rules = [];
+  if (refPos > 70) rules.push('避免在高位区间追入;等待回调至均线支撑附近再介入');
+  if (loss != null && loss <= -3) rules.push('设定止损位并严格执行,跌破即离场,不因恐慌情绪补仓或清仓');
+  rules.push('明确持仓周期(' + cycle + '),按周期持有,不随意切换策略');
+  rules.push('按 ATDS 系统信号执行,把规则写进交易计划,减少盘中临时决策');
+  var buyPosText = buyPos != null ? '成本价在20日区间位置 ' + Math.round(buyPos) + '%' : '未填成本价,以现价在区间位置 ' + Math.round(t.rangePos) + '% 参照评估';
+  var lossText = loss != null ? '当前盈亏 ' + (loss >= 0 ? '+' : '') + Math.round(loss) + '%' : '未填成本价';
+  return '<div class="modal-section"><div class="modal-section-h">① 追高评估 <small>买入位置</small></div>' +
+    '<div class="modal-card"><b class="' + (refPos > 70 ? 'no' : 'ok') + '">' + chaseLevel + '</b> · ' + buyPosText + '（' + chaseTip + '）</div></div>' +
+    '<div class="modal-section"><div class="modal-section-h">② 杀跌评估 <small>盈亏与风险</small></div>' +
+    '<div class="modal-card"><b>' + killLevel + '</b> · ' + lossText + '（' + killTip + '）</div></div>' +
+    '<div class="modal-section"><div class="modal-section-h">③ 持仓周期匹配 <small>波动结构</small></div>' +
+    '<div class="modal-card">适配周期：<b>' + cycle + '</b> · ' + cycleTip + '</div></div>' +
+    '<div class="modal-section"><div class="modal-section-h">④ 情绪化交易检测</div>' +
+    '<div class="modal-card">' + emo.join('；') + '</div></div>' +
+    '<div class="modal-section"><div class="modal-section-h">⑤ 优化规则 <small>行为改进</small></div>' +
+    '<div class="modal-card">' + rules.map(function(r){ return '· ' + r; }).join('<br>') + '</div></div>' +
+    '<div class="modal-section"><div class="modal-info" style="border-left:2px solid #c33;">仅供行为复盘参考,不构成投资建议。</div></div>';
+}
+async function runBehaviorReview(){
+  var codeInput = document.getElementById('br-code-input');
+  var costInput = document.getElementById('br-cost-input');
+  var res = document.getElementById('br-result');
+  if (!codeInput || !res) return;
+  var code = (codeInput.value || '').trim().replace(/\D/g, '');
+  if (!/^\d{6}$/.test(code)) { res.innerHTML = '<div class="modal-info">请输入 6 位股票代码</div>'; return; }
+  var costRaw = (costInput.value || '').trim();
+  var cost = costRaw ? parseFloat(costRaw) : null;
+  if (costRaw && !(cost > 0)) { res.innerHTML = '<div class="modal-info">成本价格式不正确</div>'; return; }
+  res.innerHTML = '<div class="modal-info">⏳ 正在获取行情与K线...</div>';
+  var data = await fetchStockData(code);
+  if (!data) { res.innerHTML = '<div class="modal-info">未找到该股票,请检查代码或网络</div>'; return; }
+  var c0 = code.charAt(0);
+  var full = (c0 === '6' ? 'sh' : (c0 === '4' || c0 === '8' || c0 === '9' ? 'bj' : 'sz')) + code;
+  var kl = await fetchKlineF(full, 70);
+  var t = computeTechMetrics(kl);
+  res.innerHTML = renderBehaviorResult(data, t, cost);
 }
 </script>
 <script>

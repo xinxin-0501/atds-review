@@ -510,6 +510,22 @@ function renderVerdict(report) {
   '</div>';
 }
 
+// 收盘报告 · 第五步 交易复盘 / 第六步 交易行为复盘 入口卡(前端弹窗交互)
+function renderTradeReviewEntry() {
+  return `<div class="card trade-review-entry">
+    <div class="trade-review-title">📒 第五步 · 交易复盘</div>
+    <div class="trade-review-sub">输入个股代码，自动分析买点K线位置、买入理由、是否符合系统、卖出原因</div>
+    <button class="wl-btn wl-btn-primary" onclick="openTradeReview()" style="margin-top:8px;">✍️ 开始交易复盘</button>
+  </div>`;
+}
+function renderBehaviorReviewEntry() {
+  return `<div class="card trade-review-entry">
+    <div class="trade-review-title">📊 第六步 · 交易行为复盘</div>
+    <div class="trade-review-sub">输入个股与成本价，分析追高、杀跌、持仓周期、情绪化交易等行为偏差与优化规则</div>
+    <button class="wl-btn wl-btn-primary" onclick="openBehaviorReview()" style="margin-top:8px;">🧭 开始行为复盘</button>
+  </div>`;
+}
+
 function renderRegimeGate(report) {
   const gate = report.regimeGate || {};
   const ta = gate.totalAmount || 0;
@@ -1318,6 +1334,8 @@ ${renderHero(report)}
   ${report.meta && report.meta.type === 'midday' || report.meta && report.meta.type === 'close' ? '' : renderWatchlist(report)}
   ${renderPlaybook(report)}
   ${renderVerdict(report)}
+  ${report.meta && report.meta.type === 'close' ? renderTradeReviewEntry() : ''}
+  ${report.meta && report.meta.type === 'close' ? renderBehaviorReviewEntry() : ''}
   ${renderIntlEvents(report)}
   ${renderNewsDigest(report)}
 </div>
