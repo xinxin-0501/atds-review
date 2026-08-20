@@ -1,6 +1,9 @@
 name: ATDS Daily A-share Review
 
 on:
+  # 本地/自动化推送到 main 后立即构建并部署(用仓库已有 json,不重复采集)
+  push:
+    branches: [main]
   # 高频探测:工作日北京 08:00-16:59 每 10 分钟触发一次(UTC 0-8 时),窗口内且报告缺失才真正采集,大幅提高定时可靠性
   schedule:
     - cron: '*/10 0-8 * * 1-5'   # 北京 08:00-16:59 每 10 分钟
@@ -113,7 +116,7 @@ jobs:
           if [ -f "stock_list.json" ]; then cp -f "stock_list.json" "data/stock_list.json"; echo "synced data/stock_list.json"; fi
 
       - name: Fetch market data
-        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && github.event_name != 'push'
         run: node --dns-result-order=ipv4first scripts/cloud_fetch.mjs ${{ steps.type.outputs.type }}
 
       - name: Build report HTML
