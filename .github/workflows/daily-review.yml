@@ -20,6 +20,9 @@ on:
           - premarket
           - midday
           - close
+  # 第三方 cron(cron-job.org 等)每 10 分钟触发,实现不开机也能云端自动更新
+  repository_dispatch:
+    types: [daily-review]
 
 permissions:
   contents: write
@@ -56,12 +59,12 @@ jobs:
           fi
           echo "Type: input=[$INPUT_TYPE] -> ${{ steps.type.outputs.type }}"
 
-      # 高频探测的窗口判断:仅 schedule 触发时生效;手动 Run 不受窗口限制
+      # 高频探测的窗口判断:schedule/repository_dispatch 触发时按窗口判断;手动 Run 与 push 不受窗口限制
       - name: Check time window (skip outside generation windows)
         id: win
         run: |
-          if [ "${{ github.event_name }}" != "schedule" ]; then
-            echo "手动触发,不限制窗口"
+          if [ "${{ github.event_name }}" != "schedule" ] && [ "${{ github.event_name }}" != "repository_dispatch" ]; then
+            echo "手动/推送触发,不限制窗口"
             echo "inwin=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -82,11 +85,11 @@ jobs:
             echo "inwin=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Skip if today's report already exists (schedule only; manual run always re-generates)
+      - name: Skip if today's report already exists (schedule/repository_dispatch; manual run always re-generates)
         id: check
         run: |
-          if [ "${{ github.event_name }}" != "schedule" ]; then
-            echo "手动触发,不跳过"
+          if [ "${{ github.event_name }}" != "schedule" ] && [ "${{ github.event_name }}" != "repository_dispatch" ]; then
+            echo "手动/推送触发,不跳过"
             echo "skip=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
