@@ -22,7 +22,7 @@ on:
           - close
   # 第三方 cron(cron-job.org 等)每 10 分钟触发,实现不开机也能云端自动更新
   repository_dispatch:
-    types: [daily-review]
+    types: [daily-review, trigger-run]
 
 permissions:
   contents: write
