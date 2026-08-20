@@ -1292,10 +1292,6 @@ ${renderHero(report)}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
   ${renderStockResearch(report)}
-  ${renderSectors(report)}
-  ${renderLimitUp(report)}
-  ${renderIntlEvents(report)}
-  ${renderNewsDigest(report)}
 </div>
 <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
 </div>

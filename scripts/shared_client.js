@@ -297,20 +297,30 @@ function downloadMd(){var el=document.getElementById("knowledge-md");if(!el){ale
 function copyMd(){var el=document.getElementById("knowledge-md");if(!el||!navigator.clipboard){alert("复制失败");return;}navigator.clipboard.writeText(el.textContent).then(function(){alert("已复制到剪贴板");});}
 function loadSavedWatchlist(){try{var raw=localStorage.getItem("atds_watchlist");return raw?JSON.parse(raw):[];}catch(e){return [];}}
 function restoreSavedWatchlist(){
-  // 恢复用户加入的自选(如 localStorage 有数据则全量恢复,不再过滤掉非 600392,否则新增股票刷新后会消失)
-  var codes=loadSavedWatchlist();
-  if(!codes.length)return;
+  // 以 localStorage 为准:从未存过(首次访问)才保留后端默认;存过则清空后端静态渲染并按本地数据全量重建
+  // 这样"删除的个股刷新后不恢复、新增的个股不点删除不消失"
+  var raw = null;
+  try { raw = localStorage.getItem('atds_watchlist'); } catch (e) {}
+  if (raw === null) return; // 首次访问,保留后端默认观察池
+  var codes = [];
+  try { codes = JSON.parse(raw) || []; } catch (e) {}
+  var card = document.querySelector('.watchlist-card');
+  if (!card) return; // 无观察池卡片(如午盘隐藏)时不动
+  var stocksWrap = card.querySelector('.wl-stocks');
+  if (stocksWrap) stocksWrap.innerHTML = '';
+  var detailsWrap = card.querySelector('.wl-details');
+  if (detailsWrap) detailsWrap.innerHTML = '';
   (async function(){
     for(var i=0;i<codes.length;i++){
-      var raw=codes[i];
-      if(!/^\d{6}$/.test(raw))continue;
-      var c0=raw.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
+      var rawCode=codes[i];
+      if(!/^\d{6}$/.test(rawCode))continue;
+      var c0=rawCode.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
       try{
-        var res=await fetch("https://qt.gtimg.cn/q="+sc+raw);
+        var res=await fetch("https://qt.gtimg.cn/q="+sc+rawCode);
         var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);
         var m=text.match(/="([^"]+)"/);if(!m)continue;
         var f=m[1].split("~");if(f.length<40)continue;
-        var data={code:raw,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
+        var data={code:rawCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
         if(!data.name)continue;
         addToWatchlistUI(data);
       }catch(e){}
