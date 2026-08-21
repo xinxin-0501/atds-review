@@ -4,7 +4,7 @@
     "time": "11:35",
     "type": "midday",
     "typeLabel": "午盘快照",
-    "generatedAt": "2026-08-21 20:07:40",
+    "generatedAt": "2026-08-21 20:23:43",
     "market": "A股",
     "dataSource": "腾讯行情 + 东方财富公开接口",
     "dataAsOfDate": "2026-08-21",
@@ -546,11 +546,10 @@
         "pct": 6.94,
         "patterns": [
           "启动",
-          "老鸭头",
           "拉升"
         ],
-        "score": 66,
-        "reason": "启动+老鸭头+拉升·量比2.0·5日涨17.2%"
+        "score": 58,
+        "reason": "启动+拉升·量比2.0·5日涨17.2%"
       },
       {
         "code": "601975",
@@ -634,17 +633,6 @@
         "reason": "拉升·量比2.0·5日涨19.2%"
       },
       {
-        "code": "300192",
-        "name": "科德教育",
-        "pct": 6.4,
-        "patterns": [
-          "老鸭头",
-          "拉升"
-        ],
-        "score": 48,
-        "reason": "老鸭头+拉升·量比2.0·5日涨8.8%"
-      },
-      {
         "code": "300546",
         "name": "雄帝科技",
         "pct": 6.77,
@@ -653,6 +641,16 @@
         ],
         "score": 46,
         "reason": "启动·量比2.0·5日涨10.7%"
+      },
+      {
+        "code": "300192",
+        "name": "科德教育",
+        "pct": 6.4,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 40,
+        "reason": "拉升·量比2.0·5日涨8.8%"
       },
       {
         "code": "002132",
@@ -1118,90 +1116,6 @@
       },
       {
         "rank": 5,
-        "code": "600415",
-        "name": "小商品城",
-        "price": 12.48,
-        "pct": -0.79,
-        "amount": "9.0亿",
-        "turnover": 1.32,
-        "score": 85,
-        "waveGain": 31.8,
-        "adjPct": -3,
-        "adjDays": 16,
-        "volRatio": 0.9,
-        "volTrap": 0.75,
-        "kdjGold": true,
-        "kdjDivergence": true,
-        "maAlign": false,
-        "signalType": "横盘强调整",
-        "prevHigh": 12.86,
-        "support": 12.65
-      },
-      {
-        "rank": 6,
-        "code": "600428",
-        "name": "中远海特",
-        "price": 11.83,
-        "pct": 3.05,
-        "amount": "4.9亿",
-        "turnover": 1.96,
-        "score": 85,
-        "waveGain": 20,
-        "adjPct": -2.2,
-        "adjDays": 3,
-        "volRatio": 0.65,
-        "volTrap": 0.54,
-        "kdjGold": false,
-        "kdjDivergence": true,
-        "maAlign": true,
-        "signalType": "横盘强调整",
-        "prevHigh": 12.09,
-        "support": 10.85
-      },
-      {
-        "rank": 7,
-        "code": "600475",
-        "name": "华光环能",
-        "price": 14.98,
-        "pct": 0.54,
-        "amount": "1.3亿",
-        "turnover": 0.95,
-        "score": 85,
-        "waveGain": 29,
-        "adjPct": -6.4,
-        "adjDays": 15,
-        "volRatio": 0.94,
-        "volTrap": 0.58,
-        "kdjGold": true,
-        "kdjDivergence": true,
-        "maAlign": true,
-        "signalType": "回调弱调整",
-        "prevHigh": 16,
-        "support": 14.88
-      },
-      {
-        "rank": 8,
-        "code": "600566",
-        "name": "济川药业",
-        "price": 24.39,
-        "pct": -2.87,
-        "amount": "1.9亿",
-        "turnover": 0.82,
-        "score": 85,
-        "waveGain": 23.8,
-        "adjPct": -11.2,
-        "adjDays": 22,
-        "volRatio": 0.68,
-        "volTrap": 0.5,
-        "kdjGold": true,
-        "kdjDivergence": true,
-        "maAlign": false,
-        "signalType": "回调弱调整",
-        "prevHigh": 27.47,
-        "support": 23.32
-      },
-      {
-        "rank": 9,
         "code": "601318",
         "name": "中国平安",
         "price": 53.35,
@@ -1222,7 +1136,7 @@
         "support": 53.23
       },
       {
-        "rank": 10,
+        "rank": 6,
         "code": "603268",
         "name": "松发股份",
         "price": 182.81,
@@ -1243,28 +1157,7 @@
         "support": 172.87
       },
       {
-        "rank": 11,
-        "code": "603269",
-        "name": "海鸥股份",
-        "price": 17.81,
-        "pct": 1.83,
-        "amount": "3.1亿",
-        "turnover": 3.99,
-        "score": 85,
-        "waveGain": 68.5,
-        "adjPct": -2.2,
-        "adjDays": 3,
-        "volRatio": 0.65,
-        "volTrap": 0.57,
-        "kdjGold": false,
-        "kdjDivergence": true,
-        "maAlign": true,
-        "signalType": "横盘强调整",
-        "prevHigh": 18.21,
-        "support": 17.56
-      },
-      {
-        "rank": 12,
+        "rank": 7,
         "code": "603338",
         "name": "浙江鼎力",
         "price": 53.76,
@@ -1285,7 +1178,7 @@
         "support": 51.67
       },
       {
-        "rank": 13,
+        "rank": 8,
         "code": "603486",
         "name": "科沃斯",
         "price": 61.15,
@@ -1306,7 +1199,7 @@
         "support": 61.9
       },
       {
-        "rank": 14,
+        "rank": 9,
         "code": "603871",
         "name": "嘉友国际",
         "price": 12.72,
@@ -1327,7 +1220,7 @@
         "support": 12.37
       },
       {
-        "rank": 15,
+        "rank": 10,
         "code": "603882",
         "name": "金域医学",
         "price": 31.35,
@@ -1348,7 +1241,7 @@
         "support": 24.62
       },
       {
-        "rank": 16,
+        "rank": 11,
         "code": "605599",
         "name": "菜百股份",
         "price": 16.86,
@@ -1369,7 +1262,7 @@
         "support": 17.07
       },
       {
-        "rank": 17,
+        "rank": 12,
         "code": "002422",
         "name": "科伦药业",
         "price": 44.87,
@@ -1390,7 +1283,7 @@
         "support": 39.16
       },
       {
-        "rank": 18,
+        "rank": 13,
         "code": "002490",
         "name": "山东墨龙",
         "price": 8.16,
@@ -1411,7 +1304,7 @@
         "support": 7.67
       },
       {
-        "rank": 19,
+        "rank": 14,
         "code": "300191",
         "name": "潜能恒信",
         "price": 33.44,
@@ -1432,7 +1325,7 @@
         "support": 28.58
       },
       {
-        "rank": 20,
+        "rank": 15,
         "code": "600409",
         "name": "三友化工",
         "price": 6.71,
@@ -1453,7 +1346,7 @@
         "support": 6.58
       },
       {
-        "rank": 21,
+        "rank": 16,
         "code": "600844",
         "name": "金煤科技",
         "price": 3.53,
@@ -1474,28 +1367,7 @@
         "support": 2.7
       },
       {
-        "rank": 22,
-        "code": "601601",
-        "name": "中国太保",
-        "price": 30.42,
-        "pct": 0.83,
-        "amount": "14.0亿",
-        "turnover": 0.67,
-        "score": 80,
-        "waveGain": 20.5,
-        "adjPct": -7.8,
-        "adjDays": 14,
-        "volRatio": 0.64,
-        "volTrap": 0.47,
-        "kdjGold": true,
-        "kdjDivergence": true,
-        "maAlign": false,
-        "signalType": "回调弱调整",
-        "prevHigh": 32.98,
-        "support": 31.63
-      },
-      {
-        "rank": 23,
+        "rank": 17,
         "code": "601899",
         "name": "XD紫金矿",
         "price": 34.74,
@@ -1503,8 +1375,8 @@
         "amount": "103.4亿",
         "turnover": 1.46,
         "score": 80,
-        "waveGain": 30,
-        "adjPct": -0.8,
+        "waveGain": 29.6,
+        "adjPct": -2,
         "adjDays": 9,
         "volRatio": 0.92,
         "volTrap": 0.62,
@@ -1512,11 +1384,11 @@
         "kdjDivergence": false,
         "maAlign": true,
         "signalType": "横盘强调整",
-        "prevHigh": 35.03,
-        "support": 31.78
+        "prevHigh": 35.45,
+        "support": 32.2
       },
       {
-        "rank": 24,
+        "rank": 18,
         "code": "603556",
         "name": "海兴电力",
         "price": 25.75,
@@ -1537,7 +1409,7 @@
         "support": 24.54
       },
       {
-        "rank": 25,
+        "rank": 19,
         "code": "000608",
         "name": "阳光股份",
         "price": 7.53,
@@ -1558,7 +1430,7 @@
         "support": 6.71
       },
       {
-        "rank": 26,
+        "rank": 20,
         "code": "002953",
         "name": "日丰股份",
         "price": 10.82,
@@ -1579,7 +1451,7 @@
         "support": 9.86
       },
       {
-        "rank": 27,
+        "rank": 21,
         "code": "301129",
         "name": "瑞纳智能",
         "price": 25.55,
@@ -1600,7 +1472,28 @@
         "support": 26.46
       },
       {
-        "rank": 28,
+        "rank": 22,
+        "code": "600428",
+        "name": "中远海特",
+        "price": 11.83,
+        "pct": 3.05,
+        "amount": "4.9亿",
+        "turnover": 1.96,
+        "score": 75,
+        "waveGain": 16.2,
+        "adjPct": -2.2,
+        "adjDays": 3,
+        "volRatio": 0.65,
+        "volTrap": 0.54,
+        "kdjGold": false,
+        "kdjDivergence": true,
+        "maAlign": true,
+        "signalType": "横盘强调整",
+        "prevHigh": 12.09,
+        "support": 11.17
+      },
+      {
+        "rank": 23,
         "code": "600535",
         "name": "天士力",
         "price": 14.97,
@@ -1621,46 +1514,151 @@
         "support": 15.29
       },
       {
-        "rank": 29,
-        "code": "600562",
-        "name": "国睿科技",
-        "price": 26.01,
-        "pct": -0.23,
+        "rank": 24,
+        "code": "600801",
+        "name": "华新建材",
+        "price": 23.18,
+        "pct": 1.8,
         "amount": "2.2亿",
-        "turnover": 0.69,
+        "turnover": 0.73,
         "score": 75,
-        "waveGain": 34.3,
-        "adjPct": -2.8,
-        "adjDays": 9,
-        "volRatio": 0.7,
-        "volTrap": 0.47,
+        "waveGain": 44.3,
+        "adjPct": -4.9,
+        "adjDays": 8,
+        "volRatio": 0.49,
+        "volTrap": 0.35,
         "kdjGold": false,
-        "kdjDivergence": true,
+        "kdjDivergence": false,
         "maAlign": false,
         "signalType": "横盘强调整",
-        "prevHigh": 26.75,
-        "support": 26.75
+        "prevHigh": 24.38,
+        "support": 18.89
       },
       {
-        "rank": 30,
-        "code": "600629",
-        "name": "华建集团",
-        "price": 16.6,
-        "pct": 0.3,
-        "amount": "4.2亿",
-        "turnover": 2.27,
+        "rank": 25,
+        "code": "601156",
+        "name": "东航物流",
+        "price": 18.56,
+        "pct": 1.09,
+        "amount": "1.8亿",
+        "turnover": 1.02,
         "score": 75,
-        "waveGain": 44.2,
-        "adjPct": -2.5,
-        "adjDays": 3,
-        "volRatio": 0.93,
-        "volTrap": 0.58,
+        "waveGain": 20.7,
+        "adjPct": -2,
+        "adjDays": 4,
+        "volRatio": 0.75,
+        "volTrap": 0.52,
         "kdjGold": false,
         "kdjDivergence": true,
         "maAlign": true,
         "signalType": "横盘强调整",
-        "prevHigh": 17.02,
-        "support": 15.57
+        "prevHigh": 18.93,
+        "support": 18.93
+      },
+      {
+        "rank": 26,
+        "code": "601162",
+        "name": "天风证券",
+        "price": 3.61,
+        "pct": 0.28,
+        "amount": "3.0亿",
+        "turnover": 0.98,
+        "score": 75,
+        "waveGain": 28.1,
+        "adjPct": -7.9,
+        "adjDays": 27,
+        "volRatio": 0.56,
+        "volTrap": 0.27,
+        "kdjGold": false,
+        "kdjDivergence": true,
+        "maAlign": false,
+        "signalType": "回调弱调整",
+        "prevHigh": 3.92,
+        "support": 3.71
+      },
+      {
+        "rank": 27,
+        "code": "603132",
+        "name": "XD金徽股",
+        "price": 18.94,
+        "pct": 3.67,
+        "amount": "1.3亿",
+        "turnover": 0.69,
+        "score": 75,
+        "waveGain": 33.6,
+        "adjPct": -1.4,
+        "adjDays": 11,
+        "volRatio": 1.28,
+        "volTrap": 0.85,
+        "kdjGold": false,
+        "kdjDivergence": true,
+        "maAlign": true,
+        "signalType": "横盘强调整",
+        "prevHigh": 19.21,
+        "support": 18.34
+      },
+      {
+        "rank": 28,
+        "code": "603156",
+        "name": "养元饮品",
+        "price": 53.03,
+        "pct": 3.98,
+        "amount": "9.3亿",
+        "turnover": 1.44,
+        "score": 75,
+        "waveGain": 62,
+        "adjPct": -2.8,
+        "adjDays": 2,
+        "volRatio": 1.64,
+        "volTrap": 0.82,
+        "kdjGold": false,
+        "kdjDivergence": true,
+        "maAlign": true,
+        "signalType": "横盘强调整",
+        "prevHigh": 54.57,
+        "support": 42.6
+      },
+      {
+        "rank": 29,
+        "code": "603519",
+        "name": "立霸股份",
+        "price": 16.41,
+        "pct": -0.73,
+        "amount": "3.7亿",
+        "turnover": 8.46,
+        "score": 75,
+        "waveGain": 29,
+        "adjPct": -6.8,
+        "adjDays": 24,
+        "volRatio": 1.03,
+        "volTrap": 0.4,
+        "kdjGold": true,
+        "kdjDivergence": true,
+        "maAlign": true,
+        "signalType": "回调弱调整",
+        "prevHigh": 17.6,
+        "support": 17.6
+      },
+      {
+        "rank": 30,
+        "code": "688296",
+        "name": "和达科技",
+        "price": 26.39,
+        "pct": 0.53,
+        "amount": "1.8亿",
+        "turnover": 6.3,
+        "score": 75,
+        "waveGain": 133.7,
+        "adjPct": -8,
+        "adjDays": 3,
+        "volRatio": 1.47,
+        "volTrap": 1.22,
+        "kdjGold": true,
+        "kdjDivergence": true,
+        "maAlign": true,
+        "signalType": "回调弱调整",
+        "prevHigh": 28.7,
+        "support": 28.7
       }
     ],
     "source": "全A 5004 只剔除ST → 活跃候选 2052 只"
@@ -3526,7 +3524,7 @@
           "p": 43020,
           "zdp": 9.997443199157715,
           "amount": 376032224,
-          "ltsz": 12239687053.080002,
+          "ltsz": 12239687010.060001,
           "tshare": 13506128311.68,
           "hs": 3.1604175567626953,
           "lbc": 1,
@@ -5057,7 +5055,7 @@
           "p": 43020,
           "zdp": 9.997443199157715,
           "amount": 376032224,
-          "ltsz": 12239687053.080002,
+          "ltsz": 12239687010.060001,
           "tshare": 13506128311.68,
           "hs": 3.1604175567626953,
           "lbc": 1,
@@ -6321,7 +6319,7 @@
         "p": 43020,
         "zdp": 9.997443199157715,
         "amount": 376032224,
-        "ltsz": 12239687053.080002,
+        "ltsz": 12239687010.060001,
         "tshare": 13506128311.68,
         "hs": 3.1604175567626953,
         "lbc": 1,
@@ -6880,17 +6878,17 @@
     },
     "hf_CL": {
       "name": "纽约原油",
-      "price": 86.86,
-      "change": 0.03,
-      "changePct": 0.03,
-      "time": "20:07:02"
+      "price": 87.29,
+      "change": 0.53,
+      "changePct": 0.61,
+      "time": "20:24:06"
     },
     "hf_GC": {
       "name": "纽约黄金",
-      "price": 4654.06,
-      "change": 1.81,
-      "changePct": 0.04,
-      "time": "20:07:02"
+      "price": 4641.46,
+      "change": 1.53,
+      "changePct": 0.03,
+      "time": "20:24:10"
     }
   },
   "closeEmotion": {
@@ -6964,21 +6962,21 @@
   "techAnalysis": {
     "399001": {
       "name": "深证成指",
-      "last": 14094.17,
-      "ma5": 14256.774,
-      "ma10": 14291.845000000001,
-      "ma20": 14049.967999999997,
-      "ma60": 14834.770666666669,
-      "ma120": 14743.10933333333,
-      "ma250": 13989.834159999999,
+      "last": 14094.168,
+      "ma5": 14256.7738,
+      "ma10": 14291.844499999997,
+      "ma20": 14049.968050000001,
+      "ma60": 14834.770616666667,
+      "ma120": 14743.109158333335,
+      "ma250": 13989.834032,
       "high60": 16374.02,
-      "low60": 13068.56,
+      "low60": 13068.558,
       "intLevels": [
         14000,
         14000,
         14100
       ],
-      "vol5": 6.307756577999999,
+      "vol5": 630.77565802,
       "supports": [
         {
           "price": 14049.97,
@@ -7002,21 +7000,21 @@
     },
     "399006": {
       "name": "创业板指",
-      "last": 3545.58,
-      "ma5": 3592.0759999999996,
-      "ma10": 3586.1169999999997,
-      "ma20": 3507.5805,
-      "ma60": 3803.970166666666,
-      "ma120": 3675.6640833333336,
-      "ma250": 3382.2414,
-      "high60": 4380.41,
-      "low60": 3158.14,
+      "last": 3545.577,
+      "ma5": 3592.076,
+      "ma10": 3586.1179999999995,
+      "ma20": 3507.58065,
+      "ma60": 3803.970550000001,
+      "ma120": 3675.6640750000015,
+      "ma250": 3382.2415680000017,
+      "high60": 4380.413,
+      "low60": 3158.139,
       "intLevels": [
         3500,
         3500,
         3600
       ],
-      "vol5": 1.8955475480000001,
+      "vol5": 189.554754702,
       "supports": [
         {
           "price": 3507.58,
@@ -7040,21 +7038,21 @@
     },
     "000001": {
       "name": "上证指数",
-      "last": 3905.2,
-      "ma5": 3935.2580000000003,
-      "ma10": 3937.779,
-      "ma20": 3893.2765,
-      "ma60": 3970.3714999999997,
-      "ma120": 4017.096833333336,
-      "ma250": 3979.008000000002,
-      "high60": 4175.35,
+      "last": 3905.203,
+      "ma5": 3935.2608,
+      "ma10": 3937.7807000000003,
+      "ma20": 3893.2779,
+      "ma60": 3970.3721500000006,
+      "ma120": 4017.097166666666,
+      "ma250": 3979.0081079999995,
+      "high60": 4175.348,
       "low60": 3741.11,
       "intLevels": [
         3900,
         4000,
         4000
       ],
-      "vol5": 5.053578698,
+      "vol5": 505.3578698,
       "supports": [
         {
           "price": 3900,
