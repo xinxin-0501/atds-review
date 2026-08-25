@@ -1,0 +1,5032 @@
+{
+  "meta": {
+    "date": "2026-08-25",
+    "time": "08:30",
+    "type": "premarket",
+    "typeLabel": "盘前简报",
+    "generatedAt": "2026-08-25 08:30:40",
+    "market": "A股",
+    "dataSource": "腾讯行情 + 东方财富公开接口",
+    "dataAsOfDate": "2026-08-24",
+    "dataAsOfLabel": "昨日收盘"
+  },
+  "indices": [
+    {
+      "name": "上证指数",
+      "code": "000001",
+      "price": 3882.01,
+      "changePct": -0.59
+    },
+    {
+      "name": "深证成指",
+      "code": "399001",
+      "price": 13794.29,
+      "changePct": -2.13
+    },
+    {
+      "name": "创业板指",
+      "code": "399006",
+      "price": 3431.89,
+      "changePct": -3.21
+    }
+  ],
+  "marketStats": {
+    "upCount": 0,
+    "downCount": 0,
+    "flatCount": 0,
+    "limitUpCount": 46,
+    "limitDownCount": 0,
+    "zhaBanCount": 0,
+    "maxLianBan": 4,
+    "maxLianBanStock": "汉森制药",
+    "totalAmount": "20075亿"
+  },
+  "newHigh": {
+    "count": 36,
+    "total": 46,
+    "source": "东财涨停池代理",
+    "list": [
+      {
+        "code": "000065",
+        "name": "北方国际",
+        "price": 9.98,
+        "pct": 10.03,
+        "lbc": 1,
+        "hybk": "专业工程",
+        "sealWan": 7390,
+        "firstTime": "92500",
+        "lastTime": "135606"
+      },
+      {
+        "code": "000925",
+        "name": "众合科技",
+        "price": 8.97,
+        "pct": 10.06,
+        "lbc": 1,
+        "hybk": "轨交设备",
+        "sealWan": 16908,
+        "firstTime": "92500",
+        "lastTime": "92500"
+      },
+      {
+        "code": "002015",
+        "name": "协鑫能科",
+        "price": 15.57,
+        "pct": 10.04,
+        "lbc": 1,
+        "hybk": "电力",
+        "sealWan": 34819,
+        "firstTime": "92500",
+        "lastTime": "92500"
+      },
+      {
+        "code": "002084",
+        "name": "海鸥住工",
+        "price": 3.95,
+        "pct": 10.03,
+        "lbc": 1,
+        "hybk": "家居用品",
+        "sealWan": 23624,
+        "firstTime": "92500",
+        "lastTime": "92500"
+      },
+      {
+        "code": "002445",
+        "name": "中南文化",
+        "price": 3.37,
+        "pct": 10.13,
+        "lbc": 1,
+        "hybk": "通用设备",
+        "sealWan": 19861,
+        "firstTime": "92500",
+        "lastTime": "92500"
+      },
+      {
+        "code": "002906",
+        "name": "华阳集团",
+        "price": 28.23,
+        "pct": 10.02,
+        "lbc": 1,
+        "hybk": "汽车零部",
+        "sealWan": 32574,
+        "firstTime": "92500",
+        "lastTime": "92500"
+      },
+      {
+        "code": "600604",
+        "name": "市北高新",
+        "price": 4.94,
+        "pct": 10.02,
+        "lbc": 1,
+        "hybk": "房地产开",
+        "sealWan": 6574,
+        "firstTime": "93000",
+        "lastTime": "93000"
+      },
+      {
+        "code": "001268",
+        "name": "联合精密",
+        "price": 22.42,
+        "pct": 10.01,
+        "lbc": 1,
+        "hybk": "家电零部",
+        "sealWan": 4382,
+        "firstTime": "93227",
+        "lastTime": "111324"
+      },
+      {
+        "code": "605286",
+        "name": "同力天启",
+        "price": 27.41,
+        "pct": 9.99,
+        "lbc": 1,
+        "hybk": "专用设备",
+        "sealWan": 13900,
+        "firstTime": "93250",
+        "lastTime": "93308"
+      },
+      {
+        "code": "000620",
+        "name": "盈新发展",
+        "price": 3.47,
+        "pct": 10.16,
+        "lbc": 1,
+        "hybk": "房地产开",
+        "sealWan": 25112,
+        "firstTime": "93357",
+        "lastTime": "94942"
+      },
+      {
+        "code": "603200",
+        "name": "上海洗霸",
+        "price": 39.13,
+        "pct": 10.01,
+        "lbc": 1,
+        "hybk": "环境治理",
+        "sealWan": 4111,
+        "firstTime": "93442",
+        "lastTime": "93442"
+      },
+      {
+        "code": "002277",
+        "name": "友阿股份",
+        "price": 6.44,
+        "pct": 10.09,
+        "lbc": 1,
+        "hybk": "一般零售",
+        "sealWan": 4525,
+        "firstTime": "93506",
+        "lastTime": "144454"
+      },
+      {
+        "code": "600594",
+        "name": "益佰制药",
+        "price": 4.09,
+        "pct": 9.95,
+        "lbc": 1,
+        "hybk": "中药Ⅱ",
+        "sealWan": 3729,
+        "firstTime": "93519",
+        "lastTime": "95922"
+      },
+      {
+        "code": "301152",
+        "name": "天力锂能",
+        "price": 23.32,
+        "pct": 20.02,
+        "lbc": 1,
+        "hybk": "电池",
+        "sealWan": 2487,
+        "firstTime": "93530",
+        "lastTime": "100454"
+      },
+      {
+        "code": "603089",
+        "name": "正裕工业",
+        "price": 10.53,
+        "pct": 10.03,
+        "lbc": 1,
+        "hybk": "汽车零部",
+        "sealWan": 2698,
+        "firstTime": "93613",
+        "lastTime": "93613"
+      },
+      {
+        "code": "600613",
+        "name": "神奇制药",
+        "price": 9.9,
+        "pct": 10,
+        "lbc": 1,
+        "hybk": "化学制药",
+        "sealWan": 9370,
+        "firstTime": "93629",
+        "lastTime": "93844"
+      },
+      {
+        "code": "603032",
+        "name": "德新科技",
+        "price": 20.22,
+        "pct": 10.01,
+        "lbc": 1,
+        "hybk": "电池",
+        "sealWan": 4900,
+        "firstTime": "93710",
+        "lastTime": "93710"
+      },
+      {
+        "code": "002580",
+        "name": "圣阳股份",
+        "price": 21.05,
+        "pct": 9.98,
+        "lbc": 1,
+        "hybk": "电池",
+        "sealWan": 18862,
+        "firstTime": "93733",
+        "lastTime": "94145"
+      },
+      {
+        "code": "002882",
+        "name": "金龙羽",
+        "price": 23.76,
+        "pct": 10,
+        "lbc": 1,
+        "hybk": "电网设备",
+        "sealWan": 2278,
+        "firstTime": "93912",
+        "lastTime": "93912"
+      },
+      {
+        "code": "000723",
+        "name": "美锦能源",
+        "price": 3.89,
+        "pct": 9.89,
+        "lbc": 1,
+        "hybk": "焦炭Ⅱ",
+        "sealWan": 3030,
+        "firstTime": "94003",
+        "lastTime": "94403"
+      },
+      {
+        "code": "002041",
+        "name": "登海种业",
+        "price": 10.19,
+        "pct": 10.04,
+        "lbc": 1,
+        "hybk": "种植业",
+        "sealWan": 10220,
+        "firstTime": "94412",
+        "lastTime": "94412"
+      },
+      {
+        "code": "605198",
+        "name": "安德利",
+        "price": 64.79,
+        "pct": 10,
+        "lbc": 1,
+        "hybk": "农产品加",
+        "sealWan": 5536,
+        "firstTime": "94720",
+        "lastTime": "95129"
+      },
+      {
+        "code": "003035",
+        "name": "南网能源",
+        "price": 5.73,
+        "pct": 9.98,
+        "lbc": 1,
+        "hybk": "电力",
+        "sealWan": 6798,
+        "firstTime": "94806",
+        "lastTime": "110709"
+      },
+      {
+        "code": "603105",
+        "name": "芯能科技",
+        "price": 7.74,
+        "pct": 9.94,
+        "lbc": 1,
+        "hybk": "电力",
+        "sealWan": 6100,
+        "firstTime": "95038",
+        "lastTime": "110356"
+      },
+      {
+        "code": "600508",
+        "name": "上海能源",
+        "price": 9.88,
+        "pct": 10.02,
+        "lbc": 1,
+        "hybk": "煤炭开采",
+        "sealWan": 7428,
+        "firstTime": "95249",
+        "lastTime": "103443"
+      },
+      {
+        "code": "601700",
+        "name": "风范股份",
+        "price": 7.71,
+        "pct": 9.99,
+        "lbc": 1,
+        "hybk": "电网设备",
+        "sealWan": 5032,
+        "firstTime": "95405",
+        "lastTime": "95405"
+      },
+      {
+        "code": "002651",
+        "name": "利君股份",
+        "price": 8.61,
+        "pct": 9.96,
+        "lbc": 1,
+        "hybk": "航空装备",
+        "sealWan": 6923,
+        "firstTime": "95551",
+        "lastTime": "95551"
+      },
+      {
+        "code": "002172",
+        "name": "澳洋健康",
+        "price": 4.44,
+        "pct": 9.9,
+        "lbc": 1,
+        "hybk": "医疗服务",
+        "sealWan": 5896,
+        "firstTime": "100703",
+        "lastTime": "100703"
+      },
+      {
+        "code": "603565",
+        "name": "中谷物流",
+        "price": 13.52,
+        "pct": 10.01,
+        "lbc": 1,
+        "hybk": "航运港口",
+        "sealWan": 7588,
+        "firstTime": "101223",
+        "lastTime": "143841"
+      },
+      {
+        "code": "600367",
+        "name": "红星发展",
+        "price": 38.15,
+        "pct": 10.01,
+        "lbc": 1,
+        "hybk": "化学原料",
+        "sealWan": 9148,
+        "firstTime": "102611",
+        "lastTime": "140305"
+      },
+      {
+        "code": "300313",
+        "name": "天山生物",
+        "price": 15.36,
+        "pct": 20,
+        "lbc": 1,
+        "hybk": "养殖业",
+        "sealWan": 2314,
+        "firstTime": "105842",
+        "lastTime": "105842"
+      },
+      {
+        "code": "601083",
+        "name": "锦江航运",
+        "price": 13.11,
+        "pct": 9.98,
+        "lbc": 1,
+        "hybk": "航运港口",
+        "sealWan": 1705,
+        "firstTime": "130052",
+        "lastTime": "133513"
+      },
+      {
+        "code": "600610",
+        "name": "中毅达",
+        "price": 8.66,
+        "pct": 10.04,
+        "lbc": 1,
+        "hybk": "化学原料",
+        "sealWan": 6472,
+        "firstTime": "131811",
+        "lastTime": "131811"
+      },
+      {
+        "code": "600272",
+        "name": "开开实业",
+        "price": 18.15,
+        "pct": 10,
+        "lbc": 1,
+        "hybk": "医药商业",
+        "sealWan": 1793,
+        "firstTime": "133354",
+        "lastTime": "141527"
+      },
+      {
+        "code": "002052",
+        "name": "同洲电子",
+        "price": 9.08,
+        "pct": 10.06,
+        "lbc": 1,
+        "hybk": "其他电源",
+        "sealWan": 5045,
+        "firstTime": "140503",
+        "lastTime": "140503"
+      },
+      {
+        "code": "600403",
+        "name": "大有能源",
+        "price": 7.3,
+        "pct": 9.94,
+        "lbc": 1,
+        "hybk": "煤炭开采",
+        "sealWan": 10948,
+        "firstTime": "141658",
+        "lastTime": "141658"
+      }
+    ]
+  },
+  "marketScan": {
+    "scanned": 5004,
+    "candidates": 66,
+    "source": "全市场 5004 只 → 精准筛选 66 只(优先排序)",
+    "klineOk": 66,
+    "klineFail": 0,
+    "picks": [
+      {
+        "code": "600250",
+        "name": "南京商旅",
+        "pct": 3.72,
+        "patterns": [
+          "启动",
+          "老鸭头",
+          "拉升"
+        ],
+        "score": 65,
+        "reason": "启动+老鸭头+拉升·量比2.0·5日涨11.6%"
+      },
+      {
+        "code": "601069",
+        "name": "西部黄金",
+        "pct": 6.27,
+        "patterns": [
+          "老鸭头",
+          "拉升"
+        ],
+        "score": 58,
+        "reason": "老鸭头+拉升·量比2.0·5日涨20.0%"
+      },
+      {
+        "code": "301190",
+        "name": "善水科技",
+        "pct": 7.14,
+        "patterns": [
+          "启动",
+          "拉升"
+        ],
+        "score": 58,
+        "reason": "启动+拉升·量比2.0·5日涨15.5%"
+      },
+      {
+        "code": "002614",
+        "name": "奥佳华",
+        "pct": 6.5,
+        "patterns": [
+          "启动",
+          "老鸭头",
+          "拉升"
+        ],
+        "score": 57,
+        "reason": "启动+老鸭头+拉升·量比2.0·5日涨9.1%"
+      },
+      {
+        "code": "000506",
+        "name": "招金黄金",
+        "pct": 7.56,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 50,
+        "reason": "拉升·量比2.0·5日涨25.9%"
+      },
+      {
+        "code": "000628",
+        "name": "高新发展",
+        "pct": 5.31,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 50,
+        "reason": "拉升·量比2.0·5日涨18.7%"
+      },
+      {
+        "code": "603626",
+        "name": "科森科技",
+        "pct": 4.45,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 50,
+        "reason": "拉升·量比2.0·5日涨15.2%"
+      },
+      {
+        "code": "300864",
+        "name": "南大环境",
+        "pct": 6.6,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 50,
+        "reason": "拉升·量比2.0·5日涨31.7%"
+      },
+      {
+        "code": "601011",
+        "name": "宝泰隆",
+        "pct": 4.17,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 50,
+        "reason": "拉升·量比2.0·5日涨12.4%"
+      },
+      {
+        "code": "002274",
+        "name": "华昌化工",
+        "pct": 5.67,
+        "patterns": [
+          "启动",
+          "老鸭头",
+          "拉升"
+        ],
+        "score": 48,
+        "reason": "启动+老鸭头+拉升·量比2.0·5日涨5.9%"
+      },
+      {
+        "code": "300328",
+        "name": "宜安科技",
+        "pct": 6.35,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 46,
+        "reason": "拉升·量比2.0·5日涨10.8%"
+      },
+      {
+        "code": "603123",
+        "name": "翠微股份",
+        "pct": 4.97,
+        "patterns": [
+          "启动"
+        ],
+        "score": 44,
+        "reason": "启动·量比2.0·5日涨10.1%"
+      },
+      {
+        "code": "000426",
+        "name": "兴业银锡",
+        "pct": 3.45,
+        "patterns": [
+          "老鸭头",
+          "拉升"
+        ],
+        "score": 43,
+        "reason": "老鸭头+拉升·量比2.0·5日涨7.1%"
+      },
+      {
+        "code": "300468",
+        "name": "四方精创",
+        "pct": 3.51,
+        "patterns": [
+          "启动"
+        ],
+        "score": 40,
+        "reason": "启动·量比2.0·5日涨8.6%"
+      },
+      {
+        "code": "000020",
+        "name": "深华发Ａ",
+        "pct": 4.77,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 39,
+        "reason": "拉升·量比2.0·5日涨8.4%"
+      },
+      {
+        "code": "300751",
+        "name": "迈为股份",
+        "pct": 4.16,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 38,
+        "reason": "拉升·量比2.0·5日涨7.8%"
+      },
+      {
+        "code": "600313",
+        "name": "农发种业",
+        "pct": 2.31,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 35,
+        "reason": "拉升·量比1.2·5日涨8.0%"
+      },
+      {
+        "code": "300386",
+        "name": "飞天诚信",
+        "pct": 4.72,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 34,
+        "reason": "拉升·量比2.0·5日涨6.8%"
+      },
+      {
+        "code": "601101",
+        "name": "昊华能源",
+        "pct": 6.21,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 33,
+        "reason": "拉升·量比2.0·5日涨6.5%"
+      },
+      {
+        "code": "688315",
+        "name": "诺禾致源",
+        "pct": 6.14,
+        "patterns": [
+          "拉升"
+        ],
+        "score": 31,
+        "reason": "拉升·量比2.0·5日涨5.7%"
+      }
+    ]
+  },
+  "regimeGate": {
+    "totalAmount": 20074.56397338532,
+    "newHighCount": 36,
+    "totalZhengZhang": 46,
+    "newHighSource": "东财涨停池代理"
+  },
+  "hotSectors": [
+    {
+      "rank": 1,
+      "name": "电力",
+      "changePct": 9.99,
+      "limitUpCount": 3,
+      "leadStock": "协鑫能科"
+    },
+    {
+      "rank": 2,
+      "name": "电池",
+      "changePct": 13.34,
+      "limitUpCount": 3,
+      "leadStock": "天力锂能"
+    },
+    {
+      "rank": 3,
+      "name": "化学制药",
+      "changePct": 10.01,
+      "limitUpCount": 2,
+      "leadStock": "中 关 村"
+    },
+    {
+      "rank": 4,
+      "name": "汽车零部",
+      "changePct": 10.02,
+      "limitUpCount": 2,
+      "leadStock": "华阳集团"
+    },
+    {
+      "rank": 5,
+      "name": "一般零售",
+      "changePct": 10.03,
+      "limitUpCount": 2,
+      "leadStock": "新华百货"
+    },
+    {
+      "rank": 6,
+      "name": "房地产开",
+      "changePct": 10.09,
+      "limitUpCount": 2,
+      "leadStock": "市北高新"
+    }
+  ],
+  "limitUp": [
+    {
+      "rank": 1,
+      "code": "000017",
+      "name": "深中华A",
+      "price": 7.82,
+      "pct": 9.99,
+      "lianban": 3,
+      "boardInfo": "3天3板",
+      "reason": "饰品",
+      "sealAmount": "1.81",
+      "kaiban": 0
+    },
+    {
+      "rank": 2,
+      "code": "000065",
+      "name": "北方国际",
+      "price": 9.98,
+      "pct": 10.03,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "专业工程",
+      "sealAmount": "0.74",
+      "kaiban": 6
+    },
+    {
+      "rank": 3,
+      "code": "000925",
+      "name": "众合科技",
+      "price": 8.97,
+      "pct": 10.06,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "轨交设备",
+      "sealAmount": "1.69",
+      "kaiban": 0
+    },
+    {
+      "rank": 4,
+      "code": "000931",
+      "name": "中 关 村",
+      "price": 5.6,
+      "pct": 10.02,
+      "lianban": 3,
+      "boardInfo": "3天3板",
+      "reason": "化学制药",
+      "sealAmount": "0.89",
+      "kaiban": 1
+    },
+    {
+      "rank": 5,
+      "code": "002015",
+      "name": "协鑫能科",
+      "price": 15.57,
+      "pct": 10.04,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "电力",
+      "sealAmount": "3.48",
+      "kaiban": 0
+    },
+    {
+      "rank": 6,
+      "code": "002084",
+      "name": "海鸥住工",
+      "price": 3.95,
+      "pct": 10.03,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "家居用品",
+      "sealAmount": "2.36",
+      "kaiban": 0
+    },
+    {
+      "rank": 7,
+      "code": "002445",
+      "name": "中南文化",
+      "price": 3.37,
+      "pct": 10.13,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "通用设备",
+      "sealAmount": "1.99",
+      "kaiban": 0
+    },
+    {
+      "rank": 8,
+      "code": "002906",
+      "name": "华阳集团",
+      "price": 28.23,
+      "pct": 10.02,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "汽车零部",
+      "sealAmount": "3.26",
+      "kaiban": 0
+    },
+    {
+      "rank": 9,
+      "code": "600785",
+      "name": "新华百货",
+      "price": 10.71,
+      "pct": 9.96,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "一般零售",
+      "sealAmount": "0.74",
+      "kaiban": 1
+    },
+    {
+      "rank": 10,
+      "code": "600604",
+      "name": "市北高新",
+      "price": 4.94,
+      "pct": 10.02,
+      "lianban": 1,
+      "boardInfo": "1天1板",
+      "reason": "房地产开",
+      "sealAmount": "0.66",
+      "kaiban": 0
+    },
+    {
+      "rank": 11,
+      "code": "002412",
+      "name": "汉森制药",
+      "price": 11.21,
+      "pct": 10.01,
+      "lianban": 4,
+      "boardInfo": "4天4板",
+      "reason": "中药Ⅱ",
+      "sealAmount": "2.50",
+      "kaiban": 0
+    },
+    {
+      "rank": 12,
+      "code": "601212",
+      "name": "白银有色",
+      "price": 6.7,
+      "pct": 10.02,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "工业金属",
+      "sealAmount": "3.03",
+      "kaiban": 2
+    },
+    {
+      "rank": 13,
+      "code": "002017",
+      "name": "东信和平",
+      "price": 15.98,
+      "pct": 9.98,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "通信设备",
+      "sealAmount": "0.52",
+      "kaiban": 5
+    },
+    {
+      "rank": 14,
+      "code": "603958",
+      "name": "哈森股份",
+      "price": 22.61,
+      "pct": 10.02,
+      "lianban": 3,
+      "boardInfo": "6天5板",
+      "reason": "服装家纺",
+      "sealAmount": "0.53",
+      "kaiban": 3
+    },
+    {
+      "rank": 15,
+      "code": "003040",
+      "name": "楚天龙",
+      "price": 14.07,
+      "pct": 10.01,
+      "lianban": 2,
+      "boardInfo": "2天2板",
+      "reason": "通信设备",
+      "sealAmount": "0.32",
+      "kaiban": 7
+    }
+  ],
+  "limitDown": [],
+  "watchlist": [
+    {
+      "code": "600487",
+      "name": "亨通光电",
+      "price": 60.43,
+      "pct": -2.81,
+      "amount": "89.5亿",
+      "turnover": "6.04"
+    },
+    {
+      "code": "600392",
+      "name": "盛和资源",
+      "price": 22.84,
+      "pct": 0.48,
+      "amount": "14.2亿",
+      "turnover": "3.53"
+    },
+    {
+      "code": "300285",
+      "name": "国瓷材料",
+      "price": 64.1,
+      "pct": -5.54,
+      "amount": "62.4亿",
+      "turnover": "11.36"
+    },
+    {
+      "code": "300308",
+      "name": "中际旭创",
+      "price": 870.22,
+      "pct": -7.72,
+      "amount": "344.9亿",
+      "turnover": "3.51"
+    },
+    {
+      "code": "603538",
+      "name": "美诺华",
+      "price": 26.4,
+      "pct": -7.4,
+      "amount": "17.5亿",
+      "turnover": "19.65"
+    },
+    {
+      "code": "300342",
+      "name": "天银机电",
+      "price": 31.39,
+      "pct": -2.79,
+      "amount": "5.0亿",
+      "turnover": "3.79"
+    },
+    {
+      "code": "300607",
+      "name": "拓斯达",
+      "price": 33.32,
+      "pct": -6.33,
+      "amount": "10.5亿",
+      "turnover": "9.06"
+    }
+  ],
+  "waveDivergence": null,
+  "shortCore": null,
+  "strongStock": null,
+  "mainRank": [
+    {
+      "name": "中药Ⅱ",
+      "mappedName": "中药Ⅱ",
+      "changePct": 9.98,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 4板",
+      "leadStock": "汉森制药",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 1
+    },
+    {
+      "name": "化学制药",
+      "mappedName": "化学制药",
+      "changePct": 10.01,
+      "upDown": "undefined / undefined",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 3板",
+      "leadStock": "中 关 村",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 2
+    },
+    {
+      "name": "服装家纺",
+      "mappedName": "服装家纺",
+      "changePct": 10.02,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 3板",
+      "leadStock": "哈森股份",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 3
+    },
+    {
+      "name": "饰品",
+      "mappedName": "饰品",
+      "changePct": 9.99,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 3板",
+      "leadStock": "深中华A",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 4
+    },
+    {
+      "name": "一般零售",
+      "mappedName": "一般零售",
+      "changePct": 10.03,
+      "upDown": "undefined / undefined",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 2板",
+      "leadStock": "新华百货",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 5
+    },
+    {
+      "name": "通信设备",
+      "mappedName": "通信设备",
+      "changePct": 10,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 2板",
+      "leadStock": "东信和平",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 6
+    },
+    {
+      "name": "电池",
+      "mappedName": "电池",
+      "changePct": 13.34,
+      "upDown": "undefined / undefined",
+      "inflowYi": 0,
+      "limitUpMax": "3家 / 1板",
+      "leadStock": "天力锂能",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 7
+    },
+    {
+      "name": "电力",
+      "mappedName": "电力",
+      "changePct": 9.99,
+      "upDown": "undefined / undefined",
+      "inflowYi": 0,
+      "limitUpMax": "3家 / 1板",
+      "leadStock": "协鑫能科",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 8
+    },
+    {
+      "name": "工业金属",
+      "mappedName": "工业金属",
+      "changePct": 10.02,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 2板",
+      "leadStock": "白银有色",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 9
+    },
+    {
+      "name": "塑料",
+      "mappedName": "塑料",
+      "changePct": 10.03,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 2板",
+      "leadStock": "天洋新材",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 10
+    },
+    {
+      "name": "贵金属",
+      "mappedName": "贵金属",
+      "changePct": 9.98,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 2板",
+      "leadStock": "湖南白银",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 11
+    },
+    {
+      "name": "汽车零部",
+      "mappedName": "汽车零部",
+      "changePct": 10.02,
+      "upDown": "undefined / undefined",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 1板",
+      "leadStock": "华阳集团",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 12
+    },
+    {
+      "name": "房地产开",
+      "mappedName": "房地产开",
+      "changePct": 10.09,
+      "upDown": "undefined / undefined",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 1板",
+      "leadStock": "市北高新",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 13
+    },
+    {
+      "name": "电网设备",
+      "mappedName": "电网设备",
+      "changePct": 10,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 1板",
+      "leadStock": "金龙羽",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 14
+    },
+    {
+      "name": "航运港口",
+      "mappedName": "航运港口",
+      "changePct": 10,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 1板",
+      "leadStock": "中谷物流",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 15
+    },
+    {
+      "name": "化学原料",
+      "mappedName": "化学原料",
+      "changePct": 10.02,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 1板",
+      "leadStock": "红星发展",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 16
+    },
+    {
+      "name": "煤炭开采",
+      "mappedName": "煤炭开采",
+      "changePct": 9.98,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "2家 / 1板",
+      "leadStock": "上海能源",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 17
+    },
+    {
+      "name": "专业工程",
+      "mappedName": "专业工程",
+      "changePct": 10.03,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "北方国际",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 18
+    },
+    {
+      "name": "轨交设备",
+      "mappedName": "轨交设备",
+      "changePct": 10.06,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "众合科技",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 19
+    },
+    {
+      "name": "家居用品",
+      "mappedName": "家居用品",
+      "changePct": 10.03,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "海鸥住工",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 20
+    },
+    {
+      "name": "通用设备",
+      "mappedName": "通用设备",
+      "changePct": 10.13,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "中南文化",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 21
+    },
+    {
+      "name": "家电零部",
+      "mappedName": "家电零部",
+      "changePct": 10.01,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "联合精密",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 22
+    },
+    {
+      "name": "环境治理",
+      "mappedName": "环境治理",
+      "changePct": 10.01,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "上海洗霸",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 23
+    },
+    {
+      "name": "种植业",
+      "mappedName": "种植业",
+      "changePct": 10.04,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "登海种业",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 24
+    },
+    {
+      "name": "农产品加",
+      "mappedName": "农产品加",
+      "changePct": 10,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "安德利",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 25
+    },
+    {
+      "name": "养殖业",
+      "mappedName": "养殖业",
+      "changePct": 20,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "天山生物",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 26
+    },
+    {
+      "name": "医药商业",
+      "mappedName": "医药商业",
+      "changePct": 10,
+      "upDown": "-- / --",
+      "inflowYi": 0,
+      "limitUpMax": "1家 / 1板",
+      "leadStock": "开开实业",
+      "status": "主线确认",
+      "atds": 96,
+      "newsAdjust": "+1",
+      "rank": 27
+    }
+  ],
+  "dragonPool": {
+    "todayDate": "20260825",
+    "yesterdayDate": "20260824",
+    "todayTotal": 46,
+    "yesterdayTotal": 46,
+    "zhaBanCount": 0,
+    "maxLianBan": 4,
+    "strongestSector": "电力",
+    "strongestSectorCount": 3,
+    "tiers": {
+      "1": [
+        {
+          "c": "000065",
+          "m": 0,
+          "n": "北方国际",
+          "p": 9980,
+          "zdp": 10.033076286315918,
+          "amount": 825797040,
+          "ltsz": 10628885358.54,
+          "tshare": 11591192756.800001,
+          "hs": 7.800812721252441,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 135606,
+          "fund": 73901500,
+          "zbc": 6,
+          "hybk": "专业工程",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "000925",
+          "m": 0,
+          "n": "众合科技",
+          "p": 8970,
+          "zdp": 10.061349868774414,
+          "amount": 105717890,
+          "ltsz": 6020238310.71,
+          "tshare": 6067037608.320001,
+          "hs": 1.7560416460037231,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 169076265,
+          "zbc": 0,
+          "hybk": "轨交设备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "002015",
+          "m": 0,
+          "n": "协鑫能科",
+          "p": 15570,
+          "zdp": 10.035335540771484,
+          "amount": 494260512,
+          "ltsz": 25275164239.98,
+          "tshare": 25275164146.56,
+          "hs": 1.9555184841156006,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 348193467,
+          "zbc": 0,
+          "hybk": "电力",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "002084",
+          "m": 0,
+          "n": "海鸥住工",
+          "p": 3950,
+          "zdp": 10.027854919433594,
+          "amount": 19296785,
+          "ltsz": 2546306045.9,
+          "tshare": 2551921389.6,
+          "hs": 0.7578344941139221,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 236239775,
+          "zbc": 0,
+          "hybk": "家居用品",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "002445",
+          "m": 0,
+          "n": "中南文化",
+          "p": 3370,
+          "zdp": 10.130719184875488,
+          "amount": 16167218,
+          "ltsz": 7974276731.51,
+          "tshare": 8009167396.320001,
+          "hs": 0.20274211466312408,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 198607600,
+          "zbc": 0,
+          "hybk": "通用设备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "002906",
+          "m": 0,
+          "n": "华阳集团",
+          "p": 28230,
+          "zdp": 10.01558780670166,
+          "amount": 62595480,
+          "ltsz": 14812318630.59,
+          "tshare": 14818464499.2,
+          "hs": 0.4225907027721405,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 325742046,
+          "zbc": 0,
+          "hybk": "汽车零部",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "600604",
+          "m": 1,
+          "n": "市北高新",
+          "p": 4940,
+          "zdp": 10.022271156311035,
+          "amount": 139040865,
+          "ltsz": 6952826731.76,
+          "tshare": 9254125712,
+          "hs": 2.000519037246704,
+          "lbc": 1,
+          "fbt": 93000,
+          "lbt": 93000,
+          "fund": 65737143,
+          "zbc": 0,
+          "hybk": "房地产开",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "001268",
+          "m": 0,
+          "n": "联合精密",
+          "p": 22420,
+          "zdp": 10.00981330871582,
+          "amount": 129573980,
+          "ltsz": 2115049373.14,
+          "tshare": 3378753794.1400003,
+          "hs": 6.221759796142578,
+          "lbc": 1,
+          "fbt": 93227,
+          "lbt": 111324,
+          "fund": 43818993,
+          "zbc": 1,
+          "hybk": "家电零部",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "605286",
+          "m": 1,
+          "n": "同力天启",
+          "p": 27410,
+          "zdp": 9.991974830627441,
+          "amount": 123464208,
+          "ltsz": 4604880000,
+          "tshare": 4604880000,
+          "hs": 2.7201833724975586,
+          "lbc": 1,
+          "fbt": 93250,
+          "lbt": 93308,
+          "fund": 139004113,
+          "zbc": 1,
+          "hybk": "专用设备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "000620",
+          "m": 0,
+          "n": "盈新发展",
+          "p": 3470,
+          "zdp": 10.158730506896973,
+          "amount": 1456230544,
+          "ltsz": 16210968388.050001,
+          "tshare": 20375198632.960003,
+          "hs": 9.124317169189453,
+          "lbc": 1,
+          "fbt": 93357,
+          "lbt": 94942,
+          "fund": 251117654,
+          "zbc": 1,
+          "hybk": "房地产开",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "603200",
+          "m": 1,
+          "n": "上海洗霸",
+          "p": 39130,
+          "zdp": 10.008434295654297,
+          "amount": 130284373,
+          "ltsz": 6866536430.39,
+          "tshare": 6866536430.39,
+          "hs": 1.924377679824829,
+          "lbc": 1,
+          "fbt": 93442,
+          "lbt": 93442,
+          "fund": 41106065,
+          "zbc": 0,
+          "hybk": "环境治理",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "002277",
+          "m": 0,
+          "n": "友阿股份",
+          "p": 6440,
+          "zdp": 10.085470199584961,
+          "amount": 530373392,
+          "ltsz": 8978472832,
+          "tshare": 8978472832,
+          "hs": 5.961277961730957,
+          "lbc": 1,
+          "fbt": 93506,
+          "lbt": 144454,
+          "fund": 45251703,
+          "zbc": 5,
+          "hybk": "一般零售",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "600594",
+          "m": 1,
+          "n": "益佰制药",
+          "p": 4090,
+          "zdp": 9.946236610412598,
+          "amount": 209386557,
+          "ltsz": 3208171051,
+          "tshare": 3208171067.3599997,
+          "hs": 6.601603031158447,
+          "lbc": 1,
+          "fbt": 93519,
+          "lbt": 95922,
+          "fund": 37290906,
+          "zbc": 2,
+          "hybk": "中药Ⅱ",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "301152",
+          "m": 0,
+          "n": "天力锂能",
+          "p": 23320,
+          "zdp": 20.020586013793945,
+          "amount": 324645248,
+          "ltsz": 1655235107.24,
+          "tshare": 2769016963.2400002,
+          "hs": 20.0224609375,
+          "lbc": 1,
+          "fbt": 93530,
+          "lbt": 100454,
+          "fund": 24870780,
+          "zbc": 4,
+          "hybk": "电池",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "603089",
+          "m": 1,
+          "n": "正裕工业",
+          "p": 10530,
+          "zdp": 10.031347274780273,
+          "amount": 111102288,
+          "ltsz": 2527550312.04,
+          "tshare": 2903323512.96,
+          "hs": 4.494946002960205,
+          "lbc": 1,
+          "fbt": 93613,
+          "lbt": 93613,
+          "fund": 26984441,
+          "zbc": 0,
+          "hybk": "汽车零部",
+          "zttj": {
+            "days": 7,
+            "ct": 4
+          }
+        },
+        {
+          "c": "600613",
+          "m": 1,
+          "n": "神奇制药",
+          "p": 9900,
+          "zdp": 10,
+          "amount": 937738752,
+          "ltsz": 4745267782.2,
+          "tshare": 5287309156.8,
+          "hs": 20.356971740722656,
+          "lbc": 1,
+          "fbt": 93629,
+          "lbt": 93844,
+          "fund": 93698837,
+          "zbc": 1,
+          "hybk": "化学制药",
+          "zttj": {
+            "days": 8,
+            "ct": 6
+          }
+        },
+        {
+          "c": "603032",
+          "m": 1,
+          "n": "德新科技",
+          "p": 20220,
+          "zdp": 10.010881423950195,
+          "amount": 171616655,
+          "ltsz": 4708865952,
+          "tshare": 4715858028,
+          "hs": 3.7020957469940186,
+          "lbc": 1,
+          "fbt": 93710,
+          "lbt": 93710,
+          "fund": 48995082,
+          "zbc": 0,
+          "hybk": "电池",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "002580",
+          "m": 0,
+          "n": "圣阳股份",
+          "p": 21050,
+          "zdp": 9.979101181030273,
+          "amount": 1205842672,
+          "ltsz": 9521731740,
+          "tshare": 9553942281.6,
+          "hs": 12.827672958374023,
+          "lbc": 1,
+          "fbt": 93733,
+          "lbt": 94145,
+          "fund": 188619367,
+          "zbc": 1,
+          "hybk": "电池",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "002882",
+          "m": 0,
+          "n": "金龙羽",
+          "p": 23760,
+          "zdp": 10,
+          "amount": 332816752,
+          "ltsz": 5868483302.88,
+          "tshare": 10285704000,
+          "hs": 5.773613452911377,
+          "lbc": 1,
+          "fbt": 93912,
+          "lbt": 93912,
+          "fund": 22778712,
+          "zbc": 0,
+          "hybk": "电网设备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "000723",
+          "m": 0,
+          "n": "美锦能源",
+          "p": 3890,
+          "zdp": 9.887005805969238,
+          "amount": 697970720,
+          "ltsz": 17097234803.380001,
+          "tshare": 17129624087.04,
+          "hs": 4.14756965637207,
+          "lbc": 1,
+          "fbt": 94003,
+          "lbt": 94403,
+          "fund": 30298031,
+          "zbc": 1,
+          "hybk": "焦炭Ⅱ",
+          "zttj": {
+            "days": 4,
+            "ct": 2
+          }
+        },
+        {
+          "c": "002041",
+          "m": 0,
+          "n": "登海种业",
+          "p": 10190,
+          "zdp": 10.043196678161621,
+          "amount": 450444064,
+          "ltsz": 8967200000,
+          "tshare": 8967200000,
+          "hs": 5.1568450927734375,
+          "lbc": 1,
+          "fbt": 94412,
+          "lbt": 94412,
+          "fund": 102201624,
+          "zbc": 0,
+          "hybk": "种植业",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "605198",
+          "m": 1,
+          "n": "安德利",
+          "p": 64790,
+          "zdp": 10,
+          "amount": 323766816,
+          "ltsz": 17528027440,
+          "tshare": 21652040520.000004,
+          "hs": 1.8804025650024414,
+          "lbc": 1,
+          "fbt": 94720,
+          "lbt": 95129,
+          "fund": 55363055,
+          "zbc": 1,
+          "hybk": "农产品加",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "003035",
+          "m": 0,
+          "n": "南网能源",
+          "p": 5730,
+          "zdp": 9.980806350708008,
+          "amount": 467651808,
+          "ltsz": 21704545449.510002,
+          "tshare": 21704545432.320004,
+          "hs": 2.1831259727478027,
+          "lbc": 1,
+          "fbt": 94806,
+          "lbt": 110709,
+          "fund": 67983585,
+          "zbc": 3,
+          "hybk": "电力",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "603105",
+          "m": 1,
+          "n": "芯能科技",
+          "p": 7740,
+          "zdp": 9.943181991577148,
+          "amount": 249264831,
+          "ltsz": 3870088042.5,
+          "tshare": 3870088050.2400002,
+          "hs": 6.541827201843262,
+          "lbc": 1,
+          "fbt": 95038,
+          "lbt": 110356,
+          "fund": 60997392,
+          "zbc": 1,
+          "hybk": "电力",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "600508",
+          "m": 1,
+          "n": "上海能源",
+          "p": 9880,
+          "zdp": 10.022271156311035,
+          "amount": 346728224,
+          "ltsz": 9996635376,
+          "tshare": 9996635376,
+          "hs": 3.5398504734039307,
+          "lbc": 1,
+          "fbt": 95249,
+          "lbt": 103443,
+          "fund": 74277237,
+          "zbc": 2,
+          "hybk": "煤炭开采",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "601700",
+          "m": 1,
+          "n": "风范股份",
+          "p": 7710,
+          "zdp": 9.985734939575195,
+          "amount": 1221491328,
+          "ltsz": 8779818783,
+          "tshare": 8779818752.16,
+          "hs": 14.542915344238281,
+          "lbc": 1,
+          "fbt": 95405,
+          "lbt": 95405,
+          "fund": 50322784,
+          "zbc": 0,
+          "hybk": "电网设备",
+          "zttj": {
+            "days": 16,
+            "ct": 9
+          }
+        },
+        {
+          "c": "002651",
+          "m": 0,
+          "n": "利君股份",
+          "p": 8610,
+          "zdp": 9.961685180664062,
+          "amount": 289523776,
+          "ltsz": 4868641949.009999,
+          "tshare": 8898090600,
+          "hs": 6.118129253387451,
+          "lbc": 1,
+          "fbt": 95551,
+          "lbt": 95551,
+          "fund": 69227594,
+          "zbc": 0,
+          "hybk": "航空装备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "002172",
+          "m": 0,
+          "n": "澳洋健康",
+          "p": 4440,
+          "zdp": 9.90099048614502,
+          "amount": 519433216,
+          "ltsz": 3397224841.2000003,
+          "tshare": 3399851713.92,
+          "hs": 16.141847610473633,
+          "lbc": 1,
+          "fbt": 100703,
+          "lbt": 100703,
+          "fund": 58956113,
+          "zbc": 0,
+          "hybk": "医疗服务",
+          "zttj": {
+            "days": 9,
+            "ct": 6
+          }
+        },
+        {
+          "c": "603565",
+          "m": 1,
+          "n": "中谷物流",
+          "p": 13520,
+          "zdp": 10.008136749267578,
+          "amount": 731250400,
+          "ltsz": 28392853152.559998,
+          "tshare": 28392853166.079998,
+          "hs": 2.616997718811035,
+          "lbc": 1,
+          "fbt": 101223,
+          "lbt": 143841,
+          "fund": 75877836,
+          "zbc": 1,
+          "hybk": "航运港口",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "600367",
+          "m": 1,
+          "n": "红星发展",
+          "p": 38150,
+          "zdp": 10.005766868591309,
+          "amount": 2781079056,
+          "ltsz": 12283276893.3,
+          "tshare": 13014143682.4,
+          "hs": 23.49808120727539,
+          "lbc": 1,
+          "fbt": 102611,
+          "lbt": 140305,
+          "fund": 91482212,
+          "zbc": 10,
+          "hybk": "化学原料",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "300313",
+          "m": 0,
+          "n": "天山生物",
+          "p": 15360,
+          "zdp": 20,
+          "amount": 639508496,
+          "ltsz": 3031338839.04,
+          "tshare": 3683005347.8399997,
+          "hs": 23.494287490844727,
+          "lbc": 1,
+          "fbt": 105842,
+          "lbt": 105842,
+          "fund": 23144448,
+          "zbc": 0,
+          "hybk": "养殖业",
+          "zttj": {
+            "days": 6,
+            "ct": 3
+          }
+        },
+        {
+          "c": "601083",
+          "m": 1,
+          "n": "锦江航运",
+          "p": 13110,
+          "zdp": 9.983221054077148,
+          "amount": 563987472,
+          "ltsz": 2544913200,
+          "tshare": 16965913200,
+          "hs": 22.63522720336914,
+          "lbc": 1,
+          "fbt": 130052,
+          "lbt": 133513,
+          "fund": 17050866,
+          "zbc": 1,
+          "hybk": "航运港口",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "600610",
+          "m": 1,
+          "n": "中毅达",
+          "p": 8660,
+          "zdp": 10.038119316101074,
+          "amount": 696790720,
+          "ltsz": 6137573265.3,
+          "tshare": 9277238105.28,
+          "hs": 11.99840259552002,
+          "lbc": 1,
+          "fbt": 131811,
+          "lbt": 131811,
+          "fund": 64715244,
+          "zbc": 0,
+          "hybk": "化学原料",
+          "zttj": {
+            "days": 4,
+            "ct": 2
+          }
+        },
+        {
+          "c": "600272",
+          "m": 1,
+          "n": "开开实业",
+          "p": 18150,
+          "zdp": 10,
+          "amount": 884506560,
+          "ltsz": 2904000000,
+          "tshare": 4767132801.75,
+          "hs": 31.8587646484375,
+          "lbc": 1,
+          "fbt": 133354,
+          "lbt": 141527,
+          "fund": 17932200,
+          "zbc": 4,
+          "hybk": "医药商业",
+          "zttj": {
+            "days": 13,
+            "ct": 7
+          }
+        },
+        {
+          "c": "002052",
+          "m": 0,
+          "n": "同洲电子",
+          "p": 9080,
+          "zdp": 10.060606002807617,
+          "amount": 280641488,
+          "ltsz": 6259635367.4,
+          "tshare": 6832152439.68,
+          "hs": 4.672367572784424,
+          "lbc": 1,
+          "fbt": 140503,
+          "lbt": 140503,
+          "fund": 50446146,
+          "zbc": 0,
+          "hybk": "其他电源",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "600403",
+          "m": 1,
+          "n": "大有能源",
+          "p": 7300,
+          "zdp": 9.939759254455566,
+          "amount": 1039822368,
+          "ltsz": 17452930534.6,
+          "tshare": 17452930520,
+          "hs": 6.199392795562744,
+          "lbc": 1,
+          "fbt": 141658,
+          "lbt": 141658,
+          "fund": 109480676,
+          "zbc": 0,
+          "hybk": "煤炭开采",
+          "zttj": {
+            "days": 4,
+            "ct": 2
+          }
+        }
+      ],
+      "2": [
+        {
+          "c": "600785",
+          "m": 1,
+          "n": "新华百货",
+          "p": 10710,
+          "zdp": 9.958932876586914,
+          "amount": 169637652,
+          "ltsz": 3383115412.32,
+          "tshare": 3383115412.32,
+          "hs": 5.015392780303955,
+          "lbc": 2,
+          "fbt": 92501,
+          "lbt": 93116,
+          "fund": 74140264,
+          "zbc": 1,
+          "hybk": "一般零售",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        },
+        {
+          "c": "601212",
+          "m": 1,
+          "n": "白银有色",
+          "p": 6700,
+          "zdp": 10.016420364379883,
+          "amount": 1457887760,
+          "ltsz": 49611989223.700005,
+          "tshare": 49611988480,
+          "hs": 2.9518795013427734,
+          "lbc": 2,
+          "fbt": 93045,
+          "lbt": 93618,
+          "fund": 303296109,
+          "zbc": 2,
+          "hybk": "工业金属",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        },
+        {
+          "c": "002017",
+          "m": 0,
+          "n": "东信和平",
+          "p": 15980,
+          "zdp": 9.979352951049805,
+          "amount": 684374144,
+          "ltsz": 9271154776.22,
+          "tshare": 9275301825.92,
+          "hs": 7.44802713394165,
+          "lbc": 2,
+          "fbt": 93100,
+          "lbt": 94518,
+          "fund": 51929742,
+          "zbc": 5,
+          "hybk": "通信设备",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        },
+        {
+          "c": "003040",
+          "m": 0,
+          "n": "楚天龙",
+          "p": 14070,
+          "zdp": 10.007819175720215,
+          "amount": 700507536,
+          "ltsz": 6427883130.06,
+          "tshare": 6488183069.76,
+          "hs": 11.153006553649902,
+          "lbc": 2,
+          "fbt": 93157,
+          "lbt": 102654,
+          "fund": 32440579,
+          "zbc": 7,
+          "hybk": "通信设备",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        },
+        {
+          "c": "603330",
+          "m": 1,
+          "n": "天洋新材",
+          "p": 10970,
+          "zdp": 10.03009033203125,
+          "amount": 1233974096,
+          "ltsz": 4461644133.1,
+          "tshare": 4746429918.56,
+          "hs": 28.748992919921875,
+          "lbc": 2,
+          "fbt": 100452,
+          "lbt": 110922,
+          "fund": 49273510,
+          "zbc": 7,
+          "hybk": "塑料",
+          "zttj": {
+            "days": 9,
+            "ct": 6
+          }
+        },
+        {
+          "c": "002716",
+          "m": 0,
+          "n": "湖南白银",
+          "p": 11460,
+          "zdp": 9.980806350708008,
+          "amount": 6608849664,
+          "ltsz": 26615571224.04,
+          "tshare": 32352595814.4,
+          "hs": 25.329517364501953,
+          "lbc": 2,
+          "fbt": 101430,
+          "lbt": 145018,
+          "fund": 156651576,
+          "zbc": 2,
+          "hybk": "贵金属",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        }
+      ],
+      "3": [
+        {
+          "c": "000017",
+          "m": 0,
+          "n": "深中华A",
+          "p": 7820,
+          "zdp": 9.98593521118164,
+          "amount": 69120996,
+          "ltsz": 3447227656.82,
+          "tshare": 5389426136.96,
+          "hs": 2.0051183700561523,
+          "lbc": 3,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 180589590,
+          "zbc": 0,
+          "hybk": "饰品",
+          "zttj": {
+            "days": 3,
+            "ct": 3
+          }
+        },
+        {
+          "c": "000931",
+          "m": 0,
+          "n": "中 关 村",
+          "p": 5600,
+          "zdp": 10.019646644592285,
+          "amount": 616654400,
+          "ltsz": 4205765379.2,
+          "tshare": 4217511065.6,
+          "hs": 14.989714622497559,
+          "lbc": 3,
+          "fbt": 92500,
+          "lbt": 143957,
+          "fund": 89005666,
+          "zbc": 1,
+          "hybk": "化学制药",
+          "zttj": {
+            "days": 3,
+            "ct": 3
+          }
+        },
+        {
+          "c": "603958",
+          "m": 1,
+          "n": "哈森股份",
+          "p": 22610,
+          "zdp": 10.024331092834473,
+          "amount": 965030064,
+          "ltsz": 4959729600,
+          "tshare": 4959729600,
+          "hs": 19.913835525512695,
+          "lbc": 3,
+          "fbt": 93138,
+          "lbt": 142646,
+          "fund": 52624775,
+          "zbc": 3,
+          "hybk": "服装家纺",
+          "zttj": {
+            "days": 6,
+            "ct": 5
+          }
+        }
+      ],
+      "4": [
+        {
+          "c": "002412",
+          "m": 0,
+          "n": "汉森制药",
+          "p": 11210,
+          "zdp": 10.00981330871582,
+          "amount": 403946816,
+          "ltsz": 5580842450,
+          "tshare": 5640872000,
+          "hs": 7.332803249359131,
+          "lbc": 4,
+          "fbt": 93006,
+          "lbt": 93006,
+          "fund": 249630535,
+          "zbc": 0,
+          "hybk": "中药Ⅱ",
+          "zttj": {
+            "days": 4,
+            "ct": 4
+          }
+        }
+      ]
+    },
+    "sectors": {
+      "饰品": [
+        {
+          "c": "000017",
+          "m": 0,
+          "n": "深中华A",
+          "p": 7820,
+          "zdp": 9.98593521118164,
+          "amount": 69120996,
+          "ltsz": 3447227656.82,
+          "tshare": 5389426136.96,
+          "hs": 2.0051183700561523,
+          "lbc": 3,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 180589590,
+          "zbc": 0,
+          "hybk": "饰品",
+          "zttj": {
+            "days": 3,
+            "ct": 3
+          }
+        }
+      ],
+      "专业工程": [
+        {
+          "c": "000065",
+          "m": 0,
+          "n": "北方国际",
+          "p": 9980,
+          "zdp": 10.033076286315918,
+          "amount": 825797040,
+          "ltsz": 10628885358.54,
+          "tshare": 11591192756.800001,
+          "hs": 7.800812721252441,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 135606,
+          "fund": 73901500,
+          "zbc": 6,
+          "hybk": "专业工程",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "轨交设备": [
+        {
+          "c": "000925",
+          "m": 0,
+          "n": "众合科技",
+          "p": 8970,
+          "zdp": 10.061349868774414,
+          "amount": 105717890,
+          "ltsz": 6020238310.71,
+          "tshare": 6067037608.320001,
+          "hs": 1.7560416460037231,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 169076265,
+          "zbc": 0,
+          "hybk": "轨交设备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "化学制药": [
+        {
+          "c": "000931",
+          "m": 0,
+          "n": "中 关 村",
+          "p": 5600,
+          "zdp": 10.019646644592285,
+          "amount": 616654400,
+          "ltsz": 4205765379.2,
+          "tshare": 4217511065.6,
+          "hs": 14.989714622497559,
+          "lbc": 3,
+          "fbt": 92500,
+          "lbt": 143957,
+          "fund": 89005666,
+          "zbc": 1,
+          "hybk": "化学制药",
+          "zttj": {
+            "days": 3,
+            "ct": 3
+          }
+        },
+        {
+          "c": "600613",
+          "m": 1,
+          "n": "神奇制药",
+          "p": 9900,
+          "zdp": 10,
+          "amount": 937738752,
+          "ltsz": 4745267782.2,
+          "tshare": 5287309156.8,
+          "hs": 20.356971740722656,
+          "lbc": 1,
+          "fbt": 93629,
+          "lbt": 93844,
+          "fund": 93698837,
+          "zbc": 1,
+          "hybk": "化学制药",
+          "zttj": {
+            "days": 8,
+            "ct": 6
+          }
+        }
+      ],
+      "电力": [
+        {
+          "c": "002015",
+          "m": 0,
+          "n": "协鑫能科",
+          "p": 15570,
+          "zdp": 10.035335540771484,
+          "amount": 494260512,
+          "ltsz": 25275164239.98,
+          "tshare": 25275164146.56,
+          "hs": 1.9555184841156006,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 348193467,
+          "zbc": 0,
+          "hybk": "电力",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "003035",
+          "m": 0,
+          "n": "南网能源",
+          "p": 5730,
+          "zdp": 9.980806350708008,
+          "amount": 467651808,
+          "ltsz": 21704545449.510002,
+          "tshare": 21704545432.320004,
+          "hs": 2.1831259727478027,
+          "lbc": 1,
+          "fbt": 94806,
+          "lbt": 110709,
+          "fund": 67983585,
+          "zbc": 3,
+          "hybk": "电力",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "603105",
+          "m": 1,
+          "n": "芯能科技",
+          "p": 7740,
+          "zdp": 9.943181991577148,
+          "amount": 249264831,
+          "ltsz": 3870088042.5,
+          "tshare": 3870088050.2400002,
+          "hs": 6.541827201843262,
+          "lbc": 1,
+          "fbt": 95038,
+          "lbt": 110356,
+          "fund": 60997392,
+          "zbc": 1,
+          "hybk": "电力",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "家居用品": [
+        {
+          "c": "002084",
+          "m": 0,
+          "n": "海鸥住工",
+          "p": 3950,
+          "zdp": 10.027854919433594,
+          "amount": 19296785,
+          "ltsz": 2546306045.9,
+          "tshare": 2551921389.6,
+          "hs": 0.7578344941139221,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 236239775,
+          "zbc": 0,
+          "hybk": "家居用品",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "通用设备": [
+        {
+          "c": "002445",
+          "m": 0,
+          "n": "中南文化",
+          "p": 3370,
+          "zdp": 10.130719184875488,
+          "amount": 16167218,
+          "ltsz": 7974276731.51,
+          "tshare": 8009167396.320001,
+          "hs": 0.20274211466312408,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 198607600,
+          "zbc": 0,
+          "hybk": "通用设备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "汽车零部": [
+        {
+          "c": "002906",
+          "m": 0,
+          "n": "华阳集团",
+          "p": 28230,
+          "zdp": 10.01558780670166,
+          "amount": 62595480,
+          "ltsz": 14812318630.59,
+          "tshare": 14818464499.2,
+          "hs": 0.4225907027721405,
+          "lbc": 1,
+          "fbt": 92500,
+          "lbt": 92500,
+          "fund": 325742046,
+          "zbc": 0,
+          "hybk": "汽车零部",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "603089",
+          "m": 1,
+          "n": "正裕工业",
+          "p": 10530,
+          "zdp": 10.031347274780273,
+          "amount": 111102288,
+          "ltsz": 2527550312.04,
+          "tshare": 2903323512.96,
+          "hs": 4.494946002960205,
+          "lbc": 1,
+          "fbt": 93613,
+          "lbt": 93613,
+          "fund": 26984441,
+          "zbc": 0,
+          "hybk": "汽车零部",
+          "zttj": {
+            "days": 7,
+            "ct": 4
+          }
+        }
+      ],
+      "一般零售": [
+        {
+          "c": "600785",
+          "m": 1,
+          "n": "新华百货",
+          "p": 10710,
+          "zdp": 9.958932876586914,
+          "amount": 169637652,
+          "ltsz": 3383115412.32,
+          "tshare": 3383115412.32,
+          "hs": 5.015392780303955,
+          "lbc": 2,
+          "fbt": 92501,
+          "lbt": 93116,
+          "fund": 74140264,
+          "zbc": 1,
+          "hybk": "一般零售",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        },
+        {
+          "c": "002277",
+          "m": 0,
+          "n": "友阿股份",
+          "p": 6440,
+          "zdp": 10.085470199584961,
+          "amount": 530373392,
+          "ltsz": 8978472832,
+          "tshare": 8978472832,
+          "hs": 5.961277961730957,
+          "lbc": 1,
+          "fbt": 93506,
+          "lbt": 144454,
+          "fund": 45251703,
+          "zbc": 5,
+          "hybk": "一般零售",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "房地产开": [
+        {
+          "c": "600604",
+          "m": 1,
+          "n": "市北高新",
+          "p": 4940,
+          "zdp": 10.022271156311035,
+          "amount": 139040865,
+          "ltsz": 6952826731.76,
+          "tshare": 9254125712,
+          "hs": 2.000519037246704,
+          "lbc": 1,
+          "fbt": 93000,
+          "lbt": 93000,
+          "fund": 65737143,
+          "zbc": 0,
+          "hybk": "房地产开",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "000620",
+          "m": 0,
+          "n": "盈新发展",
+          "p": 3470,
+          "zdp": 10.158730506896973,
+          "amount": 1456230544,
+          "ltsz": 16210968388.050001,
+          "tshare": 20375198632.960003,
+          "hs": 9.124317169189453,
+          "lbc": 1,
+          "fbt": 93357,
+          "lbt": 94942,
+          "fund": 251117654,
+          "zbc": 1,
+          "hybk": "房地产开",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "中药Ⅱ": [
+        {
+          "c": "002412",
+          "m": 0,
+          "n": "汉森制药",
+          "p": 11210,
+          "zdp": 10.00981330871582,
+          "amount": 403946816,
+          "ltsz": 5580842450,
+          "tshare": 5640872000,
+          "hs": 7.332803249359131,
+          "lbc": 4,
+          "fbt": 93006,
+          "lbt": 93006,
+          "fund": 249630535,
+          "zbc": 0,
+          "hybk": "中药Ⅱ",
+          "zttj": {
+            "days": 4,
+            "ct": 4
+          }
+        },
+        {
+          "c": "600594",
+          "m": 1,
+          "n": "益佰制药",
+          "p": 4090,
+          "zdp": 9.946236610412598,
+          "amount": 209386557,
+          "ltsz": 3208171051,
+          "tshare": 3208171067.3599997,
+          "hs": 6.601603031158447,
+          "lbc": 1,
+          "fbt": 93519,
+          "lbt": 95922,
+          "fund": 37290906,
+          "zbc": 2,
+          "hybk": "中药Ⅱ",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "工业金属": [
+        {
+          "c": "601212",
+          "m": 1,
+          "n": "白银有色",
+          "p": 6700,
+          "zdp": 10.016420364379883,
+          "amount": 1457887760,
+          "ltsz": 49611989223.700005,
+          "tshare": 49611988480,
+          "hs": 2.9518795013427734,
+          "lbc": 2,
+          "fbt": 93045,
+          "lbt": 93618,
+          "fund": 303296109,
+          "zbc": 2,
+          "hybk": "工业金属",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        }
+      ],
+      "通信设备": [
+        {
+          "c": "002017",
+          "m": 0,
+          "n": "东信和平",
+          "p": 15980,
+          "zdp": 9.979352951049805,
+          "amount": 684374144,
+          "ltsz": 9271154776.22,
+          "tshare": 9275301825.92,
+          "hs": 7.44802713394165,
+          "lbc": 2,
+          "fbt": 93100,
+          "lbt": 94518,
+          "fund": 51929742,
+          "zbc": 5,
+          "hybk": "通信设备",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        },
+        {
+          "c": "003040",
+          "m": 0,
+          "n": "楚天龙",
+          "p": 14070,
+          "zdp": 10.007819175720215,
+          "amount": 700507536,
+          "ltsz": 6427883130.06,
+          "tshare": 6488183069.76,
+          "hs": 11.153006553649902,
+          "lbc": 2,
+          "fbt": 93157,
+          "lbt": 102654,
+          "fund": 32440579,
+          "zbc": 7,
+          "hybk": "通信设备",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        }
+      ],
+      "服装家纺": [
+        {
+          "c": "603958",
+          "m": 1,
+          "n": "哈森股份",
+          "p": 22610,
+          "zdp": 10.024331092834473,
+          "amount": 965030064,
+          "ltsz": 4959729600,
+          "tshare": 4959729600,
+          "hs": 19.913835525512695,
+          "lbc": 3,
+          "fbt": 93138,
+          "lbt": 142646,
+          "fund": 52624775,
+          "zbc": 3,
+          "hybk": "服装家纺",
+          "zttj": {
+            "days": 6,
+            "ct": 5
+          }
+        }
+      ],
+      "家电零部": [
+        {
+          "c": "001268",
+          "m": 0,
+          "n": "联合精密",
+          "p": 22420,
+          "zdp": 10.00981330871582,
+          "amount": 129573980,
+          "ltsz": 2115049373.14,
+          "tshare": 3378753794.1400003,
+          "hs": 6.221759796142578,
+          "lbc": 1,
+          "fbt": 93227,
+          "lbt": 111324,
+          "fund": 43818993,
+          "zbc": 1,
+          "hybk": "家电零部",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "专用设备": [
+        {
+          "c": "605286",
+          "m": 1,
+          "n": "同力天启",
+          "p": 27410,
+          "zdp": 9.991974830627441,
+          "amount": 123464208,
+          "ltsz": 4604880000,
+          "tshare": 4604880000,
+          "hs": 2.7201833724975586,
+          "lbc": 1,
+          "fbt": 93250,
+          "lbt": 93308,
+          "fund": 139004113,
+          "zbc": 1,
+          "hybk": "专用设备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "环境治理": [
+        {
+          "c": "603200",
+          "m": 1,
+          "n": "上海洗霸",
+          "p": 39130,
+          "zdp": 10.008434295654297,
+          "amount": 130284373,
+          "ltsz": 6866536430.39,
+          "tshare": 6866536430.39,
+          "hs": 1.924377679824829,
+          "lbc": 1,
+          "fbt": 93442,
+          "lbt": 93442,
+          "fund": 41106065,
+          "zbc": 0,
+          "hybk": "环境治理",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "电池": [
+        {
+          "c": "301152",
+          "m": 0,
+          "n": "天力锂能",
+          "p": 23320,
+          "zdp": 20.020586013793945,
+          "amount": 324645248,
+          "ltsz": 1655235107.24,
+          "tshare": 2769016963.2400002,
+          "hs": 20.0224609375,
+          "lbc": 1,
+          "fbt": 93530,
+          "lbt": 100454,
+          "fund": 24870780,
+          "zbc": 4,
+          "hybk": "电池",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "603032",
+          "m": 1,
+          "n": "德新科技",
+          "p": 20220,
+          "zdp": 10.010881423950195,
+          "amount": 171616655,
+          "ltsz": 4708865952,
+          "tshare": 4715858028,
+          "hs": 3.7020957469940186,
+          "lbc": 1,
+          "fbt": 93710,
+          "lbt": 93710,
+          "fund": 48995082,
+          "zbc": 0,
+          "hybk": "电池",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "002580",
+          "m": 0,
+          "n": "圣阳股份",
+          "p": 21050,
+          "zdp": 9.979101181030273,
+          "amount": 1205842672,
+          "ltsz": 9521731740,
+          "tshare": 9553942281.6,
+          "hs": 12.827672958374023,
+          "lbc": 1,
+          "fbt": 93733,
+          "lbt": 94145,
+          "fund": 188619367,
+          "zbc": 1,
+          "hybk": "电池",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "电网设备": [
+        {
+          "c": "002882",
+          "m": 0,
+          "n": "金龙羽",
+          "p": 23760,
+          "zdp": 10,
+          "amount": 332816752,
+          "ltsz": 5868483302.88,
+          "tshare": 10285704000,
+          "hs": 5.773613452911377,
+          "lbc": 1,
+          "fbt": 93912,
+          "lbt": 93912,
+          "fund": 22778712,
+          "zbc": 0,
+          "hybk": "电网设备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "601700",
+          "m": 1,
+          "n": "风范股份",
+          "p": 7710,
+          "zdp": 9.985734939575195,
+          "amount": 1221491328,
+          "ltsz": 8779818783,
+          "tshare": 8779818752.16,
+          "hs": 14.542915344238281,
+          "lbc": 1,
+          "fbt": 95405,
+          "lbt": 95405,
+          "fund": 50322784,
+          "zbc": 0,
+          "hybk": "电网设备",
+          "zttj": {
+            "days": 16,
+            "ct": 9
+          }
+        }
+      ],
+      "焦炭Ⅱ": [
+        {
+          "c": "000723",
+          "m": 0,
+          "n": "美锦能源",
+          "p": 3890,
+          "zdp": 9.887005805969238,
+          "amount": 697970720,
+          "ltsz": 17097234803.380001,
+          "tshare": 17129624087.04,
+          "hs": 4.14756965637207,
+          "lbc": 1,
+          "fbt": 94003,
+          "lbt": 94403,
+          "fund": 30298031,
+          "zbc": 1,
+          "hybk": "焦炭Ⅱ",
+          "zttj": {
+            "days": 4,
+            "ct": 2
+          }
+        }
+      ],
+      "种植业": [
+        {
+          "c": "002041",
+          "m": 0,
+          "n": "登海种业",
+          "p": 10190,
+          "zdp": 10.043196678161621,
+          "amount": 450444064,
+          "ltsz": 8967200000,
+          "tshare": 8967200000,
+          "hs": 5.1568450927734375,
+          "lbc": 1,
+          "fbt": 94412,
+          "lbt": 94412,
+          "fund": 102201624,
+          "zbc": 0,
+          "hybk": "种植业",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "农产品加": [
+        {
+          "c": "605198",
+          "m": 1,
+          "n": "安德利",
+          "p": 64790,
+          "zdp": 10,
+          "amount": 323766816,
+          "ltsz": 17528027440,
+          "tshare": 21652040520.000004,
+          "hs": 1.8804025650024414,
+          "lbc": 1,
+          "fbt": 94720,
+          "lbt": 95129,
+          "fund": 55363055,
+          "zbc": 1,
+          "hybk": "农产品加",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "煤炭开采": [
+        {
+          "c": "600508",
+          "m": 1,
+          "n": "上海能源",
+          "p": 9880,
+          "zdp": 10.022271156311035,
+          "amount": 346728224,
+          "ltsz": 9996635376,
+          "tshare": 9996635376,
+          "hs": 3.5398504734039307,
+          "lbc": 1,
+          "fbt": 95249,
+          "lbt": 103443,
+          "fund": 74277237,
+          "zbc": 2,
+          "hybk": "煤炭开采",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "600403",
+          "m": 1,
+          "n": "大有能源",
+          "p": 7300,
+          "zdp": 9.939759254455566,
+          "amount": 1039822368,
+          "ltsz": 17452930534.6,
+          "tshare": 17452930520,
+          "hs": 6.199392795562744,
+          "lbc": 1,
+          "fbt": 141658,
+          "lbt": 141658,
+          "fund": 109480676,
+          "zbc": 0,
+          "hybk": "煤炭开采",
+          "zttj": {
+            "days": 4,
+            "ct": 2
+          }
+        }
+      ],
+      "航空装备": [
+        {
+          "c": "002651",
+          "m": 0,
+          "n": "利君股份",
+          "p": 8610,
+          "zdp": 9.961685180664062,
+          "amount": 289523776,
+          "ltsz": 4868641949.009999,
+          "tshare": 8898090600,
+          "hs": 6.118129253387451,
+          "lbc": 1,
+          "fbt": 95551,
+          "lbt": 95551,
+          "fund": 69227594,
+          "zbc": 0,
+          "hybk": "航空装备",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "塑料": [
+        {
+          "c": "603330",
+          "m": 1,
+          "n": "天洋新材",
+          "p": 10970,
+          "zdp": 10.03009033203125,
+          "amount": 1233974096,
+          "ltsz": 4461644133.1,
+          "tshare": 4746429918.56,
+          "hs": 28.748992919921875,
+          "lbc": 2,
+          "fbt": 100452,
+          "lbt": 110922,
+          "fund": 49273510,
+          "zbc": 7,
+          "hybk": "塑料",
+          "zttj": {
+            "days": 9,
+            "ct": 6
+          }
+        }
+      ],
+      "医疗服务": [
+        {
+          "c": "002172",
+          "m": 0,
+          "n": "澳洋健康",
+          "p": 4440,
+          "zdp": 9.90099048614502,
+          "amount": 519433216,
+          "ltsz": 3397224841.2000003,
+          "tshare": 3399851713.92,
+          "hs": 16.141847610473633,
+          "lbc": 1,
+          "fbt": 100703,
+          "lbt": 100703,
+          "fund": 58956113,
+          "zbc": 0,
+          "hybk": "医疗服务",
+          "zttj": {
+            "days": 9,
+            "ct": 6
+          }
+        }
+      ],
+      "航运港口": [
+        {
+          "c": "603565",
+          "m": 1,
+          "n": "中谷物流",
+          "p": 13520,
+          "zdp": 10.008136749267578,
+          "amount": 731250400,
+          "ltsz": 28392853152.559998,
+          "tshare": 28392853166.079998,
+          "hs": 2.616997718811035,
+          "lbc": 1,
+          "fbt": 101223,
+          "lbt": 143841,
+          "fund": 75877836,
+          "zbc": 1,
+          "hybk": "航运港口",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "601083",
+          "m": 1,
+          "n": "锦江航运",
+          "p": 13110,
+          "zdp": 9.983221054077148,
+          "amount": 563987472,
+          "ltsz": 2544913200,
+          "tshare": 16965913200,
+          "hs": 22.63522720336914,
+          "lbc": 1,
+          "fbt": 130052,
+          "lbt": 133513,
+          "fund": 17050866,
+          "zbc": 1,
+          "hybk": "航运港口",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ],
+      "贵金属": [
+        {
+          "c": "002716",
+          "m": 0,
+          "n": "湖南白银",
+          "p": 11460,
+          "zdp": 9.980806350708008,
+          "amount": 6608849664,
+          "ltsz": 26615571224.04,
+          "tshare": 32352595814.4,
+          "hs": 25.329517364501953,
+          "lbc": 2,
+          "fbt": 101430,
+          "lbt": 145018,
+          "fund": 156651576,
+          "zbc": 2,
+          "hybk": "贵金属",
+          "zttj": {
+            "days": 2,
+            "ct": 2
+          }
+        }
+      ],
+      "化学原料": [
+        {
+          "c": "600367",
+          "m": 1,
+          "n": "红星发展",
+          "p": 38150,
+          "zdp": 10.005766868591309,
+          "amount": 2781079056,
+          "ltsz": 12283276893.3,
+          "tshare": 13014143682.4,
+          "hs": 23.49808120727539,
+          "lbc": 1,
+          "fbt": 102611,
+          "lbt": 140305,
+          "fund": 91482212,
+          "zbc": 10,
+          "hybk": "化学原料",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        },
+        {
+          "c": "600610",
+          "m": 1,
+          "n": "中毅达",
+          "p": 8660,
+          "zdp": 10.038119316101074,
+          "amount": 696790720,
+          "ltsz": 6137573265.3,
+          "tshare": 9277238105.28,
+          "hs": 11.99840259552002,
+          "lbc": 1,
+          "fbt": 131811,
+          "lbt": 131811,
+          "fund": 64715244,
+          "zbc": 0,
+          "hybk": "化学原料",
+          "zttj": {
+            "days": 4,
+            "ct": 2
+          }
+        }
+      ],
+      "养殖业": [
+        {
+          "c": "300313",
+          "m": 0,
+          "n": "天山生物",
+          "p": 15360,
+          "zdp": 20,
+          "amount": 639508496,
+          "ltsz": 3031338839.04,
+          "tshare": 3683005347.8399997,
+          "hs": 23.494287490844727,
+          "lbc": 1,
+          "fbt": 105842,
+          "lbt": 105842,
+          "fund": 23144448,
+          "zbc": 0,
+          "hybk": "养殖业",
+          "zttj": {
+            "days": 6,
+            "ct": 3
+          }
+        }
+      ],
+      "医药商业": [
+        {
+          "c": "600272",
+          "m": 1,
+          "n": "开开实业",
+          "p": 18150,
+          "zdp": 10,
+          "amount": 884506560,
+          "ltsz": 2904000000,
+          "tshare": 4767132801.75,
+          "hs": 31.8587646484375,
+          "lbc": 1,
+          "fbt": 133354,
+          "lbt": 141527,
+          "fund": 17932200,
+          "zbc": 4,
+          "hybk": "医药商业",
+          "zttj": {
+            "days": 13,
+            "ct": 7
+          }
+        }
+      ],
+      "其他电源": [
+        {
+          "c": "002052",
+          "m": 0,
+          "n": "同洲电子",
+          "p": 9080,
+          "zdp": 10.060606002807617,
+          "amount": 280641488,
+          "ltsz": 6259635367.4,
+          "tshare": 6832152439.68,
+          "hs": 4.672367572784424,
+          "lbc": 1,
+          "fbt": 140503,
+          "lbt": 140503,
+          "fund": 50446146,
+          "zbc": 0,
+          "hybk": "其他电源",
+          "zttj": {
+            "days": 1,
+            "ct": 1
+          }
+        }
+      ]
+    },
+    "sectorBoards": [
+      {
+        "name": "电力",
+        "count": 3,
+        "maxLB": 1,
+        "leadStock": "协鑫能科",
+        "stocks": [
+          "协鑫能科",
+          "南网能源",
+          "芯能科技"
+        ]
+      },
+      {
+        "name": "电池",
+        "count": 3,
+        "maxLB": 1,
+        "leadStock": "天力锂能",
+        "stocks": [
+          "天力锂能",
+          "德新科技",
+          "圣阳股份"
+        ]
+      },
+      {
+        "name": "中药Ⅱ",
+        "count": 2,
+        "maxLB": 4,
+        "leadStock": "汉森制药",
+        "stocks": [
+          "汉森制药",
+          "益佰制药"
+        ]
+      },
+      {
+        "name": "化学制药",
+        "count": 2,
+        "maxLB": 3,
+        "leadStock": "中 关 村",
+        "stocks": [
+          "中 关 村",
+          "神奇制药"
+        ]
+      },
+      {
+        "name": "一般零售",
+        "count": 2,
+        "maxLB": 2,
+        "leadStock": "新华百货",
+        "stocks": [
+          "新华百货",
+          "友阿股份"
+        ]
+      },
+      {
+        "name": "通信设备",
+        "count": 2,
+        "maxLB": 2,
+        "leadStock": "东信和平",
+        "stocks": [
+          "东信和平",
+          "楚天龙"
+        ]
+      },
+      {
+        "name": "汽车零部",
+        "count": 2,
+        "maxLB": 1,
+        "leadStock": "华阳集团",
+        "stocks": [
+          "华阳集团",
+          "正裕工业"
+        ]
+      },
+      {
+        "name": "房地产开",
+        "count": 2,
+        "maxLB": 1,
+        "leadStock": "市北高新",
+        "stocks": [
+          "市北高新",
+          "盈新发展"
+        ]
+      }
+    ],
+    "ranking": [
+      {
+        "c": "002412",
+        "m": 0,
+        "n": "汉森制药",
+        "p": 11210,
+        "zdp": 10.00981330871582,
+        "amount": 403946816,
+        "ltsz": 5580842450,
+        "tshare": 5640872000,
+        "hs": 7.332803249359131,
+        "lbc": 4,
+        "fbt": 93006,
+        "lbt": 93006,
+        "fund": 249630535,
+        "zbc": 0,
+        "hybk": "中药Ⅱ",
+        "zttj": {
+          "days": 4,
+          "ct": 4
+        },
+        "score": 89.9630535
+      },
+      {
+        "c": "000017",
+        "m": 0,
+        "n": "深中华A",
+        "p": 7820,
+        "zdp": 9.98593521118164,
+        "amount": 69120996,
+        "ltsz": 3447227656.82,
+        "tshare": 5389426136.96,
+        "hs": 2.0051183700561523,
+        "lbc": 3,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 180589590,
+        "zbc": 0,
+        "hybk": "饰品",
+        "zttj": {
+          "days": 3,
+          "ct": 3
+        },
+        "score": 68.058959
+      },
+      {
+        "c": "601212",
+        "m": 1,
+        "n": "白银有色",
+        "p": 6700,
+        "zdp": 10.016420364379883,
+        "amount": 1457887760,
+        "ltsz": 49611989223.700005,
+        "tshare": 49611988480,
+        "hs": 2.9518795013427734,
+        "lbc": 2,
+        "fbt": 93045,
+        "lbt": 93618,
+        "fund": 303296109,
+        "zbc": 2,
+        "hybk": "工业金属",
+        "zttj": {
+          "days": 2,
+          "ct": 2
+        },
+        "score": 65.3296109
+      },
+      {
+        "c": "000931",
+        "m": 0,
+        "n": "中 关 村",
+        "p": 5600,
+        "zdp": 10.019646644592285,
+        "amount": 616654400,
+        "ltsz": 4205765379.2,
+        "tshare": 4217511065.6,
+        "hs": 14.989714622497559,
+        "lbc": 3,
+        "fbt": 92500,
+        "lbt": 143957,
+        "fund": 89005666,
+        "zbc": 1,
+        "hybk": "化学制药",
+        "zttj": {
+          "days": 3,
+          "ct": 3
+        },
+        "score": 58.9005666
+      },
+      {
+        "c": "603958",
+        "m": 1,
+        "n": "哈森股份",
+        "p": 22610,
+        "zdp": 10.024331092834473,
+        "amount": 965030064,
+        "ltsz": 4959729600,
+        "tshare": 4959729600,
+        "hs": 19.913835525512695,
+        "lbc": 3,
+        "fbt": 93138,
+        "lbt": 142646,
+        "fund": 52624775,
+        "zbc": 3,
+        "hybk": "服装家纺",
+        "zttj": {
+          "days": 6,
+          "ct": 5
+        },
+        "score": 55.2624775
+      },
+      {
+        "c": "002015",
+        "m": 0,
+        "n": "协鑫能科",
+        "p": 15570,
+        "zdp": 10.035335540771484,
+        "amount": 494260512,
+        "ltsz": 25275164239.98,
+        "tshare": 25275164146.56,
+        "hs": 1.9555184841156006,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 348193467,
+        "zbc": 0,
+        "hybk": "电力",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        },
+        "score": 54.8193467
+      },
+      {
+        "c": "002906",
+        "m": 0,
+        "n": "华阳集团",
+        "p": 28230,
+        "zdp": 10.01558780670166,
+        "amount": 62595480,
+        "ltsz": 14812318630.59,
+        "tshare": 14818464499.2,
+        "hs": 0.4225907027721405,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 325742046,
+        "zbc": 0,
+        "hybk": "汽车零部",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        },
+        "score": 52.5742046
+      },
+      {
+        "c": "002716",
+        "m": 0,
+        "n": "湖南白银",
+        "p": 11460,
+        "zdp": 9.980806350708008,
+        "amount": 6608849664,
+        "ltsz": 26615571224.04,
+        "tshare": 32352595814.4,
+        "hs": 25.329517364501953,
+        "lbc": 2,
+        "fbt": 101430,
+        "lbt": 145018,
+        "fund": 156651576,
+        "zbc": 2,
+        "hybk": "贵金属",
+        "zttj": {
+          "days": 2,
+          "ct": 2
+        },
+        "score": 50.6651576
+      },
+      {
+        "c": "000620",
+        "m": 0,
+        "n": "盈新发展",
+        "p": 3470,
+        "zdp": 10.158730506896973,
+        "amount": 1456230544,
+        "ltsz": 16210968388.050001,
+        "tshare": 20375198632.960003,
+        "hs": 9.124317169189453,
+        "lbc": 1,
+        "fbt": 93357,
+        "lbt": 94942,
+        "fund": 251117654,
+        "zbc": 1,
+        "hybk": "房地产开",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        },
+        "score": 45.111765399999996
+      },
+      {
+        "c": "002084",
+        "m": 0,
+        "n": "海鸥住工",
+        "p": 3950,
+        "zdp": 10.027854919433594,
+        "amount": 19296785,
+        "ltsz": 2546306045.9,
+        "tshare": 2551921389.6,
+        "hs": 0.7578344941139221,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 236239775,
+        "zbc": 0,
+        "hybk": "家居用品",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        },
+        "score": 43.623977499999995
+      },
+      {
+        "c": "600785",
+        "m": 1,
+        "n": "新华百货",
+        "p": 10710,
+        "zdp": 9.958932876586914,
+        "amount": 169637652,
+        "ltsz": 3383115412.32,
+        "tshare": 3383115412.32,
+        "hs": 5.015392780303955,
+        "lbc": 2,
+        "fbt": 92501,
+        "lbt": 93116,
+        "fund": 74140264,
+        "zbc": 1,
+        "hybk": "一般零售",
+        "zttj": {
+          "days": 2,
+          "ct": 2
+        },
+        "score": 42.4140264
+      },
+      {
+        "c": "002017",
+        "m": 0,
+        "n": "东信和平",
+        "p": 15980,
+        "zdp": 9.979352951049805,
+        "amount": 684374144,
+        "ltsz": 9271154776.22,
+        "tshare": 9275301825.92,
+        "hs": 7.44802713394165,
+        "lbc": 2,
+        "fbt": 93100,
+        "lbt": 94518,
+        "fund": 51929742,
+        "zbc": 5,
+        "hybk": "通信设备",
+        "zttj": {
+          "days": 2,
+          "ct": 2
+        },
+        "score": 40.1929742
+      },
+      {
+        "c": "603330",
+        "m": 1,
+        "n": "天洋新材",
+        "p": 10970,
+        "zdp": 10.03009033203125,
+        "amount": 1233974096,
+        "ltsz": 4461644133.1,
+        "tshare": 4746429918.56,
+        "hs": 28.748992919921875,
+        "lbc": 2,
+        "fbt": 100452,
+        "lbt": 110922,
+        "fund": 49273510,
+        "zbc": 7,
+        "hybk": "塑料",
+        "zttj": {
+          "days": 9,
+          "ct": 6
+        },
+        "score": 39.927351
+      },
+      {
+        "c": "002445",
+        "m": 0,
+        "n": "中南文化",
+        "p": 3370,
+        "zdp": 10.130719184875488,
+        "amount": 16167218,
+        "ltsz": 7974276731.51,
+        "tshare": 8009167396.320001,
+        "hs": 0.20274211466312408,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 198607600,
+        "zbc": 0,
+        "hybk": "通用设备",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        },
+        "score": 39.86076
+      },
+      {
+        "c": "002580",
+        "m": 0,
+        "n": "圣阳股份",
+        "p": 21050,
+        "zdp": 9.979101181030273,
+        "amount": 1205842672,
+        "ltsz": 9521731740,
+        "tshare": 9553942281.6,
+        "hs": 12.827672958374023,
+        "lbc": 1,
+        "fbt": 93733,
+        "lbt": 94145,
+        "fund": 188619367,
+        "zbc": 1,
+        "hybk": "电池",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        },
+        "score": 38.8619367
+      }
+    ],
+    "consecutiveBoards": [
+      {
+        "code": "002412",
+        "name": "汉森制药",
+        "lbc": 4
+      },
+      {
+        "code": "000017",
+        "name": "深中华A",
+        "lbc": 3
+      },
+      {
+        "code": "000931",
+        "name": "中 关 村",
+        "lbc": 3
+      },
+      {
+        "code": "603958",
+        "name": "哈森股份",
+        "lbc": 3
+      },
+      {
+        "code": "600785",
+        "name": "新华百货",
+        "lbc": 2
+      },
+      {
+        "code": "601212",
+        "name": "白银有色",
+        "lbc": 2
+      },
+      {
+        "code": "002017",
+        "name": "东信和平",
+        "lbc": 2
+      },
+      {
+        "code": "003040",
+        "name": "楚天龙",
+        "lbc": 2
+      }
+    ],
+    "pool": [
+      {
+        "c": "000017",
+        "m": 0,
+        "n": "深中华A",
+        "p": 7820,
+        "zdp": 9.98593521118164,
+        "amount": 69120996,
+        "ltsz": 3447227656.82,
+        "tshare": 5389426136.96,
+        "hs": 2.0051183700561523,
+        "lbc": 3,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 180589590,
+        "zbc": 0,
+        "hybk": "饰品",
+        "zttj": {
+          "days": 3,
+          "ct": 3
+        }
+      },
+      {
+        "c": "000065",
+        "m": 0,
+        "n": "北方国际",
+        "p": 9980,
+        "zdp": 10.033076286315918,
+        "amount": 825797040,
+        "ltsz": 10628885358.54,
+        "tshare": 11591192756.800001,
+        "hs": 7.800812721252441,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 135606,
+        "fund": 73901500,
+        "zbc": 6,
+        "hybk": "专业工程",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "000925",
+        "m": 0,
+        "n": "众合科技",
+        "p": 8970,
+        "zdp": 10.061349868774414,
+        "amount": 105717890,
+        "ltsz": 6020238310.71,
+        "tshare": 6067037608.320001,
+        "hs": 1.7560416460037231,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 169076265,
+        "zbc": 0,
+        "hybk": "轨交设备",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "000931",
+        "m": 0,
+        "n": "中 关 村",
+        "p": 5600,
+        "zdp": 10.019646644592285,
+        "amount": 616654400,
+        "ltsz": 4205765379.2,
+        "tshare": 4217511065.6,
+        "hs": 14.989714622497559,
+        "lbc": 3,
+        "fbt": 92500,
+        "lbt": 143957,
+        "fund": 89005666,
+        "zbc": 1,
+        "hybk": "化学制药",
+        "zttj": {
+          "days": 3,
+          "ct": 3
+        }
+      },
+      {
+        "c": "002015",
+        "m": 0,
+        "n": "协鑫能科",
+        "p": 15570,
+        "zdp": 10.035335540771484,
+        "amount": 494260512,
+        "ltsz": 25275164239.98,
+        "tshare": 25275164146.56,
+        "hs": 1.9555184841156006,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 348193467,
+        "zbc": 0,
+        "hybk": "电力",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "002084",
+        "m": 0,
+        "n": "海鸥住工",
+        "p": 3950,
+        "zdp": 10.027854919433594,
+        "amount": 19296785,
+        "ltsz": 2546306045.9,
+        "tshare": 2551921389.6,
+        "hs": 0.7578344941139221,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 236239775,
+        "zbc": 0,
+        "hybk": "家居用品",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "002445",
+        "m": 0,
+        "n": "中南文化",
+        "p": 3370,
+        "zdp": 10.130719184875488,
+        "amount": 16167218,
+        "ltsz": 7974276731.51,
+        "tshare": 8009167396.320001,
+        "hs": 0.20274211466312408,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 198607600,
+        "zbc": 0,
+        "hybk": "通用设备",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "002906",
+        "m": 0,
+        "n": "华阳集团",
+        "p": 28230,
+        "zdp": 10.01558780670166,
+        "amount": 62595480,
+        "ltsz": 14812318630.59,
+        "tshare": 14818464499.2,
+        "hs": 0.4225907027721405,
+        "lbc": 1,
+        "fbt": 92500,
+        "lbt": 92500,
+        "fund": 325742046,
+        "zbc": 0,
+        "hybk": "汽车零部",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "600785",
+        "m": 1,
+        "n": "新华百货",
+        "p": 10710,
+        "zdp": 9.958932876586914,
+        "amount": 169637652,
+        "ltsz": 3383115412.32,
+        "tshare": 3383115412.32,
+        "hs": 5.015392780303955,
+        "lbc": 2,
+        "fbt": 92501,
+        "lbt": 93116,
+        "fund": 74140264,
+        "zbc": 1,
+        "hybk": "一般零售",
+        "zttj": {
+          "days": 2,
+          "ct": 2
+        }
+      },
+      {
+        "c": "600604",
+        "m": 1,
+        "n": "市北高新",
+        "p": 4940,
+        "zdp": 10.022271156311035,
+        "amount": 139040865,
+        "ltsz": 6952826731.76,
+        "tshare": 9254125712,
+        "hs": 2.000519037246704,
+        "lbc": 1,
+        "fbt": 93000,
+        "lbt": 93000,
+        "fund": 65737143,
+        "zbc": 0,
+        "hybk": "房地产开",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "002412",
+        "m": 0,
+        "n": "汉森制药",
+        "p": 11210,
+        "zdp": 10.00981330871582,
+        "amount": 403946816,
+        "ltsz": 5580842450,
+        "tshare": 5640872000,
+        "hs": 7.332803249359131,
+        "lbc": 4,
+        "fbt": 93006,
+        "lbt": 93006,
+        "fund": 249630535,
+        "zbc": 0,
+        "hybk": "中药Ⅱ",
+        "zttj": {
+          "days": 4,
+          "ct": 4
+        }
+      },
+      {
+        "c": "601212",
+        "m": 1,
+        "n": "白银有色",
+        "p": 6700,
+        "zdp": 10.016420364379883,
+        "amount": 1457887760,
+        "ltsz": 49611989223.700005,
+        "tshare": 49611988480,
+        "hs": 2.9518795013427734,
+        "lbc": 2,
+        "fbt": 93045,
+        "lbt": 93618,
+        "fund": 303296109,
+        "zbc": 2,
+        "hybk": "工业金属",
+        "zttj": {
+          "days": 2,
+          "ct": 2
+        }
+      },
+      {
+        "c": "002017",
+        "m": 0,
+        "n": "东信和平",
+        "p": 15980,
+        "zdp": 9.979352951049805,
+        "amount": 684374144,
+        "ltsz": 9271154776.22,
+        "tshare": 9275301825.92,
+        "hs": 7.44802713394165,
+        "lbc": 2,
+        "fbt": 93100,
+        "lbt": 94518,
+        "fund": 51929742,
+        "zbc": 5,
+        "hybk": "通信设备",
+        "zttj": {
+          "days": 2,
+          "ct": 2
+        }
+      },
+      {
+        "c": "603958",
+        "m": 1,
+        "n": "哈森股份",
+        "p": 22610,
+        "zdp": 10.024331092834473,
+        "amount": 965030064,
+        "ltsz": 4959729600,
+        "tshare": 4959729600,
+        "hs": 19.913835525512695,
+        "lbc": 3,
+        "fbt": 93138,
+        "lbt": 142646,
+        "fund": 52624775,
+        "zbc": 3,
+        "hybk": "服装家纺",
+        "zttj": {
+          "days": 6,
+          "ct": 5
+        }
+      },
+      {
+        "c": "003040",
+        "m": 0,
+        "n": "楚天龙",
+        "p": 14070,
+        "zdp": 10.007819175720215,
+        "amount": 700507536,
+        "ltsz": 6427883130.06,
+        "tshare": 6488183069.76,
+        "hs": 11.153006553649902,
+        "lbc": 2,
+        "fbt": 93157,
+        "lbt": 102654,
+        "fund": 32440579,
+        "zbc": 7,
+        "hybk": "通信设备",
+        "zttj": {
+          "days": 2,
+          "ct": 2
+        }
+      },
+      {
+        "c": "001268",
+        "m": 0,
+        "n": "联合精密",
+        "p": 22420,
+        "zdp": 10.00981330871582,
+        "amount": 129573980,
+        "ltsz": 2115049373.14,
+        "tshare": 3378753794.1400003,
+        "hs": 6.221759796142578,
+        "lbc": 1,
+        "fbt": 93227,
+        "lbt": 111324,
+        "fund": 43818993,
+        "zbc": 1,
+        "hybk": "家电零部",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "605286",
+        "m": 1,
+        "n": "同力天启",
+        "p": 27410,
+        "zdp": 9.991974830627441,
+        "amount": 123464208,
+        "ltsz": 4604880000,
+        "tshare": 4604880000,
+        "hs": 2.7201833724975586,
+        "lbc": 1,
+        "fbt": 93250,
+        "lbt": 93308,
+        "fund": 139004113,
+        "zbc": 1,
+        "hybk": "专用设备",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "000620",
+        "m": 0,
+        "n": "盈新发展",
+        "p": 3470,
+        "zdp": 10.158730506896973,
+        "amount": 1456230544,
+        "ltsz": 16210968388.050001,
+        "tshare": 20375198632.960003,
+        "hs": 9.124317169189453,
+        "lbc": 1,
+        "fbt": 93357,
+        "lbt": 94942,
+        "fund": 251117654,
+        "zbc": 1,
+        "hybk": "房地产开",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "603200",
+        "m": 1,
+        "n": "上海洗霸",
+        "p": 39130,
+        "zdp": 10.008434295654297,
+        "amount": 130284373,
+        "ltsz": 6866536430.39,
+        "tshare": 6866536430.39,
+        "hs": 1.924377679824829,
+        "lbc": 1,
+        "fbt": 93442,
+        "lbt": 93442,
+        "fund": 41106065,
+        "zbc": 0,
+        "hybk": "环境治理",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "002277",
+        "m": 0,
+        "n": "友阿股份",
+        "p": 6440,
+        "zdp": 10.085470199584961,
+        "amount": 530373392,
+        "ltsz": 8978472832,
+        "tshare": 8978472832,
+        "hs": 5.961277961730957,
+        "lbc": 1,
+        "fbt": 93506,
+        "lbt": 144454,
+        "fund": 45251703,
+        "zbc": 5,
+        "hybk": "一般零售",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "600594",
+        "m": 1,
+        "n": "益佰制药",
+        "p": 4090,
+        "zdp": 9.946236610412598,
+        "amount": 209386557,
+        "ltsz": 3208171051,
+        "tshare": 3208171067.3599997,
+        "hs": 6.601603031158447,
+        "lbc": 1,
+        "fbt": 93519,
+        "lbt": 95922,
+        "fund": 37290906,
+        "zbc": 2,
+        "hybk": "中药Ⅱ",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "301152",
+        "m": 0,
+        "n": "天力锂能",
+        "p": 23320,
+        "zdp": 20.020586013793945,
+        "amount": 324645248,
+        "ltsz": 1655235107.24,
+        "tshare": 2769016963.2400002,
+        "hs": 20.0224609375,
+        "lbc": 1,
+        "fbt": 93530,
+        "lbt": 100454,
+        "fund": 24870780,
+        "zbc": 4,
+        "hybk": "电池",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "603089",
+        "m": 1,
+        "n": "正裕工业",
+        "p": 10530,
+        "zdp": 10.031347274780273,
+        "amount": 111102288,
+        "ltsz": 2527550312.04,
+        "tshare": 2903323512.96,
+        "hs": 4.494946002960205,
+        "lbc": 1,
+        "fbt": 93613,
+        "lbt": 93613,
+        "fund": 26984441,
+        "zbc": 0,
+        "hybk": "汽车零部",
+        "zttj": {
+          "days": 7,
+          "ct": 4
+        }
+      },
+      {
+        "c": "600613",
+        "m": 1,
+        "n": "神奇制药",
+        "p": 9900,
+        "zdp": 10,
+        "amount": 937738752,
+        "ltsz": 4745267782.2,
+        "tshare": 5287309156.8,
+        "hs": 20.356971740722656,
+        "lbc": 1,
+        "fbt": 93629,
+        "lbt": 93844,
+        "fund": 93698837,
+        "zbc": 1,
+        "hybk": "化学制药",
+        "zttj": {
+          "days": 8,
+          "ct": 6
+        }
+      },
+      {
+        "c": "603032",
+        "m": 1,
+        "n": "德新科技",
+        "p": 20220,
+        "zdp": 10.010881423950195,
+        "amount": 171616655,
+        "ltsz": 4708865952,
+        "tshare": 4715858028,
+        "hs": 3.7020957469940186,
+        "lbc": 1,
+        "fbt": 93710,
+        "lbt": 93710,
+        "fund": 48995082,
+        "zbc": 0,
+        "hybk": "电池",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "002580",
+        "m": 0,
+        "n": "圣阳股份",
+        "p": 21050,
+        "zdp": 9.979101181030273,
+        "amount": 1205842672,
+        "ltsz": 9521731740,
+        "tshare": 9553942281.6,
+        "hs": 12.827672958374023,
+        "lbc": 1,
+        "fbt": 93733,
+        "lbt": 94145,
+        "fund": 188619367,
+        "zbc": 1,
+        "hybk": "电池",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "002882",
+        "m": 0,
+        "n": "金龙羽",
+        "p": 23760,
+        "zdp": 10,
+        "amount": 332816752,
+        "ltsz": 5868483302.88,
+        "tshare": 10285704000,
+        "hs": 5.773613452911377,
+        "lbc": 1,
+        "fbt": 93912,
+        "lbt": 93912,
+        "fund": 22778712,
+        "zbc": 0,
+        "hybk": "电网设备",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "000723",
+        "m": 0,
+        "n": "美锦能源",
+        "p": 3890,
+        "zdp": 9.887005805969238,
+        "amount": 697970720,
+        "ltsz": 17097234803.380001,
+        "tshare": 17129624087.04,
+        "hs": 4.14756965637207,
+        "lbc": 1,
+        "fbt": 94003,
+        "lbt": 94403,
+        "fund": 30298031,
+        "zbc": 1,
+        "hybk": "焦炭Ⅱ",
+        "zttj": {
+          "days": 4,
+          "ct": 2
+        }
+      },
+      {
+        "c": "002041",
+        "m": 0,
+        "n": "登海种业",
+        "p": 10190,
+        "zdp": 10.043196678161621,
+        "amount": 450444064,
+        "ltsz": 8967200000,
+        "tshare": 8967200000,
+        "hs": 5.1568450927734375,
+        "lbc": 1,
+        "fbt": 94412,
+        "lbt": 94412,
+        "fund": 102201624,
+        "zbc": 0,
+        "hybk": "种植业",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "605198",
+        "m": 1,
+        "n": "安德利",
+        "p": 64790,
+        "zdp": 10,
+        "amount": 323766816,
+        "ltsz": 17528027440,
+        "tshare": 21652040520.000004,
+        "hs": 1.8804025650024414,
+        "lbc": 1,
+        "fbt": 94720,
+        "lbt": 95129,
+        "fund": 55363055,
+        "zbc": 1,
+        "hybk": "农产品加",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "003035",
+        "m": 0,
+        "n": "南网能源",
+        "p": 5730,
+        "zdp": 9.980806350708008,
+        "amount": 467651808,
+        "ltsz": 21704545449.510002,
+        "tshare": 21704545432.320004,
+        "hs": 2.1831259727478027,
+        "lbc": 1,
+        "fbt": 94806,
+        "lbt": 110709,
+        "fund": 67983585,
+        "zbc": 3,
+        "hybk": "电力",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "603105",
+        "m": 1,
+        "n": "芯能科技",
+        "p": 7740,
+        "zdp": 9.943181991577148,
+        "amount": 249264831,
+        "ltsz": 3870088042.5,
+        "tshare": 3870088050.2400002,
+        "hs": 6.541827201843262,
+        "lbc": 1,
+        "fbt": 95038,
+        "lbt": 110356,
+        "fund": 60997392,
+        "zbc": 1,
+        "hybk": "电力",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "600508",
+        "m": 1,
+        "n": "上海能源",
+        "p": 9880,
+        "zdp": 10.022271156311035,
+        "amount": 346728224,
+        "ltsz": 9996635376,
+        "tshare": 9996635376,
+        "hs": 3.5398504734039307,
+        "lbc": 1,
+        "fbt": 95249,
+        "lbt": 103443,
+        "fund": 74277237,
+        "zbc": 2,
+        "hybk": "煤炭开采",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "601700",
+        "m": 1,
+        "n": "风范股份",
+        "p": 7710,
+        "zdp": 9.985734939575195,
+        "amount": 1221491328,
+        "ltsz": 8779818783,
+        "tshare": 8779818752.16,
+        "hs": 14.542915344238281,
+        "lbc": 1,
+        "fbt": 95405,
+        "lbt": 95405,
+        "fund": 50322784,
+        "zbc": 0,
+        "hybk": "电网设备",
+        "zttj": {
+          "days": 16,
+          "ct": 9
+        }
+      },
+      {
+        "c": "002651",
+        "m": 0,
+        "n": "利君股份",
+        "p": 8610,
+        "zdp": 9.961685180664062,
+        "amount": 289523776,
+        "ltsz": 4868641949.009999,
+        "tshare": 8898090600,
+        "hs": 6.118129253387451,
+        "lbc": 1,
+        "fbt": 95551,
+        "lbt": 95551,
+        "fund": 69227594,
+        "zbc": 0,
+        "hybk": "航空装备",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "603330",
+        "m": 1,
+        "n": "天洋新材",
+        "p": 10970,
+        "zdp": 10.03009033203125,
+        "amount": 1233974096,
+        "ltsz": 4461644133.1,
+        "tshare": 4746429918.56,
+        "hs": 28.748992919921875,
+        "lbc": 2,
+        "fbt": 100452,
+        "lbt": 110922,
+        "fund": 49273510,
+        "zbc": 7,
+        "hybk": "塑料",
+        "zttj": {
+          "days": 9,
+          "ct": 6
+        }
+      },
+      {
+        "c": "002172",
+        "m": 0,
+        "n": "澳洋健康",
+        "p": 4440,
+        "zdp": 9.90099048614502,
+        "amount": 519433216,
+        "ltsz": 3397224841.2000003,
+        "tshare": 3399851713.92,
+        "hs": 16.141847610473633,
+        "lbc": 1,
+        "fbt": 100703,
+        "lbt": 100703,
+        "fund": 58956113,
+        "zbc": 0,
+        "hybk": "医疗服务",
+        "zttj": {
+          "days": 9,
+          "ct": 6
+        }
+      },
+      {
+        "c": "603565",
+        "m": 1,
+        "n": "中谷物流",
+        "p": 13520,
+        "zdp": 10.008136749267578,
+        "amount": 731250400,
+        "ltsz": 28392853152.559998,
+        "tshare": 28392853166.079998,
+        "hs": 2.616997718811035,
+        "lbc": 1,
+        "fbt": 101223,
+        "lbt": 143841,
+        "fund": 75877836,
+        "zbc": 1,
+        "hybk": "航运港口",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "002716",
+        "m": 0,
+        "n": "湖南白银",
+        "p": 11460,
+        "zdp": 9.980806350708008,
+        "amount": 6608849664,
+        "ltsz": 26615571224.04,
+        "tshare": 32352595814.4,
+        "hs": 25.329517364501953,
+        "lbc": 2,
+        "fbt": 101430,
+        "lbt": 145018,
+        "fund": 156651576,
+        "zbc": 2,
+        "hybk": "贵金属",
+        "zttj": {
+          "days": 2,
+          "ct": 2
+        }
+      },
+      {
+        "c": "600367",
+        "m": 1,
+        "n": "红星发展",
+        "p": 38150,
+        "zdp": 10.005766868591309,
+        "amount": 2781079056,
+        "ltsz": 12283276893.3,
+        "tshare": 13014143682.4,
+        "hs": 23.49808120727539,
+        "lbc": 1,
+        "fbt": 102611,
+        "lbt": 140305,
+        "fund": 91482212,
+        "zbc": 10,
+        "hybk": "化学原料",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "300313",
+        "m": 0,
+        "n": "天山生物",
+        "p": 15360,
+        "zdp": 20,
+        "amount": 639508496,
+        "ltsz": 3031338839.04,
+        "tshare": 3683005347.8399997,
+        "hs": 23.494287490844727,
+        "lbc": 1,
+        "fbt": 105842,
+        "lbt": 105842,
+        "fund": 23144448,
+        "zbc": 0,
+        "hybk": "养殖业",
+        "zttj": {
+          "days": 6,
+          "ct": 3
+        }
+      },
+      {
+        "c": "601083",
+        "m": 1,
+        "n": "锦江航运",
+        "p": 13110,
+        "zdp": 9.983221054077148,
+        "amount": 563987472,
+        "ltsz": 2544913200,
+        "tshare": 16965913200,
+        "hs": 22.63522720336914,
+        "lbc": 1,
+        "fbt": 130052,
+        "lbt": 133513,
+        "fund": 17050866,
+        "zbc": 1,
+        "hybk": "航运港口",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "600610",
+        "m": 1,
+        "n": "中毅达",
+        "p": 8660,
+        "zdp": 10.038119316101074,
+        "amount": 696790720,
+        "ltsz": 6137573265.3,
+        "tshare": 9277238105.28,
+        "hs": 11.99840259552002,
+        "lbc": 1,
+        "fbt": 131811,
+        "lbt": 131811,
+        "fund": 64715244,
+        "zbc": 0,
+        "hybk": "化学原料",
+        "zttj": {
+          "days": 4,
+          "ct": 2
+        }
+      },
+      {
+        "c": "600272",
+        "m": 1,
+        "n": "开开实业",
+        "p": 18150,
+        "zdp": 10,
+        "amount": 884506560,
+        "ltsz": 2904000000,
+        "tshare": 4767132801.75,
+        "hs": 31.8587646484375,
+        "lbc": 1,
+        "fbt": 133354,
+        "lbt": 141527,
+        "fund": 17932200,
+        "zbc": 4,
+        "hybk": "医药商业",
+        "zttj": {
+          "days": 13,
+          "ct": 7
+        }
+      },
+      {
+        "c": "002052",
+        "m": 0,
+        "n": "同洲电子",
+        "p": 9080,
+        "zdp": 10.060606002807617,
+        "amount": 280641488,
+        "ltsz": 6259635367.4,
+        "tshare": 6832152439.68,
+        "hs": 4.672367572784424,
+        "lbc": 1,
+        "fbt": 140503,
+        "lbt": 140503,
+        "fund": 50446146,
+        "zbc": 0,
+        "hybk": "其他电源",
+        "zttj": {
+          "days": 1,
+          "ct": 1
+        }
+      },
+      {
+        "c": "600403",
+        "m": 1,
+        "n": "大有能源",
+        "p": 7300,
+        "zdp": 9.939759254455566,
+        "amount": 1039822368,
+        "ltsz": 17452930534.6,
+        "tshare": 17452930520,
+        "hs": 6.199392795562744,
+        "lbc": 1,
+        "fbt": 141658,
+        "lbt": 141658,
+        "fund": 109480676,
+        "zbc": 0,
+        "hybk": "煤炭开采",
+        "zttj": {
+          "days": 4,
+          "ct": 2
+        }
+      }
+    ],
+    "compareNote": "东财涨停池不支持历史日期查询；连板数≥2 视为前几日已上板，承接强度待复核"
+  },
+  "intlMkt": {
+    "us.DJI": {
+      "name": "道琼斯",
+      "price": 53417.16,
+      "change": 140.15,
+      "changePct": 0.26,
+      "time": "2026-08-24 16:37:38"
+    },
+    "us.IXIC": {
+      "name": "纳斯达克",
+      "price": 25980.19,
+      "change": -200.26,
+      "changePct": -0.76,
+      "time": "2026-08-24 17:15:59"
+    },
+    "hf_CL": {
+      "name": "纽约原油",
+      "price": 85.04,
+      "change": 0.04,
+      "changePct": 0.05,
+      "time": "08:31:10"
+    },
+    "hf_GC": {
+      "name": "纽约黄金",
+      "price": 4743.48,
+      "change": 0.97,
+      "changePct": 0.02,
+      "time": "08:31:10"
+    }
+  },
+  "closeEmotion": {
+    "tempScore": 74,
+    "stage": "高温区",
+    "tone": "高涨",
+    "fact": "情绪高涨,接力效应强",
+    "ztTotal": 46,
+    "zbTotal": 0,
+    "maxLB": 4,
+    "limitBoardRate": 100,
+    "promotionRate": 22,
+    "redRate": 0,
+    "upCount": 0,
+    "downCount": 0,
+    "flatCount": 0,
+    "total": 0,
+    "mainLines": [
+      {
+        "rank": 1,
+        "name": "电力",
+        "changePct": 5.3,
+        "leader": "协鑫能科"
+      },
+      {
+        "rank": 2,
+        "name": "电池",
+        "changePct": 5.3,
+        "leader": "天力锂能"
+      },
+      {
+        "rank": 3,
+        "name": "中药Ⅱ",
+        "changePct": 6.2,
+        "leader": "汉森制药"
+      }
+    ],
+    "moneyInflow": [
+      {
+        "name": "电力",
+        "valueYi": 5.3
+      },
+      {
+        "name": "电池",
+        "valueYi": 5.3
+      },
+      {
+        "name": "中药Ⅱ",
+        "valueYi": 6.2
+      },
+      {
+        "name": "化学制药",
+        "valueYi": 5.4
+      }
+    ],
+    "ladder": [
+      {
+        "lianban": "4板",
+        "lead": "汉森制药"
+      },
+      {
+        "lianban": "3板",
+        "lead": "深中华A"
+      },
+      {
+        "lianban": "2板",
+        "lead": "新华百货"
+      }
+    ]
+  },
+  "techAnalysis": {
+    "399001": {
+      "name": "深证成指",
+      "last": 13794.29,
+      "ma5": 14074.778,
+      "ma10": 14239.578,
+      "ma20": 14032.245999999996,
+      "ma60": 14805.090000000004,
+      "ma120": 14737.513499999997,
+      "ma250": 13999.6048,
+      "high60": 16374.02,
+      "low60": 13068.56,
+      "intLevels": [
+        13800,
+        13800,
+        14000
+      ],
+      "vol5": 6.1510917460000005,
+      "supports": [
+        {
+          "price": 13068.56,
+          "label": "近60日低点"
+        }
+      ],
+      "pressures": [
+        {
+          "price": 13800,
+          "label": "整数关口"
+        },
+        {
+          "price": 13800,
+          "label": "整数关口"
+        }
+      ]
+    },
+    "399006": {
+      "name": "创业板指",
+      "last": 3431.89,
+      "ma5": 3530.422,
+      "ma10": 3575.585,
+      "ma20": 3499.6355000000003,
+      "ma60": 3793.8691666666664,
+      "ma120": 3676.8118333333337,
+      "ma250": 3386.33136,
+      "high60": 4380.41,
+      "low60": 3158.14,
+      "intLevels": [
+        3400,
+        3400,
+        3500
+      ],
+      "vol5": 1.847622462,
+      "supports": [
+        {
+          "price": 3400,
+          "label": "整数关口"
+        },
+        {
+          "price": 3400,
+          "label": "整数关口"
+        }
+      ],
+      "pressures": [
+        {
+          "price": 3499.64,
+          "label": "20日均线·月线"
+        },
+        {
+          "price": 3500,
+          "label": "整数关口"
+        }
+      ]
+    },
+    "000001": {
+      "name": "上证指数",
+      "last": 3882.01,
+      "ma5": 3915.13,
+      "ma10": 3929.321,
+      "ma20": 3894.4644999999996,
+      "ma60": 3967.262166666667,
+      "ma120": 4014.592000000003,
+      "ma250": 3979.872360000002,
+      "high60": 4175.35,
+      "low60": 3741.11,
+      "intLevels": [
+        3800,
+        3900,
+        4000
+      ],
+      "vol5": 5.047773468,
+      "supports": [
+        {
+          "price": 3800,
+          "label": "整数关口"
+        },
+        {
+          "price": 3741.11,
+          "label": "近60日低点"
+        }
+      ],
+      "pressures": [
+        {
+          "price": 3894.46,
+          "label": "20日均线·月线"
+        },
+        {
+          "price": 3900,
+          "label": "整数关口"
+        }
+      ]
+    }
+  },
+  "playbook": {
+    "offense": [
+      {
+        "name": "中药Ⅱ",
+        "count": 2,
+        "maxLB": 4,
+        "leadStock": "汉森制药"
+      },
+      {
+        "name": "化学制药",
+        "count": 2,
+        "maxLB": 3,
+        "leadStock": "中 关 村"
+      },
+      {
+        "name": "一般零售",
+        "count": 2,
+        "maxLB": 2,
+        "leadStock": "新华百货"
+      }
+    ],
+    "defense": [
+      {
+        "name": "高股息红利",
+        "logic": "低波动+稳定分红",
+        "scenario": "若市场风险偏好下行或风格切换"
+      },
+      {
+        "name": "公用事业",
+        "logic": "现金流稳定+刚性需求",
+        "scenario": "外盘走弱+量能萎缩"
+      },
+      {
+        "name": "银行(大行)",
+        "logic": "高股息+低估值",
+        "scenario": "高位板块兑现+避险情绪升温"
+      }
+    ],
+    "themes": [
+      {
+        "name": "医药",
+        "stocks": [
+          "开开实业"
+        ]
+      }
+    ],
+    "pitfall": [
+      {
+        "name": "高位连板股(连板≥4)",
+        "logic": "当前连板≥4 共 1 只,承接强度需复核",
+        "scenario": "若 11:30 后炸板率上升"
+      },
+      {
+        "name": "当日炸板股",
+        "logic": "近 0 只炸板,分歧加大",
+        "scenario": "缩量回踩阶段避免追高"
+      },
+      {
+        "name": "北证/微盘股",
+        "logic": "波动放大+流动性敏感",
+        "scenario": "外盘系统性风险时易补跌"
+      }
+    ]
+  },
+  "notes": "盘前简报（08:30），数据基于 2026-08-24 收盘。今日市场 9:30 开盘后才会有实时数据。"
+}
