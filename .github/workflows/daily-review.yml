@@ -74,7 +74,9 @@ jobs:
           OK=0
           case "$TYPE" in
             premarket) [ "$HOUR" -ge 820 ] && [ "$HOUR" -le 859 ] && OK=1 ;;
-            midday) [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1140 ] && OK=1 ;;  # 仅 11:30 一个触发点(对齐本地 automation 10:00/11:30/14:30)
+            midday)
+              # 午盘仅 10:00 / 11:30 / 14:30 三个触发点(对齐本地 automation),其他时间不更新
+              { [ "$HOUR" -ge 955 ] && [ "$HOUR" -le 1005 ]; } || { [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1140 ]; } || { [ "$HOUR" -ge 1425 ] && [ "$HOUR" -le 1440 ]; } && OK=1 ;;
             close) [ "$HOUR" -ge 1610 ] && [ "$HOUR" -le 1730 ] && OK=1 ;;
           esac
           if [ "$OK" = "1" ]; then
@@ -96,7 +98,12 @@ jobs:
           TODAY=$(TZ='Asia/Shanghai' date +%Y-%m-%d)
           case "${{ steps.type.outputs.type }}" in
             premarket) FT="08:30";;
-            midday) FT="11:35";;
+            midday)
+              # 午盘盘中更新:10:00/11:30/14:30 三次刷新,不跳过(覆盖最新数据)
+              echo "午盘盘中更新,不跳过(每次刷新最新数据)"
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
             close) FT="16:20";;
             *) FT="08:30";;
           esac
