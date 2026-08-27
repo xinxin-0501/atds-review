@@ -74,7 +74,7 @@ jobs:
           OK=0
           case "$TYPE" in
             premarket) [ "$HOUR" -ge 820 ] && [ "$HOUR" -le 859 ] && OK=1 ;;
-            midday) [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1230 ] && OK=1 ;;
+            midday) [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1140 ] && OK=1 ;;  # 仅 11:30 一个触发点(对齐本地 automation 10:00/11:30/14:30)
             close) [ "$HOUR" -ge 1610 ] && [ "$HOUR" -le 1730 ] && OK=1 ;;
           esac
           if [ "$OK" = "1" ]; then
