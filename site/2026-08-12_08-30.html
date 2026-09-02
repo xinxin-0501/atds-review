@@ -746,6 +746,167 @@
 .var-item{font-size:11px;padding:6px 0;border-bottom:1px dashed #f0f0f0;color:#333;line-height:1.5}
 .var-item:last-of-type{border-bottom:none}
 .vd-disclaimer{background:#fafafa;border-radius:8px;padding:8px;margin-top:8px;font-size:10px;color:#888;line-height:1.6;border:1px dashed #ddd}
+/* === 观察池策略扩展 + 今日执行策略模块样式 === */
+
+/* 策略 meta 行(category + tags 徽标) */
+.wl-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 10px 4px;
+  border-bottom: 1px dashed rgba(122, 90, 248, 0.12);
+  background: linear-gradient(90deg, rgba(122, 90, 248, 0.04), rgba(122, 90, 248, 0.01));
+}
+.wl-cat {
+  font-size: 12px;
+  font-weight: 700;
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.08);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.wl-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  padding: 1px 7px;
+  border-radius: 3px;
+}
+
+/* 策略 4 块网格(逻辑/资金/关键位/操作) */
+.detail-grid-strategy {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+  padding: 10px;
+  background: linear-gradient(135deg, rgba(122, 90, 248, 0.04), rgba(34, 211, 238, 0.03));
+  border-bottom: 1px solid rgba(122, 90, 248, 0.1);
+}
+.detail-grid-strategy .detail-block {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(122, 90, 248, 0.18);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.detail-h-custom {
+  color: #6d28d9;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.detail-h-custom .advice-tag {
+  margin-left: auto;
+  font-size: 10px;
+  padding: 1px 5px;
+}
+.detail-line-sys {
+  color: #64748b;
+  font-size: 11px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed rgba(100, 116, 139, 0.2);
+}
+.wl-num {
+  color: #dc2626;
+  font-weight: 700;
+  background: rgba(220, 38, 38, 0.06);
+  padding: 0 3px;
+  border-radius: 2px;
+}
+
+/* 今日执行策略模块 */
+.ts-card {
+  background: linear-gradient(180deg, rgba(255, 247, 237, 0.95), rgba(254, 243, 199, 0.5));
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  margin: 0 12px 14px;
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+}
+.ts-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #b45309;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  padding-bottom: 8px;
+}
+.ts-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: #92400e;
+  background: none;
+}
+.ts-core {
+  background: rgba(220, 252, 231, 0.7);
+  border-left: 3px solid #16a34a;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #166534;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.ts-core-tag {
+  display: inline-block;
+  background: #16a34a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-right: 6px;
+}
+.ts-plans {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+}
+.ts-plans li {
+  font-size: 13px;
+  color: #1f2937;
+  line-height: 1.7;
+  padding: 3px 0 3px 4px;
+  border-bottom: 1px dashed rgba(180, 83, 9, 0.1);
+}
+.ts-plans li:last-child { border-bottom: none; }
+.ts-dot {
+  color: #2563eb;
+  margin-right: 4px;
+  font-size: 10px;
+}
+.ts-dot-a { color: #2563eb; }
+.ts-dot-b { color: #7c3aed; }
+.ts-alert {
+  background: rgba(254, 243, 199, 0.6);
+  border-left: 3px solid #f59e0b;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #78350f;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.ts-alert b { color: #b45309; }
+.ts-source {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 10px;
+  color: #94a3b8;
+  font-style: italic;
+  border-top: 1px dashed rgba(148, 163, 184, 0.2);
+  padding-top: 6px;
+}
 </style>
 </head>
 <body>
@@ -759,7 +920,7 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-08-12_11-35.html">午盘</a><a href="2026-08-12_15-20.html">收盘</a><a href="2026-08-24_16-20.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-08-12_11-35.html">午盘</a><a href="2026-08-12_15-20.html">收盘</a><a href="2026-09-02_08-30.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-08-12 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div></div>
@@ -781,6 +942,8 @@
     <span class="wl-cell wl-cell-sig"><span class="sig sig-wait">等待确认</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600392" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600392">
+    
+    
     <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">震荡整理,方向未明</div><div class="detail-line">量能温和</div></div>
       <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-wave">波段</span></div><div class="detail-line"><b>短线</b>区间震荡,关注 MA10 方向选择</div><div class="detail-line"><b>波段</b>区间震荡,等待 MA20 方向选择</div><div class="detail-line"><b>长线</b>跌破 MA120,长线宜减仓观望</div></div>
@@ -798,6 +961,7 @@ tags: [ATDS, 交易复盘]
 # 观察池
 - 盛和资源 (600392): 23.71 -0.63%
 </pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
+  
   <div class="card">
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">--° ·  · </div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">92 家 · 最高 7 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">百花医药</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">-- 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">--</div></div></div>

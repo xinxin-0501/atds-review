@@ -19,6 +19,7 @@ const intlCss = fs.readFileSync(path.join(ROOT, 'intl_mkt.css'), 'utf8').trim();
 const tpCss = fs.readFileSync(path.join(ROOT, 'tech_playbook_verdict.css'), 'utf8').trim();
 const ceCss = fs.readFileSync(path.join(ROOT, 'close_emotion.css'), 'utf8').trim();
 const heroCss = fs.readFileSync(path.join(ROOT, 'hero_mobile.css'), 'utf8').trim();
+const wlStrategyCss = fs.readFileSync(path.join(ROOT, 'watchlist_strategy.css'), 'utf8').trim();
 
 // 自动扫描 site 下所有 HTML(含 reviews/ 子目录),云端新日期自动纳入
 function scanFiles() {
@@ -97,6 +98,13 @@ for (const rel of files) {
     if (c.includes('</style>')) {
       c = c.replace('</style>', tpCss + '\n</style>', 1);
       console.log('  +tp CSS:', rel);
+    }
+  }
+  // Ensure watchlist strategy CSS exists
+  if (!c.includes('.ts-card{')) {
+    if (c.includes('</style>')) {
+      c = c.replace('</style>', wlStrategyCss + '\n</style>', 1);
+      console.log('  +wlStrategy CSS:', rel);
     }
   }
 
