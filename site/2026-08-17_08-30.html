@@ -1026,13 +1026,19 @@
 }
 
 /* === 今日执行策略模块(图2 风格) === */
-.ts-card {
+.ts-card,
+.ts-stock-card {
   background: linear-gradient(180deg, rgba(255, 247, 237, 0.95), rgba(254, 243, 199, 0.5));
   border: 1px solid rgba(245, 158, 11, 0.25);
   margin: 14px 12px 14px;
   border-radius: 12px;
   padding: 14px 14px 12px;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+}
+.ts-stock-card {
+  margin: 0 12px 14px;  /* per-stock 时去掉上 margin,贴个股下方 */
+  padding: 12px 12px 10px;
+  border-radius: 8px;
 }
 .ts-title {
   font-size: 15px;
@@ -1160,6 +1166,7 @@
     
     
     
+    
   </div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报
 tags: [ATDS, 交易复盘]
@@ -1167,7 +1174,6 @@ tags: [ATDS, 交易复盘]
 # 观察池
 - 盛和资源 (600392): 23.58 -1.34%
 </pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
-  
   <div class="card">
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">83° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">77 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">天洋新材</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">64 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">化学制品 / 塑料 / 化学制药</div></div></div>

@@ -879,7 +879,7 @@ function deriveAdviceText(pct, atds, riskTone) {
   if (v >= 5) return '高位震荡,逢高减仓为主';
   return '持有观察,关注量能配合';
 }
-function buildStockRow(s, i) {
+function buildStockRow(s, i, report) {
   const cls = upDownClass(s.pct);
   const sig = deriveStockStrategy(s.pct);
   const atds = deriveStockAtds(s.pct, s.turnover);
@@ -939,7 +939,7 @@ function buildStockRow(s, i) {
     const stop = '<div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">' + esc(st.stopLoss || '--') + '</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">' + esc(st.takeProfit || '--') + '</span><span class="wl-st-key">目标</span>' + cellNum(st.target) + '</div>';
     const risk = st.risk ? '<div class="wl-st-risk"><b>风险</b>' + esc(st.risk) + '</div>' : '';
     todayStrategyBlock = '<div class="wl-st-table">' +
-      '<div class="wl-st-title">🎯 个股执行策略</div>' +
+      '<div class="wl-st-title">🎯 个股风控</div>' +
       '<div class="wl-st-head">' + cell('入场') + cell('执行') + cell('风控') + '</div>' +
       entry + note + stop + risk +
       '</div>';
@@ -968,10 +968,13 @@ function buildStockRow(s, i) {
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="${esc(code)}" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div>`;
   const meta = (categoryHtml || tagsHtml) ? `<div class="wl-meta">${categoryHtml}${tagsHtml}</div>` : '';
+  // 每只个股下方的"今日执行策略"卡片(盘前 per-stock 内置,字段空不渲染)
+  const perStockTS = report.meta && report.meta.type === 'premarket' ? renderPerStockTodayStrategy(s) : '';
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
     ${meta}
     ${strategyBlocks}
     ${todayStrategyBlock}
+    ${perStockTS}
   </div>`;
   return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;
 }
@@ -999,7 +1002,7 @@ function buildStockModal(s) {
 function renderWatchlist(report) {
   const list = report.watchlist || [];
   const time = (report.meta && report.meta.generatedAt) || '';
-  const stocks = list.map((s, idx) => buildStockRow(s, idx)).join('');
+  const stocks = list.map((s, idx) => buildStockRow(s, idx, report)).join('');
   const head = '<div class="card watchlist-card">' +
     '<div class="wl-header">' +
       '<div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● ' + esc(time) + '</span></div>' +
@@ -1214,13 +1217,12 @@ function renderStrongStock(report) {
   return card + modal;
 }
 
-// 今日执行策略模块(图2 风格:核心 + 方案A/B + 二选一建议 + 仓位控制 + 关键提醒 + 数据来源)
-function renderTodayStrategy(report) {
-  if (!report || report.meta.type !== 'premarket') return '';
-  const t = report.todayStrategy;
+// 每只个股的今日执行策略(图2 风格,仅盘前展示)
+function renderPerStockTodayStrategy(s) {
+  const t = s.todayStrategy;
   if (!t) return '';
   if (!t.core && !t.planA.content && !t.planB.content && !t.choice && !t.position && !t.alert) return '';
-  const core = t.core ? `<div class="ts-core"><span class="ts-core-tag">核心</span><b>${esc(t.core.split('。')[0] || t.core)}</b>${t.core.split('。')[1] ? esc('。' + t.core.split('。').slice(1).join('。')) : ''}</div>` : '';
+  const core = t.core ? `<div class="ts-core"><span class="ts-core-tag">核心</span>${esc(t.core)}</div>` : '';
   const planA = t.planA && (t.planA.title || t.planA.content) ? `<li><span class="ts-dot ts-dot-a"></span><b>方案A (${esc(t.planA.title || '求稳回踩')})</b>: ${esc(t.planA.content || '')}</li>` : '';
   const planB = t.planB && (t.planB.title || t.planB.content) ? `<li><span class="ts-dot ts-dot-b"></span><b>方案B (${esc(t.planB.title || '突破确认')})</b>: ${esc(t.planB.content || '')}</li>` : '';
   const plans = (planA || planB) ? '<ul class="ts-plans">' + planA + planB + '</ul>' : '';
@@ -1229,10 +1231,9 @@ function renderTodayStrategy(report) {
     (t.position ? `<li><span class="ts-dot"></span><b>仓位控制</b>: ${esc(t.position)}</li>` : '') +
   '</ul>' : '';
   const alert = t.alert ? `<div class="ts-alert"><b>关键提醒</b>: ${esc(t.alert)}</div>` : '';
-  const source = t.source ? `<div class="ts-source">${esc(t.source)}</div>` : '';
-  return '<div class="card ts-card">' +
+  return '<div class="card ts-stock-card">' +
     '<div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div>' +
-    core + plans + extrasList + alert + source +
+    core + plans + extrasList + alert +
   '</div>';
 }
 
@@ -1356,7 +1357,6 @@ ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
   ${renderWatchlist(report)}
-  ${renderTodayStrategy(report)}
   ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
