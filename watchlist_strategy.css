@@ -211,18 +211,19 @@
 .wl-st-head span:last-child { border-right: none; }
 .wl-st-tr {
   display: grid;
-  grid-template-columns: 70px 1fr 70px 1fr 70px 1fr;
+  grid-template-columns: 54px minmax(0, 1fr) 54px minmax(0, 1fr) 54px minmax(0, 1fr);
   font-size: 12px;
   border-bottom: 1px solid rgba(245, 158, 11, 0.08);
 }
 .wl-st-tr > span {
-  padding: 6px 8px;
+  padding: 5px 6px;
   border-right: 1px solid rgba(245, 158, 11, 0.08);
-  overflow-wrap: anywhere;  /* 文字可换行,看到完整内容 */
+  overflow-wrap: anywhere;
   word-break: break-word;
-  white-space: normal;  /* 关键修复:去掉 nowrap 避免截断 */
-  line-height: 1.5;
+  white-space: normal;
+  line-height: 1.4;
   font-size: 12px;
+  min-width: 0;  /* 关键:允许 grid 子项收缩到 0,避免 1fr 撑爆 */
 }
 .wl-st-key {
   white-space: nowrap !important;  /* 列头(策略/价格/仓位)不换行,保持紧凑 */
