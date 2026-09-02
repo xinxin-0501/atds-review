@@ -4016,10 +4016,11 @@ function restoreSavedWatchlist(){
   configCodes=[];
   document.querySelectorAll('.wl-stock-row[data-code]').forEach(function(r){var cd=r.getAttribute("data-code");if(cd&&configCodes.indexOf(cd)<0)configCodes.push(cd);});
   // 4. localStorage 中不在 config 的代码 → 拉最新行情追加
+  //    (排除 hidden:手动添加但被手动删除的股票刷新也不恢复)
   var extraCodes=[];
   if(raw!==null){
     try{extraCodes=JSON.parse(raw)||[];}catch(e){}
-    extraCodes=extraCodes.filter(function(c){return /^\d{6}$/.test(String(c))&&configCodes.indexOf(c)<0;});
+    extraCodes=extraCodes.filter(function(c){return /^\d{6}$/.test(String(c))&&configCodes.indexOf(c)<0&&hidden.indexOf(c)<0;});
   }
   if(!extraCodes.length)return;
   (async function(){
