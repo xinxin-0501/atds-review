@@ -692,7 +692,7 @@ function waveScore(klines) {
   let troughIdx = Math.max(0, peakIdx - 25);
   for (let i = troughIdx; i <= peakIdx; i++) if (closes[i] < closes[troughIdx]) troughIdx = i;
   const firstWaveGain = (closes[peakIdx] - closes[troughIdx]) / closes[troughIdx];
-  if (firstWaveGain < 0.15) return null; // 一波涨幅不足,排除
+  if (firstWaveGain < 0.25) return null; // 波幅硬门槛 ≥25%:慢牛/低波幅(如长江电力 w16/民生 w15)直接排除
   // 2) 调整段
   const adjDays = n - 1 - peakIdx;
   if (adjDays < 2 || adjDays > 30) return null;
@@ -744,17 +744,32 @@ function waveScore(klines) {
   const mean = (arr, s, e) => { let t = 0; for (let i = s; i <= e; i++) t += arr[i]; return t / (e - s + 1); };
   const ma5 = mean(closes, n - 5, n - 1), ma10 = mean(closes, n - 10, n - 1), ma20 = mean(closes, n - 20, n - 1);
   const maAlign = ma5 > ma10 && ma10 > ma20;
-  // 打分
+  // 打分(战法加权):波幅>形态>缩量>KDJ双真>支撑>止跌>均线
   let score = 0;
-  if (firstWaveGain >= 0.20) score += 25; else if (firstWaveGain >= 0.15) score += 15;
-  if (adjPct >= -0.05) score += 20; else if (adjPct >= -0.15) score += 15; else score += 8;
-  if (volRatio <= 0.5) score += 15; else if (volRatio <= 0.75) score += 10;
-  if (kdjGold) score += 15;
-  if (kdjDivergence) score += 10;
-  if (notBreakSupport) score += 10;
-  if (stabilize) score += 5;
-  if (maAlign) score += 5;
-  if (score < 45) return null;
+  // 1) 波幅权重最高(硬门槛≥25%已保证"大幅快速拉升"前提,波幅越大二波确定性越高)
+  if (firstWaveGain >= 0.60) score += 30;
+  else if (firstWaveGain >= 0.40) score += 24;
+  else if (firstWaveGain >= 0.30) score += 16;
+  else score += 10; // 0.25~0.30 保底
+  // 2) 调整形态:横盘强调整>浅回调>深回调(不破大阳支撑优先,深调破位风险高)
+  if (adjPct >= -0.05) score += 22;
+  else if (adjPct >= -0.10) score += 14;
+  else if (adjPct >= -0.15) score += 8;
+  else score += 2;
+  // 3) 缩量洗盘(战法核心:缩量调整后上涨概率更强,量窒息最佳)
+  if (volRatio <= 0.45) score += 20;
+  else if (volRatio <= 0.7) score += 16;
+  else if (volRatio <= 0.9) score += 10;
+  else if (volRatio <= 1.2) score += 4;
+  // 4) KDJ 同价位背离+金叉双真最优
+  if (kdjGold && kdjDivergence) score += 24;
+  else if (kdjGold) score += 12;
+  else if (kdjDivergence) score += 8;
+  // 5) 支撑/止跌/均线
+  if (notBreakSupport) score += 8;
+  if (stabilize) score += 4;
+  if (maAlign) score += 6;
+  if (score < 55) return null;
   return {
     score,
     waveGain: Math.round(firstWaveGain * 1000) / 10,
@@ -769,7 +784,8 @@ function waveScore(klines) {
   };
 }
 
-async function scanWaveDivergence() {
+async function scanWaveDivergence(themeCodes) {
+  // themeCodes: 当日强势股/超短核心命中代码集合(题材辨识交叉加分,默认空)
   // 读取全 A 列表(已剔除 ST/北交所)
   let symbols = [];
   try {
@@ -823,8 +839,15 @@ async function scanWaveDivergence() {
     done += slice.length;
     if (done % 300 === 0) console.log(`  波背离扫描进度: ${done}/${cands.length}, 命中 ${results.length}`);
   }
+  // 题材辨识交叉:命中强势股/超短核心的候选加分(市场辨识度,非纯形态套利)
+  const themeSet = (themeCodes instanceof Set) ? themeCodes : new Set();
+  for (const r of results) {
+    const c = String(r.code || '').replace(/^(sh|sz|bj)/, '');
+    if (themeSet.has(c)) { r.themeHit = true; r.score += 12; }
+    else r.themeHit = false;
+  }
   results.sort((a, b) => b.score - a.score);
-  const list = results.slice(0, 30).map((x, i) => ({
+  const list = results.slice(0, 20).map((x, i) => ({
     rank: i + 1,
     code: x.code.replace(/^(sh|sz|bj)/, ''),
     name: x.name,
@@ -836,6 +859,7 @@ async function scanWaveDivergence() {
     waveGain: x.waveGain, adjPct: x.adjPct, adjDays: x.adjDays,
     volRatio: x.volRatio, volTrap: x.volTrap,
     kdjGold: x.kdjGold, kdjDivergence: x.kdjDivergence, maAlign: x.maAlign,
+    themeHit: !!x.themeHit,
     signalType: x.signalType, prevHigh: x.prevHigh, support: x.support
   }));
   return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
@@ -952,7 +976,7 @@ async function scanShortCore() {
     if (done % 300 === 0) console.log(`  超短核心扫描进度: ${done}/${cands.length}, 命中 ${results.length}`);
   }
   results.sort((a, b) => b.score - a.score);
-  const list = results.slice(0, 30).map((x, i) => ({
+  const list = results.slice(0, 20).map((x, i) => ({
     rank: i + 1,
     code: x.code.replace(/^(sh|sz|bj)/, ''),
     name: x.name,
@@ -1132,7 +1156,7 @@ async function scanStrongStock() {
     if (done % 300 === 0) console.log(`  强势股扫描进度: ${done}/${cands.length}, 命中 ${results.length}`);
   }
   results.sort((a, b) => b.score - a.score);
-  const list = results.slice(0, 30).map((x, i) => ({
+  const list = results.slice(0, 20).map((x, i) => ({
     rank: i + 1,
     code: x.code.replace(/^(sh|sz|bj)/, ''),
     name: x.name,
@@ -1401,15 +1425,19 @@ async function main() {
   // 强势股选股(仅午盘):全A扫描剔除ST,优先排序TOP30
   let strongStock = null;
   if (type === 'midday') {
-    console.log('开始波背离全市场扫描(午盘)...');
-    waveDivergence = await scanWaveDivergence();
-    console.log('波背离扫描完成:', waveDivergence ? waveDivergence.list.length : 0, '只');
     console.log('开始超短核心全市场扫描(午盘)...');
     shortCore = await scanShortCore();
     console.log('超短核心扫描完成:', shortCore ? shortCore.list.length : 0, '只');
     console.log('开始强势股全市场扫描(午盘)...');
     strongStock = await scanStrongStock();
     console.log('强势股扫描完成:', strongStock ? strongStock.list.length : 0, '只');
+    // 题材辨识交叉集合:强势股+超短核心命中代码(战法加权用,避免波背离只出纯形态套利)
+    const themeCodes = new Set();
+    for (const s of (shortCore && shortCore.list) || []) themeCodes.add(String(s.code));
+    for (const s of (strongStock && strongStock.list) || []) themeCodes.add(String(s.code));
+    console.log('开始波背离全市场扫描(午盘,题材交叉集 '+themeCodes.size+' 个)...');
+    waveDivergence = await scanWaveDivergence(themeCodes);
+    console.log('波背离扫描完成:', waveDivergence ? waveDivergence.list.length : 0, '只');
   }
 
   const report = {

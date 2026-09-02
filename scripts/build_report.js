@@ -1037,7 +1037,7 @@ function renderWatchlist(report) {
   return head + knowledge + modals;
 }
 
-// 波背离选股模块(仅午盘:全A剔除ST扫描,优先排序 TOP30,点击弹个股,可刷新行情)
+// 波背离选股模块(仅午盘:全A剔除ST扫描,优先排序 TOP20,点击弹个股,可刷新行情)
 function renderWaveDivergence(report) {
   const w = report.waveDivergence;
   if (!w || !Array.isArray(w.list) || !w.list.length) return '';
@@ -1065,19 +1065,19 @@ function renderWaveDivergence(report) {
   }).join('');
   const card = `<div class="card wave-card">
     <div class="wave-header">
-      <div class="wave-title">🌊 波背离选股 TOP30</div>
+      <div class="wave-title">🌊 波背离选股 TOP20</div>
       <div class="wave-sub">前期强势一波 → 缩量调整 → KDJ背离金叉 · 盘中扫描全A剔除ST</div>
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(w.source || '全A扫描')}</span>
       <button id="wave-open-btn" class="wl-btn wl-btn-primary" onclick="openWaveDivergenceModal()">📋 打开波背离名单</button>
     </div>
-    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 30 只波背离股票 · 支持刷新行情与一键加入观察池</div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 20 只波背离股票 · 支持刷新行情与一键加入观察池</div>
   </div>`;
   const modal = `<div class="modal-mask" id="wave-divergence-modal" onclick="if(event.target===this)closeWaveDivergenceModal()">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <div class="modal-eyebrow">🌊 波背离选股 TOP30 · 全A剔除ST</div>
+        <div class="modal-eyebrow">🌊 波背离选股 TOP20 · 全A剔除ST</div>
         <span class="modal-close" onclick="closeWaveDivergenceModal()">×</span>
       </div>
       <div class="modal-body">
@@ -1126,19 +1126,19 @@ function renderShortCore(report) {
   }).join('');
   const card = `<div class="card sc-card">
     <div class="wave-header">
-      <div class="wave-title">⚡ 超短核心 TOP30</div>
+      <div class="wave-title">⚡ 超短核心 TOP20</div>
       <div class="wave-sub">竞价最强 · 开盘换手 · 连板梯度 · 量价共振 · 盘中扫描全A剔除ST</div>
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(sc.source || '全A扫描')}</span>
       <button id="sc-open-btn" class="wl-btn wl-btn-primary" onclick="openShortCoreModal()">📋 打开超短核心名单</button>
     </div>
-    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 30 个超短核心股票 · 支持刷新行情与一键全部加入观察池</div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 20 个超短核心股票 · 支持刷新行情与一键全部加入观察池</div>
   </div>`;
   const modal = `<div class="modal-mask" id="short-core-modal" onclick="if(event.target===this)closeShortCoreModal()">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <div class="modal-eyebrow">⚡ 超短核心 TOP30 · 全A剔除ST</div>
+        <div class="modal-eyebrow">⚡ 超短核心 TOP20 · 全A剔除ST</div>
         <span class="modal-close" onclick="closeShortCoreModal()">×</span>
       </div>
       <div class="modal-body">
@@ -1185,19 +1185,19 @@ function renderStrongStock(report) {
   }).join('');
   const card = `<div class="card ss-card">
     <div class="wave-header">
-      <div class="wave-title">🔥 强势股选股 TOP30</div>
+      <div class="wave-title">🔥 强势股选股 TOP20</div>
       <div class="wave-sub">缺口不回补 · 二波启动 · 突破起爆点 · KDJ(8,2,2)金叉 · 盘中扫描全A剔除ST</div>
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(ss.source || '全A扫描')}</span>
       <button id="ss-open-btn" class="wl-btn wl-btn-primary" onclick="openStrongStockModal()">📋 打开强势股名单</button>
     </div>
-    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 30 只强势股 · 支持刷新行情与一键全部加入观察池</div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 20 只强势股 · 支持刷新行情与一键全部加入观察池</div>
   </div>`;
   const modal = `<div class="modal-mask" id="strong-stock-modal" onclick="if(event.target===this)closeStrongStockModal()">
     <div class="modal" onclick="event.stopPropagation()">
       <div class="modal-header">
-        <div class="modal-eyebrow">🔥 强势股选股 TOP30 · 全A剔除ST</div>
+        <div class="modal-eyebrow">🔥 强势股选股 TOP20 · 全A剔除ST</div>
         <span class="modal-close" onclick="closeStrongStockModal()">×</span>
       </div>
       <div class="modal-body">
