@@ -3968,10 +3968,104 @@ function deriveRiskTextF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||
 function deriveHorizonLinesF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0,sh=v>=3&&t>=2?'回踩 MA5 不破可继续,跌破减仓':v>=1?'区间震荡,顺势做 T,关注 MA10':v<=-3?'下跌趋势,反弹至 MA5 减仓':'区间震荡,关注 MA10 方向选择';var wa=v>=2?'沿 MA20 运行,跌破 MA60 警惕走弱':v<=-2?'跌至 MA20 下方,关注 MA60 是否扣住':'区间震荡,等待 MA20 方向选择';var lo=v>=0?'站上 MA120 偏多,关注 MA250 突破':'跌破 MA120,长线宜减仓观望';return[{k:'短线',v:sh},{k:'波段',v:wa},{k:'长线',v:lo}];}
 function deriveAdviceTextF(pct,atds,riskTone){var v=Number(pct)||0,a=Number(atds)||0;if(v<=-5)return'跌幅较大,建议减仓规避';if(a>=85&&riskTone!='high')return'ATDS 证据强,重点关注';if(a>=75&&v>=0)return'持有观察,等待放量催化';if(a<60&&v<=-1)return'技术偏弱,观望等待企稳';if(v>=5)return'高位震荡,逢高减仓为主';return'持有观察,关注量能配合';}
 function escHtmlF(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// 自动生成 watchlist 字段模板(手动添加个股用,基于实时行情计算)
+function autoGenStrategy(s,v,atds,turnover){
+  var price=Number(s.price)||0;
+  var support=(price*0.92).toFixed(2), pressure=(price*1.08).toFixed(2);
+  var stopLoss=(price*0.95).toFixed(2);
+  // 策略字段模板
+  var logic=v>=5?'强势突破,关注量能持续性':
+             v>=2?'强势承接,技术偏强':
+             v>=-1?'震荡整理,方向待确认':
+             v>=-3?'回调观察,关注支撑位':
+             '弱势回调,严格控制仓位';
+  var capital=turnover>=5?'主力活跃,换手率 '+s.turnover+'%,资金博弈加剧':
+                turnover>=2?'换手温和('+s.turnover+'%),资金参与一般':
+                turnover>=0.5?'换手一般('+s.turnover+'%)':
+                '换手偏低('+s.turnover+'%),关注资金异动';
+  var keyLevels='支撑 '+support+' / 压力 '+pressure;
+  // 操作建议:基于 ATDS + 风险等级
+  var planEntry=atds>=85?'重点关注,可参与':
+                atds>=70?'持有观察,等待催化':
+                atds>=60?'中性观望,等放量确认':
+                '建议观望,等待企稳';
+  var entryPrice=v>=3?'突破当前价 '+price+' 跟进':
+                v<=-3?'回踩 '+support+' 附近低吸':
+                '区间震荡 '+support+' - '+pressure;
+  var entryPos=atds>=85?'中等仓位':
+                atds>=70?'轻仓试错':
+                '保守仓位';
+  var entryNote='参考风险等级与资金面,严格执行止损';
+  var stopLossStr=stopLoss+' · 清仓';
+  var takeProfitStr=v>=0?'站稳 '+pressure+' 趋势延伸':'跌破 '+support+' 走弱减仓';
+  var targetStr=price+' → '+pressure;
+  var riskStr='买入区 '+price+',止损 '+stopLoss+',可损约 5%。跌破止损必须走,不恋战。';
+  return {
+    logic:logic, capital:capital, keyLevels:keyLevels,
+    plan:planEntry+',关注 '+entryPrice+' 机会',
+    strategy:{entryStrategy:v>=3?'突破追涨':'回踩低吸',entryPrice:entryPrice,entryPosition:entryPos,entryNote:entryNote,stopLoss:stopLossStr,takeProfit:takeProfitStr,target:targetStr,risk:riskStr},
+    todayStrategy:{
+      core:v>=2?'不追高,等回踩确认后再参与':'已回调,可分批低吸,严控仓位',
+      planA:{title:'求稳回踩',content:'回踩 '+support+' 附近低吸,严控仓位在 20-30%'},
+      planB:{title:'突破确认',content:'放量突破 '+pressure+' 加仓,确认趋势后看高 5-8%'},
+      choice:'先做方案 A 求稳,跌破 '+stopLoss+' 立即止损',
+      position:'总仓位控制在回笼资金的 20% 以内,单股严控',
+      alert:'若板块整体走弱或大盘破位,放弃买入等待'
+    }
+  };
+}
+// 单独渲染 detail 区(供 refreshWatchlistQuotes 复用,保证手动添加个股 detail 也跟随最新行情)
+function buildWatchlistDetailHtml(data){
+  var v=Number(data.pct)||0;
+  var atds=70+Math.min(25,Math.max(-15,Math.round(v*2+(Number(data.turnover)||0)*0.5)));
+  var stopLoss=(Number(data.price)*0.95).toFixed(2);
+  var support=(Number(data.price)*0.92).toFixed(2);
+  var pressure=(Number(data.price)*1.08).toFixed(2);
+  var turnover=Number(data.turnover)||0;
+  var riskL=deriveRiskLevelF(v),horizonL=deriveTimeHorizonF(v,turnover),adviceL=deriveAdviceF(v,atds,riskL.tone);
+  var riskLines=deriveRiskTextF(v,turnover);
+  var adviceText=deriveAdviceTextF(v,atds,riskL.tone);
+  var autoS=autoGenStrategy(data,v,atds,turnover);
+  var catTag=v>=5?'强势突破':v>=2?'强势参与':v>=0.5?'震荡观察':v>=-1?'中性观望':v>=-3?'回调关注':'弱势规避';
+  var metaHtml='<div class="wl-meta"><span class="wl-cat">自选股</span><span class="wl-tag">'+escHtmlF(catTag)+'</span></div>';
+  var blockLogic='<div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">'+escHtmlF(autoS.logic)+'</div></div>';
+  var blockCapital='<div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">'+escHtmlF(autoS.capital)+'</div></div>';
+  var blockKey='<div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">'+escHtmlF(autoS.keyLevels)+'</div></div>';
+  var parHtml='<div class="detail-block detail-block-par">'+
+    '<div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>'+
+    '<div class="par-body">'+
+      '<div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">'+escHtmlF(autoS.plan)+'</span></div>'+
+      '<div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">'+escHtmlF(adviceText)+'<span class="advice-tag-mini advice-'+adviceL.tone+'">'+escHtmlF(adviceL.name)+'</span></span></div>'+
+      '<div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-'+riskL.tone+'">'+escHtmlF(riskL.name)+'</span><ul>'+riskLines.map(function(l){return '<li>'+escHtmlF(l)+'</li>';}).join('')+'</ul></span></div>'+
+    '</div></div>';
+  var strategyBlocks='<div class="detail-grid detail-grid-strategy">'+blockLogic+blockCapital+blockKey+parHtml+'</div>';
+  var st=autoS.strategy;
+  var todayStHtml='<div class="wl-st-table">'+
+    '<div class="wl-st-title">🎯 个股风控</div>'+
+    '<div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div>'+
+    '<div class="wl-st-tr"><span class="wl-st-key">策略</span><span>'+escHtmlF(st.entryStrategy)+'</span><span class="wl-st-key">价格</span><span class="wl-st-num">'+escHtmlF(st.entryPrice)+'</span><span class="wl-st-key">仓位</span><span>'+escHtmlF(st.entryPosition)+'</span></div>'+
+    '<div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">'+escHtmlF(st.stopLoss)+'</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">'+escHtmlF(st.takeProfit)+'</span><span class="wl-st-key">目标</span><span class="wl-st-num">'+escHtmlF(st.target)+'</span></div>'+
+    '<div class="wl-st-risk"><b>风险</b>'+escHtmlF(st.risk)+'</div>'+
+  '</div>';
+  var ts=autoS.todayStrategy;
+  var todayStrategyCard='<div class="card ts-stock-card">'+
+    '<div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div>'+
+    '<div class="ts-core"><span class="ts-core-tag">核心</span>'+escHtmlF(ts.core)+'</div>'+
+    '<ul class="ts-plans">'+
+      '<li><span class="ts-dot ts-dot-a"></span><b>方案A ('+escHtmlF(ts.planA.title)+')</b>: '+escHtmlF(ts.planA.content)+'</li>'+
+      '<li><span class="ts-dot ts-dot-b"></span><b>方案B ('+escHtmlF(ts.planB.title)+')</b>: '+escHtmlF(ts.planB.content)+'</li>'+
+    '</ul>'+
+    '<ul class="ts-plans">'+
+      '<li><span class="ts-dot"></span><b>二选一建议</b>: '+escHtmlF(ts.choice)+'</li>'+
+      '<li><span class="ts-dot"></span><b>仓位控制</b>: '+escHtmlF(ts.position)+'</li>'+
+    '</ul>'+
+    '<div class="ts-alert"><b>关键提醒</b>: '+escHtmlF(ts.alert)+'</div>'+
+  '</div>';
+  return metaHtml+strategyBlocks+todayStHtml+todayStrategyCard;
+}
 function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
   if(!card)return;
-  // 已存在则不重复添加(静态 HTML 已有 600392,恢复自选时避免重复行)
   if(s&&s.code&&document.querySelector('.wl-stock[data-stock-code="'+String(s.code).replace(/"/g,'\\"')+'"]'))return;
   var stocksWrap=card.querySelector(".wl-stocks");
   if(!stocksWrap){stocksWrap=document.createElement("div");stocksWrap.className="wl-stocks";var head=card.querySelector(".wl-stocks-head");if(head&&head.nextSibling){card.insertBefore(stocksWrap,head.nextSibling);}else{card.appendChild(stocksWrap);}}
@@ -3990,10 +4084,7 @@ function addToWatchlistUI(s){
   var support=(Number(s.price)*0.92).toFixed(2);
   var pressure=(Number(s.price)*1.08).toFixed(2);
   var turnover=Number(s.turnover)||0;
-  var riskL=deriveRiskLevelF(v),horizonL=deriveTimeHorizonF(v,turnover),adviceL=deriveAdviceF(v,atds,riskL.tone);
-  var riskLines=deriveRiskTextF(v,turnover);
-  var horizons=deriveHorizonLinesF(v,turnover);
-  var adviceText=deriveAdviceTextF(v,atds,riskL.tone);
+  var detailHtml=buildWatchlistDetailHtml(s);
   var stock=document.createElement('div');
   stock.className='wl-stock';
   stock.setAttribute('data-stock-code',s.code);
@@ -4018,13 +4109,8 @@ function addToWatchlistUI(s){
     '<span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="'+escHtmlF(s.code)+'" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="'+escHtmlF(s.code)+'" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>'+
     '</div>'+
     '</div>'+
-    '<div class="wl-detail" data-detail-code="'+escHtmlF(s.code)+'">'+
-    '<div class="detail-grid">'+
-    '<div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-'+riskL.tone+'">'+escHtmlF(riskL.name)+'</span></div>'+riskLines.map(function(l){return '<div class="detail-line">'+escHtmlF(l)+'</div>';}).join('')+'</div>'+
-    '<div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-'+horizonL.tone+'">'+escHtmlF(horizonL.name)+'</span></div>'+horizons.map(function(h){return '<div class="detail-line"><b>'+escHtmlF(h.k)+'</b>'+escHtmlF(h.v)+'</div>';}).join('')+'</div>'+
-    '<div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-'+adviceL.tone+'">'+escHtmlF(adviceL.name)+'</span></div><div class="detail-line">'+escHtmlF(adviceText)+'</div></div>'+
-    '</div>'+
-    '<div class="detail-spb"><span><b>止损</b> '+stopLoss+'</span><span><b>支撑</b> '+support+'</span><span><b>压力</b> '+pressure+'</span></div>'+
+    '<div class="wl-detail auto-detail" data-detail-code="'+escHtmlF(s.code)+'">'+
+      detailHtml+
     '</div>';
   stocksWrap.appendChild(stock);
 }
@@ -4187,39 +4273,9 @@ async function refreshWatchlistQuotes(){
           if(su)su.textContent=(price*0.92).toFixed(2);
           if(pr)pr.textContent=(price*1.08).toFixed(2);
         }
-        // 2. 重新计算 detail-grid 内"风险/风控/建议"文本(基于最新 pct/turnover/atds)
-        var turnNum=Number(turnover);
-        var riskL=deriveRiskLevelF(pct);
-        var horizonL=deriveTimeHorizonF(pct,turnNum);
-        var adviceL=deriveAdviceF(pct,atds,riskL.tone);
-        var riskLines=deriveRiskTextF(pct,turnNum);
-        var horizons=deriveHorizonLinesF(pct,turnNum);
-        var adviceText=deriveAdviceTextF(pct,atds,riskL.tone);
-        var blocks=d.querySelectorAll('.detail-block');
-        if(blocks.length>=3){
-          // 风险块(第 1 个):更新 riskName + 列表
-          var riskNameEl=blocks[0].querySelector('.risk-tag');
-          if(riskNameEl){riskNameEl.className='risk-tag risk-'+riskL.tone;riskNameEl.textContent=riskL.name;}
-          var riskListEl=blocks[0].querySelectorAll('.detail-line');
-          riskListEl.forEach(function(el,idx){if(riskLines[idx]!=null)el.textContent=riskLines[idx];});
-          // 风控块(第 2 个):更新 horizonName + 3 行短线/波段/长线
-          var horizonNameEl=blocks[1].querySelector('.horizon-tag');
-          if(horizonNameEl){horizonNameEl.className='horizon-tag horizon-'+horizonL.tone;horizonNameEl.textContent=horizonL.name;}
-          var horizonRows=blocks[1].querySelectorAll('.detail-line');
-          horizonRows.forEach(function(el,idx){
-            if(horizons[idx]){
-              var b=el.querySelector('b');if(b)b.textContent=horizons[idx].k;
-              // 文本节点(去除 b 后剩余部分)
-              var txtNode=Array.from(el.childNodes).find(function(n){return n.nodeType===3&&n.textContent.trim()!==''});
-              if(txtNode)txtNode.textContent=horizons[idx].v;
-              else if(!b){el.textContent=horizons[idx].k+horizons[idx].v;}
-            }
-          });
-          // 建议块(第 3 个):更新 adviceName + text
-          var adviceNameEl=blocks[2].querySelector('.advice-tag');
-          if(adviceNameEl){adviceNameEl.className='advice-tag advice-'+adviceL.tone;adviceNameEl.textContent=adviceL.name;}
-          var adviceTextEl=blocks[2].querySelector('.detail-line');
-          if(adviceTextEl){adviceTextEl.textContent=adviceText;}
+        // 2. 手动添加的 detail(auto-detail class): 整体重新生成(让所有字段跟随最新行情)
+        if(d.classList.contains('auto-detail')){
+          d.innerHTML=buildWatchlistDetailHtml({code:code,name:f[1],price:price,pct:pct,amount:amount,turnover:turnover,setcode:''});
         }
       }
     });
