@@ -959,19 +959,18 @@
 .wl-st-head span:last-child { border-right: none; }
 .wl-st-tr {
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr) 54px minmax(0, 1fr) 54px minmax(0, 1fr);
+  grid-template-columns: 70px 1fr 70px 1fr 70px 1fr;
   font-size: 12px;
   border-bottom: 1px solid rgba(245, 158, 11, 0.08);
 }
 .wl-st-tr > span {
-  padding: 5px 6px;
+  padding: 6px 8px;
   border-right: 1px solid rgba(245, 158, 11, 0.08);
-  overflow-wrap: anywhere;
+  overflow-wrap: anywhere;  /* 文字可换行,看到完整内容 */
   word-break: break-word;
-  white-space: normal;
-  line-height: 1.4;
+  white-space: normal;  /* 关键修复:去掉 nowrap 避免截断 */
+  line-height: 1.5;
   font-size: 12px;
-  min-width: 0;  /* 关键:允许 grid 子项收缩到 0,避免 1fr 撑爆 */
 }
 .wl-st-key {
   white-space: nowrap !important;  /* 列头(策略/价格/仓位)不换行,保持紧凑 */
@@ -1479,8 +1478,6 @@ async function addFetchedToWatchlist(code){
   if(!data){alert("未能获取行情,请检查网络后重试");return;}
   addToWatchlistUI(data);
   saveWatchlist();
-  // 添加后立即强制刷新一次,确保显示最新实时行情(不等待 60s 定时)
-  setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 200);
   var el=document.querySelector('.wl-stock-row[data-code="'+code+'"]');
   if(el){el.style.background="#e8f5e9";setTimeout(function(){el.style.background="";},1500);}
   // 滚动到观察池卡片,方便用户看到新增
@@ -1702,7 +1699,7 @@ function addToWatchlistUI(s){
     '</div>';
   stocksWrap.appendChild(stock);
 }
-function removeWatchlistRow(code){var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();saveWatchlist();try{var h=localStorage.getItem("atds_watchlist_hidden");var hidden=h?JSON.parse(h):[];if(hidden.indexOf(code)<0)hidden.push(code);localStorage.setItem("atds_watchlist_hidden",JSON.stringify(hidden));}catch(e){}}
+function removeWatchlistRow(code){var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();saveWatchlist();}
 function saveWatchlist(){try{var codes=[];document.querySelectorAll(".wl-stock-row[data-code]").forEach(function(r){var cd=r.getAttribute("data-code");if(cd)codes.push(cd);});localStorage.setItem("atds_watchlist",JSON.stringify(codes));}catch(e){}}
 function renderStockModalFront(s){
   var pct=Number(s.pct)||0,turn=Number(s.turnover)||0;
@@ -1752,31 +1749,23 @@ function downloadMd(){var el=document.getElementById("knowledge-md");if(!el){ale
 function copyMd(){var el=document.getElementById("knowledge-md");if(!el||!navigator.clipboard){alert("复制失败");return;}navigator.clipboard.writeText(el.textContent).then(function(){alert("已复制到剪贴板");});}
 function loadSavedWatchlist(){try{var raw=localStorage.getItem("atds_watchlist");return raw?JSON.parse(raw):[];}catch(e){return [];}}
 function restoreSavedWatchlist(){
-  // 合并模式:后端 config 静态渲染 + localStorage 额外添加,取并集
-  // - config 里的股票始终显示(除非用户删除过 → 记入 atds_watchlist_hidden)
-  // - localStorage atds_watchlist 中不属于 config 的代码(用户手动添加)追加显示
-  var raw=null,hiddenRaw=null;
-  try{raw=localStorage.getItem("atds_watchlist");}catch(e){}
-  try{hiddenRaw=localStorage.getItem("atds_watchlist_hidden");}catch(e){}
-  var hidden=[];
-  try{hidden=JSON.parse(hiddenRaw)||[];}catch(e){}
-  var card=document.querySelector('.watchlist-card');
-  if(!card)return;
-  // 1. 隐藏用户删除过的 config 股票(防刷新复活)
-  hidden.forEach(function(c){var el=document.querySelector('.wl-stock[data-stock-code="'+c+'"]');if(el)el.remove();});
-  // 2. 收集 config 已渲染 codes
-  var configCodes=[];
-  document.querySelectorAll('.wl-stock-row[data-code]').forEach(function(r){var cd=r.getAttribute("data-code");if(cd&&configCodes.indexOf(cd)<0)configCodes.push(cd);});
-  // 3. localStorage 中不在 config 的代码 → 拉最新行情追加
-  var extraCodes=[];
-  if(raw!==null){
-    try{extraCodes=JSON.parse(raw)||[];}catch(e){}
-    extraCodes=extraCodes.filter(function(c){return /^\d{6}$/.test(String(c))&&configCodes.indexOf(c)<0&&hidden.indexOf(c)<0;});
-  }
-  if(!extraCodes.length)return;
+  // 以 localStorage 为准:从未存过(首次访问)才保留后端默认;存过则清空后端静态渲染并按本地数据全量重建
+  // 这样"删除的个股刷新后不恢复、新增的个股不点删除不消失"
+  var raw = null;
+  try { raw = localStorage.getItem('atds_watchlist'); } catch (e) {}
+  if (raw === null) return; // 首次访问,保留后端默认观察池
+  var codes = [];
+  try { codes = JSON.parse(raw) || []; } catch (e) {}
+  var card = document.querySelector('.watchlist-card');
+  if (!card) return; // 无观察池卡片(如午盘隐藏)时不动
+  var stocksWrap = card.querySelector('.wl-stocks');
+  if (stocksWrap) stocksWrap.innerHTML = '';
+  var detailsWrap = card.querySelector('.wl-details');
+  if (detailsWrap) detailsWrap.innerHTML = '';
   (async function(){
-    for(var i=0;i<extraCodes.length;i++){
-      var rawCode=String(extraCodes[i]);
+    for(var i=0;i<codes.length;i++){
+      var rawCode=codes[i];
+      if(!/^\d{6}$/.test(rawCode))continue;
       var c0=rawCode.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
       try{
         var res=await fetch("https://qt.gtimg.cn/q="+sc+rawCode);
@@ -1789,8 +1778,6 @@ function restoreSavedWatchlist(){
       }catch(e){}
     }
   })();
-  // 追加完成后强制刷新一次(更新 ATDS/信号等附加字段)
-  setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 800);
 }
 if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(restoreSavedWatchlist,600);});}
 
