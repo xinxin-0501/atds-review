@@ -291,6 +291,16 @@
   color: #dc2626;
   font-weight: 700;
 }
+/* 风险行红框高亮 */
+.wl-st-line.wl-st-risk-line {
+  background: rgba(254, 226, 226, 0.5);
+  border-top: 1px solid rgba(220, 38, 38, 0.2);
+  border-bottom: none;
+}
+.wl-st-line.wl-st-risk-line .wl-st-content {
+  color: #7f1d1d;
+  font-weight: 500;
+}
 
 /* === 今日执行策略模块(图2 风格) === */
 .ts-card,
