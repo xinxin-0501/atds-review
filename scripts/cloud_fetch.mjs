@@ -1432,6 +1432,7 @@ async function main() {
     limitUp,
     limitDown: [],
     watchlist,
+    todayStrategy: config.todayStrategy || null,
     waveDivergence,
     shortCore,
     strongStock,
