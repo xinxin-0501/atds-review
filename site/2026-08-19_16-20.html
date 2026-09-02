@@ -971,11 +971,17 @@
   white-space: normal;
   line-height: 1.4;
   font-size: 12px;
-  min-width: 0;  /* 关键:允许 grid 子项收缩到 0,避免 1fr 撑爆 */
+  min-width: 0 !important;  /* 强制 grid 子项可收缩 */
+  max-width: 100%;
 }
 .wl-st-key {
-  white-space: nowrap !important;  /* 列头(策略/价格/仓位)不换行,保持紧凑 */
+  width: 54px !important;
+  white-space: nowrap !important;
   flex-shrink: 0;
+  background: rgba(245, 158, 11, 0.05);
+  color: #b45309;
+  font-weight: 700;
+  text-align: center;
 }
 .wl-st-num {
   color: #dc2626;
