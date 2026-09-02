@@ -2026,15 +2026,51 @@ async function refreshWatchlistQuotes(){
       if(atdsEl)atdsEl.textContent=atds;
       var sigEl=r.querySelector('.wl-cell-sig .sig');
       if(sigEl){sigEl.className='sig sig-'+sig.tone;sigEl.textContent=sig.name;}
-      // detail-spb 止损/支撑/压力 基于最新价更新
+      // detail 区域刷新:止损/支撑/压力 + 风险等级 + 风控时间 + 建议文本
+      // 关键修复:之前只更新 detail-spb,detail-grid 内的"风险/风控/建议"文本是添加时的快照
       var d=document.querySelector('.wl-detail[data-detail-code="'+code+'"]');
       if(d){
+        // 1. 止损/支撑/压力 基于最新价更新
         var spb=d.querySelectorAll('.detail-spb span');
         if(spb.length>=3){
           var sl=spb[0].childNodes[1];var su=spb[1].childNodes[1];var pr=spb[2].childNodes[1];
           if(sl)sl.textContent=(price*0.95).toFixed(2);
           if(su)su.textContent=(price*0.92).toFixed(2);
           if(pr)pr.textContent=(price*1.08).toFixed(2);
+        }
+        // 2. 重新计算 detail-grid 内"风险/风控/建议"文本(基于最新 pct/turnover/atds)
+        var turnNum=Number(turnover);
+        var riskL=deriveRiskLevelF(pct);
+        var horizonL=deriveTimeHorizonF(pct,turnNum);
+        var adviceL=deriveAdviceF(pct,atds,riskL.tone);
+        var riskLines=deriveRiskTextF(pct,turnNum);
+        var horizons=deriveHorizonLinesF(pct,turnNum);
+        var adviceText=deriveAdviceTextF(pct,atds,riskL.tone);
+        var blocks=d.querySelectorAll('.detail-block');
+        if(blocks.length>=3){
+          // 风险块(第 1 个):更新 riskName + 列表
+          var riskNameEl=blocks[0].querySelector('.risk-tag');
+          if(riskNameEl){riskNameEl.className='risk-tag risk-'+riskL.tone;riskNameEl.textContent=riskL.name;}
+          var riskListEl=blocks[0].querySelectorAll('.detail-line');
+          riskListEl.forEach(function(el,idx){if(riskLines[idx]!=null)el.textContent=riskLines[idx];});
+          // 风控块(第 2 个):更新 horizonName + 3 行短线/波段/长线
+          var horizonNameEl=blocks[1].querySelector('.horizon-tag');
+          if(horizonNameEl){horizonNameEl.className='horizon-tag horizon-'+horizonL.tone;horizonNameEl.textContent=horizonL.name;}
+          var horizonRows=blocks[1].querySelectorAll('.detail-line');
+          horizonRows.forEach(function(el,idx){
+            if(horizons[idx]){
+              var b=el.querySelector('b');if(b)b.textContent=horizons[idx].k;
+              // 文本节点(去除 b 后剩余部分)
+              var txtNode=Array.from(el.childNodes).find(function(n){return n.nodeType===3&&n.textContent.trim()!==''});
+              if(txtNode)txtNode.textContent=horizons[idx].v;
+              else if(!b){el.textContent=horizons[idx].k+horizons[idx].v;}
+            }
+          });
+          // 建议块(第 3 个):更新 adviceName + text
+          var adviceNameEl=blocks[2].querySelector('.advice-tag');
+          if(adviceNameEl){adviceNameEl.className='advice-tag advice-'+adviceL.tone;adviceNameEl.textContent=adviceL.name;}
+          var adviceTextEl=blocks[2].querySelector('.detail-line');
+          if(adviceTextEl){adviceTextEl.textContent=adviceText;}
         }
       }
     });
@@ -2056,7 +2092,7 @@ function addWatchlistRefreshBtn(){
 function initWatchlistAutoRefresh(){
   addWatchlistRefreshBtn();
   setTimeout(refreshWatchlistQuotes,1500);            // 打开页面 1.5s 后自动刷一次
-  setInterval(refreshWatchlistQuotes,60000);          // 之后每 60 秒自动刷新
+  setInterval(refreshWatchlistQuotes,30000);          // 每 30 秒自动刷新
 }
 (function(){var card=document.querySelector('.watchlist-card');if(card){addWatchlistRefreshBtn();setTimeout(refreshWatchlistQuotes,1500);setInterval(refreshWatchlistQuotes,60000);}})();
 
