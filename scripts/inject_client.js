@@ -100,12 +100,10 @@ for (const rel of files) {
       console.log('  +tp CSS:', rel);
     }
   }
-  // Ensure watchlist strategy CSS exists
-  if (!c.includes('.ts-card{')) {
-    if (c.includes('</style>')) {
-      c = c.replace('</style>', wlStrategyCss + '\n</style>', 1);
-      console.log('  +wlStrategy CSS:', rel);
-    }
+  // Ensure watchlist strategy CSS exists (强制每次注入,旧 CSS 阻挡问题修复)
+  if (c.includes('</style>')) {
+    c = c.replace('</style>', wlStrategyCss + '\n</style>', 1);
+    console.log('  +wlStrategy CSS:', rel);
   }
 
   // Remove any existing shared blocks
