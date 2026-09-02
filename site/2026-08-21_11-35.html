@@ -3912,7 +3912,20 @@ function addToWatchlistUI(s){
   stocksWrap.appendChild(stock);
 }
 function removeWatchlistRow(code){var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();saveWatchlist();try{var h=localStorage.getItem("atds_watchlist_hidden");var hidden=h?JSON.parse(h):[];if(hidden.indexOf(code)<0)hidden.push(code);localStorage.setItem("atds_watchlist_hidden",JSON.stringify(hidden));}catch(e){}}
-function saveWatchlist(){try{var codes=[];document.querySelectorAll(".wl-stock-row[data-code]").forEach(function(r){var cd=r.getAttribute("data-code");if(cd)codes.push(cd);});localStorage.setItem("atds_watchlist",JSON.stringify(codes));}catch(e){}}
+function saveWatchlist(){
+  // 合并保存:DOM 收集的 codes + 之前 localStorage 中额外手动添加的 codes
+  // (避免全量覆盖丢失用户手动添加的股票)
+  try{
+    var codes=[];
+    document.querySelectorAll(".wl-stock-row[data-code]").forEach(function(r){var cd=r.getAttribute("data-code");if(cd)codes.push(cd);});
+    var prev=localStorage.getItem("atds_watchlist");
+    var prevCodes=[];
+    try{prevCodes=JSON.parse(prev)||[];}catch(e){}
+    var merged=codes.slice();
+    prevCodes.forEach(function(c){if(merged.indexOf(c)<0&&/^\d{6}$/.test(String(c)))merged.push(c);});
+    localStorage.setItem("atds_watchlist",JSON.stringify(merged));
+  }catch(e){}
+}
 function renderStockModalFront(s){
   var pct=Number(s.pct)||0,turn=Number(s.turnover)||0;
   var atds=70+Math.min(25,Math.max(-15,Math.round(pct*2+turn*0.5)));
@@ -3971,16 +3984,19 @@ function restoreSavedWatchlist(){
   try{hidden=JSON.parse(hiddenRaw)||[];}catch(e){}
   var card=document.querySelector('.watchlist-card');
   if(!card)return;
-  // 1. 隐藏用户删除过的 config 股票(防刷新复活)
-  hidden.forEach(function(c){var el=document.querySelector('.wl-stock[data-stock-code="'+c+'"]');if(el)el.remove();});
-  // 2. 收集 config 已渲染 codes
+  // 1. 收集 config 已渲染 codes(hidden 仅作用于 config,不影响手动添加股票)
   var configCodes=[];
   document.querySelectorAll('.wl-stock-row[data-code]').forEach(function(r){var cd=r.getAttribute("data-code");if(cd&&configCodes.indexOf(cd)<0)configCodes.push(cd);});
-  // 3. localStorage 中不在 config 的代码 → 拉最新行情追加
+  // 2. 隐藏用户删除过的 config 股票(防刷新复活)
+  hidden.forEach(function(c){if(configCodes.indexOf(c)>=0){var el=document.querySelector('.wl-stock[data-stock-code="'+c+'"]');if(el)el.remove();}});
+  // 3. 重新收集 config 已渲染 codes(剔除 hidden 后)
+  configCodes=[];
+  document.querySelectorAll('.wl-stock-row[data-code]').forEach(function(r){var cd=r.getAttribute("data-code");if(cd&&configCodes.indexOf(cd)<0)configCodes.push(cd);});
+  // 4. localStorage 中不在 config 的代码 → 拉最新行情追加
   var extraCodes=[];
   if(raw!==null){
     try{extraCodes=JSON.parse(raw)||[];}catch(e){}
-    extraCodes=extraCodes.filter(function(c){return /^\d{6}$/.test(String(c))&&configCodes.indexOf(c)<0&&hidden.indexOf(c)<0;});
+    extraCodes=extraCodes.filter(function(c){return /^\d{6}$/.test(String(c))&&configCodes.indexOf(c)<0;});
   }
   if(!extraCodes.length)return;
   (async function(){
@@ -3999,7 +4015,7 @@ function restoreSavedWatchlist(){
     }
   })();
   // 追加完成后强制刷新一次(更新 ATDS/信号等附加字段)
-  setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 800);
+  setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 200);
 }
 if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(restoreSavedWatchlist,600);});}
 
