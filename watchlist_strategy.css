@@ -278,13 +278,19 @@
 }
 
 /* === 今日执行策略模块(图2 风格) === */
-.ts-card {
+.ts-card,
+.ts-stock-card {
   background: linear-gradient(180deg, rgba(255, 247, 237, 0.95), rgba(254, 243, 199, 0.5));
   border: 1px solid rgba(245, 158, 11, 0.25);
   margin: 14px 12px 14px;
   border-radius: 12px;
   padding: 14px 14px 12px;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+}
+.ts-stock-card {
+  margin: 0 12px 14px;  /* per-stock 时去掉上 margin,贴个股下方 */
+  padding: 12px 12px 10px;
+  border-radius: 8px;
 }
 .ts-title {
   font-size: 15px;
