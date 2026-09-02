@@ -1258,7 +1258,8 @@ async function main() {
       logic: w.logic || '',
       capital: w.capital || '',
       keyLevels: w.keyLevels || null,
-      plan: w.plan || ''
+      plan: w.plan || '',
+      strategy: w.strategy || null
     };
   });
 
@@ -1431,7 +1432,6 @@ async function main() {
     limitUp,
     limitDown: [],
     watchlist,
-    todayStrategy: config.todayStrategy || null,
     waveDivergence,
     shortCore,
     strongStock,

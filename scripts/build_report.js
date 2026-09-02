@@ -915,8 +915,25 @@ function buildStockRow(s, i) {
     const blockLogic = s.logic ? `<div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">${esc(s.logic)}</div></div>` : '';
     const blockCapital = s.capital ? `<div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">${esc(s.capital)}</div></div>` : '';
     const blockKey = s.keyLevels && (s.keyLevels.support || s.keyLevels.pressure) ? `<div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">${esc(fmtKL())}</div></div>` : '';
-    const blockPlan = s.plan ? `<div class="detail-block"><div class="detail-h detail-h-custom">⚡ 操作 + 建议 <span class="advice-tag advice-${adviceTone}">${esc(deriveAdvice(s.pct, atds, riskTone).name)}</span></div><div class="detail-line">${fmtPlan()}</div><div class="detail-line detail-line-sys">系统: ${esc(adviceText)}</div></div>` : '';
+    const blockPlan = s.plan ? `<div class="detail-block"><div class="detail-h detail-h-custom">⚡ 操作</div><div class="detail-line">${fmtPlan()}</div></div>` : '';
     strategyBlocks = '<div class="detail-grid detail-grid-strategy">' + blockLogic + blockCapital + blockKey + blockPlan + '</div>';
+  }
+  // 个股今日执行策略(原全局 todayStrategy 改为按个股分发,仅盘前)——图片风格:策略/价格/仓位 + 止损/止盈/目标 + 风险
+  const st = s.strategy || {};
+  const hasStrategyTable = !!(st.entryStrategy || st.entryPrice || st.entryPosition || st.entryNote || st.stopLoss || st.takeProfit || st.target || st.risk);
+  let todayStrategyBlock = '';
+  if (hasStrategyTable) {
+    const cell = (v) => `<span>${esc(v || '--')}</span>`;
+    const cellNum = (v) => `<span class="wl-st-num">${esc(v || '--')}</span>`;
+    const entry = '<div class="wl-st-tr"><span class="wl-st-key">策略</span>' + cell(st.entryStrategy) + '<span class="wl-st-key">价格</span>' + cellNum(st.entryPrice) + '<span class="wl-st-key">仓位</span>' + cell(st.entryPosition) + '</div>';
+    const note = st.entryNote ? '<div class="wl-st-tr wl-st-note"><span class="wl-st-key">说明</span><span class="wl-st-note-cell">' + esc(st.entryNote) + '</span></div>' : '';
+    const stop = '<div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">' + esc(st.stopLoss || '--') + '</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">' + esc(st.takeProfit || '--') + '</span><span class="wl-st-key">目标</span>' + cellNum(st.target) + '</div>';
+    const risk = st.risk ? '<div class="wl-st-risk"><b>风险</b>' + esc(st.risk) + '</div>' : '';
+    todayStrategyBlock = '<div class="wl-st-table">' +
+      '<div class="wl-st-title">🎯 个股执行策略</div>' +
+      '<div class="wl-st-head">' + cell('入场') + cell('执行') + cell('风控') + '</div>' +
+      entry + note + stop + risk +
+      '</div>';
   }
   // tags 徽标(从 config.tags 透传)
   const tagsHtml = (Array.isArray(s.tags) && s.tags.length)
@@ -945,16 +962,10 @@ function buildStockRow(s, i) {
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
     ${meta}
     ${strategyBlocks}
-    <div class="detail-grid">
+    <div class="detail-grid detail-grid-base">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-${riskTone}">${esc(riskName)}</span></div>${riskLines.map(l=>'<div class="detail-line">' + esc(l) + '</div>').join('')}</div>
-      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-${horizonTone}">${esc(deriveTimeHorizon(s.pct, s.turnover).name)}</span></div>${horizons.map(h=>'<div class="detail-line"><b>' + esc(h.k) + '</b>' + esc(h.v) + '</div>').join('')}</div>
-      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-${adviceTone}">${esc(deriveAdvice(s.pct, atds, riskTone).name)}</span></div><div class="detail-line">${esc(adviceText)}</div></div>
     </div>
-    <div class="detail-spb">
-      <span><b>止损</b>${stopLoss}</span>
-      <span><b>支撑</b>${support}</span>
-      <span><b>压力</b>${pressure}</span>
-    </div>
+    ${todayStrategyBlock}
   </div>`;
   return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;
 }
@@ -1015,28 +1026,6 @@ function renderWatchlist(report) {
     '</div>' +
     '</div>';
   return head + knowledge + modals;
-}
-
-// 今日执行策略模块 —— 仅盘前(premarket)展示
-function renderTodayStrategy(report) {
-  if (!report || report.meta.type !== 'premarket') return '';
-  const t = report.todayStrategy;
-  if (!t) return '';
-  // 任意一个核心字段为空就整体不渲染
-  if (!t.core && !t.planA.content && !t.planB.content && !t.choice && !t.position && !t.alert) return '';
-  const core = t.core ? `<div class="ts-core"><span class="ts-core-tag">核心</span>${esc(t.core)}</div>` : '';
-  const blockA = t.planA && (t.planA.title || t.planA.content) ? `<li><span class="ts-dot ts-dot-a">●</span> <b>方案A (${esc(t.planA.title || '回踩')})</b>: ${esc(t.planA.content || '')}</li>` : '';
-  const blockB = t.planB && (t.planB.title || t.planB.content) ? `<li><span class="ts-dot ts-dot-b">●</span> <b>方案B (${esc(t.planB.title || '突破')})</b>: ${esc(t.planB.content || '')}</li>` : '';
-  const plans = (blockA || blockB) ? '<ul class="ts-plans">' + blockA + blockB + '</ul>' : '';
-  const choice = t.choice ? `<li><span class="ts-dot">●</span> <b>二选一建议</b>: ${esc(t.choice)}</li>` : '';
-  const position = t.position ? `<li><span class="ts-dot">●</span> <b>仓位控制</b>: ${esc(t.position)}</li>` : '';
-  const extras = (choice || position) ? '<ul class="ts-plans">' + choice + position + '</ul>' : '';
-  const alert = t.alert ? `<div class="ts-alert"><b>关键提醒</b>: ${esc(t.alert)}</div>` : '';
-  const source = t.source ? `<div class="ts-source">${esc(t.source)}</div>` : '';
-  return '<div class="card ts-card">' +
-    '<div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div>' +
-    core + plans + extras + alert + source +
-  '</div>';
 }
 
 // 波背离选股模块(仅午盘:全A剔除ST扫描,优先排序 TOP30,点击弹个股,可刷新行情)
@@ -1339,7 +1328,6 @@ ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
   ${renderWatchlist(report)}
-  ${renderTodayStrategy(report)}
   ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
