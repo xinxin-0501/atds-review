@@ -935,13 +935,14 @@ function buildStockRow(s, i, report) {
     const cell = (v) => `<span>${esc(v || '--')}</span>`;
     const cellNum = (v) => `<span class="wl-st-num">${esc(v || '--')}</span>`;
     const entry = '<div class="wl-st-tr"><span class="wl-st-key">策略</span>' + cell(st.entryStrategy) + '<span class="wl-st-key">价格</span>' + cellNum(st.entryPrice) + '<span class="wl-st-key">仓位</span>' + cell(st.entryPosition) + '</div>';
-    const note = st.entryNote ? '<div class="wl-st-tr wl-st-note"><span class="wl-st-key">说明</span><span class="wl-st-note-cell">' + esc(st.entryNote) + '</span></div>' : '';
     const stop = '<div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">' + esc(st.stopLoss || '--') + '</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">' + esc(st.takeProfit || '--') + '</span><span class="wl-st-key">目标</span>' + cellNum(st.target) + '</div>';
-    const risk = st.risk ? '<div class="wl-st-risk"><b>风险</b>' + esc(st.risk) + '</div>' : '';
+    // entryNote 合并到风险行(避免独立说明行,让表格更紧凑)
+    const notePart = st.entryNote ? '<span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】' + esc(st.entryNote) + '</span>' : '';
+    const risk = '<div class="wl-st-risk"><b>风险</b>' + notePart + esc(st.risk || '--') + '</div>';
     todayStrategyBlock = '<div class="wl-st-table">' +
       '<div class="wl-st-title">🎯 个股风控</div>' +
       '<div class="wl-st-head">' + cell('入场') + cell('执行') + cell('风控') + '</div>' +
-      entry + note + stop + risk +
+      entry + stop + risk +
       '</div>';
   }
   // tags 徽标(从 config.tags 透传)

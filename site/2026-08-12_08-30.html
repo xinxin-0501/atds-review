@@ -1317,6 +1317,8 @@ async function addFetchedToWatchlist(code){
   if(!data){alert("未能获取行情,请检查网络后重试");return;}
   addToWatchlistUI(data);
   saveWatchlist();
+  // 添加后立即强制刷新一次,确保显示最新实时行情(不等待 60s 定时)
+  setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 200);
   var el=document.querySelector('.wl-stock-row[data-code="'+code+'"]');
   if(el){el.style.background="#e8f5e9";setTimeout(function(){el.style.background="";},1500);}
   // 滚动到观察池卡片,方便用户看到新增
@@ -1625,6 +1627,8 @@ function restoreSavedWatchlist(){
       }catch(e){}
     }
   })();
+  // 追加完成后强制刷新一次(更新 ATDS/信号等附加字段)
+  setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 800);
 }
 if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(restoreSavedWatchlist,600);});}
 
