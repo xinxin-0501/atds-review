@@ -1214,6 +1214,28 @@ function renderStrongStock(report) {
   return card + modal;
 }
 
+// 今日执行策略模块(图2 风格:核心 + 方案A/B + 二选一建议 + 仓位控制 + 关键提醒 + 数据来源)
+function renderTodayStrategy(report) {
+  if (!report || report.meta.type !== 'premarket') return '';
+  const t = report.todayStrategy;
+  if (!t) return '';
+  if (!t.core && !t.planA.content && !t.planB.content && !t.choice && !t.position && !t.alert) return '';
+  const core = t.core ? `<div class="ts-core"><span class="ts-core-tag">核心</span><b>${esc(t.core.split('。')[0] || t.core)}</b>${t.core.split('。')[1] ? esc('。' + t.core.split('。').slice(1).join('。')) : ''}</div>` : '';
+  const planA = t.planA && (t.planA.title || t.planA.content) ? `<li><span class="ts-dot ts-dot-a"></span><b>方案A (${esc(t.planA.title || '求稳回踩')})</b>: ${esc(t.planA.content || '')}</li>` : '';
+  const planB = t.planB && (t.planB.title || t.planB.content) ? `<li><span class="ts-dot ts-dot-b"></span><b>方案B (${esc(t.planB.title || '突破确认')})</b>: ${esc(t.planB.content || '')}</li>` : '';
+  const plans = (planA || planB) ? '<ul class="ts-plans">' + planA + planB + '</ul>' : '';
+  const extrasList = (t.choice || t.position) ? '<ul class="ts-plans">' +
+    (t.choice ? `<li><span class="ts-dot"></span><b>二选一建议</b>: ${esc(t.choice)}</li>` : '') +
+    (t.position ? `<li><span class="ts-dot"></span><b>仓位控制</b>: ${esc(t.position)}</li>` : '') +
+  '</ul>' : '';
+  const alert = t.alert ? `<div class="ts-alert"><b>关键提醒</b>: ${esc(t.alert)}</div>` : '';
+  const source = t.source ? `<div class="ts-source">${esc(t.source)}</div>` : '';
+  return '<div class="card ts-card">' +
+    '<div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div>' +
+    core + plans + extrasList + alert + source +
+  '</div>';
+}
+
 function renderPremarketStrategy(report) {
   const pb = report.playbook || {};
   const off = (pb.offense || []).slice(0, 4);
@@ -1334,6 +1356,7 @@ ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
   ${renderWatchlist(report)}
+  ${renderTodayStrategy(report)}
   ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report)}
   ${renderIndices(report)}

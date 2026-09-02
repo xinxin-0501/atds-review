@@ -1024,6 +1024,104 @@
   margin-right: 6px;
   font-weight: 800;
 }
+
+/* === 今日执行策略模块(图2 风格) === */
+.ts-card {
+  background: linear-gradient(180deg, rgba(255, 247, 237, 0.95), rgba(254, 243, 199, 0.5));
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  margin: 14px 12px 14px;
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
+}
+.ts-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #b45309;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  padding-bottom: 8px;
+}
+.ts-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: #92400e;
+}
+.ts-core {
+  background: rgba(220, 252, 231, 0.7);
+  border-left: 3px solid #16a34a;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #166534;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.ts-core b {
+  color: #14532d;
+  font-weight: 800;
+}
+.ts-core-tag {
+  display: inline-block;
+  background: #16a34a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.ts-plans {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+}
+.ts-plans li {
+  font-size: 13px;
+  color: #1f2937;
+  line-height: 1.7;
+  padding: 4px 0 4px 16px;
+  position: relative;
+  border-bottom: 1px dashed rgba(180, 83, 9, 0.1);
+}
+.ts-plans li:last-child { border-bottom: none; }
+.ts-dot {
+  position: absolute;
+  left: 0;
+  top: 13px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2563eb;
+}
+.ts-dot-a { background: #2563eb; }
+.ts-dot-b { background: #7c3aed; }
+.ts-plans li b { color: #111827; font-weight: 700; }
+.ts-alert {
+  background: rgba(254, 243, 199, 0.6);
+  border-left: 3px solid #f59e0b;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #78350f;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.ts-alert b { color: #b45309; }
+.ts-source {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 10px;
+  color: #94a3b8;
+  font-style: italic;
+  border-top: 1px dashed rgba(148, 163, 184, 0.2);
+  padding-top: 6px;
+  line-height: 1.6;
+}
 </style>
 </head>
 <body>
@@ -1069,6 +1167,7 @@ tags: [ATDS, 交易复盘]
 # 观察池
 - 盛和资源 (600392): 23.63 -2.19%
 </pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
+  
   <div class="card">
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">84° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">79 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">神奇制药</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">61 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">种植业 / 化学制药 / 养殖业</div></div></div>
