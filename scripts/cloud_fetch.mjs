@@ -1245,7 +1245,21 @@ async function main() {
   const indices = config.indices.map((idx, i) => ({ name: idx.name, code: idx.code, price: tencentAll[i].price, changePct: tencentAll[i].pct }));
   const watchlist = config.watchlist.map((w, i) => {
     const t = tencentAll[config.indices.length + i];
-    return { code: w.code, name: w.name, price: t.price, pct: t.pct, amount: fmtAmount(t.amountWan), turnover: String(t.turnover) };
+    return {
+      code: w.code,
+      name: w.name,
+      price: t.price,
+      pct: t.pct,
+      amount: fmtAmount(t.amountWan),
+      turnover: String(t.turnover),
+      // 透传策略字段（可缺失，渲染层判空）
+      category: w.category || '',
+      tags: Array.isArray(w.tags) ? w.tags : [],
+      logic: w.logic || '',
+      capital: w.capital || '',
+      keyLevels: w.keyLevels || null,
+      plan: w.plan || ''
+    };
   });
 
   // 2. 涨停/炸板池（东财）。支持显式传入目标日期（argv[3]），否则用今天
@@ -1417,6 +1431,7 @@ async function main() {
     limitUp,
     limitDown: [],
     watchlist,
+    todayStrategy: config.todayStrategy || null,
     waveDivergence,
     shortCore,
     strongStock,
