@@ -934,14 +934,14 @@ function buildStockRow(s, i, report) {
   if (hasStrategyTable) {
     const cell = (v) => `<span>${esc(v || '--')}</span>`;
     const cellNum = (v) => `<span class="wl-st-num">${esc(v || '--')}</span>`;
-    const entry = '<div class="wl-st-tr"><span class="wl-st-key">策略</span>' + cell(st.entryStrategy) + '<span class="wl-st-key">价格</span>' + cellNum(st.entryPrice) + '<span class="wl-st-key">仓位</span>' + cell(st.entryPosition) + '</div>';
-    const stop = '<div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">' + esc(st.stopLoss || '--') + '</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">' + esc(st.takeProfit || '--') + '</span><span class="wl-st-key">目标</span>' + cellNum(st.target) + '</div>';
-    // entryNote 合并到风险行(避免独立说明行,让表格更紧凑)
+    // par-line 列表式(与操作+建议+风险同款,3 行紧凑布局)
+    const entry = '<div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:' + esc(st.entryStrategy || '--') + ' · 价格:<span class="wl-st-num">' + esc(st.entryPrice || '--') + '</span> · 仓位:' + esc(st.entryPosition || '--') + '</span></div>';
+    const stop = '<div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:<span class="wl-st-loss">' + esc(st.stopLoss || '--') + '</span> · 止盈:<span class="wl-st-profit">' + esc(st.takeProfit || '--') + '</span> · 目标:<span class="wl-st-num">' + esc(st.target || '--') + '</span></span></div>';
+    // entryNote 合并到风险行
     const notePart = st.entryNote ? '<span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】' + esc(st.entryNote) + '</span>' : '';
-    const risk = '<div class="wl-st-risk"><b>风险</b>' + notePart + esc(st.risk || '--') + '</div>';
+    const risk = '<div class="wl-st-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">' + notePart + esc(st.risk || '--') + '</span></div>';
     todayStrategyBlock = '<div class="wl-st-table">' +
       '<div class="wl-st-title">🎯 个股风控</div>' +
-      '<div class="wl-st-head">' + cell('入场') + cell('执行') + cell('风控') + '</div>' +
       entry + stop + risk +
       '</div>';
   }

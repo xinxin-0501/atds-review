@@ -982,48 +982,36 @@
   font-weight: 700;
   white-space: nowrap;
 }
-.wl-st-tr > span:last-child { border-right: none; }
-.wl-st-key {
-  background: rgba(245, 158, 11, 0.05);
-  color: #b45309;
-  font-weight: 700;
-  text-align: center;
+/* === 个股风控表:par-line 列表式(取代 grid 横排,手机端更紧凑) === */
+.wl-st-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-bottom: 1px dashed rgba(245, 158, 11, 0.1);
+  white-space: normal;
+  word-break: break-word;
 }
-.wl-st-num {
-  color: #dc2626;
-  font-weight: 700;
+.wl-st-line:last-child { border-bottom: none; }
+.wl-st-line .wl-st-content {
+  flex: 1;
+  min-width: 0;
+  color: #1f2937;
+  white-space: normal;
 }
-.wl-st-loss {
+.wl-st-line .wl-st-loss {
   color: #dc2626;
   font-weight: 600;
-  background: rgba(220, 38, 38, 0.05);
 }
-.wl-st-profit {
+.wl-st-line .wl-st-profit {
   color: #16a34a;
   font-weight: 600;
-  background: rgba(22, 163, 74, 0.05);
 }
-.wl-st-note {
-  grid-template-columns: 70px 1fr;
-  background: rgba(254, 243, 199, 0.4);
-}
-.wl-st-note-cell {
-  white-space: normal !important;
-  color: #78350f;
-  font-size: 11px;
-}
-.wl-st-risk {
-  padding: 7px 10px;
-  font-size: 12px;
-  line-height: 1.6;
-  background: rgba(254, 226, 226, 0.5);
-  border-top: 1px solid rgba(220, 38, 38, 0.2);
-  color: #7f1d1d;
-}
-.wl-st-risk b {
+.wl-st-line .wl-st-num {
   color: #dc2626;
-  margin-right: 6px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* === 今日执行策略模块(图2 风格) === */
@@ -1169,7 +1157,7 @@
       <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩60-61低吸<b>500股</b>(3万-3.05万),放量突破68.5加仓,止损-5%</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,等待放量催化<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-low">低风险</span><ul><li>震荡整理,方向未明</li><li>量能温和</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div><div class="wl-st-tr"><span class="wl-st-key">策略</span><span>回踩MA5/8/31(突破)锚平台,靠稳</span><span class="wl-st-key">价格</span><span class="wl-st-num">突破 3.93</span><span class="wl-st-key">仓位</span><span>1000股</span></div><div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">3.58 · 清仓</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">跌破3/9/1平台,趋势走坏</span><span class="wl-st-key">目标</span><span class="wl-st-num">3.95 → 4.10</span></div><div class="wl-st-risk"><b>风险</b><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】放量突破今日高点,待确认</span>买入价 3.68,止损 3.58,可损约 2.7%,可控。跌破 3.58 必须走,不恋战。</div></div>
+    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA5/8/31(突破)锚平台,靠稳 · 价格:<span class="wl-st-num">突破 3.93</span> · 仓位:1000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:<span class="wl-st-loss">3.58 · 清仓</span> · 止盈:<span class="wl-st-profit">跌破3/9/1平台,趋势走坏</span> · 目标:<span class="wl-st-num">3.95 → 4.10</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content"><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】放量突破今日高点,待确认</span>买入价 3.68,止损 3.58,可损约 2.7%,可控。跌破 3.58 必须走,不恋战。</span></div></div>
     <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>不追现价,等回踩低吸区或放量突破关键位再买。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 60-61 区间分两批低吸 500 股(3万-3.05万),均价确认靠稳。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 68.5 加仓 200 股,确认后看 70 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限先做方案 A 回踩,控制单只仓位在 35% 以内,留足对冲空间。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金的 40-50%,留 50% 现金应对回踩加仓。</li></ul><div class="ts-alert"><b>关键提醒</b>: 光通信板块若整体走弱(中际旭创跌破支撑),放弃买入等待二次确认。</div></div>
   </div></div><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -1298,7 +1286,7 @@
       <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩33-34低吸<b>300股</b>(1万-1.02万),突破38确认,止损-5%</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,关注量能配合<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-mid">中风险</span><ul><li>回调 2-3%,观察支撑</li><li>放量活跃</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div><div class="wl-st-tr"><span class="wl-st-key">策略</span><span>突破前期平台+回踩10日线确认</span><span class="wl-st-key">价格</span><span class="wl-st-num">回踩 33-34</span><span class="wl-st-key">仓位</span><span>300股</span></div><div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">32.00 · 清仓</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">突破38加仓,40看趋势延伸</span><span class="wl-st-key">目标</span><span class="wl-st-num">38 → 40</span></div><div class="wl-st-risk"><b>风险</b><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】机器人板块轮动,仓位确认跟随</span>买入区33-34,止损32,可损约3-6%。跌破32必须走,不恋战。</div></div>
+    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:突破前期平台+回踩10日线确认 · 价格:<span class="wl-st-num">回踩 33-34</span> · 仓位:300股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:<span class="wl-st-loss">32.00 · 清仓</span> · 止盈:<span class="wl-st-profit">突破38加仓,40看趋势延伸</span> · 目标:<span class="wl-st-num">38 → 40</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content"><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】机器人板块轮动,仓位确认跟随</span>买入区33-34,止损32,可损约3-6%。跌破32必须走,不恋战。</span></div></div>
     <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>机器人板块轮动,跟随主线但严控仓位,只做回踩不追高。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 33-34 区间分批低吸 300 股(1万-1.02万),分两批确认。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 38 加仓 100 股,目标 40 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 建议先做方案 A 回踩,小仓位试错,跌破 32 立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金的 15-20%,机器人板块波动大要严控。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若人形机器人板块整体走弱(产业链龙头断板),放弃买入等待二次确认。</div></div>
   </div></div><div class="wl-stock" data-stock-code="002385"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -1322,7 +1310,7 @@
       <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回笼资金后可买<b>1000-2000股</b>(3500-<span class="wl-num">7000元</span>),回踩3.3附近低吸,追高不超3.6</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">跌幅较大,建议减仓规避<span class="advice-tag-mini advice-cut">减仓规避</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-high">高风险</span><ul><li>跌幅&gt;3%,风险增大</li><li>量能温和</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div><div class="wl-st-tr"><span class="wl-st-key">策略</span><span>回踩MA5/8/31(突破)锚平台,靠稳</span><span class="wl-st-key">价格</span><span class="wl-st-num">突破 3.57</span><span class="wl-st-key">仓位</span><span>1000-2000股</span></div><div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">3.26 · 清仓</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">跌破3/9/1平台,趋势走坏</span><span class="wl-st-key">目标</span><span class="wl-st-num">3.57 → 3.70</span></div><div class="wl-st-risk"><b>风险</b><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】放量突破今日高点,待确认</span>买入区3.30-3.50,止损3.26,可损约 2.7%-5%。跌破3.26必须走,不恋战。</div></div>
+    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA5/8/31(突破)锚平台,靠稳 · 价格:<span class="wl-st-num">突破 3.57</span> · 仓位:1000-2000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:<span class="wl-st-loss">3.26 · 清仓</span> · 止盈:<span class="wl-st-profit">跌破3/9/1平台,趋势走坏</span> · 目标:<span class="wl-st-num">3.57 → 3.70</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content"><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】放量突破今日高点,待确认</span>买入区3.30-3.50,止损3.26,可损约 2.7%-5%。跌破3.26必须走,不恋战。</span></div></div>
     <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>两只都不追现价,等回踩低吸区再买,或突破关键位确认后追。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 3.30-3.35 区间低吸 2000 股(6600-6700元),均价确认靠稳。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 3.57 加仓 1000 股(3570元),确认后看 3.70 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限建议先做方案A回踩,小仓位试错,跌破3.26立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 30-35%(6000-7000元),留足对冲空间。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若农业主线退潮(万向开板/传媒断板),放弃买入等待二次确认。</div></div>
   </div></div><div class="wl-stock" data-stock-code="300459"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -1346,7 +1334,7 @@
       <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩3.66-3.70低吸<b>1000股</b>(3700-<span class="wl-num">3900元</span>),突破3.93确认,止损3.58</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,关注量能配合<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-mid">中风险</span><ul><li>回调 2-3%,观察支撑</li><li>量能温和</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div><div class="wl-st-tr"><span class="wl-st-key">策略</span><span>回踩MA10不破+万向开板联动确认</span><span class="wl-st-key">价格</span><span class="wl-st-num">回踩 3.66-3.70</span><span class="wl-st-key">仓位</span><span>1000股</span></div><div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">3.58 · 清仓</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">跌破3/9/1平台,趋势走坏</span><span class="wl-st-key">目标</span><span class="wl-st-num">3.93 → 4.10</span></div><div class="wl-st-risk"><b>风险</b><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】传媒板块轮动,跟随万向开板节奏</span>买入区3.66-3.70,止损3.58,可损约 3-5%。跌破3.58必须走,不恋战。</div></div>
+    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA10不破+万向开板联动确认 · 价格:<span class="wl-st-num">回踩 3.66-3.70</span> · 仓位:1000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:<span class="wl-st-loss">3.58 · 清仓</span> · 止盈:<span class="wl-st-profit">跌破3/9/1平台,趋势走坏</span> · 目标:<span class="wl-st-num">3.93 → 4.10</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content"><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】传媒板块轮动,跟随万向开板节奏</span>买入区3.66-3.70,止损3.58,可损约 3-5%。跌破3.58必须走,不恋战。</span></div></div>
     <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>不追现价,等回踩低吸区或突破关键位再买,跟随传媒主线。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 3.66-3.70 区间低吸 1000 股(3680-3700元),确认均线支撑。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 3.93 加仓 500 股(1965元),确认后看 4.10 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限建议先做方案A回踩,跟随万向开板节奏,跌破3.58立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 18-20%(3700-3900元),严控单股风险。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若传媒主线断板(万向开板炸板),放弃买入等待二次确认。</div></div>
   </div></div><div class="wl-stock" data-stock-code="600737"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -1370,7 +1358,7 @@
       <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩15附近低吸买<b>200-300股</b>(3000-<span class="wl-num">4600元</span>),央企防御性强</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,关注量能配合<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-low">低风险</span><ul><li>震荡整理,方向未明</li><li>量能温和</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div><div class="wl-st-tr"><span class="wl-st-key">策略</span><span>回踩MA20+央企防御确认</span><span class="wl-st-key">价格</span><span class="wl-st-num">回踩 15.00 附近</span><span class="wl-st-key">仓位</span><span>200-300股</span></div><div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">14.80 · 清仓</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">跌破14.96支撑,趋势走弱</span><span class="wl-st-key">目标</span><span class="wl-st-num">15.78 → 16.20</span></div><div class="wl-st-risk"><b>风险</b><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】央企防御性配置,作为农业主线底仓</span>买入区15附近,止损14.80,可损约 1.3-2%。央企波动小,严控仓位即可。</div></div>
+    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA20+央企防御确认 · 价格:<span class="wl-st-num">回踩 15.00 附近</span> · 仓位:200-300股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:<span class="wl-st-loss">14.80 · 清仓</span> · 止盈:<span class="wl-st-profit">跌破14.96支撑,趋势走弱</span> · 目标:<span class="wl-st-num">15.78 → 16.20</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content"><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】央企防御性配置,作为农业主线底仓</span>买入区15附近,止损14.80,可损约 1.3-2%。央企波动小,严控仓位即可。</span></div></div>
     <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>央企防御性配置,作为农业主线底仓,稳健低吸不追高。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 15.00 附近低吸 200-300 股(3000-4600元),央企防御性强。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 15.78 加仓 100 股(1578元),确认后看 16.20 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 稳健型配置,作为农业主线底仓持有,严控单股仓位不超过20%。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 15-20%(3000-4600元),波动小可适度持有。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若中粮系整体走弱(粮食板块退潮),减仓观望等待二次确认。</div></div>
   </div></div><div class="wl-stock" data-stock-code="600108"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -1394,7 +1382,7 @@
       <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">激进者可买<b>1000股</b>(<span class="wl-num">3900元</span>),博农业扩散,突破4.06看高</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">跌幅较大,建议减仓规避<span class="advice-tag-mini advice-cut">减仓规避</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-high">高风险</span><ul><li>跌幅&gt;3%,风险增大</li><li>放量活跃</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div><div class="wl-st-tr"><span class="wl-st-key">策略</span><span>突破4.06+农业扩散跟随</span><span class="wl-st-key">价格</span><span class="wl-st-num">突破 4.06</span><span class="wl-st-key">仓位</span><span>1000股</span></div><div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">3.66 · 清仓</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">跌破3.66支撑,扩散失败</span><span class="wl-st-key">目标</span><span class="wl-st-num">4.06 → 4.30</span></div><div class="wl-st-risk"><b>风险</b><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】低价小盘弹性大,博农业扩散</span>买入价3.90,止损3.66,可损约 6.1%,弹性大波动大。跌破3.66必须走,不恋战。</div></div>
+    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:突破4.06+农业扩散跟随 · 价格:<span class="wl-st-num">突破 4.06</span> · 仓位:1000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:<span class="wl-st-loss">3.66 · 清仓</span> · 止盈:<span class="wl-st-profit">跌破3.66支撑,扩散失败</span> · 目标:<span class="wl-st-num">4.06 → 4.30</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content"><span style="color:#78350f;font-weight:500;margin-right:6px;">【入场说明】低价小盘弹性大,博农业扩散</span>买入价3.90,止损3.66,可损约 6.1%,弹性大波动大。跌破3.66必须走,不恋战。</span></div></div>
     <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>低价补涨弹性大,激进参与,严控止损跟随农业扩散。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (突破追涨)</b>: 若放量突破 4.06 确认 1000 股(4060元),博农业扩散,看高 4.30。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (回踩试错)</b>: 回踩 3.66 不破试错 500 股(1830元),农业主线退潮立即止损。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 激进配置,严控止损3.66,跌破立即离场不恋战。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 10-12%(1830-4060元),低价小盘严控风险。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若农业扩散失败(主线退潮),跌破3.66立即清仓不恋战。</div></div>
   </div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报
@@ -1893,10 +1881,9 @@ function buildWatchlistDetailHtml(data){
   var st=autoS.strategy;
   var todayStHtml='<div class="wl-st-table">'+
     '<div class="wl-st-title">🎯 个股风控</div>'+
-    '<div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div>'+
-    '<div class="wl-st-tr"><span class="wl-st-key">策略</span><span>'+escHtmlF(st.entryStrategy)+'</span><span class="wl-st-key">价格</span><span class="wl-st-num">'+escHtmlF(st.entryPrice)+'</span><span class="wl-st-key">仓位</span><span>'+escHtmlF(st.entryPosition)+'</span></div>'+
-    '<div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">'+escHtmlF(st.stopLoss)+'</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">'+escHtmlF(st.takeProfit)+'</span><span class="wl-st-key">目标</span><span class="wl-st-num">'+escHtmlF(st.target)+'</span></div>'+
-    '<div class="wl-st-risk"><b>风险</b>'+escHtmlF(st.risk)+'</div>'+
+    '<div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:'+escHtmlF(st.entryStrategy)+' · 价格:'+escHtmlF(st.entryPrice)+' · 仓位:'+escHtmlF(st.entryPosition)+'</span></div>'+
+    '<div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:'+escHtmlF(st.stopLoss)+' · 止盈:'+escHtmlF(st.takeProfit)+' · 目标:'+escHtmlF(st.target)+'</span></div>'+
+    '<div class="wl-st-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">'+escHtmlF(st.risk)+'</span></div>'+
   '</div>';
   var ts=autoS.todayStrategy;
   var todayStrategyCard='<div class="card ts-stock-card">'+

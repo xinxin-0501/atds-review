@@ -982,48 +982,36 @@
   font-weight: 700;
   white-space: nowrap;
 }
-.wl-st-tr > span:last-child { border-right: none; }
-.wl-st-key {
-  background: rgba(245, 158, 11, 0.05);
-  color: #b45309;
-  font-weight: 700;
-  text-align: center;
+/* === 个股风控表:par-line 列表式(取代 grid 横排,手机端更紧凑) === */
+.wl-st-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-bottom: 1px dashed rgba(245, 158, 11, 0.1);
+  white-space: normal;
+  word-break: break-word;
 }
-.wl-st-num {
-  color: #dc2626;
-  font-weight: 700;
+.wl-st-line:last-child { border-bottom: none; }
+.wl-st-line .wl-st-content {
+  flex: 1;
+  min-width: 0;
+  color: #1f2937;
+  white-space: normal;
 }
-.wl-st-loss {
+.wl-st-line .wl-st-loss {
   color: #dc2626;
   font-weight: 600;
-  background: rgba(220, 38, 38, 0.05);
 }
-.wl-st-profit {
+.wl-st-line .wl-st-profit {
   color: #16a34a;
   font-weight: 600;
-  background: rgba(22, 163, 74, 0.05);
 }
-.wl-st-note {
-  grid-template-columns: 70px 1fr;
-  background: rgba(254, 243, 199, 0.4);
-}
-.wl-st-note-cell {
-  white-space: normal !important;
-  color: #78350f;
-  font-size: 11px;
-}
-.wl-st-risk {
-  padding: 7px 10px;
-  font-size: 12px;
-  line-height: 1.6;
-  background: rgba(254, 226, 226, 0.5);
-  border-top: 1px solid rgba(220, 38, 38, 0.2);
-  color: #7f1d1d;
-}
-.wl-st-risk b {
+.wl-st-line .wl-st-num {
   color: #dc2626;
-  margin-right: 6px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 /* === 今日执行策略模块(图2 风格) === */
@@ -1787,10 +1775,9 @@ function buildWatchlistDetailHtml(data){
   var st=autoS.strategy;
   var todayStHtml='<div class="wl-st-table">'+
     '<div class="wl-st-title">🎯 个股风控</div>'+
-    '<div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div>'+
-    '<div class="wl-st-tr"><span class="wl-st-key">策略</span><span>'+escHtmlF(st.entryStrategy)+'</span><span class="wl-st-key">价格</span><span class="wl-st-num">'+escHtmlF(st.entryPrice)+'</span><span class="wl-st-key">仓位</span><span>'+escHtmlF(st.entryPosition)+'</span></div>'+
-    '<div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">'+escHtmlF(st.stopLoss)+'</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">'+escHtmlF(st.takeProfit)+'</span><span class="wl-st-key">目标</span><span class="wl-st-num">'+escHtmlF(st.target)+'</span></div>'+
-    '<div class="wl-st-risk"><b>风险</b>'+escHtmlF(st.risk)+'</div>'+
+    '<div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:'+escHtmlF(st.entryStrategy)+' · 价格:'+escHtmlF(st.entryPrice)+' · 仓位:'+escHtmlF(st.entryPosition)+'</span></div>'+
+    '<div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:'+escHtmlF(st.stopLoss)+' · 止盈:'+escHtmlF(st.takeProfit)+' · 目标:'+escHtmlF(st.target)+'</span></div>'+
+    '<div class="wl-st-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">'+escHtmlF(st.risk)+'</span></div>'+
   '</div>';
   var ts=autoS.todayStrategy;
   var todayStrategyCard='<div class="card ts-stock-card">'+
