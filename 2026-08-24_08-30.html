@@ -821,92 +821,91 @@
   border-radius: 2px;
 }
 
-/* === 个股执行策略表(图片风格:策略/价格/仓位 + 止损/止盈/目标 + 风险) === */
-.wl-st-table {
-  margin: 8px 10px 4px;
+/* 今日执行策略模块 */
+.ts-card {
+  background: linear-gradient(180deg, rgba(255, 247, 237, 0.95), rgba(254, 243, 199, 0.5));
   border: 1px solid rgba(245, 158, 11, 0.25);
-  border-radius: 8px;
-  overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 247, 237, 0.95), rgba(254, 243, 199, 0.4));
+  margin: 0 12px 14px;
+  border-radius: 12px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.08);
 }
-.wl-st-title {
-  font-size: 13px;
+.ts-title {
+  font-size: 15px;
   font-weight: 800;
   color: #b45309;
-  padding: 8px 10px;
-  background: rgba(245, 158, 11, 0.08);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  padding-bottom: 8px;
 }
-.wl-st-head {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  background: rgba(245, 158, 11, 0.06);
-  font-size: 11px;
-  font-weight: 700;
+.ts-sub {
+  font-size: 12px;
+  font-weight: 500;
   color: #92400e;
-  border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+  background: none;
 }
-.wl-st-head span {
-  padding: 6px 8px;
-  text-align: center;
-  border-right: 1px solid rgba(245, 158, 11, 0.12);
-}
-.wl-st-head span:last-child { border-right: none; }
-.wl-st-tr {
-  display: grid;
-  grid-template-columns: 70px 1fr 70px 1fr 70px 1fr;
-  font-size: 12px;
-  border-bottom: 1px solid rgba(245, 158, 11, 0.08);
-}
-.wl-st-tr > span {
-  padding: 6px 8px;
-  border-right: 1px solid rgba(245, 158, 11, 0.08);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.wl-st-tr > span:last-child { border-right: none; }
-.wl-st-key {
-  background: rgba(245, 158, 11, 0.05);
-  color: #b45309;
-  font-weight: 700;
-  text-align: center;
-}
-.wl-st-num {
-  color: #dc2626;
-  font-weight: 700;
-}
-.wl-st-loss {
-  color: #dc2626;
-  font-weight: 600;
-  background: rgba(220, 38, 38, 0.05);
-}
-.wl-st-profit {
-  color: #16a34a;
-  font-weight: 600;
-  background: rgba(22, 163, 74, 0.05);
-}
-.wl-st-note {
-  grid-template-columns: 70px 1fr;
-  background: rgba(254, 243, 199, 0.4);
-}
-.wl-st-note-cell {
-  white-space: normal !important;
-  color: #78350f;
-  font-size: 11px;
-}
-.wl-st-risk {
-  padding: 7px 10px;
-  font-size: 12px;
+.ts-core {
+  background: rgba(220, 252, 231, 0.7);
+  border-left: 3px solid #16a34a;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #166534;
+  margin-bottom: 10px;
   line-height: 1.6;
-  background: rgba(254, 226, 226, 0.5);
-  border-top: 1px solid rgba(220, 38, 38, 0.2);
-  color: #7f1d1d;
 }
-.wl-st-risk b {
-  color: #dc2626;
+.ts-core-tag {
+  display: inline-block;
+  background: #16a34a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
   margin-right: 6px;
-  font-weight: 800;
+}
+.ts-plans {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px 0;
+}
+.ts-plans li {
+  font-size: 13px;
+  color: #1f2937;
+  line-height: 1.7;
+  padding: 3px 0 3px 4px;
+  border-bottom: 1px dashed rgba(180, 83, 9, 0.1);
+}
+.ts-plans li:last-child { border-bottom: none; }
+.ts-dot {
+  color: #2563eb;
+  margin-right: 4px;
+  font-size: 10px;
+}
+.ts-dot-a { color: #2563eb; }
+.ts-dot-b { color: #7c3aed; }
+.ts-alert {
+  background: rgba(254, 243, 199, 0.6);
+  border-left: 3px solid #f59e0b;
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #78350f;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.ts-alert b { color: #b45309; }
+.ts-source {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 10px;
+  color: #94a3b8;
+  font-style: italic;
+  border-top: 1px dashed rgba(148, 163, 184, 0.2);
+  padding-top: 6px;
 }
 </style>
 </head>
@@ -945,10 +944,16 @@
   </div></div><div class="wl-detail" data-detail-code="600487">
     
     
-    <div class="detail-grid detail-grid-base">
+    <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-mid">中风险</span></div><div class="detail-line">回调 2-3%,观察支撑</div><div class="detail-line">放量活跃</div></div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-long">长线</span></div><div class="detail-line"><b>短线</b>区间震荡,关注 MA10 方向选择</div><div class="detail-line"><b>波段</b>跌至 MA20 下方,关注 MA60 是否守住</div><div class="detail-line"><b>长线</b>跌破 MA120,长线宜减仓观望</div></div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,关注量能配合</div></div>
     </div>
-    
+    <div class="detail-spb">
+      <span><b>止损</b>57.41</span>
+      <span><b>支撑</b>55.60</span>
+      <span><b>压力</b>65.26</span>
+    </div>
   </div></div><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
@@ -968,10 +973,16 @@
   </div></div><div class="wl-detail" data-detail-code="600392">
     
     
-    <div class="detail-grid detail-grid-base">
+    <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">震荡整理,方向未明</div><div class="detail-line">量能温和</div></div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-wave">波段</span></div><div class="detail-line"><b>短线</b>区间震荡,关注 MA10 方向选择</div><div class="detail-line"><b>波段</b>区间震荡,等待 MA20 方向选择</div><div class="detail-line"><b>长线</b>站上 MA120 偏多,关注 MA250 突破</div></div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,关注量能配合</div></div>
     </div>
-    
+    <div class="detail-spb">
+      <span><b>止损</b>21.70</span>
+      <span><b>支撑</b>21.01</span>
+      <span><b>压力</b>24.67</span>
+    </div>
   </div></div><div class="wl-stock" data-stock-code="300285"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
@@ -991,10 +1002,16 @@
   </div></div><div class="wl-detail" data-detail-code="300285">
     
     
-    <div class="detail-grid detail-grid-base">
+    <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-high">高风险</span></div><div class="detail-line">跌幅&gt;3%,风险增大</div><div class="detail-line">放量活跃</div></div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-long">长线</span></div><div class="detail-line"><b>短线</b>下跌趋势,反弹至 MA5 减仓</div><div class="detail-line"><b>波段</b>跌至 MA20 下方,关注 MA60 是否守住</div><div class="detail-line"><b>长线</b>跌破 MA120,长线宜减仓观望</div></div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-cut">减仓规避</span></div><div class="detail-line">跌幅较大,建议减仓规避</div></div>
     </div>
-    
+    <div class="detail-spb">
+      <span><b>止损</b>60.89</span>
+      <span><b>支撑</b>58.97</span>
+      <span><b>压力</b>69.23</span>
+    </div>
   </div></div><div class="wl-stock" data-stock-code="300308"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
@@ -1014,10 +1031,16 @@
   </div></div><div class="wl-detail" data-detail-code="300308">
     
     
-    <div class="detail-grid detail-grid-base">
+    <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-high">高风险</span></div><div class="detail-line">跌幅&gt;3%,风险增大</div><div class="detail-line">量能温和</div></div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-long">长线</span></div><div class="detail-line"><b>短线</b>下跌趋势,反弹至 MA5 减仓</div><div class="detail-line"><b>波段</b>跌至 MA20 下方,关注 MA60 是否守住</div><div class="detail-line"><b>长线</b>跌破 MA120,长线宜减仓观望</div></div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-cut">减仓规避</span></div><div class="detail-line">跌幅较大,建议减仓规避</div></div>
     </div>
-    
+    <div class="detail-spb">
+      <span><b>止损</b>826.71</span>
+      <span><b>支撑</b>800.60</span>
+      <span><b>压力</b>939.84</span>
+    </div>
   </div></div><div class="wl-stock" data-stock-code="603538"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
@@ -1037,10 +1060,16 @@
   </div></div><div class="wl-detail" data-detail-code="603538">
     
     
-    <div class="detail-grid detail-grid-base">
+    <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-high">高风险</span></div><div class="detail-line">跌幅&gt;3%,风险增大</div><div class="detail-line">放量活跃</div></div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-long">长线</span></div><div class="detail-line"><b>短线</b>下跌趋势,反弹至 MA5 减仓</div><div class="detail-line"><b>波段</b>跌至 MA20 下方,关注 MA60 是否守住</div><div class="detail-line"><b>长线</b>跌破 MA120,长线宜减仓观望</div></div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-cut">减仓规避</span></div><div class="detail-line">跌幅较大,建议减仓规避</div></div>
     </div>
-    
+    <div class="detail-spb">
+      <span><b>止损</b>25.08</span>
+      <span><b>支撑</b>24.29</span>
+      <span><b>压力</b>28.51</span>
+    </div>
   </div></div><div class="wl-stock" data-stock-code="300342"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
@@ -1060,10 +1089,16 @@
   </div></div><div class="wl-detail" data-detail-code="300342">
     
     
-    <div class="detail-grid detail-grid-base">
+    <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-mid">中风险</span></div><div class="detail-line">回调 2-3%,观察支撑</div><div class="detail-line">量能温和</div></div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-long">长线</span></div><div class="detail-line"><b>短线</b>区间震荡,关注 MA10 方向选择</div><div class="detail-line"><b>波段</b>跌至 MA20 下方,关注 MA60 是否守住</div><div class="detail-line"><b>长线</b>跌破 MA120,长线宜减仓观望</div></div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-hold">持有观察</span></div><div class="detail-line">持有观察,关注量能配合</div></div>
     </div>
-    
+    <div class="detail-spb">
+      <span><b>止损</b>29.82</span>
+      <span><b>支撑</b>28.88</span>
+      <span><b>压力</b>33.90</span>
+    </div>
   </div></div><div class="wl-stock" data-stock-code="300607"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
@@ -1083,10 +1118,16 @@
   </div></div><div class="wl-detail" data-detail-code="300607">
     
     
-    <div class="detail-grid detail-grid-base">
+    <div class="detail-grid">
       <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-high">高风险</span></div><div class="detail-line">跌幅&gt;3%,风险增大</div><div class="detail-line">放量活跃</div></div>
+      <div class="detail-block"><div class="detail-h">风控 <span class="horizon-tag horizon-long">长线</span></div><div class="detail-line"><b>短线</b>下跌趋势,反弹至 MA5 减仓</div><div class="detail-line"><b>波段</b>跌至 MA20 下方,关注 MA60 是否守住</div><div class="detail-line"><b>长线</b>跌破 MA120,长线宜减仓观望</div></div>
+      <div class="detail-block"><div class="detail-h">建议 <span class="advice-tag advice-cut">减仓规避</span></div><div class="detail-line">跌幅较大,建议减仓规避</div></div>
     </div>
-    
+    <div class="detail-spb">
+      <span><b>止损</b>31.65</span>
+      <span><b>支撑</b>30.65</span>
+      <span><b>压力</b>35.99</span>
+    </div>
   </div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报
 tags: [ATDS, 交易复盘]
@@ -1100,6 +1141,7 @@ tags: [ATDS, 交易复盘]
 - 天银机电 (300342): 31.39 -2.79%
 - 拓斯达 (300607): 33.32 -6.33%
 </pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
+  
   <div class="card">
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">74° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">46 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">汉森制药</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">36 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">中药Ⅱ / 化学制药 / 一般零售</div></div></div>

@@ -915,8 +915,17 @@ function buildStockRow(s, i) {
     const blockLogic = s.logic ? `<div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">${esc(s.logic)}</div></div>` : '';
     const blockCapital = s.capital ? `<div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">${esc(s.capital)}</div></div>` : '';
     const blockKey = s.keyLevels && (s.keyLevels.support || s.keyLevels.pressure) ? `<div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">${esc(fmtKL())}</div></div>` : '';
-    const blockPlan = s.plan ? `<div class="detail-block"><div class="detail-h detail-h-custom">⚡ 操作</div><div class="detail-line">${fmtPlan()}</div></div>` : '';
-    strategyBlocks = '<div class="detail-grid detail-grid-strategy">' + blockLogic + blockCapital + blockKey + blockPlan + '</div>';
+    // ⚡ 操作 + 建议 + 风险 —— 同一框架,占整行(grid-column:1/-1)与上面 4 块同宽
+    const adviceName = deriveAdvice(s.pct, atds, riskTone).name;
+    const planLine = s.plan ? `<div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">${fmtPlan()}</span></div>` : `<div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content par-empty">未设置操作 · 仅系统观测</span></div>`;
+    const adviceLine = `<div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">${esc(adviceText)}<span class="advice-tag-mini advice-${adviceTone}">${esc(adviceName)}</span></span></div>`;
+    const riskListHtml = riskLines.map(l => '<li>' + esc(l) + '</li>').join('');
+    const riskLine = `<div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-${riskTone}">${esc(riskName)}</span><ul>${riskListHtml}</ul></span></div>`;
+    const blockPlanAdviceRisk = `<div class="detail-block detail-block-par">
+      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
+      <div class="par-body">${planLine}${adviceLine}${riskLine}</div>
+    </div>`;
+    strategyBlocks = '<div class="detail-grid detail-grid-strategy">' + blockLogic + blockCapital + blockKey + blockPlanAdviceRisk + '</div>';
   }
   // 个股今日执行策略(原全局 todayStrategy 改为按个股分发,仅盘前)——图片风格:策略/价格/仓位 + 止损/止盈/目标 + 风险
   const st = s.strategy || {};
@@ -962,9 +971,6 @@ function buildStockRow(s, i) {
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
     ${meta}
     ${strategyBlocks}
-    <div class="detail-grid detail-grid-base">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-${riskTone}">${esc(riskName)}</span></div>${riskLines.map(l=>'<div class="detail-line">' + esc(l) + '</div>').join('')}</div>
-    </div>
     ${todayStrategyBlock}
   </div>`;
   return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;

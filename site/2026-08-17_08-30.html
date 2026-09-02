@@ -778,6 +778,7 @@
 }
 
 /* 策略 4 块网格(逻辑/资金/关键位/操作) */
+/* 旧 detail-grid-base 已合并到 .detail-block-par 整行大块,不再需要独立规则 */
 .detail-grid-strategy {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -785,6 +786,110 @@
   padding: 10px;
   background: linear-gradient(135deg, rgba(122, 90, 248, 0.04), rgba(34, 211, 238, 0.03));
   border-bottom: 1px solid rgba(122, 90, 248, 0.1);
+}
+.detail-block-plan {
+  grid-column: 1 / -1;  /* ⚡ 操作 + 建议块占整行 */
+  background: linear-gradient(90deg, rgba(254, 243, 199, 0.25), rgba(254, 215, 170, 0.15)) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+}
+
+/* === 操作 + 建议 + 风险 三段合并块(占整行) === */
+.detail-block-par {
+  grid-column: 1 / -1;
+  background: linear-gradient(180deg, rgba(254, 247, 237, 0.95), rgba(254, 243, 199, 0.6)) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  padding: 8px 10px 10px !important;
+}
+.par-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.par-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  border-left: 3px solid #cbd5e1;
+  line-height: 1.6;
+  font-size: 12.5px;
+}
+.par-tag {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 38px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 0;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.par-tag-plan {
+  background: rgba(245, 158, 11, 0.18);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.par-tag-advice {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.par-tag-risk {
+  background: rgba(220, 38, 38, 0.15);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+.par-content {
+  flex: 1;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  color: #1f2937;
+}
+.par-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+.par-risk {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 8px;
+  background: rgba(254, 226, 226, 0.5);
+  border-radius: 4px;
+  border-left: 3px solid #dc2626;
+  line-height: 1.6;
+  font-size: 12.5px;
+}
+.par-risk-content {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.par-risk-content ul {
+  flex: 1 1 100%;
+  margin: 4px 0 0;
+  padding-left: 18px;
+  list-style: none;
+}
+.par-risk-content ul li {
+  position: relative;
+  color: #7f1d1d;
+  font-size: 12px;
+  padding: 2px 0;
+}
+.par-risk-content ul li::before {
+  content: '·';
+  color: #dc2626;
+  font-weight: 700;
+  position: absolute;
+  left: -12px;
 }
 .detail-grid-strategy .detail-block {
   background: rgba(255, 255, 255, 0.85);
@@ -861,8 +966,19 @@
 .wl-st-tr > span {
   padding: 6px 8px;
   border-right: 1px solid rgba(245, 158, 11, 0.08);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;  /* 文字可换行,看到完整内容 */
+  word-break: break-word;
+  white-space: normal;  /* 关键修复:去掉 nowrap 避免截断 */
+  line-height: 1.5;
+  font-size: 12px;
+}
+.wl-st-key {
+  white-space: nowrap !important;  /* 列头(策略/价格/仓位)不换行,保持紧凑 */
+  flex-shrink: 0;
+}
+.wl-st-num {
+  color: #dc2626;
+  font-weight: 700;
   white-space: nowrap;
 }
 .wl-st-tr > span:last-child { border-right: none; }
@@ -945,9 +1061,6 @@
   </div></div><div class="wl-detail" data-detail-code="600392">
     
     
-    <div class="detail-grid detail-grid-base">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">回调 2-3%,观察支撑</div><div class="detail-line">量能温和</div></div>
-    </div>
     
   </div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报

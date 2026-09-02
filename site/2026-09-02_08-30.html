@@ -778,6 +778,7 @@
 }
 
 /* 策略 4 块网格(逻辑/资金/关键位/操作) */
+/* 旧 detail-grid-base 已合并到 .detail-block-par 整行大块,不再需要独立规则 */
 .detail-grid-strategy {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -785,6 +786,110 @@
   padding: 10px;
   background: linear-gradient(135deg, rgba(122, 90, 248, 0.04), rgba(34, 211, 238, 0.03));
   border-bottom: 1px solid rgba(122, 90, 248, 0.1);
+}
+.detail-block-plan {
+  grid-column: 1 / -1;  /* ⚡ 操作 + 建议块占整行 */
+  background: linear-gradient(90deg, rgba(254, 243, 199, 0.25), rgba(254, 215, 170, 0.15)) !important;
+  border: 1px solid rgba(245, 158, 11, 0.25) !important;
+}
+
+/* === 操作 + 建议 + 风险 三段合并块(占整行) === */
+.detail-block-par {
+  grid-column: 1 / -1;
+  background: linear-gradient(180deg, rgba(254, 247, 237, 0.95), rgba(254, 243, 199, 0.6)) !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  padding: 8px 10px 10px !important;
+}
+.par-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+.par-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  border-left: 3px solid #cbd5e1;
+  line-height: 1.6;
+  font-size: 12.5px;
+}
+.par-tag {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 38px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 0;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.par-tag-plan {
+  background: rgba(245, 158, 11, 0.18);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.par-tag-advice {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.par-tag-risk {
+  background: rgba(220, 38, 38, 0.15);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+.par-content {
+  flex: 1;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  color: #1f2937;
+}
+.par-empty {
+  color: #94a3b8;
+  font-style: italic;
+}
+.par-risk {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 8px;
+  background: rgba(254, 226, 226, 0.5);
+  border-radius: 4px;
+  border-left: 3px solid #dc2626;
+  line-height: 1.6;
+  font-size: 12.5px;
+}
+.par-risk-content {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.par-risk-content ul {
+  flex: 1 1 100%;
+  margin: 4px 0 0;
+  padding-left: 18px;
+  list-style: none;
+}
+.par-risk-content ul li {
+  position: relative;
+  color: #7f1d1d;
+  font-size: 12px;
+  padding: 2px 0;
+}
+.par-risk-content ul li::before {
+  content: '·';
+  color: #dc2626;
+  font-weight: 700;
+  position: absolute;
+  left: -12px;
 }
 .detail-grid-strategy .detail-block {
   background: rgba(255, 255, 255, 0.85);
@@ -861,8 +966,19 @@
 .wl-st-tr > span {
   padding: 6px 8px;
   border-right: 1px solid rgba(245, 158, 11, 0.08);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;  /* 文字可换行,看到完整内容 */
+  word-break: break-word;
+  white-space: normal;  /* 关键修复:去掉 nowrap 避免截断 */
+  line-height: 1.5;
+  font-size: 12px;
+}
+.wl-st-key {
+  white-space: nowrap !important;  /* 列头(策略/价格/仓位)不换行,保持紧凑 */
+  flex-shrink: 0;
+}
+.wl-st-num {
+  color: #dc2626;
+  font-weight: 700;
   white-space: nowrap;
 }
 .wl-st-tr > span:last-child { border-right: none; }
@@ -924,9 +1040,9 @@
       <a href="index.html">盘前</a><a href="2026-09-02_11-35.html">午盘</a><a href="2026-08-24_16-20.html">收盘</a><a href="2026-09-02_11-35.html">复盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-09-02 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 69°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-09-02 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 70°</span></div></div>
 <div class="section">
-  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-09-02 10:11:39</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 →</div><div class="wl-stocks"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-09-02 10:29:04</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 →</div><div class="wl-stocks"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -936,18 +1052,18 @@
     <span class="wl-cell wl-cell-act"><b>操作</b></span>
   </div><div class="wl-stock-row" data-code="600487">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">1</span><span class="wl-name">亨通光电</span><span class="wl-code">600487</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">66.12</span></span>
-    <span class="wl-cell wl-cell-pct down">-1.81%</span>
-    <span class="wl-cell wl-cell-amt">37.9亿</span>
-    <span class="wl-cell wl-cell-atds">68</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-press">走势承压</span></span>
+    <span class="wl-cell wl-cell-price"><span class="price down">66.69</span></span>
+    <span class="wl-cell wl-cell-pct down">-0.97%</span>
+    <span class="wl-cell wl-cell-amt">43.5亿</span>
+    <span class="wl-cell wl-cell-atds">69</span>
+    <span class="wl-cell wl-cell-sig"><span class="sig sig-wait">等待确认</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600487" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600487" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600487">
     <div class="wl-meta"><span class="wl-cat">光通信</span><span class="wl-tag">首选参与</span></div>
-    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">海缆+光模块双主线,受益AI算力需求爆发+海上风电招标回暖,在手订单充足</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入2.3亿(通信板块前三),量比放大,资金连续吸筹</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑60 / 压力68.5</div></div><div class="detail-block"><div class="detail-h detail-h-custom">⚡ 操作</div><div class="detail-line">回踩60-61低吸<b>500股</b>(3万-3.05万),放量突破68.5加仓,止损-5%</div></div></div>
-    <div class="detail-grid detail-grid-base">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">回调 2-3%,观察支撑</div><div class="detail-line">量能温和</div></div>
-    </div>
+    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">海缆+光模块双主线,受益AI算力需求爆发+海上风电招标回暖,在手订单充足</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入2.3亿(通信板块前三),量比放大,资金连续吸筹</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑60 / 压力68.5</div></div><div class="detail-block detail-block-par">
+      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
+      <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩60-61低吸<b>500股</b>(3万-3.05万),放量突破68.5加仓,止损-5%</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,关注量能配合<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-low">低风险</span><ul><li>震荡整理,方向未明</li><li>量能温和</li></ul></span></div></div>
+    </div></div>
     <div class="wl-st-table"><div class="wl-st-title">🎯 个股执行策略</div><div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div><div class="wl-st-tr"><span class="wl-st-key">策略</span><span>回踩MA5/8/31(突破)锚平台,靠稳</span><span class="wl-st-key">价格</span><span class="wl-st-num">突破 3.93</span><span class="wl-st-key">仓位</span><span>1000股</span></div><div class="wl-st-tr wl-st-note"><span class="wl-st-key">说明</span><span class="wl-st-note-cell">放量突破今日高点,待确认</span></div><div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">3.58 · 清仓</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">跌破3/9/1平台,趋势走坏</span><span class="wl-st-key">目标</span><span class="wl-st-num">3.95 → 4.10</span></div><div class="wl-st-risk"><b>风险</b>买入价 3.68,止损 3.58,可损约 2.7%,可控。跌破 3.58 必须走,不恋战。</div></div>
   </div></div><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -959,18 +1075,15 @@
     <span class="wl-cell wl-cell-act"><b>操作</b></span>
   </div><div class="wl-stock-row" data-code="600392">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">2</span><span class="wl-name">盛和资源</span><span class="wl-code">600392</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">21.87</span></span>
-    <span class="wl-cell wl-cell-pct down">-3.87%</span>
-    <span class="wl-cell wl-cell-amt">5.9亿</span>
+    <span class="wl-cell wl-cell-price"><span class="price down">21.90</span></span>
+    <span class="wl-cell wl-cell-pct down">-3.74%</span>
+    <span class="wl-cell wl-cell-amt">6.5亿</span>
     <span class="wl-cell wl-cell-atds">63</span>
     <span class="wl-cell wl-cell-sig"><span class="sig sig-weak">弱势回调</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600392" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600392">
     
     
-    <div class="detail-grid detail-grid-base">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-mid">中风险</span></div><div class="detail-line">跌幅&gt;3%,风险增大</div><div class="detail-line">量能一般</div></div>
-    </div>
     
   </div></div><div class="wl-stock" data-stock-code="300285"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -982,18 +1095,15 @@
     <span class="wl-cell wl-cell-act"><b>操作</b></span>
   </div><div class="wl-stock-row" data-code="300285">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">3</span><span class="wl-name">国瓷材料</span><span class="wl-code">300285</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">62.45</span></span>
-    <span class="wl-cell wl-cell-pct down">-2.44%</span>
-    <span class="wl-cell wl-cell-amt">14.6亿</span>
-    <span class="wl-cell wl-cell-atds">66</span>
+    <span class="wl-cell wl-cell-price"><span class="price down">62.66</span></span>
+    <span class="wl-cell wl-cell-pct down">-2.11%</span>
+    <span class="wl-cell wl-cell-amt">17.3亿</span>
+    <span class="wl-cell wl-cell-atds">67</span>
     <span class="wl-cell wl-cell-sig"><span class="sig sig-press">走势承压</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300285" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300285" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300285">
     
     
-    <div class="detail-grid detail-grid-base">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-mid">中风险</span></div><div class="detail-line">回调 2-3%,观察支撑</div><div class="detail-line">量能温和</div></div>
-    </div>
     
   </div></div><div class="wl-stock" data-stock-code="300308"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -1005,18 +1115,15 @@
     <span class="wl-cell wl-cell-act"><b>操作</b></span>
   </div><div class="wl-stock-row" data-code="300308">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">4</span><span class="wl-name">中际旭创</span><span class="wl-code">300308</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">816.19</span></span>
-    <span class="wl-cell wl-cell-pct down">-5.02%</span>
-    <span class="wl-cell wl-cell-amt">93.8亿</span>
-    <span class="wl-cell wl-cell-atds">60</span>
+    <span class="wl-cell wl-cell-price"><span class="price down">818.00</span></span>
+    <span class="wl-cell wl-cell-pct down">-4.81%</span>
+    <span class="wl-cell wl-cell-amt">114.4亿</span>
+    <span class="wl-cell wl-cell-atds">61</span>
     <span class="wl-cell wl-cell-sig"><span class="sig sig-weak">弱势回调</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300308" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300308" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300308">
     
     
-    <div class="detail-grid detail-grid-base">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-high">高风险</span></div><div class="detail-line">跌幅&gt;3%,风险增大</div><div class="detail-line">量能一般</div></div>
-    </div>
     
   </div></div><div class="wl-stock" data-stock-code="603538"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -1028,18 +1135,15 @@
     <span class="wl-cell wl-cell-act"><b>操作</b></span>
   </div><div class="wl-stock-row" data-code="603538">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">5</span><span class="wl-name">美诺华</span><span class="wl-code">603538</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">25.95</span></span>
-    <span class="wl-cell wl-cell-pct down">-1.33%</span>
-    <span class="wl-cell wl-cell-amt">2.3亿</span>
+    <span class="wl-cell wl-cell-price"><span class="price down">25.99</span></span>
+    <span class="wl-cell wl-cell-pct down">-1.18%</span>
+    <span class="wl-cell wl-cell-amt">2.7亿</span>
     <span class="wl-cell wl-cell-atds">69</span>
     <span class="wl-cell wl-cell-sig"><span class="sig sig-press">走势承压</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="603538" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="603538" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="603538">
     
     
-    <div class="detail-grid detail-grid-base">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">回调 2-3%,观察支撑</div><div class="detail-line">量能温和</div></div>
-    </div>
     
   </div></div><div class="wl-stock" data-stock-code="300342"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -1051,18 +1155,15 @@
     <span class="wl-cell wl-cell-act"><b>操作</b></span>
   </div><div class="wl-stock-row" data-code="300342">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">6</span><span class="wl-name">天银机电</span><span class="wl-code">300342</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">32.38</span></span>
-    <span class="wl-cell wl-cell-pct down">-1.10%</span>
-    <span class="wl-cell wl-cell-amt">1.2亿</span>
-    <span class="wl-cell wl-cell-atds">68</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-press">走势承压</span></span>
+    <span class="wl-cell wl-cell-price"><span class="price down">32.50</span></span>
+    <span class="wl-cell wl-cell-pct down">-0.73%</span>
+    <span class="wl-cell wl-cell-amt">1.4亿</span>
+    <span class="wl-cell wl-cell-atds">69</span>
+    <span class="wl-cell wl-cell-sig"><span class="sig sig-wait">等待确认</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300342" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300342" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300342">
     
     
-    <div class="detail-grid detail-grid-base">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">回调 2-3%,观察支撑</div><div class="detail-line">量能一般</div></div>
-    </div>
     
   </div></div><div class="wl-stock" data-stock-code="300607"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -1074,35 +1175,35 @@
     <span class="wl-cell wl-cell-act"><b>操作</b></span>
   </div><div class="wl-stock-row" data-code="300607">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">7</span><span class="wl-name">拓斯达</span><span class="wl-code">300607</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">35.38</span></span>
-    <span class="wl-cell wl-cell-pct down">-1.75%</span>
-    <span class="wl-cell wl-cell-amt">6.3亿</span>
+    <span class="wl-cell wl-cell-price"><span class="price down">35.41</span></span>
+    <span class="wl-cell wl-cell-pct down">-1.67%</span>
+    <span class="wl-cell wl-cell-amt">7.0亿</span>
     <span class="wl-cell wl-cell-atds">69</span>
     <span class="wl-cell wl-cell-sig"><span class="sig sig-press">走势承压</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300607" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300607" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300607">
     <div class="wl-meta"><span class="wl-cat">机器人</span><span class="wl-tag">稳健参与</span></div>
-    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">工业机器人+注塑机双主业,人形机器人产业链受益,业绩环比改善</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入0.8亿,换手2.83%活跃,短线资金关注</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑33 / 压力38</div></div><div class="detail-block"><div class="detail-h detail-h-custom">⚡ 操作</div><div class="detail-line">回踩33-34低吸<b>300股</b>(1万-1.02万),突破38确认,止损-5%</div></div></div>
-    <div class="detail-grid detail-grid-base">
-      <div class="detail-block"><div class="detail-h">风险 <span class="risk-tag risk-low">低风险</span></div><div class="detail-line">回调 2-3%,观察支撑</div><div class="detail-line">放量活跃</div></div>
-    </div>
+    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">工业机器人+注塑机双主业,人形机器人产业链受益,业绩环比改善</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入0.8亿,换手2.83%活跃,短线资金关注</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑33 / 压力38</div></div><div class="detail-block detail-block-par">
+      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
+      <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩33-34低吸<b>300股</b>(1万-1.02万),突破38确认,止损-5%</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,关注量能配合<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-low">低风险</span><ul><li>回调 2-3%,观察支撑</li><li>放量活跃</li></ul></span></div></div>
+    </div></div>
     <div class="wl-st-table"><div class="wl-st-title">🎯 个股执行策略</div><div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div><div class="wl-st-tr"><span class="wl-st-key">策略</span><span>突破前期平台+回踩10日线确认</span><span class="wl-st-key">价格</span><span class="wl-st-num">回踩 33-34</span><span class="wl-st-key">仓位</span><span>300股</span></div><div class="wl-st-tr wl-st-note"><span class="wl-st-key">说明</span><span class="wl-st-note-cell">机器人板块轮动,仓位确认跟随</span></div><div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">32.00 · 清仓</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">突破38加仓,40看趋势延伸</span><span class="wl-st-key">目标</span><span class="wl-st-num">38 → 40</span></div><div class="wl-st-risk"><b>风险</b>买入区33-34,止损32,可损约3-6%。跌破32必须走,不恋战。</div></div>
   </div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报
 tags: [ATDS, 交易复盘]
 ---
 # 观察池
-- 亨通光电 (600487): 66.12 -1.81%
-- 盛和资源 (600392): 21.87 -3.87%
-- 国瓷材料 (300285): 62.45 -2.44%
-- 中际旭创 (300308): 816.19 -5.02%
-- 美诺华 (603538): 25.95 -1.33%
-- 天银机电 (300342): 32.38 -1.10%
-- 拓斯达 (300607): 35.38 -1.75%
+- 亨通光电 (600487): 66.69 -0.97%
+- 盛和资源 (600392): 21.90 -3.74%
+- 国瓷材料 (300285): 62.66 -2.11%
+- 中际旭创 (300308): 818.00 -4.81%
+- 美诺华 (603538): 25.99 -1.18%
+- 天银机电 (300342): 32.50 -0.73%
+- 拓斯达 (300607): 35.41 -1.67%
 </pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
   <div class="card">
     <div class="card-title">盘前交易驾驶舱</div>
-    <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">69° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">31 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">竞业达</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">19 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">一般零售 / 化学原料 / 地面兵装</div></div></div>
+    <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">70° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">34 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">竞业达</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">20 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">一般零售 / 化学原料 / 地面兵装</div></div></div>
   </div>
   <div class="card">
     <div class="card-title">策略状态</div>
@@ -1120,19 +1221,19 @@ tags: [ATDS, 交易复盘]
     <div class="card-title">核心指数</div>
     <div class="index-row"><div class="index-item" data-code="000001" data-prefix="sh">
       <div class="index-name">上证指数</div>
-      <div class="index-value down">3,933.66</div>
-      <div class="index-change down">-1.16%</div>
+      <div class="index-value down">3,937.43</div>
+      <div class="index-change down">-1.07%</div>
     </div><div class="index-item" data-code="399001" data-prefix="sz">
       <div class="index-name">深证成指</div>
-      <div class="index-value down">13,558.33</div>
-      <div class="index-change down">-2.26%</div>
+      <div class="index-value down">13,591.54</div>
+      <div class="index-change down">-2.02%</div>
     </div><div class="index-item" data-code="399006" data-prefix="sz">
       <div class="index-name">创业板指</div>
-      <div class="index-value down">3,299.45</div>
-      <div class="index-change down">-2.77%</div>
+      <div class="index-value down">3,306.02</div>
+      <div class="index-change down">-2.58%</div>
     </div></div>
     <div class="status-row">
-      <div class="status-item">生成时间<strong>2026-09-02 10:11:39</strong></div>
+      <div class="status-item">生成时间<strong>2026-09-02 10:29:04</strong></div>
       <div class="status-item">数据源<strong>通达信实时</strong></div>
       <div class="status-item">类型<strong>盘前简报</strong></div>
     </div>
@@ -1228,55 +1329,55 @@ tags: [ATDS, 交易复盘]
       <td>内蒙一机</td>
     </tr><tr>
       <td>9</td>
+      <td>通信设备</td>
+      <td class="up">+10.02%</td>
+      <td>2家 / 2板</td>
+      <td>恒宝股份</td>
+    </tr><tr>
+      <td>10</td>
       <td>化学制药</td>
       <td class="up">+10.00%</td>
       <td>1家 / 2板</td>
       <td>小方制药</td>
-    </tr><tr>
-      <td>10</td>
-      <td>服装家纺</td>
-      <td class="up">+9.98%</td>
-      <td>1家 / 2板</td>
-      <td>九牧王</td>
     </tr></tbody></table>
   </div>
   <div class="card">
     <div class="card-title">个股研究摘要</div>
-    <div class="sr-list"><div class="sr-item" data-code="688543" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+    <div class="sr-list"><div class="sr-item" data-code="603269" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">1</div>
       <div class="sr-main">
-        <div class="sr-name">国科军工 <small>688543</small></div>
-        <div class="sr-reason">启动+老鸭头+拉升·量比2.0·5日涨14.1%</div>
+        <div class="sr-name">海鸥股份 <small>603269</small></div>
+        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨37.5%</div>
       </div>
-      <div class="sr-pct up">+6.33%</div>
-    </div><div class="sr-item" data-code="000564" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-pct up">+6.24%</div>
+    </div><div class="sr-item" data-code="002328" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">2</div>
       <div class="sr-main">
-        <div class="sr-name">供销大集 <small>000564</small></div>
-        <div class="sr-reason">启动+老鸭头+拉升·量比1.2·5日涨14.3%</div>
+        <div class="sr-name">新朋股份 <small>002328</small></div>
+        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨18.6%</div>
       </div>
-      <div class="sr-pct up">+1.20%</div>
-    </div><div class="sr-item" data-code="302132" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-pct up">+4.85%</div>
+    </div><div class="sr-item" data-code="600722" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">3</div>
       <div class="sr-main">
-        <div class="sr-name">中航成飞 <small>302132</small></div>
-        <div class="sr-reason">启动+老鸭头+拉升·量比2.0·5日涨9.8%</div>
+        <div class="sr-name">金牛化工 <small>600722</small></div>
+        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨28.8%</div>
       </div>
-      <div class="sr-pct up">+4.15%</div>
-    </div><div class="sr-item" data-code="603721" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-pct up">+3.60%</div>
+    </div><div class="sr-item" data-code="002855" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">4</div>
       <div class="sr-main">
-        <div class="sr-name">中广天择 <small>603721</small></div>
-        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨23.2%</div>
+        <div class="sr-name">捷荣技术 <small>002855</small></div>
+        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨61.0%</div>
       </div>
-      <div class="sr-pct up">+5.38%</div>
-    </div><div class="sr-item" data-code="605188" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
+      <div class="sr-pct up">+4.74%</div>
+    </div><div class="sr-item" data-code="603402" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
       <div class="sr-rank">5</div>
       <div class="sr-main">
-        <div class="sr-name">国光连锁 <small>605188</small></div>
-        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨30.2%</div>
+        <div class="sr-name">陕西旅游 <small>603402</small></div>
+        <div class="sr-reason">启动+拉升·量比2.0·5日涨15.1%</div>
       </div>
-      <div class="sr-pct up">+4.01%</div>
+      <div class="sr-pct up">+3.68%</div>
     </div></div>
   </div>
 </div>
