@@ -933,6 +933,9 @@
   border-radius: 8px;
   overflow: hidden;
   background: linear-gradient(180deg, rgba(255, 247, 237, 0.95), rgba(254, 243, 199, 0.4));
+  width: 100% !important;  /* 强制占满父容器 */
+  display: block !important;
+  box-sizing: border-box;
 }
 .wl-st-title {
   font-size: 13px;
@@ -958,12 +961,30 @@
 }
 .wl-st-head span:last-child { border-right: none; }
 .wl-st-tr {
-  display: grid;
-  grid-template-columns: 54px minmax(0, 1fr) 54px minmax(0, 1fr) 54px minmax(0, 1fr);
+  display: flex !important;
+  width: 100% !important;
+  align-items: stretch;
   font-size: 12px;
   border-bottom: 1px solid rgba(245, 158, 11, 0.08);
+  box-sizing: border-box;
 }
-.wl-st-tr > span {
+.wl-st-tr > .wl-st-key {
+  flex: 0 0 54px !important;  /* 列头固定 54px,不收缩 */
+  width: 54px !important;
+  min-width: 54px !important;
+  max-width: 54px !important;
+  white-space: nowrap !important;
+  background: rgba(245, 158, 11, 0.05);
+  color: #b45309;
+  font-weight: 700;
+  text-align: center;
+  padding: 5px 6px;
+  border-right: 1px solid rgba(245, 158, 11, 0.08);
+  box-sizing: border-box;
+}
+.wl-st-tr > span:not(.wl-st-key) {
+  flex: 1 1 0 !important;  /* 值列平均分配剩余宽度 */
+  min-width: 0 !important;
   padding: 5px 6px;
   border-right: 1px solid rgba(245, 158, 11, 0.08);
   overflow-wrap: anywhere;
@@ -971,8 +992,7 @@
   white-space: normal;
   line-height: 1.4;
   font-size: 12px;
-  min-width: 0 !important;  /* 强制 grid 子项可收缩 */
-  max-width: 100%;
+  box-sizing: border-box;
 }
 .wl-st-key {
   width: 54px !important;
