@@ -1043,6 +1043,16 @@
   color: #dc2626;
   font-weight: 700;
 }
+/* 风险行红框高亮 */
+.wl-st-line.wl-st-risk-line {
+  background: rgba(254, 226, 226, 0.5);
+  border-top: 1px solid rgba(220, 38, 38, 0.2);
+  border-bottom: none;
+}
+.wl-st-line.wl-st-risk-line .wl-st-content {
+  color: #7f1d1d;
+  font-weight: 500;
+}
 
 /* === 今日执行策略模块(图2 风格) === */
 .ts-card,
@@ -3891,11 +3901,10 @@ function buildWatchlistDetailHtml(data){
   var st=autoS.strategy;
   var todayStHtml='<div class="wl-st-table">'+
     '<div class="wl-st-title">🎯 个股风控</div>'+
-    '<div class="wl-st-head"><span>入场</span><span>执行</span><span>风控</span></div>'+
-    '<div class="wl-st-tr"><span class="wl-st-key">策略</span><span>'+escHtmlF(st.entryStrategy)+'</span><span class="wl-st-key">价格</span><span class="wl-st-num">'+escHtmlF(st.entryPrice)+'</span><span class="wl-st-key">仓位</span><span>'+escHtmlF(st.entryPosition)+'</span></div>'+
-    '<div class="wl-st-tr"><span class="wl-st-key">止损</span><span class="wl-st-loss">'+escHtmlF(st.stopLoss)+'</span><span class="wl-st-key">止盈</span><span class="wl-st-profit">'+escHtmlF(st.takeProfit)+'</span><span class="wl-st-key">目标</span><span class="wl-st-num">'+escHtmlF(st.target)+'</span></div>'+
-    (st.entryNote ? '<div class="wl-st-line wl-st-note-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">'+escHtmlF(st.entryNote)+'</span></div>' : '')+
-    '<div class="wl-st-risk"><b>风险</b>'+escHtmlF(st.risk)+'</div>'+
+    '<div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:'+escHtmlF(st.entryStrategy)+' · 价格:<span class="wl-st-num">'+escHtmlF(st.entryPrice)+'</span> · 仓位:'+escHtmlF(st.entryPosition)+'</span></div>'+
+    '<div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:'+escHtmlF(st.stopLoss)+' · 止盈:'+escHtmlF(st.takeProfit)+' · 目标:<span class="wl-st-num">'+escHtmlF(st.target)+'</span></span></div>'+
+    (st.entryNote ? '<div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">'+escHtmlF(st.entryNote)+'</span></div>' : '')+
+    '<div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">'+escHtmlF(st.risk)+'</span></div>'+
   '</div>';
   var ts=autoS.todayStrategy;
   var todayStrategyCard='<div class="card ts-stock-card">'+
