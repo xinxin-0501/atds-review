@@ -4180,7 +4180,39 @@ function addAllNHToWatchlist(){
   }
   bulkAddToWatchlist(codes, ' 60日新高个股');
 }
-async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();window.__atdsUnlocked=true;if(!/^\d{6}$/.test(raw)){alert("请输入 6 位数字股票代码（如 600519）");return;}try{var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}closeAllModals();if(!document.querySelector('.wl-stock-row[data-code="'+data.code+'"]')){try{await addFetchedToWatchlist(data.code);}catch(e){}}showDynamicResearch(data);input.value="";}catch(e){alert("网络异常："+e.message);}}
+async function handleSearchStock(){var input=document.getElementById("search-input");if(!input)return;var raw=(input.value||"").trim();window.__atdsUnlocked=true;if(!raw){alert("请输入股票代码或名称（如 600519 / 大北农）");return;}try{
+  if(/^\d{6}$/.test(raw)){ // 纯代码:直接查行情
+    var data=await fetchStockData(raw);if(!data){alert("未找到股票代码 "+raw);return;}
+    closeAllModals();
+    if(!document.querySelector('.wl-stock-row[data-code="'+data.code+'"]')){try{await addFetchedToWatchlist(data.code);}catch(e){}}
+    showDynamicResearch(data);input.value="";return;
+  }
+  // 名称/拼音搜索 → 候选列表
+  var cands=await searchStockByName(raw);
+  if(!cands||!cands.length){alert("未找到股票: "+raw+"，请尝试输入 6 位代码");return;}
+  if(cands.length===1){
+    var d=await fetchStockData(cands[0].code);if(!d){alert("未找到股票代码 "+cands[0].code);return;}
+    closeAllModals();
+    if(!document.querySelector('.wl-stock-row[data-code="'+d.code+'"]')){try{await addFetchedToWatchlist(d.code);}catch(e){}}
+    showDynamicResearch(d);input.value="";return;
+  }
+  showStockCandidates(cands,raw);
+}catch(e){alert("网络异常："+e.message);}}
+async function searchStockByName(q){try{var url="https://smartbox.gtimg.cn/s3/?v=2&q="+encodeURIComponent(q)+"&t=gp&c=8";var res=await fetch(url,{cache:"no-store"});if(!res.ok)return null;var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);var m=text.match(/^v_hint="(.*)"\s*$/);if(!m||!m[1])return null;return m[1].split("^").map(function(seg){var p=seg.split("~");if(p.length<5)return null;return {market:p[0],code:p[1],name:p[2],pinyin:p[3],type:p[4]};}).filter(function(x){return x&&(x.type==="GP-A"||x.type==="GP-B");});}catch(e){return null;}}
+function showStockCandidates(cands,q){
+  var mask=document.createElement("div");mask.className="modal-mask";mask.style.display="flex";
+  mask.onclick=function(ev){if(ev&&ev.target===mask&&mask.parentNode)mask.parentNode.removeChild(mask);};
+  var box=document.createElement("div");
+  box.style.cssText="background:#fff;border-radius:12px;padding:16px;width:88%;max-width:360px;max-height:70vh;overflow:auto;box-shadow:0 8px 30px rgba(0,0,0,.18);";
+  var rows=(cands||[]).map(function(c){
+    return '<div class="cand-row" data-code="'+escHtmlF(c.code)+'" style="padding:11px 6px;border-bottom:1px solid #f1f5f9;cursor:pointer;display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;">'+escHtmlF(c.name)+'</span><span style="color:#64748b;font-size:12px;">'+escHtmlF(c.code)+'</span></div>';
+  }).join("");
+  box.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px;">🔍 搜索结果：<span style="color:#7c3aed;">'+escHtmlF(q)+'</span></div><div style="color:#94a3b8;font-size:12px;margin-bottom:8px;">点击候选加入观察池并显示最新行情</div>'+rows;
+  mask.appendChild(box);document.body.appendChild(mask);
+  box.querySelectorAll(".cand-row").forEach(function(row){
+    row.onclick=function(){var code=row.getAttribute("data-code");if(mask.parentNode)mask.parentNode.removeChild(mask);(async function(){var d=await fetchStockData(code);if(!d){alert("未找到股票代码 "+code);return;}closeAllModals();if(!document.querySelector('.wl-stock-row[data-code="'+d.code+'"]')){try{await addFetchedToWatchlist(d.code);}catch(e){}}showDynamicResearch(d);var inp=document.getElementById("search-input");if(inp)inp.value="";})();};
+  });
+}
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
 function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
