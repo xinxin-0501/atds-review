@@ -1153,6 +1153,104 @@
   padding-top: 6px;
   line-height: 1.6;
 }
+
+/* ============ 板块候选股:排除涨停 · 优先可观察 (2026-09-07) ============ */
+/* 进攻方向行内候选(str-line 下方) */
+.str-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 4px 0 10px 0;
+  padding: 6px 8px;
+  background: rgba(56, 189, 248, 0.06);
+  border-radius: 6px;
+}
+.str-picks-tag {
+  font-size: 10px;
+  color: #0284c7;
+  font-weight: 600;
+  margin-right: 2px;
+  white-space: nowrap;
+}
+.str-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #fff;
+  border: 1px solid rgba(2, 132, 199, 0.18);
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.str-pick b { color: #0f172a; font-weight: 600; }
+.str-pick .up { color: #e11d48; font-weight: 600; }
+.str-pick .down { color: #16a34a; font-weight: 600; }
+.str-picks-empty { font-size: 11px; color: #94a3b8; }
+
+/* 最强主线:点击展开候选 */
+.md-card {
+  border-bottom: 1px solid rgba(100, 116, 139, 0.1);
+}
+.md-item {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.md-item:active { background: rgba(56, 189, 248, 0.08); }
+.md-arrow {
+  display: flex;
+  align-items: center;
+  color: #94a3b8;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+  margin-left: 4px;
+}
+.md-card.open .md-arrow { transform: rotate(180deg); }
+.md-picks-wrap {
+  display: none;
+  padding: 2px 8px 10px 34px;
+  animation: mdFadeIn 0.18s ease;
+}
+.md-card.open .md-picks-wrap { display: block; }
+@keyframes mdFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.md-picks-h {
+  font-size: 10px;
+  color: #0284c7;
+  font-weight: 600;
+  margin: 4px 0 6px 0;
+  letter-spacing: 0.3px;
+}
+.md-pick {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(56, 189, 248, 0.05);
+  border-radius: 6px;
+  padding: 5px 8px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border-left: 3px solid rgba(2, 132, 199, 0.35);
+}
+.md-pick-name { font-size: 12px; font-weight: 600; color: #0f172a; min-width: 0; }
+.md-pick-code { font-size: 10px; color: #94a3b8; }
+.md-pick-pct { font-size: 11px; font-weight: 600; margin-left: auto; }
+.md-pick-pct.up { color: #e11d48; }
+.md-pick-pct.down { color: #16a34a; }
+.md-pick-hint {
+  font-size: 9px;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.1);
+  border-radius: 8px;
+  padding: 0 6px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.md-picks-empty { font-size: 11px; color: #94a3b8; padding: 4px 0; }
 </style>
 </head>
 <body>
@@ -1237,42 +1335,77 @@ tags: [ATDS, 交易复盘]
     </div>
   </div>
   <div class="card">
-    <div class="card-title">当前最强主线方向</div>
-    <div class="md-list"><div class="md-item">
-      <div class="md-rank">1</div>
-      <div class="md-main">
-        <div class="md-name">通用设备 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 1家 / 5板 · 领涨 蓝盾光电 · ATDS 96</div>
+    <div class="card-title">当前最强主线方向 <span class="card-sub">点击板块查看可观察个股</span></div>
+    <div class="md-list"><div class="md-card">
+      <div class="md-item" onclick="toggleMdPicks(0)">
+        <div class="md-rank">1</div>
+        <div class="md-main">
+          <div class="md-name">通用设备 <span class="md-status ok">主线确认</span></div>
+          <div class="md-sub">涨停 1家 / 5板 · 领涨 蓝盾光电 · ATDS 96</div>
+        </div>
+        <div class="md-pct up">+19.99%</div>
+        <div class="md-arrow">▾</div>
       </div>
-      <div class="md-pct up">+19.99%</div>
-    </div><div class="md-item">
-      <div class="md-rank">2</div>
-      <div class="md-main">
-        <div class="md-name">汽车零部 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 3家 / 3板 · 领涨 坤泰股份 · ATDS 96</div>
+      <div class="md-picks-wrap" id="md-picks-0">
+        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
+        <div class="md-picks-empty">候选数据暂缺</div>
       </div>
-      <div class="md-pct up">+10.02%</div>
-    </div><div class="md-item">
-      <div class="md-rank">3</div>
-      <div class="md-main">
-        <div class="md-name">通信设备 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 4家 / 2板 · 领涨 共进股份 · ATDS 96</div>
+    </div><div class="md-card">
+      <div class="md-item" onclick="toggleMdPicks(1)">
+        <div class="md-rank">2</div>
+        <div class="md-main">
+          <div class="md-name">汽车零部 <span class="md-status ok">主线确认</span></div>
+          <div class="md-sub">涨停 3家 / 3板 · 领涨 坤泰股份 · ATDS 96</div>
+        </div>
+        <div class="md-pct up">+10.02%</div>
+        <div class="md-arrow">▾</div>
       </div>
-      <div class="md-pct up">+12.50%</div>
-    </div><div class="md-item">
-      <div class="md-rank">4</div>
-      <div class="md-main">
-        <div class="md-name">医疗服务 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 2家 / 3板 · 领涨 澳洋健康 · ATDS 96</div>
+      <div class="md-picks-wrap" id="md-picks-1">
+        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
+        <div class="md-picks-empty">候选数据暂缺</div>
       </div>
-      <div class="md-pct up">+14.97%</div>
-    </div><div class="md-item">
-      <div class="md-rank">5</div>
-      <div class="md-main">
-        <div class="md-name">装修装饰 <span class="md-status ok">主线确认</span></div>
-        <div class="md-sub">涨停 2家 / 3板 · 领涨 金 螳 螂 · ATDS 96</div>
+    </div><div class="md-card">
+      <div class="md-item" onclick="toggleMdPicks(2)">
+        <div class="md-rank">3</div>
+        <div class="md-main">
+          <div class="md-name">通信设备 <span class="md-status ok">主线确认</span></div>
+          <div class="md-sub">涨停 4家 / 2板 · 领涨 共进股份 · ATDS 96</div>
+        </div>
+        <div class="md-pct up">+12.50%</div>
+        <div class="md-arrow">▾</div>
       </div>
-      <div class="md-pct up">+10.00%</div>
+      <div class="md-picks-wrap" id="md-picks-2">
+        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
+        <div class="md-picks-empty">候选数据暂缺</div>
+      </div>
+    </div><div class="md-card">
+      <div class="md-item" onclick="toggleMdPicks(3)">
+        <div class="md-rank">4</div>
+        <div class="md-main">
+          <div class="md-name">医疗服务 <span class="md-status ok">主线确认</span></div>
+          <div class="md-sub">涨停 2家 / 3板 · 领涨 澳洋健康 · ATDS 96</div>
+        </div>
+        <div class="md-pct up">+14.97%</div>
+        <div class="md-arrow">▾</div>
+      </div>
+      <div class="md-picks-wrap" id="md-picks-3">
+        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
+        <div class="md-picks-empty">候选数据暂缺</div>
+      </div>
+    </div><div class="md-card">
+      <div class="md-item" onclick="toggleMdPicks(4)">
+        <div class="md-rank">5</div>
+        <div class="md-main">
+          <div class="md-name">装修装饰 <span class="md-status ok">主线确认</span></div>
+          <div class="md-sub">涨停 2家 / 3板 · 领涨 金 螳 螂 · ATDS 96</div>
+        </div>
+        <div class="md-pct up">+10.00%</div>
+        <div class="md-arrow">▾</div>
+      </div>
+      <div class="md-picks-wrap" id="md-picks-4">
+        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
+        <div class="md-picks-empty">候选数据暂缺</div>
+      </div>
     </div></div>
   </div>
   <div class="card">
@@ -1598,6 +1731,13 @@ function showStockCandidates(cands,q){
   });
 }
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
+// 最强主线卡片:点击展开/收起"排除涨停 · 优先可观察前3"
+function toggleMdPicks(i){
+  var w=document.getElementById("md-picks-"+i);
+  if(!w)return;
+  var card=w.closest?w.closest(".md-card"):w.parentElement;
+  if(card)card.classList.toggle("open");
+}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
 function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
 function deriveAdviceF(pct,atds,riskTone){var v=Number(pct)||0,a=Number(atds)||0;if(v<=-5)return{name:'减仓规避',tone:'cut'};if(a>=85&&riskTone!='high')return{name:'重点关注',tone:'focus'};if(a>=70)return{name:'持有观察',tone:'hold'};if(a<60&&v<=-1)return{name:'观望',tone:'wait'};return{name:'持有观察',tone:'hold'};}

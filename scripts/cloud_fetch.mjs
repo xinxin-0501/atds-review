@@ -410,6 +410,141 @@ function fmtAmount(wan) {
   return Math.round(wan).toLocaleString() + '万';
 }
 
+/* ============ 板块候选股:排除涨停 · 优先可观察 topN (2026-09-07) ============ */
+async function fetchJsonTxt(u, opts) {
+  const ac = new AbortController();
+  const timer = setTimeout(() => ac.abort(), (opts && opts.timeout) || 10000);
+  try {
+    const r = await fetch(u, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://www.eastmoney.com/' }, signal: ac.signal });
+    if (!r.ok) return null;
+    const txt = await r.text();
+    try { return JSON.parse(txt); } catch (e) { return null; }
+  } catch (e) { return null; } finally { clearTimeout(timer); }
+}
+// 东财搜索建议接口:板块名 → BK 代码。兼容涨停池 hybk 截断名(如"汽车零部"→"汽车零部件" BK0481)
+async function resolveBoardCode(name) {
+  try {
+    const j = await fetchJsonTxt('https://searchapi.eastmoney.com/api/suggest/get?input=' + encodeURIComponent(String(name).trim()) + '&type=14&count=12');
+    const rows = (j && j.QuotationCodeTable && j.QuotationCodeTable.Data) || [];
+    const boards = rows.filter(x => x && (x.Classify === 'BK' || x.SecurityType === '9'));
+    if (!boards.length) return null;
+    const nm = String(name).trim();
+    const hit = boards.find(x => x.Name === nm && String(x.TypeUS) === '2')
+      || boards.find(x => x.Name === nm)
+      || boards.find(x => x.TypeUS === '2' && String(x.Name).includes(nm.slice(0, Math.max(2, nm.length))))
+      || boards.find(x => String(x.Name).includes(nm) || nm.includes(String(x.Name)));
+    return hit ? { name: hit.Name, code: hit.Code } : { name: boards[0].Name, code: boards[0].Code };
+  } catch (e) { return null; }
+}
+// 板块成分实时行情:剔除 涨停/ST/退市/北交所,非涨停按涨幅降序取前 N(含当日涨幅/换手)
+async function fetchBoardPicks(bkCode, ztSet, topN) {
+  const tryHosts = ['https://push2.eastmoney.com', 'http://push2.eastmoney.com', 'https://push2delay.eastmoney.com', 'http://push2ex.eastmoney.com'];
+  for (const base of tryHosts) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const url = `${base}/api/qt/clist/get?pn=1&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=b:${bkCode}&fields=f2,f3,f8,f12,f14`;
+        const j = await fetchJsonTxt(url, { timeout: 8000 });
+        if (!j || !j.data) { if (attempt === 0) await new Promise(r => setTimeout(r, 300)); continue; }
+        const diff = j.data.diff || [];
+        const picks = [];
+        for (const it of diff) {
+          const code = String(it.f12 || '');
+          const nm = String(it.f14 || '');
+          const pct = Number(it.f3);
+          if (!/^(60|00|30|68)/.test(code)) continue;        // 剔除北交所(4/8/9 开头)
+          if (/ST|退/.test(nm)) continue;                    // 剔除 ST/退市
+          if (ztSet.has(code)) continue;                     // 剔除涨停(当日涨停池口径)
+          if (isNaN(pct) || pct < 0) continue;               // 仅取红盘候选
+          if (pct >= 19.8 && /^(30|68)/.test(code)) continue;// 创业板/科创板 涨停≈20cm
+          if (pct >= 9.8 && /^(60|00)/.test(code)) continue; // 主板 涨停≈10cm
+          picks.push({ code, name: nm, pct: Math.round(pct * 100) / 100, turnover: it.f8 != null ? Number(it.f8) : null });
+          if (picks.length >= (topN || 3)) break;
+        }
+        if (picks.length) return picks;
+        if (diff.length) return picks;  // 成分拿到了但无满足候选 → 返回空而非继续换 host
+      } catch (e) { if (attempt === 0) await new Promise(r => setTimeout(r, 300)); }
+    }
+  }
+  return [];
+}
+// 为多个板块批量注入候选(名称去重、错峰并发),返回 { 板块名: { board, picks } }
+async function attachSectorPicks(sectorNames, ztSet) {
+  const out = {};
+  const uniq = [...new Set((sectorNames || []).filter(Boolean))].slice(0, 10);
+  const entries = await Promise.all(uniq.map(async (nm, i) => {
+    await new Promise(r => setTimeout(r, i * 120));  // 错峰,防限流
+    const b = await resolveBoardCode(nm);
+    if (!b) { console.warn('  [板块候选] 板块名解析失败:', nm); return [nm, { board: '', picks: [] }]; }
+    const picks = await fetchBoardPicks(b.code, ztSet, 3);
+    return [nm, { board: b.name, picks }];
+  }));
+  for (const [k, v] of entries) out[k] = v;
+  return out;
+}
+
+/* ============ 观察池技术画像(盘前):MA/量比/KDJ/趋势 → 支撑"建议"五类文案 ============ */
+function calcTechFromKline(arr) {
+  if (!Array.isArray(arr) || arr.length < 30) return null;
+  const closes = arr.map(k => parseFloat(k[2])).filter(n => !isNaN(n));
+  const vols = arr.map(k => parseFloat(k[5]) || 0);
+  const n = closes.length;
+  if (n < 30) return null;
+  const last = closes[n - 1];
+  const sma = (m) => n >= m ? closes.slice(-m).reduce((a, b) => a + b, 0) / m : null;
+  const ma5 = sma(5), ma10 = sma(10), ma20 = sma(20), ma60 = sma(60);
+  // 量比:最近5日均量 / 之前15日均量(>1.3 放量,<0.75 缩量/窒息)
+  const last5v = vols.slice(-5).reduce((a, b) => a + b, 0) / 5;
+  const prev15v = vols.slice(-20, -5).reduce((a, b) => a + b, 0) / 15;
+  const volRatio = prev15v > 0 ? last5v / prev15v : null;
+  // KDJ(9,3,3):最后一根是否金叉
+  let k = 50, d = 50, prevK = null, prevD = null;
+  let kdjGold = false;
+  for (let i = 0; i < n; i++) {
+    const seg = closes.slice(Math.max(0, i - 8), i + 1);
+    const hi = Math.max(...seg), lo = Math.min(...seg);
+    const rsv = hi > lo ? (closes[i] - lo) / (hi - lo) * 100 : 50;
+    k = 2 / 3 * k + 1 / 3 * rsv;
+    d = 2 / 3 * d + 1 / 3 * k;
+    if (i === n - 1 && prevK != null && prevK <= prevD && k > d) kdjGold = true;
+    prevK = k; prevD = d;
+  }
+  // 趋势:多头(均线全多头) / 修复(MA10>MA20 且价在MA20上) / 空头(价在MA20下) / 震荡
+  const ma20Prev = n >= 25 ? closes.slice(-25, -5).reduce((a, b) => a + b, 0) / 20 : null;
+  const ma20Slope = (ma20 != null && ma20Prev != null)
+    ? (ma20 > ma20Prev * 1.002 ? 'up' : ma20 < ma20Prev * 0.998 ? 'down' : 'flat') : 'flat';
+  const bullArrange = !!(ma5 && ma10 && ma20 && ma60 && ma5 > ma10 && ma10 > ma20 && ma20 > ma60);
+  const trend = bullArrange ? 'up'
+    : (!bullArrange && ma10 && ma20 && ma10 > ma20 && last > ma20 && ma20Slope !== 'down') ? 'repair'
+    : (ma20 != null && last < ma20) ? 'down' : 'flat';
+  const r60 = closes.slice(-60);
+  const hi60 = Math.max(...r60), lo60 = Math.min(...r60);
+  const range60 = hi60 > lo60 ? (last - lo60) / (hi60 - lo60) * 100 : 50;
+  const pct5 = n >= 6 ? (last / closes[n - 6] - 1) * 100 : 0;
+  const r2 = (x) => (x == null ? null : Math.round(x * 100) / 100);
+  return {
+    price: r2(last), ma5: r2(ma5), ma10: r2(ma10), ma20: r2(ma20), ma60: r2(ma60),
+    ma20Slope, trend,
+    volRatio: volRatio != null ? Math.round(volRatio * 100) / 100 : null,
+    kdjGold,
+    bias10: ma10 ? Math.round((last / ma10 - 1) * 1000) / 10 : null,
+    bias20: ma20 ? Math.round((last / ma20 - 1) * 1000) / 10 : null,
+    range60: Math.round(range60), pct5: Math.round(pct5 * 100) / 100
+  };
+}
+async function enrichWatchlistTech(list) {
+  const arr = await Promise.all((list || []).map(async (s) => {
+    if (!s || !s.code) return s;
+    try {
+      const pre = String(s.code).charAt(0) === '6' ? 'sh' : 'sz';
+      const kl = await fetchKline(pre + s.code, 90);
+      const t = calcTechFromKline(kl);
+      if (t) s.tech = t;
+    } catch (e) { /* 技术画像缺失时渲染层降级为通用建议 */ }
+    return s;
+  }));
+  return arr;
+}
+
 
 // 全市场成交额(沪深两市合计,单位:亿元)
 async function fetchTotalAmount() {
@@ -1267,7 +1402,7 @@ async function main() {
   const watchCodes = config.watchlist.map(w => (w.setcode === '1' ? 'sh' : 'sz') + w.code);
   const tencentAll = await fetchTencent([...indexCodes, ...watchCodes]);
   const indices = config.indices.map((idx, i) => ({ name: idx.name, code: idx.code, price: tencentAll[i].price, changePct: tencentAll[i].pct }));
-  const watchlist = config.watchlist.map((w, i) => {
+  let watchlist = config.watchlist.map((w, i) => {
     const t = tencentAll[config.indices.length + i];
     return {
       code: w.code,
@@ -1318,6 +1453,13 @@ async function main() {
   }
   const techAnalysis = buildTechAnalysis(klineMap, config.indices);
   const playbook = derivePlaybook(zt.list, dragonPool);
+
+  // 盘前:为观察池补技术画像(MA/量比/KDJ/趋势),驱动"建议"按五类情形给出可执行结论
+  if (isPre && watchlist.length) {
+    const t0 = Date.now();
+    watchlist = await enrichWatchlistTech(watchlist);
+    console.log('观察池技术画像:', watchlist.filter(s => s.tech).length + '/' + watchlist.length + ' 只 (' + (Date.now() - t0) + 'ms)');
+  }
 
   // 国际联动：盘中/盘前外盘快照
   const intlMkt = await fetchIntlMkt();
@@ -1415,6 +1557,24 @@ async function main() {
   const mainRank = rows.sort((a, b) => b._score - a._score).slice(0, 27).map((s, i) => { s.rank = i + 1; delete s._score; delete s._hasZT; return s });
   if (!mainRank.length && ztByHybk.size === 0) {
     // 终极兜底:数据完全缺失时给个空数组
+  }
+
+  // 板块候选股:最强主线前5 + 进攻方向 → "排除涨停 · 优先可观察 top3"(供卡片点击/行内展示)
+  {
+    const sectorPickTargets = [];
+    for (const r of mainRank.slice(0, 5)) sectorPickTargets.push(r.mappedName || r.name);
+    for (const o of (playbook && playbook.offense) || []) sectorPickTargets.push(o.name);
+    const ztCodeSet = new Set(zt.list.map(s => String(s.code)));
+    const sectorPicks = await attachSectorPicks(sectorPickTargets, ztCodeSet);
+    for (const r of mainRank.slice(0, 5)) {
+      const hit = sectorPicks[r.mappedName || r.name];
+      if (hit && hit.picks.length) r.picks = hit.picks;
+    }
+    for (const o of (playbook && playbook.offense) || []) {
+      const hit = sectorPicks[o.name];
+      if (hit && hit.picks.length) o.picks = hit.picks;
+    }
+    console.log('板块候选股注入:', Object.values(sectorPicks).filter(v => v.picks.length).length + '/' + Object.keys(sectorPicks).length, '个板块有候选');
   }
 
   const dataAsOfDate = isPre ? qdate : date;

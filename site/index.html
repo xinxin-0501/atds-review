@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<html lang="zh-CN" data-page-node-id="H0Wrc0WQUO4IxT1F71OO7B">
+<head data-page-node-id="ObJGyNP58gZaWYcKXvYTZE">
+<meta charset="UTF-8" data-page-node-id="ZOqZ0FUzeJJiOFcafxLTVv">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" data-page-node-id="4a0ZtDEI9XwFC0HOYIC0lv">
+<meta http-equiv="Pragma" content="no-cache" data-page-node-id="xkwuUSwUJHG3RcBDdAWBrK">
+<meta http-equiv="Expires" content="0" data-page-node-id="Up7qZrUqsBFKFisZxtfwRz">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="1Xm4ZpOWEvZ3G5mB1NODlp">
 <title>ATDS PRO · A 股每日复盘</title>
 <style>.modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0}
 .modal-mask.show{display:flex}
@@ -1157,37 +1157,135 @@
   padding-top: 6px;
   line-height: 1.6;
 }
+
+/* ============ 板块候选股:排除涨停 · 优先可观察 (2026-09-07) ============ */
+/* 进攻方向行内候选(str-line 下方) */
+.str-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 4px 0 10px 0;
+  padding: 6px 8px;
+  background: rgba(56, 189, 248, 0.06);
+  border-radius: 6px;
+}
+.str-picks-tag {
+  font-size: 10px;
+  color: #0284c7;
+  font-weight: 600;
+  margin-right: 2px;
+  white-space: nowrap;
+}
+.str-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #fff;
+  border: 1px solid rgba(2, 132, 199, 0.18);
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.str-pick b { color: #0f172a; font-weight: 600; }
+.str-pick .up { color: #e11d48; font-weight: 600; }
+.str-pick .down { color: #16a34a; font-weight: 600; }
+.str-picks-empty { font-size: 11px; color: #94a3b8; }
+
+/* 最强主线:点击展开候选 */
+.md-card {
+  border-bottom: 1px solid rgba(100, 116, 139, 0.1);
+}
+.md-item {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.md-item:active { background: rgba(56, 189, 248, 0.08); }
+.md-arrow {
+  display: flex;
+  align-items: center;
+  color: #94a3b8;
+  font-size: 12px;
+  transition: transform 0.2s ease;
+  margin-left: 4px;
+}
+.md-card.open .md-arrow { transform: rotate(180deg); }
+.md-picks-wrap {
+  display: none;
+  padding: 2px 8px 10px 34px;
+  animation: mdFadeIn 0.18s ease;
+}
+.md-card.open .md-picks-wrap { display: block; }
+@keyframes mdFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.md-picks-h {
+  font-size: 10px;
+  color: #0284c7;
+  font-weight: 600;
+  margin: 4px 0 6px 0;
+  letter-spacing: 0.3px;
+}
+.md-pick {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(56, 189, 248, 0.05);
+  border-radius: 6px;
+  padding: 5px 8px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border-left: 3px solid rgba(2, 132, 199, 0.35);
+}
+.md-pick-name { font-size: 12px; font-weight: 600; color: #0f172a; min-width: 0; }
+.md-pick-code { font-size: 10px; color: #94a3b8; }
+.md-pick-pct { font-size: 11px; font-weight: 600; margin-left: auto; }
+.md-pick-pct.up { color: #e11d48; }
+.md-pick-pct.down { color: #16a34a; }
+.md-pick-hint {
+  font-size: 9px;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.1);
+  border-radius: 8px;
+  padding: 0 6px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.md-picks-empty { font-size: 11px; color: #94a3b8; padding: 4px 0; }
 </style>
 </head>
-<body>
-<div class="phone">
-<div class="header">
-  <div class="brand">
-    <div class="logo">A</div>
-    <div class="brand-text">
-      <div class="brand-name">ATDS <span class="pro-badge">PRO</span> 复盘</div>
-      <div class="brand-sub">GLOBAL LINKAGE V4.0 · 工作台</div>
+<body data-page-node-id="SEZSqMkDWXcWYneFxPZXb7">
+<div class="phone" data-page-node-id="Ean1udNTarYSjtLE1Ee9Vd">
+<div class="header" data-page-node-id="iRXRKCTEbuz7FaGPaAfdgA">
+  <div class="brand" data-page-node-id="rKzp057RbZJHTZgjBZAOy3">
+    <div class="logo" data-page-node-id="Kv7G2qhPyiIQbKMlHsfksy">A</div>
+    <div class="brand-text" data-page-node-id="mXrywwEOHfiBZPJlpXqhJK">
+      <div class="brand-name" data-page-node-id="Z1lwDeVHKXq7UVuchNFdAW">ATDS <span class="pro-badge" data-page-node-id="0mjbh0VKxjwLkK1rskuWQG">PRO</span> 复盘</div>
+      <div class="brand-sub" data-page-node-id="nAjVxDR1hPJmgBv2GqjpNR">GLOBAL LINKAGE V4.0 · 工作台</div>
     </div>
   </div>
 </div>
-<div class="hero">
-  <div class="hero-title">A股每日复盘工作台</div>
-  <div class="hero-sub">盘中 11:35 / 收盘 16:20 自动采集与渲染</div>
+<div class="hero" data-page-node-id="ZCBW7nnqHIK2YtWU5yv1KD">
+  <div class="hero-title" data-page-node-id="m1if7CsTiUPuWD04XZZaWS">A股每日复盘工作台</div>
+  <div class="hero-sub" data-page-node-id="rbzHa0CZxPLqlFEcDE630D">盘中 11:35 / 收盘 16:20 自动采集与渲染</div>
 </div>
-<div class="section">
-  <div class="tools">
-    <a class="tool-btn" href="2026-09-07_08-30.html">盘前 08:30 简报 · 2026-09-07</a>
-    <a class="tool-btn" href="2026-09-07_11-35.html">盘中 11:35 快照 · 2026-09-07</a>
-    <a class="tool-btn" href="2026-09-02_16-20.html">收盘 16:20 复盘 · 2026-09-02</a>
-    <a class="tool-btn" href="main-rank.html">主线实时校准</a>
-    <button class="tool-btn qr-btn" onclick="showQr()">手机扫码打开</button>
+<div class="section" data-page-node-id="Bc9JWFWi4A1E3Od6ZmVwV0">
+  <div class="tools" data-page-node-id="5fzVzAN2urFgVG2QpPQOy6">
+    <a class="tool-btn" href="2026-09-07_08-30.html" data-page-node-id="xevZbPqNfhp9LIhyc61nIX">盘前 08:30 简报 · 2026-09-07</a>
+    <a class="tool-btn" href="2026-09-07_11-35.html" data-page-node-id="9p7vK3Ju1shvOh3hofwXeD">盘中 11:35 快照 · 2026-09-07</a>
+    <a class="tool-btn" href="2026-09-02_16-20.html" data-page-node-id="MIUKEL4MtNmUAayOqTY9o9">收盘 16:20 复盘 · 2026-09-02</a>
+    <a class="tool-btn" href="main-rank.html" data-page-node-id="gzMWspMdqRVJjz4L5inCDG">主线实时校准</a>
+    <button class="tool-btn qr-btn" onclick="showQr()" data-page-node-id="kNqJJ631Uiz2kbCGADJOXi">手机扫码打开</button>
   </div>
-  <div class="card">
-    <div class="card-title">历史复盘 (5536)</div>
-    <div class="report-list"><a class="report-card" href="2026-09-07_11-35.html"><div class="rc-title">2026-09-07 11:35 · 午盘快照</div><div class="rc-meta">上证指数 -0.24% / 深证成指 +1.38% / 创业板指 +2.63%</div></a><a class="report-card" href="2026-09-07_08-30.html"><div class="rc-title">2026-09-07 08:30 · 盘前简报</div><div class="rc-meta">上证指数 -0.24% / 深证成指 +1.38% / 创业板指 +2.63%</div></a><a class="report-card" href="2026-09-02_16-20.html"><div class="rc-title">2026-09-02 16:20 · 收盘复盘</div><div class="rc-meta">上证指数 -0.97% / 深证成指 -1.88% / 创业板指 -2.39%</div></a><a class="report-card" href="2026-09-02_11-35.html"><div class="rc-title">2026-09-02 11:35 · 午盘快照</div><div class="rc-meta">上证指数 -0.97% / 深证成指 -1.88% / 创业板指 -2.39%</div></a><a class="report-card" href="2026-09-02_08-30.html"><div class="rc-title">2026-09-02 08:30 · 盘前简报</div><div class="rc-meta">上证指数 -0.82% / 深证成指 -1.71% / 创业板指 -2.18%</div></a><a class="report-card" href="2026-08-24_16-20.html"><div class="rc-title">2026-08-24 16:20 · 收盘复盘</div><div class="rc-meta">上证指数 -0.59% / 深证成指 -2.13% / 创业板指 -3.21%</div></a><a class="report-card" href="2026-08-24_11-35.html"><div class="rc-title">2026-08-24 11:35 · 午盘快照</div><div class="rc-meta">上证指数 -0.59% / 深证成指 -2.13% / 创业板指 -3.21%</div></a><a class="report-card" href="2026-08-24_08-30.html"><div class="rc-title">2026-08-24 08:30 · 盘前简报</div><div class="rc-meta">上证指数 -0.59% / 深证成指 -2.13% / 创业板指 -3.21%</div></a><a class="report-card" href="2026-08-21_16-20.html"><div class="rc-title">2026-08-21 16:20 · 收盘复盘</div><div class="rc-meta">上证指数 +0.04% / 深证成指 +0.87% / 创业板指 +1.43%</div></a><a class="report-card" href="2026-08-21_11-35.html"><div class="rc-title">2026-08-21 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +0.04% / 深证成指 +0.87% / 创业板指 +1.43%</div></a><a class="report-card" href="2026-08-21_08-30.html"><div class="rc-title">2026-08-21 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.04% / 深证成指 +0.87% / 创业板指 +1.43%</div></a><a class="report-card" href="2026-08-20_16-20.html"><div class="rc-title">2026-08-20 16:20 · 收盘复盘</div><div class="rc-meta">上证指数 +0.24% / 深证成指 +0.59% / 创业板指 +0.64%</div></a><a class="report-card" href="2026-08-20_11-35.html"><div class="rc-title">2026-08-20 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +0.24% / 深证成指 +0.59% / 创业板指 +0.64%</div></a><a class="report-card" href="2026-08-20_08-30.html"><div class="rc-title">2026-08-20 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.24% / 深证成指 +0.59% / 创业板指 +0.64%</div></a><a class="report-card" href="2026-08-19_16-20.html"><div class="rc-title">2026-08-19 16:20 · 收盘复盘</div><div class="rc-meta">上证指数 -2.40% / 深证成指 -5.01% / 创业板指 -6.26%</div></a><a class="report-card" href="2026-08-19_11-35.html"><div class="rc-title">2026-08-19 11:35 · 午盘快照</div><div class="rc-meta">上证指数 -2.40% / 深证成指 -5.01% / 创业板指 -6.26%</div></a><a class="report-card" href="2026-08-19_08-30.html"><div class="rc-title">2026-08-19 08:30 · 盘前简报</div><div class="rc-meta">上证指数 -2.40% / 深证成指 -5.01% / 创业板指 -6.26%</div></a><a class="report-card" href="2026-08-18_15-20.html"><div class="rc-title">2026-08-18 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 +0.19% / 深证成指 -0.56% / 创业板指 -0.93%</div></a><a class="report-card" href="2026-08-18_11-35.html"><div class="rc-title">2026-08-18 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +0.19% / 深证成指 -0.56% / 创业板指 -0.93%</div></a><a class="report-card" href="2026-08-18_08-30.html"><div class="rc-title">2026-08-18 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.19% / 深证成指 -0.56% / 创业板指 -0.93%</div></a><a class="report-card" href="2026-08-17_16-20.html"><div class="rc-title">2026-08-17 16:20 · 收盘复盘</div><div class="rc-meta">上证指数 +1.41% / 深证成指 +2.44% / 创业板指 +3.14%</div></a><a class="report-card" href="2026-08-17_11-35.html"><div class="rc-title">2026-08-17 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +1.41% / 深证成指 +2.44% / 创业板指 +3.14%</div></a><a class="report-card" href="2026-08-17_08-30.html"><div class="rc-title">2026-08-17 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.80% / 深证成指 +1.26% / 创业板指 +1.40%</div></a><a class="report-card" href="2026-08-14_15-20.html"><div class="rc-title">2026-08-14 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="2026-08-14_11-35.html"><div class="rc-title">2026-08-14 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="2026-08-14_08-30.html"><div class="rc-title">2026-08-14 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="2026-08-13_15-20.html"><div class="rc-title">2026-08-13 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="2026-08-13_11-35.html"><div class="rc-title">2026-08-13 11:35 · 午盘快照</div><div class="rc-meta">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="2026-08-13_08-30.html"><div class="rc-title">2026-08-13 08:30 · 盘前简报</div><div class="rc-meta">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="2026-08-12_15-20.html"><div class="rc-title">2026-08-12 15:20 · 收盘复盘</div><div class="rc-meta">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a><a class="report-card" href="2026-08-12_11-35.html"><div class="rc-title">2026-08-12 11:35 · 午盘快照</div><div class="rc-meta">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a><a class="report-card" href="2026-08-12_08-30.html"><div class="rc-title">2026-08-12 08:30 · 盘前简报</div><div class="rc-meta">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a></div>
+  <div class="card" data-page-node-id="oeJQ2P2twqqGyEwHXVCMVG">
+    <div class="card-title" data-page-node-id="Qgwl8ccSHNTLDHPl1BoZuB">历史复盘 (5536)</div>
+    <div class="report-list" data-page-node-id="0OdIhYgvOXoVEXAGINQNMu"><a class="report-card" href="2026-09-07_11-35.html" data-page-node-id="0HzS6Ell1HqZlrMpPsMlHP"><div class="rc-title" data-page-node-id="JwOfveCuRLyOKpgaO9bnCP">2026-09-07 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="edtg8ZbCZSmi687MN2bMpP">上证指数 -0.24% / 深证成指 +1.38% / 创业板指 +2.63%</div></a><a class="report-card" href="2026-09-07_08-30.html" data-page-node-id="R0UkQYAK1x6xa8fVLGVey7"><div class="rc-title" data-page-node-id="oyvFBcGVEPUqZ4T5lDvJ24">2026-09-07 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="AHDQFdT3hfrHdZ2imDa3dy">上证指数 -0.24% / 深证成指 +1.38% / 创业板指 +2.63%</div></a><a class="report-card" href="2026-09-02_16-20.html" data-page-node-id="vOiEGIYDWLfteyKeo1EXRJ"><div class="rc-title" data-page-node-id="0jm7WcmstF8h2gmyfgcLpq">2026-09-02 16:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="3sFlNbHVrYUlsekhWN6ZQc">上证指数 -0.97% / 深证成指 -1.88% / 创业板指 -2.39%</div></a><a class="report-card" href="2026-09-02_11-35.html" data-page-node-id="f5xS4p6wglAfxEHkoh9hti"><div class="rc-title" data-page-node-id="T6FcgaSPThYe8mgHsqc6v3">2026-09-02 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="y7LBBS1Zi54MhTEUj2uBKD">上证指数 -0.97% / 深证成指 -1.88% / 创业板指 -2.39%</div></a><a class="report-card" href="2026-09-02_08-30.html" data-page-node-id="j2T7X2W2gh8ZPEPtJLp1AD"><div class="rc-title" data-page-node-id="U0fA78O5ocTsxJE1jpY0lP">2026-09-02 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="xULQEQvAAkHuuL7GsgyXRN">上证指数 -0.82% / 深证成指 -1.71% / 创业板指 -2.18%</div></a><a class="report-card" href="2026-08-24_16-20.html" data-page-node-id="c3F07abtWeoCqOGTxj7gJQ"><div class="rc-title" data-page-node-id="Uf5KT313xA8Ub1yNLKht4B">2026-08-24 16:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="XXw5y15JLAbNe1qTsiFbZD">上证指数 -0.59% / 深证成指 -2.13% / 创业板指 -3.21%</div></a><a class="report-card" href="2026-08-24_11-35.html" data-page-node-id="vDRSJ518iG6vuAChs5g47z"><div class="rc-title" data-page-node-id="PSQaSo48ZbYkPqSWD6UBmd">2026-08-24 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="XfSL7j9LYHlEGLg6tgPqrO">上证指数 -0.59% / 深证成指 -2.13% / 创业板指 -3.21%</div></a><a class="report-card" href="2026-08-24_08-30.html" data-page-node-id="SQurWSDmkxGc0F6nQQosrW"><div class="rc-title" data-page-node-id="PU5C4SqVHqUAClNAFhKO0X">2026-08-24 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="gWU6KYbSUGy31sN0F5XQTX">上证指数 -0.59% / 深证成指 -2.13% / 创业板指 -3.21%</div></a><a class="report-card" href="2026-08-21_16-20.html" data-page-node-id="YHbGuS9JHX3wrpiKiFmwqO"><div class="rc-title" data-page-node-id="Ayy01AVgAR1UHVTU3RWKKJ">2026-08-21 16:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="kHj6h0XH5XnAK54hAYA9Om">上证指数 +0.04% / 深证成指 +0.87% / 创业板指 +1.43%</div></a><a class="report-card" href="2026-08-21_11-35.html" data-page-node-id="6CtKcrvL8nApHA4QwsWTAY"><div class="rc-title" data-page-node-id="CmCvhUK14BoSDvNfJQBdaM">2026-08-21 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="nKBZUpnEzW3M06W7wZrhZj">上证指数 +0.04% / 深证成指 +0.87% / 创业板指 +1.43%</div></a><a class="report-card" href="2026-08-21_08-30.html" data-page-node-id="a9AiUns6fHgzGtoSef5rRw"><div class="rc-title" data-page-node-id="TsF962X9Hx1RGcBryvn9dA">2026-08-21 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="P9KWpHdxlnRkKavKiPQIjn">上证指数 +0.04% / 深证成指 +0.87% / 创业板指 +1.43%</div></a><a class="report-card" href="2026-08-20_16-20.html" data-page-node-id="0X34w906ugxdyh2e7p6kJM"><div class="rc-title" data-page-node-id="qkjnTgpdOD293gk6exbddd">2026-08-20 16:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="rCbjJgQgwTIcjeYGBHBIQ8">上证指数 +0.24% / 深证成指 +0.59% / 创业板指 +0.64%</div></a><a class="report-card" href="2026-08-20_11-35.html" data-page-node-id="uMG0D6DTxk9HNv4iYMXwDy"><div class="rc-title" data-page-node-id="mCODK2KCd72C9vNqHGFOLy">2026-08-20 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="DaelJCjfhGok6B24Dr4V1c">上证指数 +0.24% / 深证成指 +0.59% / 创业板指 +0.64%</div></a><a class="report-card" href="2026-08-20_08-30.html" data-page-node-id="UeEtOufKdlEzlSkk9JLilF"><div class="rc-title" data-page-node-id="nzkEBJCMZ5ilDX7Mz8Robc">2026-08-20 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="euiHsTkpfQs0z8nxUY5OeQ">上证指数 +0.24% / 深证成指 +0.59% / 创业板指 +0.64%</div></a><a class="report-card" href="2026-08-19_16-20.html" data-page-node-id="g5bHCmAYqdGsd7vgEFHcfu"><div class="rc-title" data-page-node-id="vxkH9VIR5M3fCF7F34VrIB">2026-08-19 16:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="pJhnRWkldHaH9Uf9sq4J9R">上证指数 -2.40% / 深证成指 -5.01% / 创业板指 -6.26%</div></a><a class="report-card" href="2026-08-19_11-35.html" data-page-node-id="E8urr9ZkYdUE93RnIH4vRz"><div class="rc-title" data-page-node-id="MVvjTfhLefEyvZKHabegem">2026-08-19 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="LzLzospy8vMDfDzo5KiOmb">上证指数 -2.40% / 深证成指 -5.01% / 创业板指 -6.26%</div></a><a class="report-card" href="2026-08-19_08-30.html" data-page-node-id="KtqgLNfeXk7JnFeJQ2s7Ko"><div class="rc-title" data-page-node-id="ahMyrT0cS6NSFEfLEIMDGQ">2026-08-19 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="ItjPtN5L84wopyPHIm6xj0">上证指数 -2.40% / 深证成指 -5.01% / 创业板指 -6.26%</div></a><a class="report-card" href="2026-08-18_15-20.html" data-page-node-id="Do9JNstQ7lT627D4aCiGpY"><div class="rc-title" data-page-node-id="w3CRybQbhKsEZzQB7OO3Pb">2026-08-18 15:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="AKiNx19ST1ACVYDxv3abvN">上证指数 +0.19% / 深证成指 -0.56% / 创业板指 -0.93%</div></a><a class="report-card" href="2026-08-18_11-35.html" data-page-node-id="lASZA3MRwjQ44PzE7Qdp6r"><div class="rc-title" data-page-node-id="tJQo5WMP7iBVhzlqleAjkg">2026-08-18 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="uuH69c3P7ifKQ3OgZJYodW">上证指数 +0.19% / 深证成指 -0.56% / 创业板指 -0.93%</div></a><a class="report-card" href="2026-08-18_08-30.html" data-page-node-id="DiJA2bX06vNYFza4THEfvp"><div class="rc-title" data-page-node-id="1240qIlVBGGuBiI4hr3p9L">2026-08-18 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="X2Nc1YZimmMmCCmH638feF">上证指数 +0.19% / 深证成指 -0.56% / 创业板指 -0.93%</div></a><a class="report-card" href="2026-08-17_16-20.html" data-page-node-id="9iRQfdbXHh6XLV6L07A30t"><div class="rc-title" data-page-node-id="QBBqD8atT0BoctHYCVhdPI">2026-08-17 16:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="xl1NUwudl8z4Ak5xKULtxh">上证指数 +1.41% / 深证成指 +2.44% / 创业板指 +3.14%</div></a><a class="report-card" href="2026-08-17_11-35.html" data-page-node-id="pmxxBeiYkkerskP3ynCoD2"><div class="rc-title" data-page-node-id="AlEoix9BzBdFFhNDN1sDxK">2026-08-17 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="HQRdA7189sqE6IWWyMJ3Nt">上证指数 +1.41% / 深证成指 +2.44% / 创业板指 +3.14%</div></a><a class="report-card" href="2026-08-17_08-30.html" data-page-node-id="GJxoLHDachunPhHAwT10BD"><div class="rc-title" data-page-node-id="1sdU7IbeTz0NBeCMwPGmkt">2026-08-17 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="0kZZKtrEXW5SiC0JmjW843">上证指数 +0.80% / 深证成指 +1.26% / 创业板指 +1.40%</div></a><a class="report-card" href="2026-08-14_15-20.html" data-page-node-id="jwUjhNf5nvWpqCzb8dHG8m"><div class="rc-title" data-page-node-id="fhbYOyXCHkznATt2REMxns">2026-08-14 15:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="6vXueHtdcCtFyqTBHTomMy">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="2026-08-14_11-35.html" data-page-node-id="ui19zdJ5Omk5DBaNfZUnGT"><div class="rc-title" data-page-node-id="LKC9WzTxHFPL7EAcMCoVwj">2026-08-14 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="BkeDNmvHuzR8Rs2tOdVyvB">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="2026-08-14_08-30.html" data-page-node-id="ju7uah5HHPgqCSiDFGLCDX"><div class="rc-title" data-page-node-id="sLHoBGx1G525LBr4AqV65r">2026-08-14 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="E6f0K4CQfTlAgGdGHL2ivM">上证指数 +0.01% / 深证成指 +0.45% / 创业板指 +1.12%</div></a><a class="report-card" href="2026-08-13_15-20.html" data-page-node-id="9C7X37oxWeHZ27ft1Lr5gO"><div class="rc-title" data-page-node-id="okd7G46mazrb2P9NFLtz4Q">2026-08-13 15:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="CNjxyg9ZTX55drQgE76mIz">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="2026-08-13_11-35.html" data-page-node-id="cOtqbhTuHIlQYmyv12qCY8"><div class="rc-title" data-page-node-id="MnrmhSdVF3IcpEApsFbP5X">2026-08-13 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="5zC7R3xJukzM3iCjfr324P">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="2026-08-13_08-30.html" data-page-node-id="E6mtAA5k6GgzoEgZwKzRK4"><div class="rc-title" data-page-node-id="HfBVna1nMMeLtD8AJPB5ap">2026-08-13 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="G6SlFaVGNckAdBGaYcia4D">上证指数 -0.50% / 深证成指 -0.87% / 创业板指 -0.45%</div></a><a class="report-card" href="2026-08-12_15-20.html" data-page-node-id="FDyReGi3iDupFJs3Q1pl7H"><div class="rc-title" data-page-node-id="K8oNJU1hsaQVKC4V283Mw7">2026-08-12 15:20 · 收盘复盘</div><div class="rc-meta" data-page-node-id="kfMDIDldyjWHrXdUejXw4d">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a><a class="report-card" href="2026-08-12_11-35.html" data-page-node-id="sNH4ptnw5rJIH8CEGPsBq5"><div class="rc-title" data-page-node-id="oxxIyFAJOYlxI9mdpIP54T">2026-08-12 11:35 · 午盘快照</div><div class="rc-meta" data-page-node-id="U6ruqRUnPaWy7KbE0tztIR">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a><a class="report-card" href="2026-08-12_08-30.html" data-page-node-id="9WrdrysBxlFgPRgP8kII7V"><div class="rc-title" data-page-node-id="q53WiQ3GZpMMRuvcQfmCiN">2026-08-12 08:30 · 盘前简报</div><div class="rc-meta" data-page-node-id="wjUgu8BibzqmtMyNbVOWFV">上证指数 +0.32% / 深证成指 +1.09% / 创业板指 +1.49%</div></a></div>
   </div>
 </div>
-<div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
+<div class="footer" data-page-node-id="HvPLq2CTI2pNzOkienJGjt">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
 </div>
 <script>
 function getBaseUrl(){var h=location.href.split("#")[0];if(/index\.html/i.test(h)){return h.replace(/index\.html.*$/i,"");}if(h.slice(-1)==="/"){return h;}var i=h.lastIndexOf("/");return h.slice(0,i+1);}
@@ -1406,6 +1504,13 @@ function showStockCandidates(cands,q){
   });
 }
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
+// 最强主线卡片:点击展开/收起"排除涨停 · 优先可观察前3"
+function toggleMdPicks(i){
+  var w=document.getElementById("md-picks-"+i);
+  if(!w)return;
+  var card=w.closest?w.closest(".md-card"):w.parentElement;
+  if(card)card.classList.toggle("open");
+}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
 function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
 function deriveAdviceF(pct,atds,riskTone){var v=Number(pct)||0,a=Number(atds)||0;if(v<=-5)return{name:'减仓规避',tone:'cut'};if(a>=85&&riskTone!='high')return{name:'重点关注',tone:'focus'};if(a>=70)return{name:'持有观察',tone:'hold'};if(a<60&&v<=-1)return{name:'观望',tone:'wait'};return{name:'持有观察',tone:'hold'};}

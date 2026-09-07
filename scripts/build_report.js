@@ -869,15 +869,61 @@ function deriveHorizonLines(pct, turnover) {
     : '跌破 MA120,长线宜减仓观望';
   return [{ k: '短线', v: short }, { k: '波段', v: wave }, { k: '长线', v: long }];
 }
-function deriveAdviceText(pct, atds, riskTone) {
+function deriveAdviceText(pct, atds, riskTone, tech) {
   const v = Number(pct) || 0;
   const a = Number(atds) || 0;
   if (v <= -5) return '跌幅较大,建议减仓规避';
+  if (tech) {
+    const tw = wlTechAdviceText(pct, tech);
+    if (tw) return tw;
+  }
   if (a >= 85 && riskTone !== 'high') return 'ATDS 证据强,重点关注';
   if (a >= 75 && v >= 0) return '持有观察,等待放量催化';
   if (a < 60 && v <= -1) return '技术偏弱,观望等待企稳';
   if (v >= 5) return '高位震荡,逢高减仓为主';
   return '持有观察,关注量能配合';
+}
+// 观察池"建议"五类情形文案(2026-09-07):基于 MA/量比/KDJ/趋势 技术画像,输出可执行的跟踪结论
+// ①满足条件可跟踪 ②等回踩MA10企稳后买入 ③放量突破MA20确认后纳入 ④信号不充分先观望 ⑤强势可关注回踩买入
+function wlTechAdviceText(pct, tech) {
+  if (!tech || tech.ma20 == null) return null;
+  const v = Number(pct) || 0;
+  const f2 = (x) => (x == null ? '--' : Number(x).toFixed(2));
+  const p = tech.price;
+  const up = tech.trend === 'up';
+  const vol = tech.volRatio;
+  const kdjGold = !!tech.kdjGold;
+  const b10 = tech.bias10, b20 = tech.bias20;
+  // 1) 大阴线/已破位 → 观望(信号不充分)
+  if (v <= -3 || (tech.trend === 'down' && p != null && tech.ma20 != null && p < tech.ma20)) {
+    return '信号尚不充分:现价运行于MA20(' + f2(tech.ma20) + ')下方,趋势未修复。建议先观望,待重新站上MA20并放量后再评估';
+  }
+  // 2) 高位大阳/加速乖离过大 → 强势可关注,等回踩
+  if (up && v >= 5 && b10 != null && b10 > 6) {
+    return '强势加速、短线乖离偏大,不建议追高。可关注回踩MA10(' + f2(tech.ma10) + ')企稳后的买入机会';
+  }
+  // 3) 多头趋势中缩量回踩至MA10/MA20 附近 → 回踩企稳可买入
+  if (up && b10 != null && b10 <= 4 && vol != null && vol < 1.15) {
+    return '强势可关注:多头趋势缩量回踩MA10(' + f2(tech.ma10) + ')附近,企稳可分批买入;跌破MA20(' + f2(tech.ma20) + ')则离场观望';
+  }
+  // 4) 多头趋势运行健康 → 满足条件可跟踪
+  if (up) {
+    return '满足跟踪条件:均线多头排列,沿MA10(' + f2(tech.ma10) + ')上行。回踩不破可跟踪介入,跌破MA20(' + f2(tech.ma20) + ')止盈离场';
+  }
+  // 5) 放量突破MA20(修复初期/平台突破) → 观察确认后纳入
+  if ((tech.trend === 'repair' || tech.trend === 'flat') && p != null && tech.ma20 != null && p >= tech.ma20 && vol != null && vol >= 1.3 && v >= 2) {
+    return '放量突破MA20(' + f2(tech.ma20) + '),满足跟踪条件:观察2-3日站稳不回补缺口后,回踩MA5(' + f2(tech.ma5) + ')附近可确认纳入';
+  }
+  // 6) 缩量企稳 + KDJ金叉 → 满足跟踪,等放量
+  if (vol != null && vol < 0.75 && kdjGold && b20 != null && b20 > -8) {
+    return '缩量企稳+KDJ低位金叉,满足跟踪条件:等待放量突破MA20(' + f2(tech.ma20) + ')后再确认介入';
+  }
+  // 7) 站上MA20 但趋势未走强 → 等放量确认
+  if (p != null && tech.ma20 != null && p >= tech.ma20) {
+    return '站上MA20(' + f2(tech.ma20) + ')但趋势尚未走强,建议观察:放量突破MA20并站稳2-3日后再确认纳入';
+  }
+  // 8) 其余横盘/方向不明 → 观望
+  return '信号尚不充分,建议先观望,等待趋势进一步明朗后再决定是否纳入跟踪';
 }
 function buildStockRow(s, i, report) {
   const cls = upDownClass(s.pct);
@@ -887,7 +933,7 @@ function buildStockRow(s, i, report) {
   const riskTone = deriveRiskLevel(s.pct).tone;
   const riskLines = deriveRiskText(s.pct, s.turnover);
   const horizons = deriveHorizonLines(s.pct, s.turnover);
-  const adviceText = deriveAdviceText(s.pct, atds, riskTone);
+  const adviceText = deriveAdviceText(s.pct, atds, riskTone, s.tech);
   const riskName = deriveRiskLevel(s.pct).name;
   const horizonTone = deriveTimeHorizon(s.pct, s.turnover).tone;
   const adviceTone = deriveAdvice(s.pct, atds, riskTone).tone;
@@ -1242,7 +1288,16 @@ function renderPremarketStrategy(report) {
   const off = (pb.offense || []).slice(0, 4);
   const def = (pb.defense || []).slice(0, 3);
   const pit = (pb.pitfall || []).slice(0, 3);
-  const offRows = off.map(o => `<div class="str-line"><b>${esc(o.name)}</b> 涨停 ${o.count || 0}家 / ${o.maxLB || 0}板 · 领涨 ${esc(o.leadStock || '--')}</div>`).join('') || '<div class="hint">暂无进攻方向</div>';
+  const fmtPick = (pk) => {
+    const cls = upDownClass(pk.pct);
+    return `<span class="str-pick"><b>${esc(pk.name)}</b><span class="${cls}">${fmtPct(pk.pct)}</span></span>`;
+  };
+  const pickLine = (o) => {
+    const picks = (Array.isArray(o.picks) ? o.picks : []).slice(0, 3);
+    if (!picks.length) return '';
+    return '<div class="str-picks"><span class="str-picks-tag">排除涨停 · 优先可观察</span>' + picks.map(fmtPick).join('') + '</div>';
+  };
+  const offRows = off.map(o => `<div class="str-line"><b>${esc(o.name)}</b> 涨停 ${o.count || 0}家 / ${o.maxLB || 0}板 · 领涨 ${esc(o.leadStock || '--')}</div>${pickLine(o)}`).join('') || '<div class="hint">暂无进攻方向</div>';
   const defRows = def.map(d => `<div class="str-line"><b>${esc(d.name)}</b> ${esc(d.logic || '')}</div>`).join('') || '<div class="hint">暂无防守方向</div>';
   const pitRows = pit.map(p => `<div class="str-line pit"><b>${esc(p.name)}</b> ${esc(p.logic || '')}</div>`).join('') || '<div class="hint">暂无风险提示</div>';
   return `<div class="card">
@@ -1288,17 +1343,28 @@ function renderMainDirection(report) {
   if (!list.length) return `<div class="card"><div class="card-title">当前最强主线方向</div><div class="hint">暂无主线方向数据</div></div>`;
   const rows = list.map((s, i) => {
     const cls = upDownClass(s.changePct);
-    return `<div class="md-item">
-      <div class="md-rank">${i + 1}</div>
-      <div class="md-main">
-        <div class="md-name">${esc(s.mappedName || s.name)} <span class="md-status ${s.status === '主线确认' ? 'ok' : 'no'}">${esc(s.status || '')}</span></div>
-        <div class="md-sub">涨停 ${esc(s.limitUpMax || '--')} · 领涨 ${esc(s.leadStock || '--')} · ATDS ${s.atds || '--'}</div>
+    const picks = (Array.isArray(s.picks) ? s.picks : []).slice(0, 3);
+    const picksBody = picks.length
+      ? picks.map(pk => `<div class="md-pick" data-code="${esc(pk.code)}" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">${esc(pk.name)}</span><span class="md-pick-code">${esc(pk.code)}</span><span class="md-pick-pct ${upDownClass(pk.pct)}">${fmtPct(pk.pct)}</span><span class="md-pick-hint">未涨停 · 可观察</span></div>`).join('')
+      : '<div class="md-picks-empty">候选数据暂缺</div>';
+    return `<div class="md-card">
+      <div class="md-item" onclick="toggleMdPicks(${i})">
+        <div class="md-rank">${i + 1}</div>
+        <div class="md-main">
+          <div class="md-name">${esc(s.mappedName || s.name)} <span class="md-status ${s.status === '主线确认' ? 'ok' : 'no'}">${esc(s.status || '')}</span></div>
+          <div class="md-sub">涨停 ${esc(s.limitUpMax || '--')} · 领涨 ${esc(s.leadStock || '--')} · ATDS ${s.atds || '--'}</div>
+        </div>
+        <div class="md-pct ${cls}">${fmtPct(s.changePct)}</div>
+        <div class="md-arrow">▾</div>
       </div>
-      <div class="md-pct ${cls}">${fmtPct(s.changePct)}</div>
+      <div class="md-picks-wrap" id="md-picks-${i}">
+        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
+        ${picksBody}
+      </div>
     </div>`;
   }).join('');
   return `<div class="card">
-    <div class="card-title">当前最强主线方向</div>
+    <div class="card-title">当前最强主线方向 <span class="card-sub">点击板块查看可观察个股</span></div>
     <div class="md-list">${rows}</div>
   </div>`;
 }
