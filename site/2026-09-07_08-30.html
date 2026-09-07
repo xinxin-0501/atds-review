@@ -2754,6 +2754,14 @@ function restoreSavedWatchlist(){
         var f=m[1].split("~");if(f.length<40)continue;
         var data={code:rawCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
         if(!data.name)continue;
+        // 补拉 K 线 + 技术画像 → 让手动加的股也走五类文案(与亨通光电等 config 观察池一致)
+        try{
+          var full=(c0==="6"||c0==="5")?("sh"+rawCode):("sz"+rawCode);
+          var kl=await fetchKlineF(full,70);
+          if(kl&&kl.length>=20){
+            data.tech=computeTechMetrics(kl);
+          }
+        }catch(e){/* K 线失败降级用粗逻辑 */}
         addToWatchlistUI(data);
       }catch(e){}
     }
@@ -2830,6 +2838,42 @@ async function refreshWatchlistQuotes(){
     if(timeEl)timeEl.textContent='● '+new Date().toLocaleString('zh-CN',{hour12:false});
   }catch(e){}
   if(btn){btn.disabled=false;btn.textContent='↻ 刷新';}
+  // 异步补丁:对没有 tech 数据的行补拉 K 线 → 写入 data-tech → 重建 detail
+  // (本地老版手动加股此前未经过 K 线补全,需要走一遍让它享受五类文案)
+  try{
+    var noTechRows=document.querySelectorAll('.wl-stock-row[data-code]:not([data-tech]),.wl-stock-row[data-code][data-tech="null"]');
+    if(noTechRows.length){
+      (async function(){
+        for(var k=0;k<noTechRows.length;k++){
+          var rEl=noTechRows[k];
+          var c=rEl.getAttribute('data-code');if(!c)continue;
+          try{
+            var c0=c.charAt(0);
+            var full=(c0==="6"||c0==="5")?("sh"+c):("sz"+c);
+            var kl=await fetchKlineF(full,70);
+            if(!kl||kl.length<20)continue;
+            var t=computeTechMetrics(kl);
+            rEl.setAttribute('data-tech',JSON.stringify(t));
+            // 重建该股的 detail,让建议切换为五类技术画像文案
+            var priceEl=rEl.querySelector('.wl-cell-price .price');
+            var pctEl=rEl.querySelector('.wl-cell-pct');
+            var amtEl=rEl.querySelector('.wl-cell-amt');
+            var turnEl=rEl.querySelector('.wl-cell-pct');
+            var price=priceEl?parseFloat(priceEl.textContent)||0:0;
+            var pct=0;
+            if(pctEl){var pm=pctEl.textContent.match(/([+\-]?[\d.]+)%/);if(pm)pct=parseFloat(pm[1])||0;}
+            var amount=amtEl?amtEl.textContent:'--';
+            var turnover='--';
+            var d=document.querySelector('.wl-detail[data-detail-code="'+c+'"]');
+            var name=rEl.querySelector('.wl-name')?rEl.querySelector('.wl-name').textContent:c;
+            if(d){
+              d.innerHTML=buildWatchlistDetailHtml({code:c,name:name,price:price,pct:pct,amount:amount,turnover:turnover,setcode:'',tech:t});
+            }
+          }catch(e){}
+        }
+      })();
+    }
+  }catch(e){}
 }
 function addWatchlistRefreshBtn(){
   var tools=document.querySelector('.watchlist-card .wl-tools');

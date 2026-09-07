@@ -394,7 +394,7 @@ function renderCloseEmotion(report) {
   }).join('');
   const cautionText = (todayWatch.caution || []).join('、');
   const todayWatchBlock = m.type === 'midday' ? '' : '<div class="card tw-card-outer">' +
-    '<div class="card-title"><span class="tw-eyebrow">02</span> 今天怎么看</div>' +
+    '<div class="card-title"><span class="tw-eyebrow">02</span> 明日看什么</div>' +
     '<div class="tw-tabs">' + themeTabs + '</div>' +
     '<div class="tw-details">' + themeDetails + '</div>' +
     (cautionText ? '<div class="tw-caution"><span class="tw-caution-tag">03 谨慎方向</span>' + esc(cautionText) + '。</div>' : '') +
