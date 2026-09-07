@@ -482,6 +482,82 @@ async function attachSectorPicks(sectorNames, ztSet) {
   return out;
 }
 
+/* ============ 打板五佳股 Top5 (2026-09-07 中午+收盘使用) ============ */
+// 涨停池里按"安全度/量能/涨速/形态/强庄"五维评分,排序取 Top5 用于报告卡片
+function scanTopBoardPicks(ztList) {
+  if (!Array.isArray(ztList) || !ztList.length) return null;
+  const sectorAgg = new Map();
+  for (const s of ztList) {
+    const k = s.hybk || '其他';
+    if (!sectorAgg.has(k)) sectorAgg.set(k, []);
+    sectorAgg.get(k).push(s);
+  }
+  const scored = ztList.map(s => {
+    const secCount = (sectorAgg.get(s.hybk || '其他') || []).length;
+    const sealYi = (Number(s.sealWan) || 0) / 10000;       // 封单亿元
+    const lianban = Number(s.lianban) || 1;
+    const safety = Math.min(100, Math.round(secCount * 18 + lianban * 8));      // 板块持续+连板
+    const volume = Math.min(100, Math.round((Math.sqrt(Math.max(sealYi, 0)) * 35) + 15));  // 量能(封单开方)
+    const speed = s.pct >= 19.8 ? 100 : s.pct >= 9.8 ? 92 : Math.round(Math.max(0, s.pct) * 9);  // 涨速
+    const shape = lianban === 1 ? 95 : lianban === 2 ? 80 : lianban === 3 ? 62 : lianban === 4 ? 42 : (lianban === 5 ? 28 : 18);  // 形态/资金集中(首板最稳)
+    const intent = Math.min(100, Math.round(Math.sqrt(Math.max(sealYi, 0)) * 32 + secCount * 9 + 8));  // 强庄意图
+    const total = Math.round(safety * 0.22 + volume * 0.18 + speed * 0.20 + shape * 0.20 + intent * 0.20);
+    return {
+      code: String(s.code || '').padStart(6, '0'),
+      name: s.name || '--',
+      pct: Number(s.pct) || 0,
+      lianban,
+      sector: s.hybk || '其他',
+      sealAmount: (Number(sealYi) || 0).toFixed(2),
+      score: { safety, volume, speed, shape, intent, total }
+    };
+  });
+  // 排序:综合分为主、连板奖励调节(防止 7 板等极高位股票霸榜)
+  const ranked = scored
+    .filter(s => s.lianban <= 7)
+    .sort((a, b) => (b.score.total + Math.min(b.lianban - 1, 3) * 4) - (a.score.total + Math.min(a.lianban - 1, 3) * 4));
+  const picks = ranked.slice(0, 5);
+  picks.forEach((s, i) => { s.rank = i + 1; });
+  return { picks, totalCandidates: ranked.length, latestLianBan: ranked[0] ? ranked[0].lianban : 0 };
+}
+
+// 回测查取:扫描 data/reviews/ 找历史报告中的 topBoardPicks 摘要,用于"回测追踪"表
+function loadTopBoardBacktest(dataDir, currentDateTime, limit) {
+  try {
+    if (!fs.existsSync(dataDir)) return [];
+    const files = fs.readdirSync(dataDir)
+      .filter(f => /^(\d{4}-\d{2}-\d{2})_(08-30|11-35|16-20)\.json$/.test(f))
+      .filter(f => f !== currentDateTime)
+      .sort()
+      .reverse();
+    const rows = [];
+    for (const f of files) {
+      try {
+        const j = JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf8'));
+        const tbp = j && j.topBoardPicks;
+        if (!tbp || !Array.isArray(tbp.picks) || !tbp.picks.length) continue;
+        const hitDate = f.replace(/_(\d{2}-\d{2})\.json$/, '').replace(/-/g, '-');
+        // 每份报告只取 Top1 写入表格(精简条数;每日一行)
+        const top1 = tbp.picks[0];
+        rows.push({
+          predictDate: hitDate,
+          code: top1.code,
+          name: top1.name,
+          predictPct: top1.pct,
+          isTop1: top1.rank === 1,
+          topN: top1.rank,
+          totalScore: top1.score ? top1.score.total : null,
+          highestLianBan: tbp.latestLianBan || top1.lianban || 1,
+          sector: top1.sector || '--',
+          actual: null  // 后续若接入实时行情再回填,简化版以"待验证"显示
+        });
+        if (rows.length >= (limit || 5)) break;
+      } catch (e) { /* 单文件损坏忽略 */ }
+    }
+    return rows;
+  } catch (e) { return []; }
+}
+
 /* ============ 观察池技术画像(盘前):MA/量比/KDJ/趋势 → 支撑"建议"五类文案 ============ */
 function calcTechFromKline(arr) {
   if (!Array.isArray(arr) || arr.length < 30) return null;
@@ -1559,20 +1635,33 @@ async function main() {
     // 终极兜底:数据完全缺失时给个空数组
   }
 
-  // 板块候选股:最强主线前5 + 进攻方向 → "排除涨停 · 优先可观察 top3"(供卡片点击/行内展示)
+  // 板块候选股:最强主线前5 + 进攻方向 + 主题方向 → "排除涨停 · 优先可观察 top3"
   {
     const sectorPickTargets = [];
     for (const r of mainRank.slice(0, 5)) sectorPickTargets.push(r.mappedName || r.name);
     for (const o of (playbook && playbook.offense) || []) sectorPickTargets.push(o.name);
+    for (const t of (playbook && playbook.themes) || []) sectorPickTargets.push(t.name);  // 主题方向(关键词/全名)
     const ztCodeSet = new Set(zt.list.map(s => String(s.code)));
     const sectorPicks = await attachSectorPicks(sectorPickTargets, ztCodeSet);
+    // 注入 mainRank 前5
     for (const r of mainRank.slice(0, 5)) {
       const hit = sectorPicks[r.mappedName || r.name];
       if (hit && hit.picks.length) r.picks = hit.picks;
     }
+    // 注入 offense
     for (const o of (playbook && playbook.offense) || []) {
       const hit = sectorPicks[o.name];
       if (hit && hit.picks.length) o.picks = hit.picks;
+    }
+    // 注入 themes:若主题名直接命中则用,否则从 mainRank 中模糊复用
+    const mainRankByName = mainRank.slice(0, 5);
+    for (const t of (playbook && playbook.themes) || []) {
+      let hit = sectorPicks[t.name];
+      if (!hit || !hit.picks.length) {
+        const fuzzy = mainRankByName.find(r => (r.mappedName || r.name || '').includes(t.name) || t.name.includes(r.mappedName || r.name));
+        if (fuzzy && (fuzzy.picks || []).length) hit = { board: fuzzy.mappedName || fuzzy.name, picks: fuzzy.picks };
+      }
+      if (hit && hit.picks && hit.picks.length) t.picks = hit.picks;
     }
     console.log('板块候选股注入:', Object.values(sectorPicks).filter(v => v.picks.length).length + '/' + Object.keys(sectorPicks).length, '个板块有候选');
   }
@@ -1633,6 +1722,17 @@ async function main() {
     notes: isPre ? `盘前简报（08:30），数据基于 ${dataAsOfDate} 收盘。今日市场 9:30 开盘后才会有实时数据。` : '数据来源：腾讯行情 + 东方财富公开接口（云端自动采集）。仅做行情展示，不构成投资建议。'
   };
 
+  // 打板五佳股 Top5 + 历史回测查取(仅 midday/close)
+  let topBoardPicks = null;
+  let topBoardBacktest = [];
+  if (!isPre) {
+    topBoardPicks = scanTopBoardPicks(zt.list);
+    const outFileName = `${date}_${time.replace(':', '-')}.json`;
+    topBoardBacktest = loadTopBoardBacktest(DATA_DIR, outFileName, 5);
+    report.topBoardPicks = topBoardPicks;
+    report.topBoardBacktest = topBoardBacktest;
+    console.log('打板五佳股 Top5:', topBoardPicks ? topBoardPicks.picks.length + '/' + topBoardPicks.totalCandidates : 'n/a', '| 历史回测:', topBoardBacktest.length, '条');
+  }
   fs.mkdirSync(DATA_DIR, { recursive: true });
   const outFile = path.join(DATA_DIR, `${date}_${time.replace(':', '-')}.json`);
   fs.writeFileSync(outFile, JSON.stringify(report, null, 2), 'utf8');

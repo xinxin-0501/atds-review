@@ -453,6 +453,16 @@ function renderPlaybook(report) {
   const defense = pb.defense || [];
   const themes = pb.themes || [];
   const pitfall = pb.pitfall || [];
+  // 单只候选 chip(板块成分 → 排除涨停 · 优先可观察);fmtPct 自带 +/- 号,不要再前置
+  const fmtPick = (pk) => {
+    const cls = pk.pct > 0 ? 'up' : pk.pct < 0 ? 'down' : 'flat';
+    return '<span class="str-pick"><b>' + esc(pk.name) + '</b><span class="' + cls + '">' + fmtPct(pk.pct) + '</span></span>';
+  };
+  const picksLine = (picks) => {
+    const arr = (Array.isArray(picks) ? picks : []).slice(0, 3);
+    if (!arr.length) return '';
+    return '<div class="str-picks"><span class="str-picks-tag">排除涨停 · 优先可观察</span>' + arr.map(fmtPick).join('') + '</div>';
+  };
   const sec = (items, type, title, icon) => {
     if (!items.length) return '<div class="hint">暂无' + title + '数据</div>';
     return '<div class="pb-sec pb-' + type + '"><div class="pb-sec-h">' + icon + ' ' + title + '</div>' +
@@ -461,13 +471,22 @@ function renderPlaybook(report) {
         '<div class="pb-name">' + esc(it.name) + (it.count != null ? '<span class="pb-count">' + it.count + '家 / ' + it.maxLB + '板</span>' : '') + (it.leadStock ? '<span class="pb-lead">龙头 ' + esc(it.leadStock) + '</span>' : '') + '</div>' +
         '<div class="pb-logic">' + esc(it.logic || '') + '</div>' +
         '<div class="pb-scenario">适用场景:' + esc(it.scenario || '') + '</div>' +
+        picksLine(it.picks) +
         '</div>'
       ).join('') + '</div>';
   };
   const themeSec = () => {
     if (!themes.length) return '';
     return '<div class="pb-sec pb-themes"><div class="pb-sec-h">🎯 主题方向</div>' +
-      themes.map(t => '<div class="pb-item"><div class="pb-name">' + esc(t.name) + '<span class="pb-stocks">映射标的:' + (t.stocks || []).map(esc).join('、') + '</span></div></div>').join('') + '</div>';
+      themes.map(t => {
+        const stocks = Array.isArray(t.stocks) ? t.stocks : [];
+        const stocksLine = stocks.length ? '<div class="pb-logic">映射标的:' + stocks.map(esc).join('、') + '</div>' : '';
+        return '<div class="pb-item">' +
+          '<div class="pb-name">' + esc(t.name) + '</div>' +
+          stocksLine +
+          picksLine(t.picks) +
+          '</div>';
+      }).join('') + '</div>';
   };
   const rhythm = '<div class="card"><div class="card-title">操作节奏</div>' +
     '<div class="rhythm-item"><span class="rhythm-time">早盘 9:30-10:30</span><span class="rhythm-rule">"高开不追、低开看承接":基于外盘+开盘竞价,若高开 ≥0.5% 谨防冲高回落;若低开 ≤-0.5% 关注早盘 30 分钟承接力度</span></div>' +
@@ -1436,6 +1455,149 @@ ${renderHero(report)}
 </html>`;
 }
 
+/* ============ 打板五佳股 Top5 (2026-09-07) ============ */
+// 五维评分雷达(SVG) — 每只候选在透明叠层绘制,按综合分排序且 rank 越大透明度越高
+function renderRadarSvg(svgId, picks) {
+  // 5 维标签固定:安全/量能/涨速/形态/意图(顺序与 score 字段对应)
+  const dims = ['安全', '量能', '涨速', '形态', '意图'];
+  const cx = 110, cy = 110, R = 88;
+  const n = dims.length;
+  // 圆环+轴线
+  const rings = [0.2, 0.4, 0.6, 0.8, 1].map(r => {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = -Math.PI / 2 + i * 2 * Math.PI / n;
+      pts.push((cx + Math.cos(a) * R * r).toFixed(2) + ',' + (cy + Math.sin(a) * R * r).toFixed(2));
+    }
+    return '<polygon points="' + pts.join(' ') + '" fill="none" stroke="#e2e8f0" stroke-width="0.6" />';
+  }).join('');
+  const axes = dims.map((d, i) => {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / n;
+    const ex = (cx + Math.cos(a) * R).toFixed(2);
+    const ey = (cy + Math.sin(a) * R).toFixed(2);
+    const lx = (cx + Math.cos(a) * (R + 14)).toFixed(2);
+    const ly = (cy + Math.sin(a) * (R + 14)).toFixed(2);
+    return '<line x1="' + cx + '" y1="' + cy + '" x2="' + ex + '" y2="' + ey + '" stroke="#cbd5e1" stroke-width="0.5" />' +
+      '<text x="' + lx + '" y="' + ly + '" font-size="9" fill="#475569" text-anchor="middle" dominant-baseline="middle">' + d + '</text>';
+  }).join('');
+  // 多股叠加
+  const palette = ['#e11d48', '#0284c7', '#16a34a', '#a855f7', '#f59e0b'];
+  const polys = picks.map((p, i) => {
+    const sc = p.score || { safety: 0, volume: 0, speed: 0, shape: 0, intent: 0 };
+    const vals = [sc.safety, sc.volume, sc.speed, sc.shape, sc.intent].map(v => Math.max(0, Math.min(100, Number(v) || 0)));
+    const pts = vals.map((v, j) => {
+      const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+      const r = R * (v / 100);
+      return (cx + Math.cos(a) * r).toFixed(2) + ',' + (cy + Math.sin(a) * r).toFixed(2);
+    }).join(' ');
+    const opacity = 0.55 + (picks.length - i) * 0.05;     // rank 靠前更实
+    const color = palette[i % palette.length];
+    return '<polygon points="' + pts + '" fill="' + color + '" fill-opacity="' + (0.08 + (picks.length - i) * 0.03) + '" stroke="' + color + '" stroke-width="1.5" stroke-opacity="' + opacity + '" />' +
+      vals.map((v, j) => {
+        const a = -Math.PI / 2 + j * 2 * Math.PI / n;
+        const r = R * (v / 100);
+        return '<circle cx="' + (cx + Math.cos(a) * r).toFixed(2) + '" cy="' + (cy + Math.sin(a) * r).toFixed(2) + '" r="1.6" fill="' + color + '" />';
+      }).join('');
+  }).join('');
+  // 综合分标识
+  const legend = picks.map((p, i) => {
+    const color = palette[i % palette.length];
+    return '<span class="radar-leg"><i style="background:' + color + '"></i>#' + (i + 1) + ' ' + esc(p.name || '--') + ' · ' + (p.score ? p.score.total : '--') + '</span>';
+  }).join('');
+  return '<div class="radar-wrap"><svg id="' + svgId + '" viewBox="0 0 220 220" width="220" height="220">' + rings + axes + polys +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="2" fill="#0f172a" /></svg>' +
+    '<div class="radar-legend">' + legend + '</div></div>';
+}
+
+// 打板五佳股卡片(含五维评分 + 综合分 + 雷达图),单卡片高度允许移动端滚动
+function renderTopBoardCard(p, radarId) {
+  const sc = p.score || {};
+  const pctCls = p.pct > 0 ? 'up' : 'down';
+  const dimRow = (k, label) => {
+    const v = Number(sc[k]) || 0;
+    return '<div class="tb-dim"><span class="tb-dim-l">' + label + '</span>' +
+      '<div class="tb-dim-bar"><i style="width:' + Math.min(100, v) + '%"></i></div>' +
+      '<span class="tb-dim-v">' + v + '</span></div>';
+  };
+  return '<div class="tb-card">' +
+    '<div class="tb-rank">#' + (p.rank || '--') + ' TOP</div>' +
+    '<div class="tb-name">' + esc(p.name) + '<span class="tb-code">' + esc(p.code) + '</span></div>' +
+    '<div class="tb-pct"><b class="' + pctCls + '">' + fmtPct(p.pct) + '</b><span class="tb-pct-sub"> 涨幅</span></div>' +
+    '<div class="tb-line"><span class="tb-tag">板块</span><span class="tb-val">' + esc(p.sector || '--') + '</span></div>' +
+    '<div class="tb-line"><span class="tb-tag">涨停</span><span class="tb-val">' + (p.lianban || 1) + ' 连板 · 封单 ' + esc(p.sealAmount || '--') + '亿</span></div>' +
+    '<div class="tb-dims">' +
+      dimRow('safety', '板块持续安全度') +
+      dimRow('volume', '量能 · 涨速') +
+      dimRow('speed', '涨速变化') +
+      dimRow('shape', '形态/资金集中度') +
+      dimRow('intent', '强庄意图度') +
+    '</div>' +
+    '<div class="tb-total"><span>综合评分</span><b>' + (sc.total || 0) + '</b></div>' +
+  '</div>';
+}
+
+function renderTopBoardPicks(report) {
+  const tbp = report.topBoardPicks;
+  if (!tbp || !Array.isArray(tbp.picks) || !tbp.picks.length) return '';
+  const picks = tbp.picks;
+  const radarId = 'tb-radar-' + (report.meta.date || 'd').replace(/-/g, '');
+  const cards = picks.map(p => renderTopBoardCard(p, radarId)).join('');
+  const meta = report.meta || {};
+  const ms = report.marketStats || {};
+  const pb = (report.playbook || {});
+  // 头部摘要:贴近参考图 5 格指标(涨停总数/涨停股票数/炸板率/一字定流/今日主线)
+  const ztTotal = ms.limitUpCount || 0;
+  const zhaBan = ms.zhaBanCount || 0;
+  // 涨停股票总数:去重后的个股数(从 limitUp 列表中提取 code 去重)
+  const ztList = (report.limitUp || []);
+  const ztCodeSet = new Set(ztList.map(s => String(s.code || '')));
+  const ztStockCount = ztCodeSet.size || ztTotal;
+  const zhaBanRate = ztTotal + zhaBan > 0 ? Math.round(zhaBan / (ztTotal + zhaBan) * 100) : 0;
+  const topLine = tbp.latestLianBan || (picks[0] ? picks[0].lianban : 1) || 1;
+  const mainLine = ((pb.offense || [])[0] || {}).name || '--';
+  return '<div class="card top5-card" id="card-top5">' +
+    '<div class="top5-header">' +
+    '<div class="top5-title">🎯 打板五佳股日报<span class="top5-sub">' + esc(meta.date || '--') + ' ' + (meta.typeLabel || '') + '</span></div>' +
+    '<div class="top5-desc">本报告通过 AI 模型搜集当日强势的连续涨停力,并用 5 维加权评估市场情绪 <b>锁定方向</b>,不锁定 <b>具体个股</b> 的抓板路径及目前<b>静态抓板风险</b>。</div>' +
+    '</div>' +
+    '<div class="top5-stats">风险高度统计: 打板 <b>' + ztTotal + '</b> 只,情绪错冷 排除 <b>' + Math.max(0, ztTotal - picks.length) + '</b> 只 · 涨停数据 ' + esc(meta.date || '--') + ' · ' +
+    '<div class="top5-stats-grid">' +
+      '<div><span class="ts-num">' + ztTotal + '</span><span class="ts-lbl">涨停总数</span></div>' +
+      '<div><span class="ts-num">' + ztStockCount + '</span><span class="ts-lbl">涨停股票数</span></div>' +
+      '<div><span class="ts-num">' + zhaBan + '/' + (ztTotal + zhaBan) + '</span><span class="ts-lbl">炸板率(非中率)</span></div>' +
+      '<div><span class="ts-num">' + topLine + ' 板</span><span class="ts-lbl">一字定流</span></div>' +
+      '<div><span class="ts-num">' + esc(mainLine) + '</span><span class="ts-lbl">今日主线</span></div>' +
+    '</div>' +
+    '</div>' +
+    '<div class="top5-section-h">今日候选 · Top5<b>（基于 AI 模型推荐）</b></div>' +
+    '<div class="tb-scroll"><div class="tb-cards">' + cards + '</div></div>' +
+    renderRadarSvg(radarId, picks) +
+  '</div>';
+}
+
+function renderTopBoardBacktest(report) {
+  const rows = report.topBoardBacktest || [];
+  if (!rows.length) return '';
+  const body = rows.map((r, i) => '<tr>' +
+    '<td>' + esc(r.predictDate || '--') + '</td>' +
+    '<td>' + esc(r.code || '--') + '</td>' +
+    '<td>' + esc(r.name || '--') + '</td>' +
+    '<td class="up">' + (r.predictPct != null ? '+' + fmtPct(r.predictPct) : '--') + '</td>' +
+    '<td><span class="tb-hit">' + (r.isTop1 ? 'Top1' : 'Top5') + '</span></td>' +
+    '<td>' + (r.totalScore != null ? r.totalScore : '--') + '</td>' +
+    '<td>' + (r.highestLianBan || 1) + ' 连板</td>' +
+    '<td>' + esc(r.sector || '--') + '</td>' +
+    '<td class="verif">待验证</td>' +
+    '</tr>').join('');
+  return '<div class="card">' +
+    '<div class="card-title">回测追踪 · 历史推荐 Top 摘要（' + rows.length + ' 条）</div>' +
+    '<div class="tb-backtest-wrap"><table class="tb-backtest"><thead><tr>' +
+    '<th>预测日期</th><th>代码</th><th>名称</th><th>预测当日涨幅</th><th>命中</th><th>综合分</th><th>连板</th><th>所属板块</th><th>回测状态</th>' +
+    '</tr></thead><tbody>' + body + '</tbody></table></div>' +
+    '<div class="hint">回测状态:历史日报告仅记录当天 AI 综合评分与命中情况;下一交易日收盘后再用行情数据复核"当时推荐 vs 实际表现"。</div>' +
+    '</div>';
+}
+
 function renderReport(report, nav) {
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1453,8 +1615,10 @@ function renderReport(report, nav) {
 ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
-  ${renderCloseEmotion(report)}
-  ${report.meta && report.meta.type === 'close' ? '' : renderRegimeGate(report)}
+${renderCloseEmotion(report)}
+    ${report.meta && (report.meta.type === 'midday' || report.meta.type === 'close') ? renderTopBoardPicks(report) : ''}
+    ${report.meta && (report.meta.type === 'midday' || report.meta.type === 'close') ? renderTopBoardBacktest(report) : ''}
+    ${report.meta && report.meta.type === 'close' ? '' : renderRegimeGate(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
   ${report.meta && report.meta.type === 'midday' ? renderShortCore(report) : ''}
