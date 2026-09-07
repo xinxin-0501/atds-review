@@ -688,6 +688,95 @@ function loadTopBoardBacktest(dataDir, currentDateTime, dayLimit) {
   } catch (e) { return []; }
 }
 
+/* ============ "今天怎么看" 5 主题观察锚 (2026-09-07) ============ */
+// 收盘专属:从 mainRank/themes/hotSectors/limitUp 聚合出 5 大主题
+// 输出:{ themes:[{icon,name,category,reason,picks[3]}], caution:[str,str,str,str] }
+function deriveTodayWatchList(mainRank, playbook, zt, limitUpList, hotSectors) {
+  // 主题定义:icon + 主题名 + 板块关键词(用于 mainRank/picks 匹配) + 兜底观察股池(用户预设典型龙头)
+  const themeDefs = [
+    { id: 'power', icon: '⚡', name: '算力电源/液冷', sectorKeys: ['元件', '消费电子', '电子化学', '通信设备', '电源', '液冷', '通信', '算力'],
+      defaults: ['科华数据', '科士达', '英维克'] },
+    { id: 'fin',   icon: '🏛️', name: '金融',          sectorKeys: ['银行', '保险', '证券', '多元金融', '金融'],
+      defaults: ['工商银行', '农业银行', '中国人保'] },
+    { id: 'ai',    icon: '🤖', name: 'AI应用/传媒',   sectorKeys: ['影视', '游戏', 'AI', '传媒', '数字', '广告', '互联网'],
+      defaults: ['三六零', '天娱数科', '掌阅科技'] },
+    { id: 'agri',  icon: '🌾', name: '农业/消费',     sectorKeys: ['种植业', '一般零售', '小家电', '食品加工', '调味', '养殖', '渔业', '饲料', '农产品', '消费', '零售'],
+      defaults: ['农发种业', '大北农', '王府井'] },
+    { id: 'mil',   icon: '✈️', name: '国防军工',       sectorKeys: ['国防军工', '军工', '船舶', '航空', '航天'],
+      defaults: ['中国船舶', '中航沈飞', '航发动力'] }
+  ];
+  // 辅助:从 mainRank 中按关键词匹配命中的板块,聚合 picks(去重)
+  const collectPicks = (keys) => {
+    const matched = [];
+    for (const r of (mainRank || [])) {
+      const nm = r.mappedName || r.name || '';
+      if (keys.some(k => nm.indexOf(k) >= 0)) matched.push(r);
+    }
+    const picks = [];
+    const seen = new Set();
+    for (const r of matched) {
+      for (const p of (r.picks || [])) {
+        if (!seen.has(p.code) && (p.name || '').length) { picks.push(p); seen.add(p.code); }
+        if (picks.length >= 3) break;
+      }
+      if (picks.length >= 3) break;
+    }
+    return { picks, matched };
+  };
+  // 兜底:从 themes.stocks + 主题 defaults(用户预设龙头) — 不再随机用 hotSectors leadStock 跨主题混
+  const fallbackPicks = (def) => {
+    const out = [];
+    const themes = (playbook && playbook.themes) || [];
+    // 1) themes 命中的同名 stocks
+    for (const t of themes) {
+      const tn = String(t.name || '');
+      const matched = def.sectorKeys.some(k => tn.indexOf(k) >= 0);
+      if (!matched) continue;
+      for (const s of (t.stocks || [])) if (out.indexOf(s) < 0) out.push(s);
+      for (const p of (t.picks || [])) if (out.indexOf(p.name) < 0) out.push(p.name);
+      if (out.length >= 3) break;
+    }
+    // 2) 用户预设龙头兜底
+    for (const s of (def.defaults || [])) if (out.indexOf(s) < 0) out.push(s);
+    return out.slice(0, 3);
+  };
+  // 短文案模板(基于命中板块的 status + pct 派生)
+  const reasonText = (themeName, matched, isFallback) => {
+    if (!matched.length && isFallback) return themeName + '资金持续流入,验证第二天承接。';
+    const tops = matched.filter(m => m.status === '主线确认').length;
+    const avgPct = matched.length ? matched.reduce((s, m) => s + (Number(m.changePct) || 0), 0) / matched.length : 0;
+    if (tops >= 2 && avgPct >= 8) return themeName + '主线确认(' + tops + '板块),资金分歧,只做龙头不追高。';
+    if (tops >= 1) return themeName + '主线已获资金强化,先看资金是否真实回流。';
+    if (avgPct >= 5) return themeName + '资金已开始流入,验证第二天承接力度。';
+    return themeName + '短线资金分歧,谨防一致兑现。';
+  };
+  const themes = themeDefs.map(def => {
+    const { picks, matched } = collectPicks(def.sectorKeys);
+    let list = picks.map(p => p.name);
+    if (list.length < 3) {
+      const fb = fallbackPicks(def);
+      for (const n of fb) if (list.indexOf(n) < 0) list.push(n);
+      list = list.slice(0, 3);
+    }
+    // 分类:命中板块当日均涨 >= 4% → 观察;反之 → 等回调
+    const avgPct = matched.length ? matched.reduce((s, m) => s + (Number(m.changePct) || 0), 0) / matched.length : 0;
+    const confirmed = matched.some(m => m.status === '主线确认');
+    const category = (avgPct >= 4 || confirmed) ? '观察' : '等回调';
+    const reason = reasonText(def.name, matched, list.length === 0);
+    return { id: def.id, icon: def.icon, name: def.name, picks: list, category, reason };
+  });
+  // 谨慎方向:基于主线 + 题材 + 量能衍生的 4 条短文
+  const caution = [];
+  const ai = themes.find(t => t.id === 'ai');
+  caution.push(ai && ai.picks.length ? ai.name + '高位加速' : '题材高位加速');
+  const power = themes.find(t => t.id === 'power');
+  caution.push(power && power.picks.length ? power.name.replace('/', '·') + '一致高开' : '科技硬件一致高开');
+  const agri = themes.find(t => t.id === 'agri');
+  caution.push(agri ? agri.name + '追涨' : '消费板块追涨');
+  caution.push('无量追液冷');
+  return { themes, caution };
+}
+
 /* ============ 观察池技术画像(盘前):MA/量比/KDJ/趋势 → 支撑"建议"五类文案 ============ */
 function calcTechFromKline(arr) {
   if (!Array.isArray(arr) || arr.length < 30) return null;
@@ -1889,6 +1978,10 @@ async function main() {
     report.topBoardPicks = topBoardPicks;
     report.topBoardBacktest = topBoardBacktest;
     console.log('回测追踪:', topBoardBacktest.length, '条');
+
+    // 今天怎么看 · 5 主题观察锚(收盘专属):从主线 + 题材 + 板块成分里聚合,产出"明天看什么"
+    report.todayWatchList = deriveTodayWatchList(mainRank, playbook, zt, zt.list, hotSectors);
+    console.log('今天怎么看 · 5 主题:', report.todayWatchList.themes.length, '主题,谨慎方向:', (report.todayWatchList.caution || []).length, '条');
   }
   fs.mkdirSync(DATA_DIR, { recursive: true });
   const outFile = path.join(DATA_DIR, `${date}_${time.replace(':', '-')}.json`);

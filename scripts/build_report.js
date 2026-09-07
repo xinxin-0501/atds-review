@@ -372,6 +372,25 @@ function renderCloseEmotion(report) {
   const anchorBlock = m.type === 'midday' ? '' : '<div class="card"><div class="card-title">05 明日观察锚点</div>' +
     '<div class="ce-anchor-grid">' + anchorCards + '</div></div>';
 
+  // 05b 今天怎么看 + 谨慎方向(收盘专属,5 主题观察锚横向卡片 + 1 行谨慎方向 banner)
+  const todayWatch = report.todayWatchList || { themes: [], caution: [] };
+  const themeCards = (todayWatch.themes || []).map((t, i) => {
+    const catCls = (t.category === '观察') ? 'tw-cat-watch' : 'tw-cat-wait';
+    const picksHtml = (t.picks && t.picks.length) ? t.picks.map(p => '<div class="tw-pick">' + esc(p) + '</div>').join('') : '<div class="tw-pick tw-pick-empty">候选数据暂缺</div>';
+    return '<div class="tw-card">' +
+      '<div class="tw-h"><span class="tw-rank">' + (i + 1) + '</span><span class="tw-name">' + esc(t.name) + '</span></div>' +
+      '<div class="tw-picks">' + picksHtml + '</div>' +
+      '<div class="tw-cat ' + catCls + '">' + esc(t.category) + '</div>' +
+      '<div class="tw-reason">' + esc(t.reason || '') + '</div>' +
+      '</div>';
+  }).join('');
+  const cautionText = (todayWatch.caution || []).join('、');
+  const todayWatchBlock = m.type === 'midday' ? '' : '<div class="card tw-card-outer">' +
+    '<div class="card-title"><span class="tw-eyebrow">02</span> 今天怎么看</div>' +
+    '<div class="tw-cards">' + themeCards + '</div>' +
+    (cautionText ? '<div class="tw-caution"><span class="tw-caution-tag">03 谨慎方向</span>' + esc(cautionText) + '。</div>' : '') +
+    '</div>';
+
   // 底部强调横幅
   const banner = '<div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div>';
 
@@ -384,6 +403,7 @@ function renderCloseEmotion(report) {
     flowBlock +
     ladderBlock +
     anchorBlock +
+    todayWatchBlock +
     banner +
   '</div>';
 }
