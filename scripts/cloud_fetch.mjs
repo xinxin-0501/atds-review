@@ -483,8 +483,102 @@ async function attachSectorPicks(sectorNames, ztSet) {
 }
 
 /* ============ 打板五佳股 Top5 (2026-09-07 中午+收盘使用) ============ */
-// 涨停池里按"安全度/量能/涨速/形态/强庄"五维评分,排序取 Top5 用于报告卡片
-function scanTopBoardPicks(ztList) {
+/* ============ 打板五佳股 Top5 (2026-09-07 中午+收盘使用) ============ */
+// 拉 Top 候选股的流通市值/换手率(东财 secid 行情;失败回 0)
+async function fetchZTPicksDetail(picks) {
+  if (!Array.isArray(picks) || !picks.length) return [];
+  const secids = picks.map(p => {
+    const c = String(p.code || '').padStart(6, '0');
+    const setcode = c.startsWith('6') || c.startsWith('5') ? '1' : '0';
+    return setcode + '.' + c;
+  }).join(',');
+  const tryHosts = ['https://push2.eastmoney.com', 'http://push2.eastmoney.com', 'https://push2delay.eastmoney.com'];
+  for (const base of tryHosts) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const url = `${base}/api/qt/ulist.np/get?fltt=2&fields=f12,f14,f2,f3,f8,f9,f20&secids=${secids}`;
+        const j = await fetchJsonTxt(url, { timeout: 9000 });
+        if (!j || !j.data || !Array.isArray(j.data.diff)) { if (attempt === 0) await new Promise(r => setTimeout(r, 250)); continue; }
+        const map = {};
+        for (const it of j.data.diff) map[String(it.f12 || '').padStart(6, '0')] = it;
+        return picks.map(p => {
+          const it = map[String(p.code).padStart(6, '0')] || {};
+          // 东财 ulist 接口字段单位:f2 现价(元)/ f3 涨幅%/ f8 换手率%/ f9 流通市值(亿元,已带精度)/ f20 总市值(元)
+          const price = it.f2 != null ? Number(it.f2) : 0;
+          const liqMcapYi = it.f9 != null ? Math.round(Number(it.f9) * 10) / 10 : 0;  // 亿元
+          const turnover = it.f8 != null ? Number(it.f8) : 0;
+          return { code: p.code, price, liqMcapYi, turnoverRate: Math.round(turnover * 100) / 100 };
+        });
+      } catch (e) { if (attempt === 0) await new Promise(r => setTimeout(r, 250)); }
+    }
+  }
+  return picks.map(p => ({ code: p.code, liqMcapYi: 0, turnoverRate: 0 }));
+}
+
+// 板型/形态/题材派生 + 8 维评分 + 涨停原因短文
+function deriveBoardMeta(p, secCount) {
+  const lianban = p.lianban || 1;
+  const boardType = lianban === 1 ? '首板' : (lianban === 2 ? '2板' : (lianban === 3 ? '3板' : (lianban === 4 ? '4板' : (lianban + '连板'))));
+  // 形态派生:基于 firstTime(封板时间 HHmm)/ kaiban(开板次数)/ pct 涨幅
+  const ft = String(p.firstTime || '').slice(0, 4);
+  let shape = '盘中拉板';
+  if (p.kaiban && p.kaiban >= 1) shape = '炸板回封';
+  else if (ft && ft < '0933') shape = '一字板';
+  else if (ft && ft > '1430') shape = '尾盘封板';
+  else if (ft && ft > '1100' && ft < '1330') shape = '午后封板';
+  else if (ft && ft >= '0930' && ft <= '0945') shape = '开盘秒板';
+  // 题材派生:板块 + 联动(同板块涨停家数 secCount)
+  const theme = (p.sector || '其他') + (secCount > 1 ? `(联动` + secCount + ')' : '');
+  // 涨停原因:基于板块名+联动+封板时间多行短文
+  const reasonParts = [];
+  if (p.sector && p.sector !== '其他') {
+    reasonParts.push((p.sector || '') + '纯情');
+  }
+  if (secCount >= 2) {
+    reasonParts.push('缩炸作(同板块涨停 ' + secCount + ' 只)');
+  }
+  // 封板时间表述
+  if (ft && ft < '0933') reasonParts.push('一字封板');
+  else if (ft) reasonParts.push('首封 ' + ft.slice(0, 2) + ':' + ft.slice(2, 4));
+  if (p.sealAmountYi && p.sealAmountYi >= 2) reasonParts.push('首封 ' + Math.round(p.sealAmountYi * 100) / 100 + '亿');
+  if (p.kaiban && p.kaiban >= 1) reasonParts.push('炸板 ' + p.kaiban + ' 次');
+  const reason = reasonParts.slice(0, 4).join(' · ');
+  return { boardType, shape, theme, reason };
+}
+
+// 8 维评分:股价表现/板块类型/板块强势/放量缩量/横盘放量/半年涨势/模块效益/盈亏评价
+function radarEight(s, ctx) {
+  const pct = s.pct || 0;
+  const sealYi = Number(s.sealAmount) || 0;
+  const lianban = s.lianban || 1;
+  const turnover = s.turnoverRate || 0;
+  const liqMcap = s.liqMcapYi || 0;
+  const secCount = ctx ? ctx.secCount : 1;
+  const fundDesc = s.fundDesc || '';          // 放量/缩量派生(可由外部填)
+  const rangeDesc = s.rangeDesc || '';         // 横盘放量派生
+  const halfYearChg = s.halfYearChg || 0;      // 半年涨幅 %
+  return {
+    // 股价表现:今日涨幅 + 连板加速(连板越高越强)
+    priceAction: Math.min(100, Math.round((pct >= 9.8 ? 80 : pct * 8) + lianban * 5)),
+    // 板块类型:板块聚合度(同板块涨停越多越主流)
+    boardType: Math.min(100, Math.round(secCount * 22 + 30)),
+    // 板块强势:涨停家数 + 连板龙头加成
+    boardStrong: Math.min(100, Math.round(secCount * 18 + lianban * 12 + 18)),
+    // 放量缩量:换手率 5-15% 最佳 + 封单加分
+    volQuality: Math.min(100, Math.round(turnover > 0 ? (turnover < 5 ? 60 : (turnover > 30 ? 70 : Math.round(85 + (15 - Math.abs(turnover - 12)) * 1.5))) : 50 + (sealYi > 3 ? 18 : 0))),
+    // 横盘放量:派生自 5 日 K 线(由调用方算)
+    rangeBreakout: Math.max(0, Math.min(100, Math.round(Number(s.rangeBreakout) || 60))),
+    // 半年涨势:半年涨幅 0~30% 线性映射
+    halfYearTrend: Math.max(0, Math.min(100, Math.round(halfYearChg * 3 + 50))),
+    // 模块效益:综合分基础 + 流动性辅助
+    moduleBenefit: Math.min(100, Math.round((s.score && s.score.total) || 70)),
+    // 盈亏评价:综合分 + 大盘状态
+    profitEval: Math.min(100, Math.round((s.score && s.score.total) || 60) + Math.min(10, Math.round(liqMcap / 50)))
+  };
+}
+
+// 涨停池里按"安全度/量能/涨速/形态/强庄"五维评分 + 8 维扩展,排序取 Top5 用于报告卡片
+function scanTopBoardPicks(ztList, klineMap, opt) {
   if (!Array.isArray(ztList) || !ztList.length) return null;
   const sectorAgg = new Map();
   for (const s of ztList) {
@@ -502,27 +596,56 @@ function scanTopBoardPicks(ztList) {
     const shape = lianban === 1 ? 95 : lianban === 2 ? 80 : lianban === 3 ? 62 : lianban === 4 ? 42 : (lianban === 5 ? 28 : 18);  // 形态/资金集中(首板最稳)
     const intent = Math.min(100, Math.round(Math.sqrt(Math.max(sealYi, 0)) * 32 + secCount * 9 + 8));  // 强庄意图
     const total = Math.round(safety * 0.22 + volume * 0.18 + speed * 0.20 + shape * 0.20 + intent * 0.20);
+    // K 线辅助:近 5 日/120 日 数据(若有)
+    let rangeBreakout = 55, halfYearChg = 0;
+    const c6 = (s.code || '').toString().padStart(6, '0');
+    const k = klineMap && (klineMap[c6] || klineMap[s.code]);
+    if (Array.isArray(k) && k.length > 5) {
+      const closes = k.map(x => parseFloat(x[2])).filter(n => !isNaN(n));
+      if (closes.length >= 5) {
+        const last5hi = Math.max(...closes.slice(-5));
+        const last5lo = Math.min(...closes.slice(-5));
+        const last = closes[closes.length - 1];
+        const range = (last5hi - last5lo) / Math.max(last5lo, 0.01);
+        // 近 5 日窄幅 → 横盘;放量突破 → 高分(用 close/avg5 模拟放量)
+        const avg5 = closes.slice(-5).reduce((a, b) => a + b, 0) / 5;
+        rangeBreakout = Math.round(range < 0.04 ? 70 : (range < 0.10 ? 60 : 50) + (last > avg5 * 1.02 ? 20 : 0));
+      }
+      if (closes.length >= 120) {
+        halfYearChg = Math.round((closes[closes.length - 1] - closes[closes.length - 120]) / Math.max(closes[closes.length - 120], 0.01) * 100 * 10) / 10;
+      }
+    }
+    // 派生板型/形态/涨停原因
+    const meta = deriveBoardMeta({
+      pct: s.pct, lianban, sector: s.hybk || '其他', sealAmountYi: sealYi, firstTime: s.firstTime, kaiban: s.kaiban
+    }, secCount);
     return {
-      code: String(s.code || '').padStart(6, '0'),
+      code: c6,
       name: s.name || '--',
       pct: Number(s.pct) || 0,
       lianban,
       sector: s.hybk || '其他',
       sealAmount: (Number(sealYi) || 0).toFixed(2),
-      score: { safety, volume, speed, shape, intent, total }
+      sealAmountYi: Number(sealYi) || 0,
+      price: Number(s.price) || 0,
+      firstTime: String(s.firstTime || ''),
+      kaiban: Number(s.kaiban) || 0,
+      halfYearChg,
+      score: { safety, volume, speed, shape, intent, total },
+      meta,           // { boardType, shape, theme, reason }
+      rangeBreakout   // 用于 8 维的 横盘放量
     };
   });
   // 排序:综合分为主、连板奖励调节(防止 7 板等极高位股票霸榜)
   const ranked = scored
     .filter(s => s.lianban <= 7)
     .sort((a, b) => (b.score.total + Math.min(b.lianban - 1, 3) * 4) - (a.score.total + Math.min(a.lianban - 1, 3) * 4));
-  const picks = ranked.slice(0, 5);
-  picks.forEach((s, i) => { s.rank = i + 1; });
-  return { picks, totalCandidates: ranked.length, latestLianBan: ranked[0] ? ranked[0].lianban : 0 };
+  const candidates = ranked.slice(0, 10);  // 拉行情取前 10,再用详情补全
+  return { ranked, candidates, totalCandidates: ranked.length };
 }
 
-// 回测查取:扫描 data/reviews/ 找历史报告中的 topBoardPicks 摘要,用于"回测追踪"表
-function loadTopBoardBacktest(dataDir, currentDateTime, limit) {
+// 回测查取:取历史报告的 topBoardPicks 全 Top5 行,用于"回测追踪"表
+function loadTopBoardBacktest(dataDir, currentDateTime, dayLimit) {
   try {
     if (!fs.existsSync(dataDir)) return [];
     const files = fs.readdirSync(dataDir)
@@ -531,27 +654,34 @@ function loadTopBoardBacktest(dataDir, currentDateTime, limit) {
       .sort()
       .reverse();
     const rows = [];
+    const cap = typeof dayLimit === 'number' ? dayLimit : 5;
     for (const f of files) {
       try {
         const j = JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf8'));
         const tbp = j && j.topBoardPicks;
         if (!tbp || !Array.isArray(tbp.picks) || !tbp.picks.length) continue;
         const hitDate = f.replace(/_(\d{2}-\d{2})\.json$/, '').replace(/-/g, '-');
-        // 每份报告只取 Top1 写入表格(精简条数;每日一行)
-        const top1 = tbp.picks[0];
-        rows.push({
-          predictDate: hitDate,
-          code: top1.code,
-          name: top1.name,
-          predictPct: top1.pct,
-          isTop1: top1.rank === 1,
-          topN: top1.rank,
-          totalScore: top1.score ? top1.score.total : null,
-          highestLianBan: tbp.latestLianBan || top1.lianban || 1,
-          sector: top1.sector || '--',
-          actual: null  // 后续若接入实时行情再回填,简化版以"待验证"显示
-        });
-        if (rows.length >= (limit || 5)) break;
+        const slot = f.match(/_(\d{2}-\d{2})\.json$/);
+        const slotLabel = slot ? (slot[1] === '08-30' ? '盘前' : (slot[1] === '11-35' ? '午盘' : '收盘')) : '收盘';
+        // 取该报告 Top5 全部 5 行(命中 = rank<=5)
+        const picks = tbp.picks.slice(0, 5);
+        for (const top1 of picks) {
+          rows.push({
+            predictDate: hitDate,
+            slot: slotLabel,
+            code: top1.code,
+            name: top1.name,
+            predictPct: top1.pct,
+            rank: top1.rank || 1,
+            isTop5: true,
+            totalScore: top1.score ? top1.score.total : null,
+            lianban: top1.lianban || 1,
+            sector: top1.sector || top1.meta && top1.meta.theme || '--',
+            actual: null
+          });
+        }
+        if (rows.length >= cap * 5) break;
+        if (files.indexOf(f) >= cap - 1) break;     // 限制天数
       } catch (e) { /* 单文件损坏忽略 */ }
     }
     return rows;
@@ -1726,12 +1856,39 @@ async function main() {
   let topBoardPicks = null;
   let topBoardBacktest = [];
   if (!isPre) {
-    topBoardPicks = scanTopBoardPicks(zt.list);
+    // 1) 五维评分 + 8 维基础雷达 + 板型/形态/题材/涨停原因 派生
+    const t0 = Date.now();
+    const raw = scanTopBoardPicks(zt.list, klineMap || {});
+    if (raw && raw.candidates && raw.candidates.length) {
+      // 2) 拉流通市值 / 换手率(候选 Top10)
+      const details = await fetchZTPicksDetail(raw.candidates);
+      const detailMap = {};
+      for (const d of details) detailMap[String(d.code).padStart(6, '0')] = d;
+      // 3) 取最终 Top5,装配 8 维 + 加 rank
+      const picks = raw.candidates.slice(0, 5).map((c, i) => {
+        const c6 = String(c.code).padStart(6, '0');
+        const det = detailMap[c6] || {};
+        const enriched = Object.assign({}, c, {
+          price: det.price || c.price || 0,       // 优先用行情接口 f2
+          liqMcapYi: det.liqMcapYi || 0,
+          turnoverRate: det.turnoverRate || 0
+        });
+        // 8 维评分
+        const secCount = raw.ranked.filter(r => (r.sector || '') === c.sector).length;
+        enriched.radar8 = radarEight(enriched, { secCount });
+        enriched.rank = i + 1;
+        return enriched;
+      });
+      topBoardPicks = { picks, totalCandidates: raw.totalCandidates, latestLianBan: raw.candidates[0] ? raw.candidates[0].lianban : 0 };
+      console.log('打板五佳股详情:', picks.length + '/' + raw.totalCandidates, '只,', '流通市值/换手率补全:', details.filter(d => d.liqMcapYi > 0).length + '/' + details.length, '| 耗时', (Date.now() - t0) + 'ms');
+    } else {
+      topBoardPicks = { picks: [], totalCandidates: 0, latestLianBan: 0 };
+    }
     const outFileName = `${date}_${time.replace(':', '-')}.json`;
     topBoardBacktest = loadTopBoardBacktest(DATA_DIR, outFileName, 5);
     report.topBoardPicks = topBoardPicks;
     report.topBoardBacktest = topBoardBacktest;
-    console.log('打板五佳股 Top5:', topBoardPicks ? topBoardPicks.picks.length + '/' + topBoardPicks.totalCandidates : 'n/a', '| 历史回测:', topBoardBacktest.length, '条');
+    console.log('回测追踪:', topBoardBacktest.length, '条');
   }
   fs.mkdirSync(DATA_DIR, { recursive: true });
   const outFile = path.join(DATA_DIR, `${date}_${time.replace(':', '-')}.json`);
