@@ -372,22 +372,31 @@ function renderCloseEmotion(report) {
   const anchorBlock = m.type === 'midday' ? '' : '<div class="card"><div class="card-title">05 明日观察锚点</div>' +
     '<div class="ce-anchor-grid">' + anchorCards + '</div></div>';
 
-  // 05b 今天怎么看 + 谨慎方向(收盘专属,5 主题观察锚横向卡片 + 1 行谨慎方向 banner)
+  // 05b 今天怎么看 + 谨慎方向(收盘专属)· 双层紧凑:上半 5 个紧凑主题标签,下半选中主题的详情
   const todayWatch = report.todayWatchList || { themes: [], caution: [] };
-  const themeCards = (todayWatch.themes || []).map((t, i) => {
+  const themesArr = todayWatch.themes || [];
+  // 上半:5 个紧凑主题 tab(仅 编号 + 主题名 + 分类 chip)
+  const themeTabs = themesArr.map((t, i) => {
     const catCls = (t.category === '观察') ? 'tw-cat-watch' : 'tw-cat-wait';
-    const picksHtml = (t.picks && t.picks.length) ? t.picks.map(p => '<div class="tw-pick">' + esc(p) + '</div>').join('') : '<div class="tw-pick tw-pick-empty">候选数据暂缺</div>';
-    return '<div class="tw-card">' +
-      '<div class="tw-h"><span class="tw-rank">' + (i + 1) + '</span><span class="tw-name">' + esc(t.name) + '</span></div>' +
-      '<div class="tw-picks">' + picksHtml + '</div>' +
-      '<div class="tw-cat ' + catCls + '">' + esc(t.category) + '</div>' +
-      '<div class="tw-reason">' + esc(t.reason || '') + '</div>' +
+    return '<div class="tw-tab' + (i === 0 ? ' active' : '') + '" data-tw-idx="' + i + '" onclick="toggleTwCard(' + i + ')">' +
+      '<span class="tw-tab-rank">' + (i + 1) + '</span>' +
+      '<span class="tw-tab-name">' + esc(t.name) + '</span>' +
+      '<span class="tw-tab-cat ' + catCls + '">' + esc(t.category) + '</span>' +
+      '</div>';
+  }).join('');
+  // 下半:每个主题的详情面板(只展示当前激活;通过 CSS 控制显隐)
+  const themeDetails = themesArr.map((t, i) => {
+    const picksHtml = (t.picks && t.picks.length) ? t.picks.map(p => '<span class="tw-d-pick">' + esc(p) + '</span>').join('') : '<span class="tw-d-empty">候选数据暂缺</span>';
+    return '<div class="tw-detail' + (i === 0 ? ' active' : '') + '" data-tw-detail="' + i + '">' +
+      '<div class="tw-d-picks">' + picksHtml + '</div>' +
+      '<div class="tw-d-reason">' + esc(t.reason || '') + '</div>' +
       '</div>';
   }).join('');
   const cautionText = (todayWatch.caution || []).join('、');
   const todayWatchBlock = m.type === 'midday' ? '' : '<div class="card tw-card-outer">' +
     '<div class="card-title"><span class="tw-eyebrow">02</span> 今天怎么看</div>' +
-    '<div class="tw-cards">' + themeCards + '</div>' +
+    '<div class="tw-tabs">' + themeTabs + '</div>' +
+    '<div class="tw-details">' + themeDetails + '</div>' +
     (cautionText ? '<div class="tw-caution"><span class="tw-caution-tag">03 谨慎方向</span>' + esc(cautionText) + '。</div>' : '') +
     '</div>';
 

@@ -230,6 +230,17 @@ function toggleMdPicks(i){
   var card=w.closest?w.closest(".md-card"):w.parentElement;
   if(card)card.classList.toggle("open");
 }
+// 今天怎么看 · 5 主题切换(收盘复盘,02 模块);点击 tab 切换 detail
+function toggleTwCard(i){
+  var tabs=document.querySelectorAll(".tw-tab");
+  var details=document.querySelectorAll(".tw-detail");
+  for(var j=0;j<tabs.length;j++){
+    if(j===i){ tabs[j].classList.add("active"); }else{ tabs[j].classList.remove("active"); }
+  }
+  for(var j=0;j<details.length;j++){
+    if(j===i){ details[j].classList.add("active"); }else{ details[j].classList.remove("active"); }
+  }
+}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
 function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
 function deriveAdviceF(pct,atds,riskTone){var v=Number(pct)||0,a=Number(atds)||0;if(v<=-5)return{name:'减仓规避',tone:'cut'};if(a>=85&&riskTone!='high')return{name:'重点关注',tone:'focus'};if(a>=70)return{name:'持有观察',tone:'hold'};if(a<60&&v<=-1)return{name:'观望',tone:'wait'};return{name:'持有观察',tone:'hold'};}
