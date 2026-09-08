@@ -1131,11 +1131,14 @@
 .vt-tag { position:absolute; left:0; top:4px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(14,165,233,0.1); color:#0ea5e9; max-width:82px; line-height:1.2; text-align:center; }
 
 /* 板块强弱表 */
+.bd-section { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:6px; padding:6px 8px; margin-top:6px; }
 .bd-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:4px; }
 .bd-block { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:6px; padding:6px; }
 .bd-h { font-size:11px; font-weight:800; color:#e11d48; padding:2px 0 4px 0; border-bottom:1px solid rgba(15,23,42,0.06); margin-bottom:2px; }
 .bd-tbl { width:100%; border-collapse:collapse; }
-.bd-tbl td { font-size:10px; color:#475569; padding:2px 0; line-height:1.3; }
+.bd-tbl thead th { font-size:10px; font-weight:700; color:#94a3b8; padding:4px 2px; text-align:left; border-bottom:1px solid rgba(15,23,42,0.1); }
+.bd-tbl td { font-size:10px; color:#475569; padding:3px 2px; line-height:1.3; border-bottom:1px dashed rgba(15,23,42,0.05); }
+.bd-dir { font-size:11px; font-weight:800; color:#0f172a; text-align:center; vertical-align:middle; background:rgba(225,29,72,0.05); border-right:1px solid rgba(15,23,42,0.06); }
 .bd-cat { color:#0f172a; font-weight:700; padding-right:4px; }
 .bd-tag { font-size:9px; font-weight:700; padding:1px 4px; border-radius:3px; }
 .bd-tag-1 { background:rgba(225,29,72,0.12); color:#e11d48; }
@@ -1143,6 +1146,7 @@
 .bd-tag-3 { background:rgba(14,165,233,0.12); color:#0ea5e9; }
 .bd-tag-4 { background:rgba(100,116,139,0.12); color:#64748b; }
 .bd-tag-5 { background:rgba(168,85,247,0.12); color:#a855f7; }
+.bd-empty { color:#94a3b8; font-style:italic; }
 .up { color:#e11d48; font-weight:700; }
 .down { color:#16a34a; font-weight:700; }
 
@@ -1151,6 +1155,8 @@
 .msw-h { font-size:12px; font-weight:800; color:#0ea5e9; padding-bottom:4px; }
 .msw-row { display:flex; gap:8px; align-items:flex-start; font-size:11px; padding:3px 0; }
 .msw-tag { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(14,165,233,0.12); color:#0ea5e9; min-width:88px; text-align:center; }
+.msw-tag-def { background:rgba(245,158,11,0.15); color:#f59e0b; }
+.msw-tag-ag { background:rgba(22,163,74,0.15); color:#16a34a; }
 .msw-vals { font-size:11px; color:#0f172a; flex:1; }
 .msw-vals .up { color:#e11d48; }
 .msw-vals .down { color:#16a34a; }

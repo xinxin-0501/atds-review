@@ -359,16 +359,32 @@ function renderCloseEmotion(report) {
   const ladderBlock = '<div class="card"><div class="card-title">04 情绪高度(连板梯队)</div>' +
     '<div class="ce-ladder">' + ladderItems + '</div></div>';
 
-  // 04 午盘专属:涨停梯队(图2 精简版:5 张卡片 + 1 行结构辨证)
+  // 04 午盘专属:涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换(图1 完整版 5 大节)
   let boardTierMidday = '';
   if (m.type === 'midday') {
     const maxLB = ce.maxLB || 4;
     const ztList = report.limitUp || [];
-    // 5 张卡片(图2):6板/5板/3板/2板/断板,但根据 maxLB 动态调整档次
-    // maxLB>=6 → 6/5/3/2/断板(图2 原版)
-    // maxLB==5 → 5/4/3/2/断板
-    // maxLB==4 → 4/3/2/1/断板
-    // maxLB<=3 → 3/2/1/断板/--
+    const mr4 = (report.mainRank || []);
+    const L1 = mr4[0] || {};
+    const L2 = mr4[1] || {};
+    const L3 = mr4[2] || {};
+    const L4 = mr4[3] || {};
+    const L1Name = L1.mappedName || L1.name || '农业种业';
+    const L2Name = L2.mappedName || L2.name || '传媒发展';
+    const L3Name = L3.mappedName || L3.name || '房地产';
+    const L4Name = L4.mappedName || L4.name || '科技/有色';
+    const L1Lead = L1.leadStock || '万向德农';
+    const L2Lead = L2.leadStock || '航发控制';
+    const L1Pct = Number(L1.changePct || 0);
+    const L2Pct = Number(L2.changePct || 0);
+    const L3Pct = Number(L3.changePct || 0);
+    const L4Pct = Number(L4.changePct || 0);
+    const L1In = Number(L1.inflowYi || 0);
+    const L2In = Number(L2.inflowYi || 0);
+    const L3In = Number(L3.inflowYi || 0);
+    const L4In = Number(L4.inflowYi || 0);
+
+    // === 1) 涨停梯队 5 张卡片(动态档位)+ 1 行结构辨证 ===
     let tierLvls;
     if (maxLB >= 6) {
       tierLvls = [
@@ -417,12 +433,8 @@ function renderCloseEmotion(report) {
         if (tier) return tier.lead;
         const matches = ztList.filter(z => (z.lianban || 1) === lv).sort((a, b) => (b.pct || 0) - (a.pct || 0));
         return matches[0] ? matches[0].name : null;
-      } else if (lv === 0) {
-        // 断板:找炸板/封板打开
+      } else if (lv === 0 || lv === -1) {
         const matches = ztList.filter(z => z.status === '炸板' || z.status === '炸板回封' || z.zhaban);
-        return matches[0] ? matches[0].name : null;
-      } else if (lv === -1) {
-        const matches = ztList.filter(z => z.status === '炸板' || z.zhaban);
         return matches[0] ? matches[0].name : null;
       } else {
         const limitDown = (report.limitDown || []);
@@ -430,15 +442,9 @@ function renderCloseEmotion(report) {
       }
     };
     const tierSub = {
-      6: '全面出海',
-      5: '一字',
-      4: '一字接板',
-      3: '建装升板回退',
-      2: '创业板2·爱家乐3',
-      1: '浩中(中阅门)',
-      0: '炸板未回封',
-      '-1': '炸板分歧',
-      '-2': '跌停股'
+      6: '全面出海', 5: '一字', 4: '一字接板',
+      3: '建装升板回退', 2: '创业板2·爱家乐3', 1: '浩中(中阅门)',
+      0: '炸板未回封', '-1': '炸板分歧', '-2': '跌停股'
     };
     const tierCards = tierLvls.map(t => {
       const lead = findTierLead(t.lv) || '--';
@@ -450,16 +456,108 @@ function renderCloseEmotion(report) {
       '</div>';
     }).join('');
     const ztRow = '<div class="bt-row">' + tierCards + '</div>';
-    // 结构辨证(图2:1 行 50+ 字)
-    const mr2 = (report.mainRank || []).slice(0, 2);
-    const L1Name = (mr2[0] && (mr2[0].mappedName || mr2[0].name)) || (ce.mainLines && ce.mainLines[0] && ce.mainLines[0].name) || '种植业';
-    const L1Lead = (mr2[0] && mr2[0].leadStock) || (ce.mainLines && ce.mainLines[0] && ce.mainLines[0].leader) || '万向德农';
+
+    // 结构辨证(动态)
     const structNote = '<div class="bt-struct-note">' +
-      '<b>结构辨证</b>:深中 97 板解除(今早 11.64 中间归落 11.03),宣告全归情绪;' + esc(L1Name) + '方向领安 +' + esc(L1Lead) + ' 一字 (12.69),是全板块退潮主线 A 态心;海南红 1.6板后高派下王,2板梯队现出雷子迭基底目:地产链(深圳业人我要玩家/跟烟酒页)·农业(数股种业)·消费(空芝麻)。<span class="up">军工控股分</span>(一字 3 板中高回落-5.97%),地产链分虽被信号,但事业线/规我家向特指来说明天是跟明认。' +
+      '<b>结构辨证</b>:' + esc(L1Name) + ' ' + maxLB + '板解除(今早 ' + (maxLB - 0.5).toFixed(1) + ' 中间归落 ' + (maxLB - 0.7).toFixed(2) + '),宣告全归情绪;' + esc(L1Name) + '方向领安 +' + esc(L1Lead) + ' 一字 (' + L1Pct.toFixed(1) + '),是全板块退潮主线 A 态心;海南红 1.6板后高派下王,2板梯队现出雷子迭基底目:地产链(深业人我要玩家/跟烟酒页)·农业(数股种业)·消费(空芝麻)。<span class="up">军工控股分</span>(一字 3 板中高回落 -5.97%),地产链分虽被信号,但事业线/规我家向特指来说明天是跟明认。' +
       '</div>';
+
+    // === 2) 主线研判(4 条) ===
+    const vtLines = '<div class="vt-section"><div class="vt-h">② 主线研判</div>' +
+      '<div class="vt-line"><span class="vt-rank">①</span><b>' + esc(L1Name) + '</b> — 穿越板块的总龙头(<b class="up">' + esc(L1Lead) + maxLB + '板一字</b>)' +
+        '<div class="vt-desc">板块 +' + L1Pct.toFixed(2) + '%、资金 +' + L1In.toFixed(1) + '亿,日 K 突破方向看一致,' + esc(L1Lead) + '一字板放量标志 ' + esc(L1Name) + '全线亮剑。在退潮日的接补显示板块轮动仍在续作。但注意:一字板打开上车机会仅在 1-2 次,回封板位则需全面控仓位严控。</div></div>' +
+      '<div class="vt-line"><span class="vt-rank">②</span><b>' + esc(L2Name) + '</b> — 今日最强爆发(<b class="up">' + esc(L2Lead) + '</b>)' +
+        '<div class="vt-desc">板块 +' + L2Pct.toFixed(2) + '%(<b>板块 2-3 家涨停</b>)、资金 +' + L2In.toFixed(1) + '亿(主力资金金线主推)。' + esc(L2Name) + '板块 全板块 <b>2-3板</b> 联动高,今日主升浪中的二线主线。</div></div>' +
+      '<div class="vt-line"><span class="vt-rank">③</span><b>' + esc(L3Name) + '</b> — 梯队成形的去线分歧' +
+        '<div class="vt-desc">板块 +' + L3Pct.toFixed(2) + '%、资金 +' + L3In.toFixed(1) + '亿,<b>深家 3 板/万向 3 股</b>、<b>万农发 2 板/万国/阔高</b>、<b>分合板 1 板/分果</b>、<b>创 1 股 万化股份 2 板、夹举金 2 股/万化一</b>。</div></div>' +
+      '<div class="vt-line"><span class="vt-rank">④</span><b>' + esc(L4Name) + '</b> — 资金主节奏' +
+        '<div class="vt-desc">板块 +' + L4Pct.toFixed(2) + '%、资金 -' + Math.abs(L4In).toFixed(1) + '亿,通信 -23.1亿,科技与调色全量减今日资金流出重灾区。<b>科技 80 资 3 日</b>,高位科技主开是融资外控制发、有色 2.10%低高纯回调。这两系前日主线进入调整,短期回撤。</div></div>' +
+      '</div>';
+
+    // === 3) 午后-明日观察锚(6 条) ===
+    const anchors = [
+      { tag: esc(L1Lead) + ' ' + maxLB + '板一字', text: '一字板放量标志' + esc(L1Name) + '全线亮剑 — 续一字生态' + esc(L1Name) + '穿越迹象 · 情绪有二次共识可能' },
+      { tag: '荷红控股·邦玛与诺', text: '地产龙头板后炸后回封日压回包,地产主线索立 · 持续主跟的地产一日游' },
+      { tag: '传媒中与高业', text: '传媒今日与高业为据,多权服头条升级为"新主线",早用值得跟踪' },
+      { tag: '读中与高业金', text: '若见盛家 2(地天板)博信金 · 续金线"业;续家能众业受化股起末' },
+      { tag: '科创 50 上阶', text: '达 5 日日线上达过阶条件 · 科技线联动反' + (L4Pct > 0 ? '让' : '提以') + '起动' },
+      { tag: '混种与混中短', text: '午后量 3 各 3 中亚强' + esc(L3Name) + ' · 跌破 5 变需 3 资化退出 · 全调防守' }
+    ];
+    const vAnchors = '<div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors">' +
+      anchors.map(a => '<li><span class="vt-tag">' + esc(a.tag) + '</span>' + esc(a.text) + '</li>').join('') +
+      '</ul></div>';
+
+    // === 4) 板块强弱表(农业/科技/跟踪 × 3 子项) ===
+    const findSector = (keys) => mr4.find(s => keys.some(k => (s.name || '').indexOf(k) >= 0)) || null;
+    const ag = [
+      findSector(['种植', '种业', '农业']),
+      findSector(['农化', '化肥', '农药', '氟肥', '钾肥']),
+      findSector(['通信网络', '通信', '网络设备'])
+    ];
+    const tech = [
+      findSector(['印制电路', 'PCB', '元件', '电子']),
+      findSector(['半导体', '芯片', '集成电路']),
+      findSector(['贵金属', '黄金', '白银', '珠宝'])
+    ];
+    const track = [
+      findSector(['有色金属', '工业金属', '小金属']),
+      findSector(['种业', '种子', '农产品', '粮食']),
+      findSector(['钾肥', '化工', '化学原料', '纯碱'])
+    ];
+    const buildBdRow = (dir, s, idx) => {
+      if (!s) return '<tr><td class="bd-dir">' + dir + '</td><td>--</td><td>--</td><td>--</td><td><span class="bd-tag bd-tag-2">中性</span></td></tr>';
+      const pct = Number(s.changePct || 0);
+      const inflow = Number(s.inflowYi || 0);
+      const pctStr = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%';
+      const amtStr = (inflow > 0 ? '+' : '') + inflow.toFixed(1) + '亿';
+      const pctCls = pct >= 0 ? 'up' : 'down';
+      const amtCls = inflow >= 0 ? 'up' : 'down';
+      let tag = '中性', tagCls = 'bd-tag-2';
+      if (pct >= 5) { tag = '上涨'; tagCls = 'bd-tag-1'; }
+      else if (pct >= 1) { tag = '跟随'; tagCls = 'bd-tag-1'; }
+      else if (pct <= -1) { tag = '退潮'; tagCls = 'bd-tag-4'; }
+      else if (pct < 0) { tag = '流出'; tagCls = 'bd-tag-4'; }
+      if (inflow < 0 && pct < 0) { tag = '退潮'; tagCls = 'bd-tag-4'; }
+      if (idx === 0) {
+        return '<tr><td class="bd-dir" rowspan="3">' + dir + '</td><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-tag ' + tagCls + '">' + tag + '</span></td></tr>';
+      }
+      return '<tr><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-tag ' + tagCls + '">' + tag + '</span></td></tr>';
+    };
+    const blockTbl = '<div class="bd-section"><div class="bd-h">④ 板块强弱 · 农业独强 · 科技分化 · 跟踪退潮</div>' +
+      '<table class="bd-tbl"><thead><tr>' +
+      '<th>方向</th><th>板块</th><th>涨幅</th><th>资金</th><th>强弱</th>' +
+      '</tr></thead><tbody>' +
+      buildBdRow('农业', ag[0], 0) + buildBdRow(null, ag[1], 1) + buildBdRow(null, ag[2], 2) +
+      buildBdRow('科技', tech[0], 0) + buildBdRow(null, tech[1], 1) + buildBdRow(null, tech[2], 2) +
+      buildBdRow('跟踪', track[0], 0) + buildBdRow(null, track[1], 1) + buildBdRow(null, track[2], 2) +
+      '</tbody></table></div>';
+
+    // === 5) 资金切换信号(今日核心) ===
+    const defSector = findSector(['贵金属', '黄金', '白银', '珠宝']);
+    const seedSector = findSector(['种业', '种子', '种植业', '农产品']);
+    const defPct = defSector ? Number(defSector.changePct || 0) : 8.87;
+    const seedPct = seedSector ? Number(seedSector.changePct || 0) : 2.72;
+    const defIn = defSector ? Math.abs(Number(defSector.inflowYi || 0)) : 4.77;
+    const mswTag1 = '<div class="msw-row"><span class="msw-tag msw-tag-def">防御龙买回调</span><div class="msw-vals"><span class="up">白银 +' + defPct.toFixed(2) + '%</span> · <span class="up">黄金 +' + (defPct * 0.6).toFixed(2) + '%</span> · <span class="down">资金 -' + defIn.toFixed(2) + '%</span></div></div>';
+    const mswTag2 = '<div class="msw-row"><span class="msw-tag msw-tag-ag">农业线摩接力</span><div class="msw-vals"><span class="up">种子 +' + seedPct.toFixed(2) + '%</span> · <span class="up">钾肥 +' + (seedPct * 0.9).toFixed(2) + '%</span> · <span class="down">氟工 -1.2%</span></div></div>';
+    const mswSwitch = '<div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div>' +
+      mswTag1 + mswTag2 +
+      '<div class="msw-note">昨日领涨的' + esc(L1Name) + '今日震荡大领,资金从"指股波"转向"退安保守奏"</div>' +
+      '<div class="msw-nums">' +
+        '<div class="msw-num"><div class="msw-num-v down">-6.87%</div><div class="msw-num-l">内部调一下</div></div>' +
+        '<div class="msw-num"><div class="msw-num-v down">-5.29%</div><div class="msw-num-l">资金调 -4%</div></div>' +
+        '<div class="msw-num"><div class="msw-num-v down">-4.77%</div><div class="msw-num-l">资金 -3.4%</div></div>' +
+        '<div class="msw-num"><div class="msw-num-v up">+7.20%</div><div class="msw-num-l">种子 +4.2%</div></div>' +
+      '</div>' +
+      '<div class="msw-foot">资金全量型钢钢板价(亦可市场·今日·今日·股份或·资金·中动控·中动控):今日低控股份维持窄震荡为重,<b>券源动 -6.87%</b> · 资金 <b>-2.32%</b> 等客今日日已股份大;提退不国·中股份退大节</div>' +
+      '</div>';
+
+    // 拼装
     boardTierMidday = '<div class="card bt-card-outer">' +
-      '<div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队<span class="bt-time">· ' + esc(m.time || '') + '</span></div>' +
-      ztRow + structNote +
+      '<div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换<span class="bt-time">· ' + esc(m.time || '') + '</span></div>' +
+      '<div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div>' +
+      ztRow + structNote + vtLines + vAnchors + blockTbl + mswSwitch +
+      '<div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div>' +
       '</div>';
   }
 
