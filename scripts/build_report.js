@@ -352,12 +352,51 @@ function renderCloseEmotion(report) {
       '</div>' +
     '</div></div>';
 
-  // 04 情绪高度(连板梯队)
+  // 04 情绪高度(连板梯队) - 仅 close 展示
   const ladderItems = (ce.ladder || []).map(l => {
     return '<span class="ce-ladder-pill">' + esc(l.lianban) + ' · ' + esc(l.lead) + '</span>';
   }).join('');
   const ladderBlock = '<div class="card"><div class="card-title">04 情绪高度(连板梯队)</div>' +
     '<div class="ce-ladder">' + ladderItems + '</div></div>';
+
+  // 04 午盘专属:打板梯队(盘中)+主流资金
+  let boardTierMidday = '';
+  if (m.type === 'midday') {
+    // 1) 打板梯队卡片:5板/4板/3板/2板 + 跌停 + 涨停/炸板
+    const maxLB = ce.maxLB || 4;
+    const lbOptions = [5, 4, 3, 2, 1];
+    const tierCards = lbOptions.map(lv => {
+      const tier = (ce.ladder || []).find(l => String(l.lianban || '').startsWith(String(lv) + '板'));
+      const stock = tier ? tier.lead : '--';
+      const cls = lv === 5 ? 'bt-5' : (lv === 4 ? 'bt-4' : (lv === 3 ? 'bt-3' : (lv === 2 ? 'bt-2' : 'bt-1')));
+      const cnt = (ce.ladder || []).filter(l => String(l.lianban || '').startsWith(String(lv) + '板')).length || (lv === maxLB ? 1 : 0);
+      return '<div class="bt-card ' + cls + '"><div class="bt-lv">' + lv + '板</div><div class="bt-cnt">' + (cnt || (lv === maxLB ? 1 : 0)) + '家</div><div class="bt-name">' + esc(stock) + '</div></div>';
+    }).join('');
+    const limitDownPanel = '<div class="bt-card bt-1"><div class="bt-lv">跌停</div><div class="bt-cnt">' + (ce.limitDownCount || 0) + '家</div><div class="bt-name">' + esc((ce.mostLower || '--')) + '</div></div>';
+    const stats = '<div class="bt-stats"><div class="bt-stat"><span class="bt-stat-n">' + (ce.ztTotal || 0) + '</span><span class="bt-stat-l">涨停</span></div><div class="bt-stat"><span class="bt-stat-n">' + (ce.zbTotal || 0) + '</span><span class="bt-stat-l">炸板</span></div><div class="bt-stat"><span class="bt-stat-n">' + (ce.limitBoardRate || '--') + '%</span><span class="bt-stat-l">封板率</span></div><div class="bt-stat"><span class="bt-stat-n">' + (ce.promotionRate || '--') + '%</span><span class="bt-stat-l">晋级率</span></div></div>';
+    const tier = '<div class="bt-row">' + tierCards + limitDownPanel + '</div>';
+    // 2) 主线强度 + 主流资金 — 复用 ce.mainLines / ce.moneyInflow
+    const mainLines = (ce.mainLines || []).slice(0, 3);
+    const money = (ce.moneyInflow || []).slice(0, 3);
+    const mainBlock = mainLines.length ? mainLines.map(mm => '<div class="mm-row"><span class="mm-name">' + esc(mm.name) + '</span><span class="mm-val up">+' + Number(mm.changePct || 0).toFixed(2) + '%</span><span class="mm-lead">' + esc(mm.leader || '--') + '</span></div>').join('') : '<div class="mm-row"><span class="hint">暂无数据</span></div>';
+    const moneyBlock = money.length ? money.map(mm => '<div class="mm-row"><span class="mm-name">' + esc(mm.name) + '</span><span class="mm-val up">+' + Number(mm.valueYi || 0).toFixed(2) + '亿</span></div>').join('') : '<div class="mm-row"><span class="hint">暂无数据</span></div>';
+    // 3) 主力资金要点 3条
+    const tips = [
+      '主力资金净流入 Top3: ' + (money.slice(0,3).map(mm => mm.name + '+' + Number(mm.valueYi || 0).toFixed(1) + '亿').join(' / ') || '--'),
+      '强度龙头: ' + ((mainLines[0] && mainLines[0].name) || '--') + ' (' + ((mainLines[0] && ((mainLines[0].leader || '--'))) ) + ')',
+      '连板梯队热度: ' + ((ce.ladder || []).length + ' 梯队 · 高度 ' + (ce.maxLB || 0) + '板')
+    ];
+    boardTierMidday = '<div class="card"><div class="card-title"><span class="bt-eyebrow">04</span> 打板梯队(盘中)<span class="bt-time">· ' + esc(m.time || '') + '</span></div>' +
+      '<div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘中接力判断</span></div>' +
+      tier + stats +
+      '<div class="mm-grid">' +
+        '<div class="mm-block"><div class="mm-h">主线强度</div>' + mainBlock + '</div>' +
+        '<div class="mm-block"><div class="mm-h">主流资金</div>' + moneyBlock + '</div>' +
+        '<div class="mm-block"><div class="mm-h">结论</div><ul class="mm-tips">' + tips.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div>' +
+      '</div>' +
+      '<div class="hint">盘中实时口径:连板梯队=收盘梯队封板个股;主流资金=主力资金净流入板块 Top3;结论=三维共振判断</div>' +
+      '</div>';
+  }
 
   // 05 明日观察锚点（午盘隐藏，收盘展示）
   const anchors = [
@@ -410,7 +449,7 @@ function renderCloseEmotion(report) {
     emotion +
     broadBlock +
     flowBlock +
-    ladderBlock +
+    (m.type === 'midday' ? boardTierMidday : ladderBlock) +
     anchorBlock +
     todayWatchBlock +
     banner +
@@ -1331,7 +1370,8 @@ function renderPerStockTodayStrategy(s) {
   '</div>';
 }
 
-function renderPremarketStrategy(report) {
+function renderPremarketStrategy(report, opts) {
+  const o = opts || {};
   const mr = (report.mainRank || []).slice(0, 3);     // A/B/C 三块
   const playbook = report.playbook || {};
   const pit = (playbook.pitfall || []).slice(0, 3);
@@ -1425,7 +1465,8 @@ function renderPremarketStrategy(report) {
 
   return '<div class="card em-card">' +
     '<div class="em-header">' +
-      '<span class="em-title">主升浪·新周期</span>' +
+      '<span class="em-title">' + esc(o.title || '主升浪·新周期') + '</span>' +
+      (o.subtitle ? '<span class="em-sub">' + esc(o.subtitle) + '</span>' : '') +
       '<span class="em-date">' + esc(date) + '</span>' +
     '</div>' +
     banner +
@@ -1554,7 +1595,7 @@ ${renderHero(report)}
 <div class="section">
   ${renderWatchlist(report)}
   ${renderPremarketCockpit(report)}
-  ${renderPremarketStrategy(report)}
+  ${renderPremarketStrategy(report, { title: '主升浪参与策略', subtitle: '盘前接力判断 · 板块联动确认 · 强势股池筛选' })}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
   ${renderStockResearch(report)}
@@ -1724,7 +1765,7 @@ ${renderHero(report)}
 <div class="section">
 ${renderCloseEmotion(report)}
     ${report.meta && (report.meta.type === 'midday' || report.meta.type === 'close') ? renderTopBoardPicks(report) : ''}
-    ${report.meta && (report.meta.type === 'midday' || report.meta.type === 'close') ? renderTopBoardBacktest(report) : ''}
+    ${report.meta && report.meta.type === 'close' ? renderPremarketStrategy(report, { title: '主升浪·新周期', subtitle: '实时下载 · 市场数据 · A 股收盘数据全维度复盘' }) : ''}
     ${report.meta && report.meta.type === 'close' ? '' : renderRegimeGate(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
@@ -1733,7 +1774,6 @@ ${renderCloseEmotion(report)}
   ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderIntlMkt(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderTechAnalysis(report)}
-  ${renderPremarketStrategy(report)}
   ${renderIndices(report)}
   ${renderStatusBar(report)}
   ${renderMarketStats(report)}
