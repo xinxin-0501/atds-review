@@ -305,7 +305,7 @@
 .modal-box .modal-b{font-size:11px;color:#444;line-height:1.6;background:#fafafa;border-radius:8px;padding:8px 10px}
 .modal-box .modal-footer{background:#fafafa;padding:10px 16px;font-size:9px;color:#999;border-top:1px solid #f0f0f0;text-align:center}
 /* v16: 每只股票独立卡片(自带表头+数据+拉杆+详情) */
-.wl-stocks{display:flex;flex-direction:column;gap:10px}
+.wl-stocks{display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:460px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .wl-stock{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0}
 .wl-stock-scroll{display:block;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%}
 .wl-stock-scroll::-webkit-scrollbar{height:5px}
@@ -1694,6 +1694,33 @@
   .tw-d-pick { font-size: 11px; padding: 1px 8px; }
   .tw-d-reason { font-size: 11px; padding: 6px 10px; }
 }
+
+/* ============ 主线参与策略 (2026-09-08) ============ */
+.ml-main { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: linear-gradient(135deg, rgba(122,90,248,0.06), rgba(34,211,238,0.04)); border-radius: 8px; margin-bottom: 10px; }
+.ml-score { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.ml-score-num { font-size: 28px; font-weight: 800; line-height: 1; }
+.ml-score-label { font-size: 9px; color: #64748b; font-weight: 600; }
+.ml-tone-strong .ml-score-num { color: #16a34a; }
+.ml-tone-mid .ml-score-num { color: #0284c7; }
+.ml-tone-wait .ml-score-num { color: #f59e0b; }
+.ml-tone-weak .ml-score-num { color: #94a3b8; }
+.ml-desc { font-size: 14px; font-weight: 700; color: #0f172a; }
+.ml-block { margin-bottom: 10px; }
+.ml-h { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; padding-left: 6px; border-left: 3px solid #e11d48; }
+.ml-row { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: #fff; border: 1px solid rgba(100,116,139,0.1); border-radius: 6px; margin-bottom: 4px; font-size: 12px; }
+.ml-rank { background: #e11d48; color: #fff; font-size: 10px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ml-name { font-weight: 600; color: #0f172a; min-width: 0; flex: 1; }
+.ml-pct { font-weight: 600; font-size: 11px; }
+.ml-pct.up { color: #e11d48; }
+.ml-pct.down { color: #16a34a; }
+.ml-count { font-size: 10px; color: #64748b; }
+.ml-lead { font-size: 10px; color: #64748b; }
+.ml-strategy { font-size: 13px; font-weight: 600; color: #0f172a; padding: 8px 10px; background: rgba(34,197,94,0.08); border-radius: 6px; border-left: 3px solid #16a34a; margin-bottom: 6px; }
+.ml-strategy-detail { font-size: 11px; color: #64748b; padding: 4px 10px; }
+.ml-strategy-detail b { color: #0f172a; }
+.ml-risk-item { display: flex; gap: 8px; padding: 5px 8px; background: rgba(225,29,72,0.05); border-radius: 4px; margin-bottom: 3px; font-size: 11px; }
+.ml-risk-name { font-weight: 700; color: #e11d48; flex-shrink: 0; }
+.ml-risk-logic { color: #475569; }
 </style>
 </head>
 <body>
@@ -1707,7 +1734,7 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-09-07_11-35.html">午盘</a><a href="2026-09-07_16-20.html">收盘</a><a href="2026-09-08_08-30.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-09-08_11-35.html">午盘</a><a href="2026-09-07_16-20.html">收盘</a><a href="2026-09-08_11-35.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-09-08 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 82°</span></div></div>
@@ -1982,39 +2009,7 @@ tags: [ATDS, 交易复盘]
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">82° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">73 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">爱仕达</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">55 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">农化制品 / 种植业 / 出版</div></div></div>
   </div>
-  <div class="card">
-    <div class="card-title">策略状态</div>
-    <div class="str-block">
-      <div class="str-h">⚔️ 进攻方向</div><div class="str-line"><b>农化制品</b> 涨停 4家 / 2板 · 领涨 金正大</div><div class="str-picks"><span class="str-picks-tag">排除涨停 · 优先可观察</span><span class="str-pick"><b>川金诺</b><span class="up">+11.69%</span></span><span class="str-pick"><b>雅本化学</b><span class="up">+9.13%</span></span><span class="str-pick"><b>六国化工</b><span class="up">+8.48%</span></span></div><div class="str-line"><b>种植业</b> 涨停 3家 / 4板 · 领涨 亚盛集团</div><div class="str-picks"><span class="str-picks-tag">排除涨停 · 优先可观察</span><span class="str-pick"><b>海南橡胶</b><span class="up">+9.31%</span></span><span class="str-pick"><b>北大荒</b><span class="up">+5.63%</span></span><span class="str-pick"><b>宏辉果蔬</b><span class="up">+5.44%</span></span></div><div class="str-line"><b>出版</b> 涨停 3家 / 3板 · 领涨 读者传媒</div><div class="str-picks"><span class="str-picks-tag">排除涨停 · 优先可观察</span><span class="str-pick"><b>龙版传媒</b><span class="up">+9.12%</span></span><span class="str-pick"><b>粤 传 媒</b><span class="up">+5.11%</span></span><span class="str-pick"><b>读客文化</b><span class="up">+4.78%</span></span></div>
-    </div>
-    <div class="str-block">
-      <div class="str-h">🛡️ 防守方向</div><div class="str-line"><b>高股息红利</b> 低波动+稳定分红</div><div class="str-line"><b>公用事业</b> 现金流稳定+刚性需求</div><div class="str-line"><b>银行(大行)</b> 高股息+低估值</div>
-    </div>
-    <div class="str-block">
-      <div class="str-h">⚠️ 风险提示</div><div class="str-line pit"><b>高位连板股(连板≥4)</b> 当前连板≥4 共 3 只,承接强度需复核</div><div class="str-line pit"><b>当日炸板股</b> 近 0 只炸板,分歧加大</div><div class="str-line pit"><b>北证/微盘股</b> 波动放大+流动性敏感</div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">核心指数</div>
-    <div class="index-row"><div class="index-item" data-code="000001" data-prefix="sh">
-      <div class="index-name">上证指数</div>
-      <div class="index-value up">3,940.55</div>
-      <div class="index-change up">+0.20%</div>
-    </div><div class="index-item" data-code="399001" data-prefix="sz">
-      <div class="index-name">深证成指</div>
-      <div class="index-value down">13,703.21</div>
-      <div class="index-change down">-0.52%</div>
-    </div><div class="index-item" data-code="399006" data-prefix="sz">
-      <div class="index-name">创业板指</div>
-      <div class="index-value down">3,359.72</div>
-      <div class="index-change down">-1.15%</div>
-    </div></div>
-    <div class="status-row">
-      <div class="status-item">生成时间<strong>2026-09-08 18:46:11</strong></div>
-      <div class="status-item">数据源<strong>通达信实时</strong></div>
-      <div class="status-item">类型<strong>盘前简报</strong></div>
-    </div>
-  </div>
+  <div class="card"><div class="card-title">主线参与策略</div><div class="ml-main"><div class="ml-score ml-tone-strong"><span class="ml-score-num">100</span><span class="ml-score-label">主线强度</span></div><div class="ml-desc">强势主线·积极参与</div></div><div class="ml-block"><div class="ml-h">📊 当前主线板块</div><div class="ml-row"><span class="ml-rank">1</span><span class="ml-name">种植业</span><span class="ml-pct up">+9.98%</span><span class="ml-count">涨停 3家 / 4板家</span><span class="ml-lead">亚盛集团</span></div><div class="ml-row"><span class="ml-rank">2</span><span class="ml-name">一般零售</span><span class="ml-pct up">+10.00%</span><span class="ml-count">涨停 2家 / 4板家</span><span class="ml-lead">百大集团</span></div><div class="ml-row"><span class="ml-rank">3</span><span class="ml-name">出版</span><span class="ml-pct up">+13.31%</span><span class="ml-count">涨停 3家 / 3板家</span><span class="ml-lead">中国出版</span></div></div><div class="ml-block"><div class="ml-h">🎯 参与策略</div><div class="ml-strategy">主线强势,聚焦前3板块龙头,回踩MA10低吸参与</div><div class="ml-strategy-detail">涨停总数 <b>73</b> 家 · 炸板率 <b>0%</b> · 总仓位 40-60%,单股不超过 15%</div></div><div class="ml-block"><div class="ml-h">⚠️ 风险提示</div><div class="ml-risk-item"><span class="ml-risk-name">高位连板股(连板≥4)</span><span class="ml-risk-logic">当前连板≥4 共 3 只,承接强度需复核</span></div><div class="ml-risk-item"><span class="ml-risk-name">当日炸板股</span><span class="ml-risk-logic">近 0 只炸板,分歧加大</span></div><div class="ml-risk-item"><span class="ml-risk-name">北证/微盘股</span><span class="ml-risk-logic">波动放大+流动性敏感</span></div></div></div>
   <div class="card">
     <div class="card-title">当前最强主线方向 <span class="card-sub">点击板块查看可观察个股</span></div>
     <div class="md-list"><div class="md-card">

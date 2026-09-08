@@ -1332,34 +1332,65 @@ function renderPerStockTodayStrategy(s) {
 }
 
 function renderPremarketStrategy(report) {
+  const mainRank = report.mainRank || [];
   const pb = report.playbook || {};
   const off = (pb.offense || []).slice(0, 4);
   const def = (pb.defense || []).slice(0, 3);
   const pit = (pb.pitfall || []).slice(0, 3);
+  const ms = report.marketStats || {};
+  const totalZT = ms.limitUpCount || 0;
+  const zhaBan = ms.zhaBanCount || 0;
+  // 主线强度评分:基于前 3 主线板块的涨停数 + 涨幅 + 主线确认状态
+  const top3 = mainRank.slice(0, 3);
+  let mainScore = 0, mainDesc = '', mainTone = '';
+  if (top3.length) {
+    const totalCount = top3.reduce((s, r) => s + (Number(r.limitUpMax) || 0), 0);
+    const avgPct = top3.reduce((s, r) => s + (Number(r.changePct) || 0), 0) / top3.length;
+    const confirmed = top3.filter(r => r.status === '主线确认').length;
+    mainScore = Math.min(100, Math.round(avgPct * 5 + totalCount * 2 + confirmed * 15));
+    if (mainScore >= 80) { mainDesc = '强势主线·积极参与'; mainTone = 'strong'; }
+    else if (mainScore >= 60) { mainDesc = '主线确立·稳步参与'; mainTone = 'mid'; }
+    else if (mainScore >= 40) { mainDesc = '主线初现·谨慎观察'; mainTone = 'wait'; }
+    else { mainDesc = '主线分散·等待确认'; mainTone = 'weak'; }
+  }
+  // 主线板块行(排除涨停·优先可观察)
   const fmtPick = (pk) => {
     const cls = upDownClass(pk.pct);
-    return `<span class="str-pick"><b>${esc(pk.name)}</b><span class="${cls}">${fmtPct(pk.pct)}</span></span>`;
+    return '<span class="str-pick"><b>' + esc(pk.name) + '</b><span class="' + cls + '">' + fmtPct(pk.pct) + '</span></span>';
   };
   const pickLine = (o) => {
     const picks = (Array.isArray(o.picks) ? o.picks : []).slice(0, 3);
     if (!picks.length) return '';
     return '<div class="str-picks"><span class="str-picks-tag">排除涨停 · 优先可观察</span>' + picks.map(fmtPick).join('') + '</div>';
   };
-  const offRows = off.map(o => `<div class="str-line"><b>${esc(o.name)}</b> 涨停 ${o.count || 0}家 / ${o.maxLB || 0}板 · 领涨 ${esc(o.leadStock || '--')}</div>${pickLine(o)}`).join('') || '<div class="hint">暂无进攻方向</div>';
-  const defRows = def.map(d => `<div class="str-line"><b>${esc(d.name)}</b> ${esc(d.logic || '')}</div>`).join('') || '<div class="hint">暂无防守方向</div>';
-  const pitRows = pit.map(p => `<div class="str-line pit"><b>${esc(p.name)}</b> ${esc(p.logic || '')}</div>`).join('') || '<div class="hint">暂无风险提示</div>';
-  return `<div class="card">
-    <div class="card-title">策略状态</div>
-    <div class="str-block">
-      <div class="str-h">⚔️ 进攻方向</div>${offRows}
-    </div>
-    <div class="str-block">
-      <div class="str-h">🛡️ 防守方向</div>${defRows}
-    </div>
-    <div class="str-block">
-      <div class="str-h">⚠️ 风险提示</div>${pitRows}
-    </div>
-  </div>`;
+  const mainRows = top3.map((r, i) => {
+    const cls = upDownClass(r.changePct);
+    return '<div class="ml-row"><span class="ml-rank">' + (i + 1) + '</span><span class="ml-name">' + esc(r.mappedName || r.name) + '</span><span class="ml-pct ' + cls + '">' + fmtPct(r.changePct) + '</span><span class="ml-count">涨停 ' + (r.limitUpMax || 0) + '家</span><span class="ml-lead">' + esc(r.leadStock || '--') + '</span></div>';
+  }).join('') || '<div class="hint">暂无主线数据</div>';
+  // 参与策略:基于主线强度 + 涨停数 + 炸板率
+  const zhaBanRate = totalZT + zhaBan > 0 ? Math.round(zhaBan / (totalZT + zhaBan) * 100) : 0;
+  let strategyText = '', posText = '', riskText = '';
+  if (mainScore >= 70) {
+    strategyText = '主线强势,聚焦前3板块龙头,回踩MA10低吸参与';
+    posText = '总仓位 40-60%,单股不超过 15%';
+    riskText = '高位追涨风险,板块轮动加速时注意止盈';
+  } else if (mainScore >= 45) {
+    strategyText = '主线初步确立,轻仓试错,优先选择板块领涨股';
+    posText = '总仓位 20-40%,单股不超过 10%';
+    riskText = '主线分化风险,若板块涨停数减少需减仓';
+  } else {
+    strategyText = '主线分散,以观望为主,等待成交量确认后再入场';
+    posText = '总仓位 10-20%,仅保留观察仓';
+    riskText = '市场方向不明确,谨防追高回落';
+  }
+  const riskHtml = pit.length ? pit.map(p => '<div class="ml-risk-item"><span class="ml-risk-name">' + esc(p.name) + '</span><span class="ml-risk-logic">' + esc(p.logic || '') + '</span></div>').join('') : '<div class="ml-risk-item">暂无</div>';
+  return '<div class="card">' +
+    '<div class="card-title">主线参与策略</div>' +
+    '<div class="ml-main"><div class="ml-score ml-tone-' + mainTone + '"><span class="ml-score-num">' + mainScore + '</span><span class="ml-score-label">主线强度</span></div><div class="ml-desc">' + mainDesc + '</div></div>' +
+    '<div class="ml-block"><div class="ml-h">📊 当前主线板块</div>' + mainRows + '</div>' +
+    '<div class="ml-block"><div class="ml-h">🎯 参与策略</div><div class="ml-strategy">' + esc(strategyText) + '</div><div class="ml-strategy-detail">涨停总数 <b>' + totalZT + '</b> 家 · 炸板率 <b>' + zhaBanRate + '%</b> · ' + esc(posText) + '</div></div>' +
+    '<div class="ml-block"><div class="ml-h">⚠️ 风险提示</div>' + riskHtml + '</div>' +
+    '</div>';
 }
 
 function renderPremarketCockpit(report) {
@@ -1473,7 +1504,6 @@ ${renderHero(report)}
   ${renderWatchlist(report)}
   ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report)}
-  ${renderIndices(report)}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
   ${renderStockResearch(report)}

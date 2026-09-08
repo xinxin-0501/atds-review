@@ -299,7 +299,7 @@
 .modal-box .modal-b{font-size:11px;color:#444;line-height:1.6;background:#fafafa;border-radius:8px;padding:8px 10px}
 .modal-box .modal-footer{background:#fafafa;padding:10px 16px;font-size:9px;color:#999;border-top:1px solid #f0f0f0;text-align:center}
 /* v16: 每只股票独立卡片(自带表头+数据+拉杆+详情) */
-.wl-stocks{display:flex;flex-direction:column;gap:10px}
+.wl-stocks{display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:460px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .wl-stock{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0}
 .wl-stock-scroll{display:block;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%}
 .wl-stock-scroll::-webkit-scrollbar{height:5px}

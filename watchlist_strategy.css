@@ -946,3 +946,30 @@
   .tw-d-pick { font-size: 11px; padding: 1px 8px; }
   .tw-d-reason { font-size: 11px; padding: 6px 10px; }
 }
+
+/* ============ 主线参与策略 (2026-09-08) ============ */
+.ml-main { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: linear-gradient(135deg, rgba(122,90,248,0.06), rgba(34,211,238,0.04)); border-radius: 8px; margin-bottom: 10px; }
+.ml-score { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.ml-score-num { font-size: 28px; font-weight: 800; line-height: 1; }
+.ml-score-label { font-size: 9px; color: #64748b; font-weight: 600; }
+.ml-tone-strong .ml-score-num { color: #16a34a; }
+.ml-tone-mid .ml-score-num { color: #0284c7; }
+.ml-tone-wait .ml-score-num { color: #f59e0b; }
+.ml-tone-weak .ml-score-num { color: #94a3b8; }
+.ml-desc { font-size: 14px; font-weight: 700; color: #0f172a; }
+.ml-block { margin-bottom: 10px; }
+.ml-h { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 6px; padding-left: 6px; border-left: 3px solid #e11d48; }
+.ml-row { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: #fff; border: 1px solid rgba(100,116,139,0.1); border-radius: 6px; margin-bottom: 4px; font-size: 12px; }
+.ml-rank { background: #e11d48; color: #fff; font-size: 10px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ml-name { font-weight: 600; color: #0f172a; min-width: 0; flex: 1; }
+.ml-pct { font-weight: 600; font-size: 11px; }
+.ml-pct.up { color: #e11d48; }
+.ml-pct.down { color: #16a34a; }
+.ml-count { font-size: 10px; color: #64748b; }
+.ml-lead { font-size: 10px; color: #64748b; }
+.ml-strategy { font-size: 13px; font-weight: 600; color: #0f172a; padding: 8px 10px; background: rgba(34,197,94,0.08); border-radius: 6px; border-left: 3px solid #16a34a; margin-bottom: 6px; }
+.ml-strategy-detail { font-size: 11px; color: #64748b; padding: 4px 10px; }
+.ml-strategy-detail b { color: #0f172a; }
+.ml-risk-item { display: flex; gap: 8px; padding: 5px 8px; background: rgba(225,29,72,0.05); border-radius: 4px; margin-bottom: 3px; font-size: 11px; }
+.ml-risk-name { font-weight: 700; color: #e11d48; flex-shrink: 0; }
+.ml-risk-logic { color: #475569; }
