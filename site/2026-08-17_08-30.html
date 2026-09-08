@@ -44,7 +44,7 @@
 .modal-rating{display:flex;align-items:center;gap:6px;margin:8px 0}
 .modal-rating-stars{color:#c33;font-size:14px}
 .modal-rating-text{font-size:11px;color:#666}
-.watchlist-card{padding:14px 12px;margin:0;overflow:hidden;position:relative}
+.watchlist-card{padding:14px 12px;margin:0;overflow:hidden;position:relative;max-height:88vh;display:flex;flex-direction:column}
 .wl-table-body{display:block;overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
 .wl-table{width:max-content;min-width:100%;max-width:100%;table-layout:auto;border-collapse:collapse}
 .wl-table td,.wl-table th{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;padding:8px 6px;border-bottom:1px dashed #f5f5f5;font-size:11px}
@@ -305,15 +305,16 @@
 .modal-box .modal-b{font-size:11px;color:#444;line-height:1.6;background:#fafafa;border-radius:8px;padding:8px 10px}
 .modal-box .modal-footer{background:#fafafa;padding:10px 16px;font-size:9px;color:#999;border-top:1px solid #f0f0f0;text-align:center}
 /* v16: 每只股票独立卡片(自带表头+数据+拉杆+详情) */
-.wl-stocks{display:flex;flex-direction:column;gap:10px}
+.wl-stocks{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow:hidden}
 /* v17: 观察池可上下滚动容器(右侧滚动条+首条默认可见+提示徽章) */
-.wl-stocks-scroll{overflow-y:auto;max-height:380px;-webkit-overflow-scrolling:touch;scrollbar-width:6px;padding-right:4px;border-radius:6px;background:rgba(56,189,248,0.02)}
+.wl-stocks-scroll{overflow-y:auto;overflow-x:hidden;max-height:none;height:100%;-webkit-overflow-scrolling:touch;scrollbar-width:6px;padding-right:4px;border-radius:6px;background:rgba(56,189,248,0.02);min-height:220px}
 .wl-stocks-scroll::-webkit-scrollbar{width:6px;background:rgba(56,189,248,0.04);border-radius:3px}
 .wl-stocks-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#38bdf8,#0ea5e9);border-radius:3px;border:1px solid rgba(255,255,255,0.4)}
 .wl-stocks-scroll::-webkit-scrollbar-track{background:rgba(56,189,248,0.06);border-radius:3px}
-.wl-stocks-scroll-wrap{position:relative}
-.wl-stocks-scroll-wrap::after{content:"↕ 上下滚动";position:absolute;right:6px;top:6px;font-size:9px;color:#0284c7;background:rgba(186,230,253,0.85);padding:1px 5px;border-radius:8px;pointer-events:none;z-index:2;font-weight:600;letter-spacing:0.5px}
+.wl-stocks-scroll-wrap{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid rgba(56,189,248,0.15);border-radius:8px;background:linear-gradient(180deg,rgba(56,189,248,0.03),rgba(56,189,248,0.01))}
+.wl-stocks-scroll-wrap::after{content:"↕ 上下滚动查看更多";position:absolute;right:8px;top:8px;font-size:10px;color:#fff;background:linear-gradient(135deg,#0ea5e9,#0284c7);padding:2px 8px;border-radius:10px;pointer-events:none;z-index:3;font-weight:700;letter-spacing:0.5px;box-shadow:0 2px 4px rgba(2,132,199,0.3);animation:pulse-badge 2s ease-in-out infinite}
 .wl-stocks-scroll-wrap::before{content:"";position:absolute;right:0;top:0;bottom:0;width:8px;background:linear-gradient(90deg,transparent,rgba(56,189,248,0.05));pointer-events:none;border-radius:0 6px 6px 0;z-index:1}
+@keyframes pulse-badge{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.85;transform:scale(1.03)}}
 .wl-stock{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0}
 .wl-stock-scroll{display:block;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%}
 .wl-stock-scroll::-webkit-scrollbar{height:5px}
@@ -2018,7 +2019,7 @@
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 83°</span></div></div>
 <div class="section">
-  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-08-17 13:00:38</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 · 右侧 ↕ 上下滚动查看更多个股</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-08-17 13:00:38</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 · 右侧 ↕ 上下滚动查看更多个股 · 第一只股票始终固定可见</div><div class="wl-stocks"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -2039,7 +2040,7 @@
     
     
     
-  </div></div></div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
+  </div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报
 tags: [ATDS, 交易复盘]
 ---

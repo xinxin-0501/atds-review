@@ -1334,7 +1334,10 @@ function buildStockModal(s) {
 function renderWatchlist(report) {
   const list = report.watchlist || [];
   const time = (report.meta && report.meta.generatedAt) || '';
-  const stocks = list.map((s, idx) => buildStockRow(s, idx, report)).join('');
+  // 第一只股票固定显示在顶部(图2),其余在可滚动容器里
+  const firstStock = list.length > 0 ? buildStockRow(list[0], 0, report) : '';
+  const restStocks = list.length > 1 ? list.slice(1).map((s, idx) => buildStockRow(s, idx + 1, report)).join('') : '';
+  const scrollWrap = restStocks ? '<div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll">' + restStocks + '</div></div>' : '';
   const head = '<div class="card watchlist-card">' +
     '<div class="wl-header">' +
       '<div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● ' + esc(time) + '</span></div>' +
@@ -1345,8 +1348,8 @@ function renderWatchlist(report) {
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
       '</div>' +
     '</div>' +
-    '<div class="wl-scroll-hint">← 左右滑动查看全部列 · 右侧 ↕ 上下滚动查看更多个股</div>' +
-    '<div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll">' + stocks + '</div></div></div>' +
+    '<div class="wl-scroll-hint">← 左右滑动查看全部列 · 右侧 ↕ 上下滚动查看更多个股 · 第一只股票始终固定可见</div>' +
+    '<div class="wl-stocks">' + firstStock + scrollWrap + '</div>' +
     '<div class="wl-details"></div>' +
     '</div>';
   const modals = '';  // v12b: 不再静态生成个股 modal,统一由 openStockResearch/showDynamicResearch 动态生成,避免 id 重复导致关闭失效
