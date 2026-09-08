@@ -3,9 +3,6 @@
 <head data-page-node-id="DnfefRhyc2hwNUiiYuot18">
 <meta charset="UTF-8" data-page-node-id="NDTh41KAOFdsNgMjAn4sz6">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" data-page-node-id="zjkDVkPfmuMyzOP4twkugA">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" data-page-node-id="278TVnMxSMR3r9KHel7WSO">
-<meta http-equiv="Pragma" content="no-cache" data-page-node-id="RAfnip1xcU4lbuCJFHJjuU">
-<meta http-equiv="Expires" content="0" data-page-node-id="5rxyPQknPaeSB8BCKziR81">
 <title>观察池 v5 独立版</title>
 <style>
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -2120,6 +2117,124 @@ body { margin: 0; padding: 8px; font-family: -apple-system, BlinkMacSystemFont, 
   .mm-grid { grid-template-columns: 1fr; }
 }
 </style>
+<style id="atds-v8-mobile-scroll">
+/* v8 强滚修复 — 2026-09-09 — 单层滚动 + 详情移出 */
+.watchlist-card{overflow:hidden;padding:14px 12px;margin:0;position:relative}
+.wl-stocks{
+  display:block!important;
+  flex:none!important;
+  max-height:480px!important;
+  height:auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch;
+  border:1px solid rgba(56,189,248,0.15);
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(56,189,248,0.03),rgba(56,189,248,0.01));
+  padding:8px 6px;
+  position:relative;
+}
+.wl-stocks-scroll-wrap{
+  position:static!important;
+  display:block!important;
+  height:auto!important;
+  max-height:none!important;
+  min-height:0!important;
+  overflow:visible!important;
+  border:none!important;
+  background:none!important;
+  border-radius:0!important;
+  flex:none!important;
+}
+.wl-stocks-scroll{
+  display:block!important;
+  height:auto!important;
+  max-height:none!important;
+  min-height:0!important;
+  overflow:visible!important;
+  background:none!important;
+  padding-right:0!important;
+  border-radius:0!important;
+}
+/* 滚动条美化 */
+.wl-stocks::-webkit-scrollbar{width:6px}
+.wl-stocks::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#0ea5e9,#0284c7);border-radius:3px}
+.wl-stocks::-webkit-scrollbar-track{background:rgba(56,189,248,0.05)}
+/* 顶部 sticky 提示 */
+.wl-stocks::before{
+  content:"↕ 上下滚动查看 11 只个股 · ← → 左右滑动 7 列";
+  position:sticky;
+  top:0;
+  display:block;
+  text-align:center;
+  font-size:10px;
+  color:#fff;
+  background:linear-gradient(135deg,#0ea5e9,#0284c7);
+  padding:3px 8px;
+  border-radius:10px;
+  margin:0 0 6px 0;
+  font-weight:700;
+  letter-spacing:0.5px;
+  box-shadow:0 2px 4px rgba(2,132,199,0.3);
+  z-index:2;
+  pointer-events:none;
+}
+.wl-stocks-scroll-wrap::after{display:none!important}
+.wl-stocks-scroll-wrap::before{display:none!important}
+/* 第 2-11 只股的详情折叠(只显示标题行) */
+.wl-stocks .wl-stock:not(:first-child) .wl-detail,
+.wl-stocks .wl-stock:not(:first-child) .ts-stock-card{
+  display:none!important;
+}
+/* 第 1 只股详情(已移出到 .wl-stocks 之后)的样式微调 */
+.watchlist-card > .wl-detail:first-of-type,
+.watchlist-card > .ts-stock-card:first-of-type{
+  margin-top:10px;
+}
+/* 移动端更紧凑 */
+@media (max-width:640px){
+  .wl-stocks{max-height:420px!important;padding:6px 4px}
+}
+</style>
+<script id="atds-v8-mobile-fix-js">
+/* v8 JS — 把第 1 只股的 .wl-detail + .ts-stock-card 移出滚动容器到 .wl-stocks 之后 */
+(function(){
+  function fix(){
+    var cards = document.querySelectorAll('.watchlist-card');
+    cards.forEach(function(card){
+      var stocksEl = card.querySelector('.wl-stocks');
+      if (!stocksEl) return;
+      var stocks = stocksEl.querySelectorAll(':scope > .wl-stocks-scroll-wrap > .wl-stocks-scroll > .wl-stock, :scope > .wl-stock');
+      // 兼容：直接 .wl-stocks > .wl-stock
+      if (!stocks.length) stocks = stocksEl.querySelectorAll('.wl-stock');
+      if (stocks.length < 1) return;
+      var first = stocks[0];
+      var det = first.querySelector('.wl-detail');
+      var ts = first.querySelector('.ts-stock-card');
+      // 标记第 1 只
+      first.classList.add('wl-stock-active');
+      // 把第 1 只的详情移到 .wl-stocks 之后(watchlist-card 内,卡片底部)
+      if (det && det.parentNode === first) {
+        stocksEl.parentNode.insertBefore(det, stocksEl.nextSibling);
+      }
+      if (ts && ts.parentNode === first) {
+        // 多个 ts-stock-card 一起移
+        var tsAll = first.querySelectorAll('.ts-stock-card');
+        tsAll.forEach(function(t){ stocksEl.parentNode.insertBefore(t, stocksEl.nextSibling); });
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fix);
+  } else {
+    fix();
+  }
+})();
+</script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 </head>
 <body data-page-node-id="1m5SHaIhdZzXqBCxPnfbu1">
 <div class="cache-banner" data-page-node-id="GQEYJN45IviKdg28dVYMjQ">
@@ -2127,7 +2242,7 @@ body { margin: 0; padding: 8px; font-family: -apple-system, BlinkMacSystemFont, 
   这是绕过缓存的独立页面,11 只股票在同一个 max-height:480px 滚动容器内<br data-page-node-id="SL1capDokGq7d3PJB9gRGn">
   URL 全新,绝对不被浏览器缓存 · 如果看不到下方滚动容器,请用无痕模式访问
 </div>
-card watchlist-card"><div class="wl-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:10px;border-bottom:1px solid #f0f0f0;flex-shrink:0;" data-page-node-id="AeFS0ZtZb0xMVhCXrva5Cp"><div class="wl-title" style="font-size:13px;font-weight:700;color:#333;flex:1;min-width:200px;" data-page-node-id="yXuuPY448HhGZkFICa4vxN">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);" data-page-node-id="Ek8roJ2Rj212uQugT9V3sw">v5独立版</span> <span class="wl-time" data-page-node-id="EbYDxF9BFzMAER3GEljYjW">● 2026-09-08 21:05:19</span></div><div class="wl-tools" data-page-node-id="Pikl77XwGuZnHM3UwdspZh"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric" data-page-node-id="dAtWeKTsFFAI528rNFMg8j"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()" data-page-node-id="DUxHvIxtI4cPJT1kyJhTrz">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()" data-page-node-id="DAnB1nYZw7kAlokEdWb9xH">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')" data-page-node-id="POi14GbKRgUnNKsBiryjec">↥ 批量导入</button></div></div><div class="wl-scroll-hint" data-page-node-id="oRGzl3ZVmTY9Q2uilySpbC">← 左右滑动查看全部列 · ↕ 上下滚动查看更多个股</div><div class="wl-stocks" style="display:block;" data-page-node-id="x1THRSvOFeyMPg0VcE5RAe"><div <div style="position:absolute;right:8px;top:8px;font-size:10px;color:#fff;background:linear-gradient(135deg,#0ea5e9,#0284c7);padding:2px 8px;border-radius:10px;z-index:3;font-weight:700;letter-spacing:0.5px;box-shadow:0 2px 4px rgba(2,132,199,0.3);" data-page-node-id="JwqTfgVSUQmKp8tzmaKG1h">↕ 上下滚动查看更多</div><div class="wl-stocks-scroll-wrap" style="position:relative;flex:0 1 auto;min-height:220px;max-height:480px;overflow:hidden;border:1px solid rgba(56,189,248,0.15);border-radius:8px;background:linear-gradient(180deg,rgba(56,189,248,0.03),rgba(56,189,248,0.01));margin-top:10px;" data-page-node-id="uIFEpyiokwha07VNiDJp4l"><div class="wl-stocks-scroll" style="height:100%;max-height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:6px;padding-right:4px;border-radius:6px;background:rgba(56,189,248,0.02);min-height:200px;" data-page-node-id="sCFwkFa2DHzQ7TlnD0GbX8"><div class="wl-stock" data-stock-code="600487" data-page-node-id="WzYvGQD2scgheMcb8OcC19"><div class="wl-stock-scroll" data-page-node-id="X7TsDZMl5o31Z5v914S2CL"><div class="wl-stock-row wl-stock-head" data-page-node-id="xJuWI9LmGzDzHTUo9tDfZy">
+card watchlist-card"><div class="wl-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:10px;border-bottom:1px solid #f0f0f0;flex-shrink:0;" data-page-node-id="AeFS0ZtZb0xMVhCXrva5Cp"><div class="wl-title" style="font-size:13px;font-weight:700;color:#333;flex:1;min-width:200px;" data-page-node-id="yXuuPY448HhGZkFICa4vxN">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);" data-page-node-id="Ek8roJ2Rj212uQugT9V3sw">v5独立版</span> <span class="wl-time" data-page-node-id="EbYDxF9BFzMAER3GEljYjW">● 2026-09-08 21:05:19</span></div><div class="wl-tools" data-page-node-id="Pikl77XwGuZnHM3UwdspZh"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric" data-page-node-id="dAtWeKTsFFAI528rNFMg8j"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()" data-page-node-id="DUxHvIxtI4cPJT1kyJhTrz">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()" data-page-node-id="DAnB1nYZw7kAlokEdWb9xH">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')" data-page-node-id="POi14GbKRgUnNKsBiryjec">↥ 批量导入</button></div></div><div class="wl-scroll-hint" data-page-node-id="oRGzl3ZVmTY9Q2uilySpbC">← 左右滑动查看全部列 · ↕ 上下滚动查看更多个股</div><div class="wl-stocks" style="display:block;" data-page-node-id="x1THRSvOFeyMPg0VcE5RAe"><div <div style="position:absolute;right:8px;top:8px;font-size:10px;color:#fff;background:linear-gradient(135deg,#0ea5e9,#0284c7);padding:2px 8px;border-radius:10px;z-index:3;font-weight:700;letter-spacing:0.5px;box-shadow:0 2px 4px rgba(2,132,199,0.3);" data-page-node-id="JwqTfgVSUQmKp8tzmaKG1h">↕ 上下滚动查看更多</div><div class="wl-stocks-scroll-wrap" style="position:relative;flex:0 1 auto;min-height:220px;max-height:480px;overflow:hidden;border:1px solid rgba(56,189,248,0.15);border-radius:8px;background:linear-gradient(180deg,rgba(56,189,248,0.03),rgba(56,189,248,0.01));margin-top:10px;" data-page-node-id="uIFEpyiokwha07VNiDJp4l"><div class="wl-stocks-scroll" style="height:100%;max-height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:6px;padding-right:4px;border-radius:6px;background:rgba(56,189,248,0.02);min-height:200px;" data-page-node-id="sCFwkFa2DHzQ7TlnD0GbX8"><div class="wl-stock" data-stock-code="600487" data-page-node-id="WzYvGQD2scgheMcb8OcC19"><div class="wl-stock-scroll" data-page-node-id="X7TsDZMl5o31Z5v914S2CL"><div class="wl-stock-row wl-stock-head" data-page-node-id="xJuWI9LmGzDzHTUo9tDfZy">
     <span class="wl-cell wl-cell-rank" data-page-node-id="Q6iQz67Z0raEC5TrR2r3zi"><b data-page-node-id="0MWH2zkcG5ww739UGMn5mu">排名/标的</b></span>
     <span class="wl-cell wl-cell-price" data-page-node-id="EB1f9D4Gr1JliSEKofKvQq"><b data-page-node-id="Hm7H93rcdohDCnT4SXUo6l">最新价</b></span>
     <span class="wl-cell wl-cell-pct" data-page-node-id="5irBNnHveSDDsgrnESoGvE"><b data-page-node-id="5P0VeQZCobKXvdbBqEUqiF">涨跌幅</b></span>

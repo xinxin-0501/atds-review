@@ -301,7 +301,7 @@
 /* v16: 每只股票独立卡片(自带表头+数据+拉杆+详情) */
 .wl-stocks{display:flex;flex-direction:column;gap:10px;flex:0 1 auto;min-height:0;overflow:hidden}
 /* v17: 观察池可上下滚动容器(右侧滚动条+首条默认可见+提示徽章) */
-.wl-stocks-scroll{overflow-y:auto;overflow-x:hidden;height:100%;max-height:100%;-webkit-overflow-scrolling:touch;scrollbar-width:6px;padding-right:4px;border-radius:6px;background:rgba(56,189,248,0.02);min-height:200px}
+.wl-stocks-scroll{overflow-y:auto;overflow-x:hidden;height:auto;max-height:480px;-webkit-overflow-scrolling:touch;scrollbar-width:6px;padding-right:4px;border-radius:6px;background:rgba(56,189,248,0.02);min-height:200px}
 .wl-stocks-scroll::-webkit-scrollbar{width:6px;background:rgba(56,189,248,0.04);border-radius:3px}
 .wl-stocks-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#38bdf8,#0ea5e9);border-radius:3px;border:1px solid rgba(255,255,255,0.4)}
 .wl-stocks-scroll::-webkit-scrollbar-track{background:rgba(56,189,248,0.06);border-radius:3px}

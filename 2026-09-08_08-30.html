@@ -3,7 +3,7 @@
 <head data-page-node-id="PY8tJnrkz3zxnjvA40MUai">
 <meta charset="UTF-8" data-page-node-id="MW63czsiyDSTEUQcLgPRy3">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="peyarjyX5AiLkL7NWzZeL7">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" data-page-node-id="XIm1PCHzchpDl2BZpoWokn"><meta http-equiv="Pragma" content="no-cache" data-page-node-id="1v09jendXRxnw8HnhjYcT1"><meta http-equiv="Expires" content="0" data-page-node-id="zDDv8IG1EUuyaG07I5wlDj"><title>ATDS PRO · 盘前简报</title>
+<title>ATDS PRO · 盘前简报</title>
 <style>.modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0}
 .modal-mask.show{display:flex}
 .modal{background:#fff;border-radius:20px;max-width:414px;width:92%;margin:0 auto;padding:0;overflow:hidden}
@@ -1695,6 +1695,124 @@
   .tw-d-reason { font-size: 11px; padding: 6px 10px; }
 }
 </style>
+<style id="atds-v8-mobile-scroll">
+/* v8 强滚修复 — 2026-09-09 — 单层滚动 + 详情移出 */
+.watchlist-card{overflow:hidden;padding:14px 12px;margin:0;position:relative}
+.wl-stocks{
+  display:block!important;
+  flex:none!important;
+  max-height:480px!important;
+  height:auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  -webkit-overflow-scrolling:touch;
+  border:1px solid rgba(56,189,248,0.15);
+  border-radius:8px;
+  background:linear-gradient(180deg,rgba(56,189,248,0.03),rgba(56,189,248,0.01));
+  padding:8px 6px;
+  position:relative;
+}
+.wl-stocks-scroll-wrap{
+  position:static!important;
+  display:block!important;
+  height:auto!important;
+  max-height:none!important;
+  min-height:0!important;
+  overflow:visible!important;
+  border:none!important;
+  background:none!important;
+  border-radius:0!important;
+  flex:none!important;
+}
+.wl-stocks-scroll{
+  display:block!important;
+  height:auto!important;
+  max-height:none!important;
+  min-height:0!important;
+  overflow:visible!important;
+  background:none!important;
+  padding-right:0!important;
+  border-radius:0!important;
+}
+/* 滚动条美化 */
+.wl-stocks::-webkit-scrollbar{width:6px}
+.wl-stocks::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#0ea5e9,#0284c7);border-radius:3px}
+.wl-stocks::-webkit-scrollbar-track{background:rgba(56,189,248,0.05)}
+/* 顶部 sticky 提示 */
+.wl-stocks::before{
+  content:"↕ 上下滚动查看 11 只个股 · ← → 左右滑动 7 列";
+  position:sticky;
+  top:0;
+  display:block;
+  text-align:center;
+  font-size:10px;
+  color:#fff;
+  background:linear-gradient(135deg,#0ea5e9,#0284c7);
+  padding:3px 8px;
+  border-radius:10px;
+  margin:0 0 6px 0;
+  font-weight:700;
+  letter-spacing:0.5px;
+  box-shadow:0 2px 4px rgba(2,132,199,0.3);
+  z-index:2;
+  pointer-events:none;
+}
+.wl-stocks-scroll-wrap::after{display:none!important}
+.wl-stocks-scroll-wrap::before{display:none!important}
+/* 第 2-11 只股的详情折叠(只显示标题行) */
+.wl-stocks .wl-stock:not(:first-child) .wl-detail,
+.wl-stocks .wl-stock:not(:first-child) .ts-stock-card{
+  display:none!important;
+}
+/* 第 1 只股详情(已移出到 .wl-stocks 之后)的样式微调 */
+.watchlist-card > .wl-detail:first-of-type,
+.watchlist-card > .ts-stock-card:first-of-type{
+  margin-top:10px;
+}
+/* 移动端更紧凑 */
+@media (max-width:640px){
+  .wl-stocks{max-height:420px!important;padding:6px 4px}
+}
+</style>
+<script id="atds-v8-mobile-fix-js">
+/* v8 JS — 把第 1 只股的 .wl-detail + .ts-stock-card 移出滚动容器到 .wl-stocks 之后 */
+(function(){
+  function fix(){
+    var cards = document.querySelectorAll('.watchlist-card');
+    cards.forEach(function(card){
+      var stocksEl = card.querySelector('.wl-stocks');
+      if (!stocksEl) return;
+      var stocks = stocksEl.querySelectorAll(':scope > .wl-stocks-scroll-wrap > .wl-stocks-scroll > .wl-stock, :scope > .wl-stock');
+      // 兼容：直接 .wl-stocks > .wl-stock
+      if (!stocks.length) stocks = stocksEl.querySelectorAll('.wl-stock');
+      if (stocks.length < 1) return;
+      var first = stocks[0];
+      var det = first.querySelector('.wl-detail');
+      var ts = first.querySelector('.ts-stock-card');
+      // 标记第 1 只
+      first.classList.add('wl-stock-active');
+      // 把第 1 只的详情移到 .wl-stocks 之后(watchlist-card 内,卡片底部)
+      if (det && det.parentNode === first) {
+        stocksEl.parentNode.insertBefore(det, stocksEl.nextSibling);
+      }
+      if (ts && ts.parentNode === first) {
+        // 多个 ts-stock-card 一起移
+        var tsAll = first.querySelectorAll('.ts-stock-card');
+        tsAll.forEach(function(t){ stocksEl.parentNode.insertBefore(t, stocksEl.nextSibling); });
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fix);
+  } else {
+    fix();
+  }
+})();
+</script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 </head>
 <body data-page-node-id="mYfGHSP18r7BIDLbvilpA9">
 <div class="phone" data-page-node-id="A1fYOiJCZdCA8y5Wb4F4lA">
@@ -1712,7 +1830,7 @@
   </div>
 <div class="hero" data-page-node-id="cFtgYTQXYTEfoGY4YX2bB0"><div class="hero-eyebrow" data-page-node-id="IrX8Ts2BfhMEpaK8jNZHlv">A 股每日复盘 · 盘前简报</div><h1 class="hero-title" data-page-node-id="WO6lSLWy7zlsEEpVBrmf2P">2026-09-08 · <span class="hero-time" data-page-node-id="Cnq42NUfteVv9Pt21lD5vD">08:30</span></h1><div class="hero-sub" data-page-node-id="D6fG3jGsFjKzf3Iqara2Yr">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh" data-page-node-id="yDbZ9wBcAHGoqKsSSLUO2Z"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()" data-page-node-id="fn1aPDiUftnGnHLizoenq7">🔄 一键刷新最新数据</button></div><div class="hero-tags" data-page-node-id="PPfwGNIGbV0MiMPSo59ZOD"><span class="hero-temp-tag" data-page-node-id="kIuSndsTnkM42PCKkDr11o">高温区 · 82°</span></div></div>
 <div class="section" data-page-node-id="KNxSWysXt5UvTWBKiB9LTR">
-  <div class="card watchlist-card" data-page-node-id="Vhjn1Hl8d9n7DBuNbuTGYd"><div class="wl-header" data-page-node-id="2Z7PatzeXXmeB6sKIDEpOm"><div class="wl-title" data-page-node-id="acBrrIBiWDdTzLDqH7ZSuA">LIVE 我的实时观察池 <span class="wl-time" data-page-node-id="j0e4s043foSWPx2pSL34bj">● 2026-09-08 18:46:11</span></div><div class="wl-tools" data-page-node-id="CsJy6jaZoMfkPuANSxChBq"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric" data-page-node-id="xEb8YdkeiASHOHiJar9dbq"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()" data-page-node-id="TrO6DUYQuTzgA7uZGef2d0">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()" data-page-node-id="i9NLHqFG4uUy81dE9Xtl7q">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')" data-page-node-id="OSliTQIiB5DMYxk48TqIYy">↥ 批量导入</button></div></div><div class="wl-scroll-hint" data-page-node-id="vYPOuj4cIypizVYgeDnVrZ">← 左右滑动查看全部列 →</div><div class="wl-stocks" data-page-node-id="1Q9ygiozkcroED9wvCa9Y8"><div class="wl-stock" data-stock-code="600487" data-page-node-id="DxgXbKNZvgaAARgSSTje9e"><div class="wl-stock-scroll" data-page-node-id="eH8N2dzjyb42kSHXhcQpFF"><div class="wl-stock-row wl-stock-head" data-page-node-id="2Rj6O9Ru7MQCNcNmxSL1wd">
+  <div class="card watchlist-card" data-page-node-id="Vhjn1Hl8d9n7DBuNbuTGYd"><div class="wl-header" data-page-node-id="2Z7PatzeXXmeB6sKIDEpOm"><div class="wl-title" data-page-node-id="acBrrIBiWDdTzLDqH7ZSuA">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time" data-page-node-id="j0e4s043foSWPx2pSL34bj">● 2026-09-08 18:46:11</span></div><div class="wl-tools" data-page-node-id="CsJy6jaZoMfkPuANSxChBq"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric" data-page-node-id="xEb8YdkeiASHOHiJar9dbq"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()" data-page-node-id="TrO6DUYQuTzgA7uZGef2d0">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()" data-page-node-id="i9NLHqFG4uUy81dE9Xtl7q">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')" data-page-node-id="OSliTQIiB5DMYxk48TqIYy">↥ 批量导入</button></div></div><div class="wl-scroll-hint" data-page-node-id="vYPOuj4cIypizVYgeDnVrZ">← 左右滑动查看全部列 →</div><div class="wl-stocks" data-page-node-id="1Q9ygiozkcroED9wvCa9Y8"><div class="wl-stock" data-stock-code="600487" data-page-node-id="DxgXbKNZvgaAARgSSTje9e"><div class="wl-stock-scroll" data-page-node-id="eH8N2dzjyb42kSHXhcQpFF"><div class="wl-stock-row wl-stock-head" data-page-node-id="2Rj6O9Ru7MQCNcNmxSL1wd">
     <span class="wl-cell wl-cell-rank" data-page-node-id="Ik4qPN5OE9mDP63KxmPWxb"><b data-page-node-id="Uws7qfOd4iUP9TnVapNMCB">排名/标的</b></span>
     <span class="wl-cell wl-cell-price" data-page-node-id="ovlR8uL6DfkQaK3JnUTQDO"><b data-page-node-id="6EaCx52quaOKHOCwpVefD8">最新价</b></span>
     <span class="wl-cell wl-cell-pct" data-page-node-id="GfUJ65nBFUaLABucTFSCkO"><b data-page-node-id="3wqG9b4GoxZuJGUjpVHhLk">涨跌幅</b></span>
