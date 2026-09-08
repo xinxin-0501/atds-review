@@ -52,7 +52,7 @@ function renderHeader(report, nav) {
       </div>
     </div>
     <div class="time-nav">
-      <a href="${nav.home}">盘前</a><a href="${nav.midday}"${m.type === 'midday' ? ' class="active"' : ''}>午盘</a><a href="${nav.close}"${m.type === 'close' ? ' class="active"' : ''}>收盘</a><a href="${nav.latest}">复盘</a>
+      <a href="${nav.home}">盘前</a><a href="${nav.midday}"${m.type === 'midday' ? ' class="active"' : ''}>盘中</a><a href="${nav.close}"${m.type === 'close' ? ' class="active"' : ''}>收盘</a><a href="${nav.latest}">复盘</a>
     </div>
   </div>`;
 }
@@ -2232,12 +2232,12 @@ function renderIndex(reports) {
 </div>
 <div class="hero">
   <div class="hero-title">A股每日复盘工作台</div>
-  <div class="hero-sub">盘中 ${midT} / 收盘 ${cloT} 自动采集与渲染</div>
+  <div class="hero-sub">盘中 10:00 / 11:30 / 13:30 / 14:40 · 收盘 ${cloT} 自动采集</div>
 </div>
 <div class="section">
   <div class="tools">
     <a class="tool-btn" href="${preUrl}">盘前 ${preT} 简报 · ${pre ? pre.meta.date : ''}</a>
-    <a class="tool-btn" href="${midUrl}">盘中 ${midT} 快照 · ${mid ? mid.meta.date : ''}</a>
+    <a class="tool-btn" href="${midUrl}">盘中快照 · ${mid ? mid.meta.date : ''}</a>
     <a class="tool-btn" href="${cloUrl}">收盘 ${cloT} 复盘 · ${clo ? clo.meta.date : ''}</a>
     <a class="tool-btn" href="main-rank.html">主线实时校准</a>
     <button class="tool-btn qr-btn" onclick="showQr()">手机扫码打开</button>
