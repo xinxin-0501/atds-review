@@ -1108,7 +1108,7 @@ function renderWatchlist(report) {
       '</div>' +
     '</div>' +
     '<div class="wl-scroll-hint">← 左右滑动查看全部列 →</div>' +
-    '<div class="wl-stocks">' + stocks + '</div>' +
+    '<div class="wl-stocks"><div class="wl-stocks-scroll">' + stocks + '</div></div>' +
     '<div class="wl-details"></div>' +
     '</div>';
   const modals = '';  // v12b: 不再静态生成个股 modal,统一由 openStockResearch/showDynamicResearch 动态生成,避免 id 重复导致关闭失效
@@ -1332,64 +1332,49 @@ function renderPerStockTodayStrategy(s) {
 }
 
 function renderPremarketStrategy(report) {
-  const mainRank = report.mainRank || [];
-  const pb = report.playbook || {};
-  const off = (pb.offense || []).slice(0, 4);
-  const def = (pb.defense || []).slice(0, 3);
-  const pit = (pb.pitfall || []).slice(0, 3);
+  const mr = report.mainRank || [];
+  const playbook = report.playbook || {};
+  const off = (playbook.offense || []).slice(0, 5);
+  const pit = (playbook.pitfall || []).slice(0, 3);
   const ms = report.marketStats || {};
+  // 统计数据
   const totalZT = ms.limitUpCount || 0;
   const zhaBan = ms.zhaBanCount || 0;
-  // 主线强度评分:基于前 3 主线板块的涨停数 + 涨幅 + 主线确认状态
-  const top3 = mainRank.slice(0, 3);
-  let mainScore = 0, mainDesc = '', mainTone = '';
-  if (top3.length) {
-    const totalCount = top3.reduce((s, r) => s + (Number(r.limitUpMax) || 0), 0);
-    const avgPct = top3.reduce((s, r) => s + (Number(r.changePct) || 0), 0) / top3.length;
-    const confirmed = top3.filter(r => r.status === '主线确认').length;
-    mainScore = Math.min(100, Math.round(avgPct * 5 + totalCount * 2 + confirmed * 15));
-    if (mainScore >= 80) { mainDesc = '强势主线·积极参与'; mainTone = 'strong'; }
-    else if (mainScore >= 60) { mainDesc = '主线确立·稳步参与'; mainTone = 'mid'; }
-    else if (mainScore >= 40) { mainDesc = '主线初现·谨慎观察'; mainTone = 'wait'; }
-    else { mainDesc = '主线分散·等待确认'; mainTone = 'weak'; }
-  }
-  // 主线板块行(排除涨停·优先可观察)
-  const fmtPick = (pk) => {
-    const cls = upDownClass(pk.pct);
-    return '<span class="str-pick"><b>' + esc(pk.name) + '</b><span class="' + cls + '">' + fmtPct(pk.pct) + '</span></span>';
-  };
-  const pickLine = (o) => {
-    const picks = (Array.isArray(o.picks) ? o.picks : []).slice(0, 3);
-    if (!picks.length) return '';
-    return '<div class="str-picks"><span class="str-picks-tag">排除涨停 · 优先可观察</span>' + picks.map(fmtPick).join('') + '</div>';
-  };
-  const mainRows = top3.map((r, i) => {
-    const cls = upDownClass(r.changePct);
-    return '<div class="ml-row"><span class="ml-rank">' + (i + 1) + '</span><span class="ml-name">' + esc(r.mappedName || r.name) + '</span><span class="ml-pct ' + cls + '">' + fmtPct(r.changePct) + '</span><span class="ml-count">涨停 ' + (r.limitUpMax || 0) + '家</span><span class="ml-lead">' + esc(r.leadStock || '--') + '</span></div>';
-  }).join('') || '<div class="hint">暂无主线数据</div>';
-  // 参与策略:基于主线强度 + 涨停数 + 炸板率
   const zhaBanRate = totalZT + zhaBan > 0 ? Math.round(zhaBan / (totalZT + zhaBan) * 100) : 0;
-  let strategyText = '', posText = '', riskText = '';
-  if (mainScore >= 70) {
-    strategyText = '主线强势,聚焦前3板块龙头,回踩MA10低吸参与';
-    posText = '总仓位 40-60%,单股不超过 15%';
-    riskText = '高位追涨风险,板块轮动加速时注意止盈';
-  } else if (mainScore >= 45) {
-    strategyText = '主线初步确立,轻仓试错,优先选择板块领涨股';
-    posText = '总仓位 20-40%,单股不超过 10%';
-    riskText = '主线分化风险,若板块涨停数减少需减仓';
-  } else {
-    strategyText = '主线分散,以观望为主,等待成交量确认后再入场';
-    posText = '总仓位 10-20%,仅保留观察仓';
-    riskText = '市场方向不明确,谨防追高回落';
+  // 取前5个主线板块构建A-E类别
+  const top5 = mr.slice(0, 5);
+  const catNames = ['A', 'B', 'C', 'D', 'E'];
+  const catTitles = ['领涨主线', '强势题材', '资金聚焦', '轮动方向', '异动关注'];
+  let catSections = top5.map((s, i) => {
+    const nm = s.mappedName || s.name || '--';
+    const pct = Number(s.changePct) || 0;
+    const cls = upDownClass(pct);
+    const ztCnt = s.limitUpMax || 0;
+    const lead = s.leadStock || '--';
+    const picks = (s.picks || []).slice(0, 2);
+    const picksHtml = picks.length ? picks.map(p => {
+      const pc = upDownClass(p.pct);
+      return '<span class="em-pick"><b>' + esc(p.name) + '</b> <span class="' + pc + '">' + (p.pct > 0 ? '+' : '') + fmtPct(p.pct) + '</span></span>';
+    }).join('') : '';
+    return '<div class="em-cat"><div class="em-cat-h"><span class="em-cat-tag">' + catNames[i] + '</span><span class="em-cat-title">' + esc(nm) + '</span><span class="em-cat-status ' + cls + '">' + (s.status === '主线确认' ? '主线确认' : '轮动') + '</span></div>' +
+      '<div class="em-cat-body">涨停 <b>' + ztCnt + '</b>家 · 领涨 ' + esc(lead) + ' · 涨幅 <b class="' + cls + '">' + fmtPct(pct) + '</b></div>' +
+      (picksHtml ? '<div class="em-cat-picks">' + picksHtml + '</div>' : '') +
+      '</div>';
+  }).join('');
+  // 补齐到5个类别
+  for (let i = top5.length; i < 5; i++) {
+    const offItem = off[i - top5.length];
+    const nm = offItem ? offItem.name : catTitles[i];
+    catSections += '<div class="em-cat em-cat-dim"><div class="em-cat-h"><span class="em-cat-tag">' + catNames[i] + '</span><span class="em-cat-title">' + esc(nm) + '</span></div><div class="em-cat-body">暂无数据</div></div>';
   }
-  const riskHtml = pit.length ? pit.map(p => '<div class="ml-risk-item"><span class="ml-risk-name">' + esc(p.name) + '</span><span class="ml-risk-logic">' + esc(p.logic || '') + '</span></div>').join('') : '<div class="ml-risk-item">暂无</div>';
-  return '<div class="card">' +
-    '<div class="card-title">主线参与策略</div>' +
-    '<div class="ml-main"><div class="ml-score ml-tone-' + mainTone + '"><span class="ml-score-num">' + mainScore + '</span><span class="ml-score-label">主线强度</span></div><div class="ml-desc">' + mainDesc + '</div></div>' +
-    '<div class="ml-block"><div class="ml-h">📊 当前主线板块</div>' + mainRows + '</div>' +
-    '<div class="ml-block"><div class="ml-h">🎯 参与策略</div><div class="ml-strategy">' + esc(strategyText) + '</div><div class="ml-strategy-detail">涨停总数 <b>' + totalZT + '</b> 家 · 炸板率 <b>' + zhaBanRate + '%</b> · ' + esc(posText) + '</div></div>' +
-    '<div class="ml-block"><div class="ml-h">⚠️ 风险提示</div>' + riskHtml + '</div>' +
+  // 风险提示
+  const riskHtml = pit.length ? pit.map(p => '<div class="em-risk-item"><span class="em-risk-name">' + esc(p.name) + '</span><span class="em-risk-logic">' + esc(p.logic || '') + '</span></div>').join('') : '<div class="em-risk-item">暂无</div>';
+  const date = (report.meta && report.meta.date) || '';
+  return '<div class="card em-card">' +
+    '<div class="em-header"><span class="em-title">主升浪·新周期</span><span class="em-date">' + esc(date) + '</span></div>' +
+    '<div class="em-stats"><span class="em-stat em-stat-green"><b>' + totalZT + '</b> 涨停</span><span class="em-stat em-stat-gray">--</span><span class="em-stat em-stat-red"><b>' + zhaBan + '</b> 炸板</span></div>' +
+    '<div class="em-cats">' + catSections + '</div>' +
+    '<div class="em-risk"><span class="em-risk-tag">⚠ 风险提示</span>' + riskHtml + '</div>' +
     '</div>';
 }
 
