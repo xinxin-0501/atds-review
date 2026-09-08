@@ -1302,13 +1302,14 @@ function buildStockRow(s, i, report) {
   const meta = (categoryHtml || tagsHtml) ? `<div class="wl-meta">${categoryHtml}${tagsHtml}</div>` : '';
   // 每只个股下方的"今日执行策略"卡片(盘前 per-stock 内置,字段空不渲染)
   const perStockTS = report.meta && report.meta.type === 'premarket' ? renderPerStockTodayStrategy(s) : '';
+  // 关键修复: perStockTS 移到 wl-detail 外,避免 div 嵌套不平衡
+  // (renderPerStockTodayStrategy 返回 <div class="card ts-stock-card">...</div>,嵌入到 wl-detail 会让 watchlist-card div 延伸到所有 ts-stock-card)
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
     ${meta}
     ${strategyBlocks}
     ${todayStrategyBlock}
-    ${perStockTS}
   </div>`;
-  return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;
+  return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}${perStockTS}</div>`;
 }
 
 function buildStockModal(s) {
