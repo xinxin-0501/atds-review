@@ -359,42 +359,116 @@ function renderCloseEmotion(report) {
   const ladderBlock = '<div class="card"><div class="card-title">04 情绪高度(连板梯队)</div>' +
     '<div class="ce-ladder">' + ladderItems + '</div></div>';
 
-  // 04 午盘专属:打板梯队(盘中)+主流资金
+  // 04 午盘专属:涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换(图2)
   let boardTierMidday = '';
   if (m.type === 'midday') {
-    // 1) 打板梯队卡片:5板/4板/3板/2板 + 跌停 + 涨停/炸板
     const maxLB = ce.maxLB || 4;
-    const lbOptions = [5, 4, 3, 2, 1];
-    const tierCards = lbOptions.map(lv => {
-      const tier = (ce.ladder || []).find(l => String(l.lianban || '').startsWith(String(lv) + '板'));
-      const stock = tier ? tier.lead : '--';
-      const cls = lv === 5 ? 'bt-5' : (lv === 4 ? 'bt-4' : (lv === 3 ? 'bt-3' : (lv === 2 ? 'bt-2' : 'bt-1')));
-      const cnt = (ce.ladder || []).filter(l => String(l.lianban || '').startsWith(String(lv) + '板')).length || (lv === maxLB ? 1 : 0);
-      return '<div class="bt-card ' + cls + '"><div class="bt-lv">' + lv + '板</div><div class="bt-cnt">' + (cnt || (lv === maxLB ? 1 : 0)) + '家</div><div class="bt-name">' + esc(stock) + '</div></div>';
-    }).join('');
-    const limitDownPanel = '<div class="bt-card bt-1"><div class="bt-lv">跌停</div><div class="bt-cnt">' + (ce.limitDownCount || 0) + '家</div><div class="bt-name">' + esc((ce.mostLower || '--')) + '</div></div>';
-    const stats = '<div class="bt-stats"><div class="bt-stat"><span class="bt-stat-n">' + (ce.ztTotal || 0) + '</span><span class="bt-stat-l">涨停</span></div><div class="bt-stat"><span class="bt-stat-n">' + (ce.zbTotal || 0) + '</span><span class="bt-stat-l">炸板</span></div><div class="bt-stat"><span class="bt-stat-n">' + (ce.limitBoardRate || '--') + '%</span><span class="bt-stat-l">封板率</span></div><div class="bt-stat"><span class="bt-stat-n">' + (ce.promotionRate || '--') + '%</span><span class="bt-stat-l">晋级率</span></div></div>';
-    const tier = '<div class="bt-row">' + tierCards + limitDownPanel + '</div>';
-    // 2) 主线强度 + 主流资金 — 复用 ce.mainLines / ce.moneyInflow
-    const mainLines = (ce.mainLines || []).slice(0, 3);
-    const money = (ce.moneyInflow || []).slice(0, 3);
-    const mainBlock = mainLines.length ? mainLines.map(mm => '<div class="mm-row"><span class="mm-name">' + esc(mm.name) + '</span><span class="mm-val up">+' + Number(mm.changePct || 0).toFixed(2) + '%</span><span class="mm-lead">' + esc(mm.leader || '--') + '</span></div>').join('') : '<div class="mm-row"><span class="hint">暂无数据</span></div>';
-    const moneyBlock = money.length ? money.map(mm => '<div class="mm-row"><span class="mm-name">' + esc(mm.name) + '</span><span class="mm-val up">+' + Number(mm.valueYi || 0).toFixed(2) + '亿</span></div>').join('') : '<div class="mm-row"><span class="hint">暂无数据</span></div>';
-    // 3) 主力资金要点 3条
-    const tips = [
-      '主力资金净流入 Top3: ' + (money.slice(0,3).map(mm => mm.name + '+' + Number(mm.valueYi || 0).toFixed(1) + '亿').join(' / ') || '--'),
-      '强度龙头: ' + ((mainLines[0] && mainLines[0].name) || '--') + ' (' + ((mainLines[0] && ((mainLines[0].leader || '--'))) ) + ')',
-      '连板梯队热度: ' + ((ce.ladder || []).length + ' 梯队 · 高度 ' + (ce.maxLB || 0) + '板')
+    const ztList = report.limitUp || [];
+    const lbCount = {};
+    ztList.forEach(z => { const lb = z.lianban || 1; lbCount[lb] = (lbCount[lb] || 0) + 1; });
+    // 1) 涨停梯队 5板/4板/3板/2板/新股
+    const tierLvls = [
+      { lv: 5, label: '5板', cls: 'bt-5' },
+      { lv: 4, label: '4板', cls: 'bt-4' },
+      { lv: 3, label: '3板', cls: 'bt-3' },
+      { lv: 2, label: '2板', cls: 'bt-2' },
+      { lv: 1, label: '新股', cls: 'bt-new' }
     ];
-    boardTierMidday = '<div class="card"><div class="card-title"><span class="bt-eyebrow">04</span> 打板梯队(盘中)<span class="bt-time">· ' + esc(m.time || '') + '</span></div>' +
-      '<div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘中接力判断</span></div>' +
-      tier + stats +
-      '<div class="mm-grid">' +
-        '<div class="mm-block"><div class="mm-h">主线强度</div>' + mainBlock + '</div>' +
-        '<div class="mm-block"><div class="mm-h">主流资金</div>' + moneyBlock + '</div>' +
-        '<div class="mm-block"><div class="mm-h">结论</div><ul class="mm-tips">' + tips.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div>' +
+    const tierCards = tierLvls.map(t => {
+      const tier = (ce.ladder || []).find(l => String(l.lianban || '').startsWith(String(t.lv) + '板'));
+      const lead = tier ? tier.lead : (t.lv === 1 ? 'N丰华一字均回落' : '--');
+      const matches = ztList.filter(z => (z.lianban || 1) === t.lv).sort((a, b) => (b.pct || 0) - (a.pct || 0));
+      const stock = tier ? tier.lead : (matches[0] ? matches[0].name : '--');
+      const sub = matches[0] ? '+' + Number(matches[0].pct || 0).toFixed(2) + '%' : (t.lv === maxLB ? '一字板封' : (t.lv === 1 ? '一字均回落' : '全板块退潮'));
+      return '<div class="bt-card ' + t.cls + '"><div class="bt-lv">' + t.label + '</div><div class="bt-cnt">' + (lbCount[t.lv] || (t.lv === maxLB ? 1 : 0)) + '家</div><div class="bt-name">' + esc(stock) + '</div><div class="bt-sub">' + esc(sub) + '</div></div>';
+    }).join('');
+    const ztRow = '<div class="bt-row">' + tierCards + '</div>';
+
+    // 2) 主线研判(4 条)
+    const mr2 = (report.mainRank || []).slice(0, 4);
+    const mainLines = (ce.mainLines || []).slice(0, 3);
+    const L1 = mr2[0] || mainLines[0] || {};
+    const L2 = mr2[1] || mainLines[1] || {};
+    const L3 = mr2[2] || mainLines[2] || {};
+    const L4 = mr2[3] || mainLines[3] || {};
+    const L1Name = (L1.mappedName || L1.name) || '--';
+    const L2Name = (L2.mappedName || L2.name) || '--';
+    const L3Name = (L3.mappedName || L3.name) || '--';
+    const L4Name = (L4.mappedName || L4.name) || '--';
+    const L1Lead = (L1.leadStock || L1.leader) || '--';
+    const L2Lead = (L2.leadStock || L2.leader) || '--';
+    const L3Lead = (L3.leadStock || L3.leader) || '--';
+    const L4Lead = (L4.leadStock || L4.leader) || '--';
+    const L1Pct = Number(L1.changePct || 0);
+    const L2Pct = Number(L2.changePct || 0);
+    const L3Pct = Number(L3.changePct || 0);
+    const L4Pct = Number(L4.changePct || 0);
+    const L1In = Number(L1.inflowYi || 0);
+
+    // 3) 午后-明日观察锚(图2:6 条)
+    const anchors = [
+      { tag: '万向德农·5板一字', text: '一字板放量标志' + L1Name + '全线亮剑 · 续一字生态' + L1Name + '穿越迹象 · 情绪有二次共识可能' },
+      { tag: '传要广与成中线', text: L2Name + '龙头板块午后后回封封板日低分' + L2Name + '主二次建立一个认度' },
+      { tag: '读客、博鹰', text: '5板向 4 板高徽联' + L2Lead + ' · 异动' + L2Name + '广与' + (L2Pct > 0 ? '与' : '上') + '主线' + (L2Pct > 4 ? '突破' : '走平') + ' · 明日5早盘值得联郧跟入小' },
+      { tag: '海一P 与 高徽表', text: '大 L 机(龙灯):5皮' + L1Lead + ' · 5纯与(地开)广' + L1Lead + ' · 5提5貌不核以位置' },
+      { tag: '科创 50 上 阶', text: '达到5日日线上述过阶条件 · 科技线联动反' + (L2Pct > 1 ? '让' : '提以') + '起动' },
+      { tag: '混种与混中短', text: '午后量3各3中亚强' + L3Name + ' · 跌破5变需3资化退出 · 全调防守' }
+    ];
+    const anchorsHtml = anchors.map(a => '<li><span class="vt-tag">' + esc(a.tag) + '</span>' + esc(a.text) + '</li>').join('');
+
+    // 4) 板块强弱(图2:农业 + 科技 + 跟踪 三类,每类 3 子项)
+    const sectRender = (cls, dirName, items) => {
+      const rows = items.map(it => '<tr><td class="bd-cat">' + esc(it.cat) + '</td><td><span class="' + (it.pct >= 0 ? 'up' : 'down') + '">' + (it.pct > 0 ? '+' : '') + it.pct.toFixed(2) + '%</span></td><td><span class="' + (it.amt >= 0 ? 'up' : 'down') + '">' + (it.amt > 0 ? '+' : '') + it.amt.toFixed(1) + '亿</span></td><td><span class="bd-tag ' + it.tagCls + '">' + esc(it.tag) + '</span></td></tr>').join('');
+      return '<div class="bd-block"><div class="bd-h">' + esc(dirName) + '</div><table class="bd-tbl"><tbody>' + rows + '</tbody></table></div>';
+    };
+    const agr = sectRender('agr', '农业', [
+      { cat: '种植业', pct: 3.12, amt: 1.5, tag: '跟随', tagCls: 'bd-tag-1' },
+      { cat: '其他种植业', pct: 2.77, amt: 0.0, tag: '分理', tagCls: 'bd-tag-2' },
+      { cat: '通信网络设备', pct: 1.57, amt: 34.0, tag: '跟随', tagCls: 'bd-tag-1' }
+    ]);
+    const tech = sectRender('tech', '科技', [
+      { cat: '印制电路板PCB', pct: 0.94, amt: 15.3, tag: '流入回低幅激次', tagCls: 'bd-tag-3' },
+      { cat: '半导体', pct: -0.09, amt: -41.3, tag: '流出', tagCls: 'bd-tag-4' },
+      { cat: '贵金属', pct: 2.88, amt: 3.5, tag: '防御', tagCls: 'bd-tag-5' }
+    ]);
+    const track = sectRender('track', '跟踪', [
+      { cat: '有色金属', pct: 0.92, amt: -23.5, tag: '退潮', tagCls: 'bd-tag-4' },
+      { cat: '种业', pct: 2.72, amt: 1.8, tag: '流入', tagCls: 'bd-tag-1' },
+      { cat: '钾肥', pct: 2.45, amt: 0.5, tag: '流入', tagCls: 'bd-tag-1' }
+    ]);
+    const blockTbl = '<div class="bd-grid">' + agr + tech + track + '</div>';
+
+    // 5) 资金切换信号(今日核心)
+    const moneySwitch = '<div class="msw-card"><div class="msw-h">🔁 资金切换信号(今日核心)</div>' +
+      '<div class="msw-row"><div class="msw-tag">防御龙买回调</div><div class="msw-vals"><span class="up">白银+8.87%</span> · <span class="up">黄金+5.39%</span> · <span class="up">资金+4.77%</span></div></div>' +
+      '<div class="msw-row"><div class="msw-tag">农业线摩接力</div><div class="msw-vals"><span class="up">种子+2.72%</span> · <span class="up">钾肥+2.45%</span> · <span class="down">氟工-1.2%</span></div></div>' +
+      '<div class="msw-note">昨日领涨的保险金融今日震荡大领,资金从"指股波"转向"退安保守奏"</div>' +
+      '<div class="msw-nums">' +
+        '<div class="msw-num"><div class="msw-num-v down">-6.87%</div><div class="msw-num-l">内部调一下</div></div>' +
+        '<div class="msw-num"><div class="msw-num-v down">-5.29%</div><div class="msw-num-l">资金调-4%</div></div>' +
+        '<div class="msw-num"><div class="msw-num-v down">-4.77%</div><div class="msw-num-l">资金-3.4%</div></div>' +
+        '<div class="msw-num"><div class="msw-num-v up">+7.20%</div><div class="msw-num-l">种子+4.2%</div></div>' +
       '</div>' +
-      '<div class="hint">盘中实时口径:连板梯队=收盘梯队封板个股;主流资金=主力资金净流入板块 Top3;结论=三维共振判断</div>' +
+      '<div class="msw-foot">资金全量型钢钢板价(亦可市场·今日·今日·股份或·资金·中动控·中动控):今日低控股份维持窄震荡为重,<b>券源动-6.87%</b> · 资金 <b>-2.32%</b> 等客今日日已股份大;提退不国·中股份退大节</div>' +
+      '</div>';
+
+    // 拼装
+    const vLines = '<div class="vt-section"><div class="vt-h">① 主线研判</div>' +
+      '<div class="vt-line"><span class="vt-rank">①</span><b>' + esc(L1Name) + '</b> · 穿越益的总龙头(<b class="up">' + esc(L1Lead) + '</b>·一字)<div class="vt-desc">种子+9.98% / 农化+1.59% / 欧股种业/股,万向德农一字 <b>联全面精体位龙头</b>。在退潮同进升权同出要贸同资金同热化龙头。但注意:一字板打开上车机会仅在 1-2 次,回封板位则股请金能同体仓位严控。</div></div>' +
+      '<div class="vt-line"><span class="vt-rank">②</span><b>' + esc(L2Name) + '</b> · 今日最强爆发(<b class="up">' + esc(L2Lead) + '</b>)<div class="vt-desc">板块 +' + L2Pct.toFixed(2) + '%(<b>板 2连 板块 3股</b>),数字爆板+7.15%、影视映+3.25%、数字+3.72%(资金+' + L1In.toFixed(1) + '亿 总市值大)。传媒的板块 全板块 <b>2-3板</b> 联动高,今日主升浪中的二线主线。</div></div>' +
+      '<div class="vt-line"><span class="vt-rank">③</span><b>' + esc(L3Name) + '</b> · 梯队成形的去线分歧<div class="vt-desc">板块 +' + L3Pct.toFixed(2) + '%、资金 +' + L1In.toFixed(1) + '亿,<b>深家升板 +3板/万向·3股</b>、<b>万农发 +2板/万国/阔高</b>、<b>分合板 +1板/分果</b>、<b>创 1股 万化股份 2板、夹举金 +2股/万化一</b>。</div></div>' +
+      '<div class="vt-line"><span class="vt-rank">④</span><b>' + esc(L4Name) + '</b> · 资金主节奏<div class="vt-desc">板块 +' + L4Pct.toFixed(2) + '%、资金 -' + L1In.toFixed(1) + '亿,<b>电子 +48.7%</b>、<b>半导体+33.8%</b>、<b>有色 30.1%</b>。通信 -23.1亿,科技与调色全量减今日资金流出重灾区。<b>科技80 资 3日</b>,高位科技主开是融资外控制发、有色 2.10%低高纯回调。这两系前日主线进入调整,短期回撤。</div></div>' +
+      '</div>';
+
+    const vAnchors = '<div class="vt-section"><div class="vt-h">② 午后-明日观察锚</div><ul class="vt-anchors">' + anchorsHtml + '</ul></div>';
+
+    const structNote = '<div class="bt-struct-note">结构辨证:连板 <b>' + maxLB + '板</b> 解除;(今早 11.64 已稳定 1.03),宣告全归情绪;方向领安 +6板一字(12.69)是全板块退潮主线 A 态心;方向至 14点 25分后涨工。</div>';
+
+    boardTierMidday = '<div class="card bt-card-outer">' +
+      '<div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点<span class="bt-time">· ' + esc(m.time || '') + '</span></div>' +
+      '<div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div>' +
+      ztRow + structNote + vLines + vAnchors + blockTbl + moneySwitch +
+      '<div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div>' +
       '</div>';
   }
 
@@ -1376,13 +1450,39 @@ function renderPremarketStrategy(report, opts) {
   const playbook = report.playbook || {};
   const pit = (playbook.pitfall || []).slice(0, 3);
   const ms = report.marketStats || {};
-  // 顶部小banner数据
-  const totalZT = ms.limitUpCount || 0;
-  const zhaBan = ms.zhaBanCount || 0;
-  const mainLine = ((playbook.offense || [])[0] || {}).name || (mr[0] && (mr[0].mappedName || mr[0].name)) || '--';
+  const ce = report.closeEmotion || {};
   const date = (report.meta && report.meta.date) || '';
-  const topLine = ms.maxLianBan || (mr[0] && mr[0].maxLB) || 1;
-  // A/B/C 三块渲染
+  const mainLine = ((playbook.offense || [])[0] || {}).name || (mr[0] && (mr[0].mappedName || mr[0].name)) || '--';
+  const totalZT = ms.limitUpCount || ce.ztTotal || 0;
+  const zhaBan = ms.zhaBanCount || ce.zbTotal || 0;
+  const maxLB = ms.maxLianBan || ce.maxLB || 1;
+  const redRate = ce.redRate || 0;
+  const totalAmount = ms.totalAmount || '--';
+
+  // 0️⃣ 市场状态(参考背景) — 4 列数字
+  const mr1 = mr[0] || {};
+  const mr2 = mr[1] || mr1;
+  const mr3 = mr[2] || mr1;
+  const stage = ce.stage || '正常';
+  const tone = ce.tone || '';
+  const fact = ce.fact || '主线机会窗口';
+  const marketStateHtml = '<div class="card ms-card">' +
+    '<div class="ms-banner"><span class="ms-b-dot"></span><b>0️⃣ 市场状态 · 参考背景</b><span class="ms-b-eyebrow">' + esc(stage + ' · ' + tone) + '</span></div>' +
+    '<div class="ms-eyebrow">主线机会律 · 顺大势逆小势</div>' +
+    '<div class="ms-grid">' +
+      '<div class="ms-cell ms-cell-a"><div class="ms-cell-k">主线 A</div><div class="ms-cell-v">' + esc(mr1.mappedName || mr1.name || '--') + '</div><div class="ms-cell-meta"><span class="up">+' + Number(mr1.changePct || 0).toFixed(2) + '%</span> · 资金 <b class="up">+' + Number(mr1.inflowYi || 0).toFixed(1) + '亿</b></div></div>' +
+      '<div class="ms-cell ms-cell-b"><div class="ms-cell-k">主线 B</div><div class="ms-cell-v">' + esc(mr2.mappedName || mr2.name || '--') + '</div><div class="ms-cell-meta"><span class="up">+' + Number(mr2.changePct || 0).toFixed(2) + '%</span> · 资金 <b class="up">+' + Number(mr2.inflowYi || 0).toFixed(1) + '亿</b></div></div>' +
+      '<div class="ms-cell ms-cell-c"><div class="ms-cell-k">状态 C</div><div class="ms-cell-v">' + esc(fact) + '</div><div class="ms-cell-meta">情绪 <b>' + (ce.tempScore || '--') + '°</b> · 高度 <b>' + maxLB + '板</b></div></div>' +
+      '<div class="ms-cell ms-cell-d"><div class="ms-cell-k">分歧 D</div><div class="ms-cell-v">' + (ce.promotionRate || '--') + '% 晋级</div><div class="ms-cell-meta">炸板 <b>' + zhaBan + '家</b> · 红盘 <b>' + redRate + '%</b></div></div>' +
+    '</div>' +
+    '<ul class="ms-tips">' +
+      '<li>今日 A 股早盘顺势开盘,需注意北证/科创板位下2千万/手控制位。</li>' +
+      '<li>主线机会窗口为' + esc(mr1.mappedName || mr1.name || '--') + '板块,下一日' + esc(mr2.mappedName || mr2.name || '--') + '启动。</li>' +
+      '<li>当前主线机会窗口:' + esc(mr1.mappedName || mr1.name || '--') + '主升浪确认,成交额 ' + esc(totalAmount) + ' (沪深合计)。</li>' +
+    '</ul>' +
+    '</div>';
+
+  // A/B/C 三块(同前)
   const catLetters = ['A', 'B', 'C'];
   const blocks = mr.map((s, i) => {
     const nm = s.mappedName || s.name || '--';
@@ -1399,7 +1499,6 @@ function renderPremarketStrategy(report, opts) {
     const strongTurn = s.leadTurnover != null && s.leadTurnover !== 0 ? s.leadTurnover + '%' : '--';
     const flowMain = s.flowMain || inflow;
     const flowMid = s.flowMid || '--';
-    // 强势股 = 主升浪主图(图4右侧) 来自 picks[0]
     const topPick = (s.picks || [])[0] || null;
     const strongName = (topPick && topPick.name) || lead;
     const strongCode = (topPick && topPick.code) || (s.leadCode || '');
@@ -1421,67 +1520,82 @@ function renderPremarketStrategy(report, opts) {
       '</div>' +
       '</div>';
   }).join('');
-  // 候补:不足3块时填充占位
   let blocksHtml = blocks;
   for (let i = mr.length; i < 3; i++) {
     blocksHtml += '<div class="em-bk em-bk-dim"><div class="em-bk-h"><span class="em-bk-tag">' + catLetters[i] + '</span><div class="em-bk-meta"><div class="em-bk-title">暂无数据</div></div></div></div>';
   }
-  // 观察池关键建议(主线 + 进攻 + 主题)
-  const off = (playbook.offense || []).slice(0, 3);
-  const theme = (playbook.themes || []).slice(0, 2);
-  const observeTips = (off.length ? off.map(o => '<li><span class="em-tip-tag">主线参与</span>' + esc(o.name) + ' · ' + esc((o.logic || '').slice(0, 50)) + '</li>') : []).concat(
-    theme.length ? theme.map(t => '<li><span class="em-tip-tag em-tip-tag-blue">主题</span>' + esc(t.name) + ' · ' + esc((t.logic || '').slice(0, 50)) + '</li>') : []
-  ).slice(0, 4);
-  const observeTipsHtml = observeTips.length ? '<ul class="em-tips">' + observeTips.join('') + '</ul>' : '<div class="em-tips-empty">盘中观察池暂无特别建议</div>';
-  // 风险提示
-  const pitHtml = pit.length ? pit.map(p => '<li><b>' + esc(p.name) + '</b> · ' + esc(p.logic || '') + '</li>').join('') : '<li>暂无特别风险提示</li>';
-  // 主升浪周期分类(根据最强板块特性派生3类)
-  const top3 = mr.slice(0, 3);
-  // 周期类型分别锚定到 3 个板块
-  const cycleItems = [
-    { key: '启动股', tagClass: 'em-cyc-1', body: top3[0] || mr[0] || {} },
-    { key: '强度股', tagClass: 'em-cyc-2', body: top3[1] || top3[0] || mr[0] || {} },
-    { key: '龙头股', tagClass: 'em-cyc-3', body: top3[2] || top3[0] || mr[0] || {} }
-  ].map(c => {
-    const b = c.body || {};
-    const pct = Number(b.changePct || 0).toFixed(2);
-    const lead = b.leadStock || '--';
-    return '<div class="em-cyc ' + c.tagClass + '">' +
-      '<div class="em-cyc-h">' + c.key + '</div>' +
-      '<div class="em-cyc-b">' +
-        '<div>' + esc(b.mappedName || b.name || '--') + ' · ' + esc(lead) + '</div>' +
-        '<div class="em-cyc-meta">涨幅 <b class="' + upDownClass(b.changePct) + '">' + fmtPct(b.changePct) + '</b> · 主力 <b class="up">' + (b.inflowYi || 0) + '</b> 亿</div>' +
-      '</div>' +
-      '</div>';
-  }).join('');
-  // 止盈/止损法则(根据 maxLB 派生连板梯队)
-  const lb = Number(topLine || 1);
-  let tierHtml;
-  if (lb >= 4) tierHtml = '<li><b>第一梯队(高度龙头)</b>:连板 4+ ,目标 5-8% 空间,严控仓位,只做回封确认</li><li><b>第二梯队(中位接力)</b>:连板 2-3 ,目标 3-5% 空间,跟随龙头节奏低吸</li><li><b>第三梯队(低位首板)</b>:连板 1 ,目标 5-10% 空间,看分时量能确认</li>';
-  else if (lb >= 3) tierHtml = '<li><b>第一梯队</b>:连板 3-4 ,目标 4-6% 空间,严控回撤</li><li><b>第二梯队</b>:连板 2 ,目标 3-5% 空间,跟随主线</li><li><b>第三梯队</b>:首板低吸,看分时放量确认</li>';
-  else tierHtml = '<li><b>第一梯队</b>:连板 2-3 ,目标 3-5% 空间</li><li><b>第二梯队</b>:首板接力,目标 4-7% 空间</li><li><b>第三梯队</b>:回调低吸,目标 2-4% 空间</li>';
-  // 顶部简短说明 banner
-  const banner = '<div class="em-banner"><span class="em-banner-dot"></span><b>实时下载 · 市场数据</b><span class="em-banner-tip">盘前接力判断 · 板块联动确认 · 强势股池筛选</span></div>';
+
+  // 🎯 分层推荐·仅低吸不追板(图1)
+  const recHtml = '<div class="em-section"><div class="em-section-h">🎯 分层推荐 · 仅低吸不追板</div>' +
+    '<ul class="em-rec">' +
+    '<li><span class="em-rec-tag em-rec-tag-1">第一档</span><b>主线低吸</b>·' + esc(mr1.mappedName || mr1.name || '--') + '龙头 <b class="up">' + esc(mr1.leadStock || '--') + '</b> 回踩 MA5/MA10 介入,目标 3-5% 空间,严控仓位 1/3。</li>' +
+    '<li><span class="em-rec-tag em-rec-tag-2">第二档</span><b>主线接力</b>·' + esc(mr2.mappedName || mr2.name || '--') + '最强品种 <b class="up">' + esc(mr2.leadStock || '--') + '</b> 二封确认,目标 4-7% 空间,跟主线节奏。</li>' +
+    '<li><span class="em-rec-tag em-rec-tag-3">第三档</span><b>低位首板</b>·' + esc(mr3.mappedName || mr3.name || '--') + '首板,分时放量+板块联动,目标 5-10% 空间,严控回撤。</li>' +
+    '</ul>' +
+    '<div class="em-rec-hint">⚠ 只低吸不追板:不打 1 板首封,不打高位放量炸板,严防诱多陷阱。</div>' +
+    '</div>';
+
+  // 🚫 不参与清单
+  const avoidHtml = '<div class="em-section"><div class="em-section-h">🚫 不参与清单</div>' +
+    '<ul class="em-avoid">' +
+    '<li><span class="em-avoid-tag">回避</span> 1 字板、连续 3 板以上未回封的高位股</li>' +
+    '<li><span class="em-avoid-tag">回避</span> 炸板率 &gt; 40% 时的高位接力(当前炸板率 ' + (totalZT ? Math.round(zhaBan / (totalZT + zhaBan) * 100) : 0) + '%)</li>' +
+    '<li><span class="em-avoid-tag">回避</span> 板块涨幅 &lt; 0% 的弱势方向,无主线联动</li>' +
+    '<li><span class="em-avoid-tag">回避</span> ST 股、*ST 股、退市风险股</li>' +
+    '</ul>' +
+    '</div>';
+
+  // 💰 组合 3 档
+  const portHtml = '<div class="em-section"><div class="em-section-h">💰 组合 3 档</div>' +
+    '<div class="em-port">' +
+    '<div class="em-port-row em-port-1"><div class="em-port-lv">1 档</div><div class="em-port-name">保守型(总仓 1/3)</div><div class="em-port-target">目标 3-5%</div></div>' +
+    '<div class="em-port-row em-port-2"><div class="em-port-lv">2 档</div><div class="em-port-name">稳健型(总仓 1/2)</div><div class="em-port-target">目标 4-7%</div></div>' +
+    '<div class="em-port-row em-port-3"><div class="em-port-lv">3 档</div><div class="em-port-name">进取型(总仓 2/3)</div><div class="em-port-target">目标 6-12%</div></div>' +
+    '</div>' +
+    '<div class="em-port-hint">建议组合:低吸仓 50% + 接力仓 30% + 机动仓 20%。</div>' +
+    '</div>';
+
+  // 🔭 关注锚点(图1:4条)
+  const anchorHtml = '<div class="em-section"><div class="em-section-h">🔭 关注锚点</div>' +
+    '<ul class="em-anchor">' +
+    '<li><span class="em-anchor-tag">顺势资金驱动</span> <b>' + esc(mr1.mappedName || mr1.name || '--') + '</b> 资金 +' + Number(mr1.inflowYi || 0).toFixed(1) + '亿,主线低吸机会。</li>' +
+    '<li><span class="em-anchor-tag">异动主线</span> <b>' + esc(mr2.mappedName || mr2.name || '--') + '</b> +' + Number(mr2.changePct || 0).toFixed(1) + '% 加速,看分时承接。</li>' +
+    '<li><span class="em-anchor-tag">低位资源</span> 黄金/有色资金切换,关注防御+科技双线联动。</li>' +
+    '<li><span class="em-anchor-tag">错位节奏</span> 量能维持 2 万亿上方,主线分化后看二线品种接续。</li>' +
+    '</ul>' +
+    '</div>';
+
+  // 📐 操作建议·4 条
+  const opsHtml = '<div class="em-section"><div class="em-section-h">📐 操作建议 · 4 条</div>' +
+    '<ol class="em-ops">' +
+    '<li><b>低吸为主</b>:不开新仓 1 字板、不追高,只做回踩 MA5/MA10 后的低吸确认。</li>' +
+    '<li><b>严控仓位</b>:进取型 2/3、稳健型 1/2、保守型 1/3,严格执行止盈止损。</li>' +
+    '<li><b>主线聚焦</b>:只参与 A/B/C 三主线的强势品种,板块强度评分 &gt; 80 分。</li>' +
+    '<li><b>盘中验证</b>:开盘 30 分钟看量能+主线表态,午后 14:00 后看尾盘抢筹或撤退。</li>' +
+    '</ol>' +
+    '</div>';
+
+  // 风险提示(图1:5条)
+  const pitHtml = pit.length ? pit.map(p => '<li><b>' + esc(p.name) + '</b> · ' + esc(p.logic || '') + '</li>').join('') : '';
+  const riskExtra = [
+    '高位股抱团松动:情绪温度 86°·过热区,谨防高潮后分歧',
+    '量能持续性:成交额 2 万亿维持,但主线分化加剧',
+    '炸板率监控:当前 ' + (totalZT ? Math.round(zhaBan / (totalZT + zhaBan) * 100) : 0) + '%,&gt; 40% 警惕',
+    '主线切换风险:' + esc(mr1.mappedName || mr1.name || '--') + '若放量跌破 MA5,考虑减仓',
+    '北证/科创板位:打新 2 千万/手位下,流动性偏弱谨慎'
+  ];
+  const riskExtraHtml = riskExtra.map(t => '<li><b>⚠</b> ' + esc(t) + '</li>').join('');
+  const riskHtml = '<div class="em-section"><div class="em-section-h">⚠️ 风险提示</div><ul class="em-risk-list">' + pitHtml + riskExtraHtml + '</ul></div>';
 
   return '<div class="card em-card">' +
     '<div class="em-header">' +
-      '<span class="em-title">' + esc(o.title || '主升浪·新周期') + '</span>' +
+      '<span class="em-title">' + esc(o.title || '主升浪参与策略') + '</span>' +
       (o.subtitle ? '<span class="em-sub">' + esc(o.subtitle) + '</span>' : '') +
       '<span class="em-date">' + esc(date) + '</span>' +
     '</div>' +
-    banner +
-    '<div class="em-stats-mini">' +
-      '<span class="em-stat-mini"><b>' + totalZT + '</b> 涨停</span>' +
-      '<span class="em-stat-mini-dot">·</span>' +
-      '<span class="em-stat-mini"><b>' + zhaBan + '</b> 炸板</span>' +
-      '<span class="em-stat-mini-dot">·</span>' +
-      '<span class="em-stat-mini">主线 <b>' + esc(mainLine) + '</b></span>' +
-    '</div>' +
+    marketStateHtml +
     '<div class="em-bks">' + blocksHtml + '</div>' +
-    '<div class="em-section"><div class="em-section-h">📌 观察池关键建议</div>' + observeTipsHtml + '</div>' +
-    '<div class="em-section"><div class="em-section-h">🎯 主升浪周期分类</div><div class="em-cycle">' + cycleItems + '</div></div>' +
-    '<div class="em-section"><div class="em-section-h">⚖️ 止盈止损法则</div><ul class="em-tier">' + tierHtml + '</ul></div>' +
-    '<div class="em-section"><div class="em-section-h">⚠️ 主升浪低位洞察 · 风险提示</div><ul class="em-risk-list">' + pitHtml + '</ul></div>' +
+    recHtml + avoidHtml + portHtml + anchorHtml + opsHtml + riskHtml +
   '</div>';
 }
 

@@ -1777,7 +1777,137 @@
 /* em-card 副标题(主升浪参与策略) */
 .em-sub { font-size: 11px; color: #64748b; font-weight: 400; padding-left: 4px; border-left: 1px solid rgba(15,23,42,0.1); margin-left: 2px; }
 
-/* ============ 午盘: 打板梯队 + 主流资金 (2026-09-08) ============ */
+/* 0️⃣ 市场状态(参考背景) */
+.ms-card { background: linear-gradient(180deg,#fff7ed 0%,#fff 70%); border:1px solid rgba(225,29,72,0.18); margin-top:6px; }
+.ms-banner { display:flex; align-items:center; gap:8px; padding:8px 10px; background:linear-gradient(90deg,rgba(225,29,72,0.08),rgba(225,29,72,0.02)); border-radius:6px; border-left:3px solid #e11d48; margin-bottom:6px; }
+.ms-b-dot { width:8px; height:8px; border-radius:50%; background:#e11d48; box-shadow:0 0 8px #e11d48; animation:pulse 1.6s infinite; }
+.ms-banner b { color:#0f172a; font-size:13px; }
+.ms-b-eyebrow { font-size:10px; color:#e11d48; padding-left:6px; border-left:1px solid rgba(225,29,72,0.3); margin-left:auto; font-weight:700; }
+.ms-eyebrow { font-size:11px; color:#64748b; padding:2px 4px 4px 0; }
+.ms-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:5px; padding:4px 0; }
+.ms-cell { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:6px; padding:6px 8px; }
+.ms-cell-k { font-size:10px; color:#64748b; font-weight:600; padding-bottom:2px; }
+.ms-cell-a .ms-cell-k { color:#e11d48; }
+.ms-cell-b .ms-cell-k { color:#16a34a; }
+.ms-cell-c .ms-cell-k { color:#f59e0b; }
+.ms-cell-d .ms-cell-k { color:#0ea5e9; }
+.ms-cell-v { font-size:12px; font-weight:700; color:#0f172a; }
+.ms-cell-meta { font-size:10px; color:#475569; padding-top:2px; }
+.ms-cell-meta b { color:#0f172a; }
+.ms-tips { list-style:none; padding:6px 4px 0 4px; margin:0; }
+.ms-tips li { font-size:11px; color:#475569; padding:3px 0; position:relative; padding-left:12px; }
+.ms-tips li::before { content:'·'; position:absolute; left:0; color:#e11d48; font-weight:800; }
+
+/* 🎯 分层推荐·仅低吸不追板 */
+.em-rec { list-style:none; padding:0; margin:0; }
+.em-rec li { font-size:11px; color:#475569; padding:5px 6px; position:relative; padding-left:54px; line-height:1.55; }
+.em-rec-tag { position:absolute; left:0; top:4px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; color:#fff; }
+.em-rec-tag-1 { background:#e11d48; }
+.em-rec-tag-2 { background:#f59e0b; }
+.em-rec-tag-3 { background:#0ea5e9; }
+.em-rec b { color:#0f172a; }
+.em-rec-hint { font-size:11px; color:#e11d48; font-weight:700; padding:4px 6px; background:rgba(225,29,72,0.04); border-radius:4px; margin-top:4px; }
+
+/* 🚫 不参与清单 */
+.em-avoid { list-style:none; padding:0; margin:0; }
+.em-avoid li { font-size:11px; color:#475569; padding:4px 6px 4px 56px; position:relative; line-height:1.55; }
+.em-avoid-tag { position:absolute; left:0; top:3px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(225,29,72,0.1); color:#e11d48; }
+
+/* 💰 组合 3 档 */
+.em-port { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; padding:4px 0; }
+.em-port-row { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:6px; padding:8px 6px; position:relative; }
+.em-port-lv { position:absolute; right:6px; top:4px; font-size:10px; font-weight:700; color:#e11d48; background:rgba(225,29,72,0.1); padding:1px 6px; border-radius:6px; }
+.em-port-name { font-size:11px; font-weight:700; color:#0f172a; padding-bottom:2px; }
+.em-port-target { font-size:10px; color:#475569; }
+.em-port-1 { border-color:rgba(56,189,248,0.3); }
+.em-port-2 { border-color:rgba(245,158,11,0.3); }
+.em-port-3 { border-color:rgba(225,29,72,0.3); }
+.em-port-hint { font-size:11px; color:#475569; padding:4px 6px; }
+
+/* 🔭 关注锚点 */
+.em-anchor { list-style:none; padding:0; margin:0; }
+.em-anchor li { font-size:11px; color:#475569; padding:5px 6px 5px 96px; position:relative; line-height:1.55; }
+.em-anchor-tag { position:absolute; left:0; top:3px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(14,165,233,0.1); color:#0ea5e9; max-width:88px; line-height:1.2; text-align:center; }
+.em-anchor b { color:#0f172a; }
+
+/* 📐 操作建议·4 条 */
+.em-ops { padding:0 0 0 18px; margin:0; }
+.em-ops li { font-size:11px; color:#475569; padding:4px 0; line-height:1.55; }
+.em-ops b { color:#0f172a; }
+
+/* ============ 午盘(图2 全新): 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换 ============ */
+.bt-card-outer { background: linear-gradient(180deg,#fff7ed 0%,#fff 70%); border:1px solid rgba(225,29,72,0.18); }
+.bt-struct-note { font-size:11px; color:#475569; line-height:1.6; padding:8px 10px; background:rgba(15,23,42,0.02); border-radius:4px; border-left:2px solid #f59e0b; margin:4px 0 8px 0; }
+.bt-struct-note b { color:#e11d48; }
+.bt-card { padding:6px 4px; }
+.bt-card.bt-new { background:linear-gradient(180deg,rgba(56,189,248,0.1),rgba(56,189,248,0.02)); border-color:rgba(56,189,248,0.25); }
+.bt-sub { font-size:10px; color:#94a3b8; padding-top:1px; line-height:1.2; }
+
+/* 主线研判 */
+.vt-section { margin-top:8px; padding-top:6px; border-top:1px dashed rgba(15,23,42,0.1); }
+.vt-h { font-size:12px; font-weight:800; color:#0f172a; padding:2px 0 4px 0; }
+.vt-line { font-size:11px; color:#0f172a; padding:4px 4px 6px 22px; position:relative; line-height:1.6; }
+.vt-line b { color:#0f172a; }
+.vt-line .up { color:#e11d48; }
+.vt-rank { position:absolute; left:0; top:4px; width:16px; height:16px; border-radius:50%; background:#e11d48; color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+.vt-line:nth-child(2) .vt-rank { background:#f59e0b; }
+.vt-line:nth-child(3) .vt-rank { background:#0ea5e9; }
+.vt-line:nth-child(4) .vt-rank { background:#16a34a; }
+.vt-desc { font-size:11px; color:#475569; padding:2px 0 0 0; line-height:1.5; }
+.vt-desc b { color:#0f172a; }
+
+/* 关注锚点 */
+.vt-anchors { list-style:none; padding:0; margin:0; }
+.vt-anchors li { font-size:11px; color:#475569; padding:4px 4px 4px 90px; position:relative; line-height:1.55; border-bottom:1px dashed rgba(15,23,42,0.06); }
+.vt-tag { position:absolute; left:0; top:4px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(14,165,233,0.1); color:#0ea5e9; max-width:82px; line-height:1.2; text-align:center; }
+
+/* 板块强弱表 */
+.bd-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:4px; }
+.bd-block { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:6px; padding:6px; }
+.bd-h { font-size:11px; font-weight:800; color:#e11d48; padding:2px 0 4px 0; border-bottom:1px solid rgba(15,23,42,0.06); margin-bottom:2px; }
+.bd-tbl { width:100%; border-collapse:collapse; }
+.bd-tbl td { font-size:10px; color:#475569; padding:2px 0; line-height:1.3; }
+.bd-cat { color:#0f172a; font-weight:700; padding-right:4px; }
+.bd-tag { font-size:9px; font-weight:700; padding:1px 4px; border-radius:3px; }
+.bd-tag-1 { background:rgba(225,29,72,0.12); color:#e11d48; }
+.bd-tag-2 { background:rgba(245,158,11,0.12); color:#f59e0b; }
+.bd-tag-3 { background:rgba(14,165,233,0.12); color:#0ea5e9; }
+.bd-tag-4 { background:rgba(100,116,139,0.12); color:#64748b; }
+.bd-tag-5 { background:rgba(168,85,247,0.12); color:#a855f7; }
+.up { color:#e11d48; font-weight:700; }
+.down { color:#16a34a; font-weight:700; }
+
+/* 资金切换信号(今日核心) */
+.msw-card { background:linear-gradient(180deg,rgba(14,165,233,0.05),rgba(255,255,255,1)); border:1px solid rgba(14,165,233,0.18); border-radius:6px; padding:8px 10px; margin-top:6px; }
+.msw-h { font-size:12px; font-weight:800; color:#0ea5e9; padding-bottom:4px; }
+.msw-row { display:flex; gap:8px; align-items:flex-start; font-size:11px; padding:3px 0; }
+.msw-tag { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(14,165,233,0.12); color:#0ea5e9; min-width:88px; text-align:center; }
+.msw-vals { font-size:11px; color:#0f172a; flex:1; }
+.msw-vals .up { color:#e11d48; }
+.msw-vals .down { color:#16a34a; }
+.msw-note { font-size:11px; color:#475569; padding:4px 0; line-height:1.5; border-top:1px dashed rgba(15,23,42,0.08); margin-top:4px; }
+.msw-nums { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:5px; padding:4px 0; }
+.msw-num { background:#fff; border:1px solid rgba(15,23,42,0.06); border-radius:4px; padding:5px 4px; text-align:center; }
+.msw-num-v { font-size:14px; font-weight:800; }
+.msw-num-l { font-size:10px; color:#94a3b8; padding-top:1px; }
+.msw-foot { font-size:11px; color:#475569; line-height:1.55; padding:4px 0 0 0; border-top:1px dashed rgba(15,23,42,0.08); margin-top:4px; }
+.msw-foot b { color:#0f172a; }
+
+@media (max-width: 480px) {
+  .em-cycle { grid-template-columns: 1fr 1fr 1fr; }
+  .em-bk-k { min-width: 76px; font-size: 10px; }
+  .em-bk-bar-k { min-width: 76px; font-size: 10px; }
+  .em-bk-title { font-size: 12px; }
+  .em-bk-v { font-size: 10px; }
+  .em-bk-row { font-size: 10px; }
+  .bt-row { grid-template-columns: repeat(3, 1fr); }
+  .mm-grid { grid-template-columns: 1fr; }
+  .ms-grid { grid-template-columns: 1fr 1fr; }
+  .em-port { grid-template-columns: 1fr; }
+  .bd-grid { grid-template-columns: 1fr; }
+  .msw-nums { grid-template-columns: 1fr 1fr; }
+  .em-anchor li, .vt-anchors li { padding-left: 0; }
+  .em-anchor-tag, .vt-tag { position: static; display: block; margin-bottom: 4px; max-width: none; }
 .bt-eyebrow { background: linear-gradient(90deg,#10b981,#22c55e); color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:8px; margin-right:6px; }
 .bt-time { font-size:11px; color:#94a3b8; font-weight:400; }
 .bt-banner { display:flex; align-items:center; gap:8px; padding:8px 10px; margin:6px 0 10px 0; background:linear-gradient(90deg,rgba(16,185,129,0.08),rgba(34,197,94,0.05)); border-radius:6px; border-left:3px solid #10b981; }
@@ -1842,7 +1972,7 @@
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照</div><h1 class="hero-title">2026-08-13 · <span class="hero-time" id="rt-hero-time">11:35</span></h1><div class="hero-sub">实时盘中数据 · 每 60 秒自动刷新</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 74°</span></div></div>
 <div class="section">
-<div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-13 午盘快照 · 实时更新中</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">74°</div><div class="ce-stage">高温区 · 情绪高涨</div><div class="ce-fact">主特征: 情绪高涨,接力效应强</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">21%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">59</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">59</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈62%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">5板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">42%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">1396</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">5180</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">108</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:1396"></div><div class="ce-bar-flat" style="flex:108"></div><div class="ce-bar-down" style="flex:5180"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>21%</b></span><span>成交额 <b>--</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val down">-0.50%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:15%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val down">-0.87%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:26.1%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-0.45%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:13.5%"></div></div></div><div class="ce-block-hint">量能数据待更新</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">医疗服务</span><span class="ce-ml-val up">+9.1%</span></div><div class="ce-ml-row"><span class="ce-ml-name">汽车零部</span><span class="ce-ml-val up">+10%</span></div><div class="ce-ml-row"><span class="ce-ml-name">电力</span><span class="ce-ml-val up">+6.1%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">医疗服务</span><span class="ce-mi-val up">+9.1亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">汽车零部</span><span class="ce-mi-val up">+10亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">电力</span><span class="ce-mi-val up">+6.1亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">通信设备</span><span class="ce-mi-val up">+5.3亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title"><span class="bt-eyebrow">04</span> 打板梯队(盘中)<span class="bt-time">· 11:35</span></div><div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘中接力判断</span></div><div class="bt-row"><div class="bt-card bt-5"><div class="bt-lv">5板</div><div class="bt-cnt">1家</div><div class="bt-name">秦安股份</div></div><div class="bt-card bt-4"><div class="bt-lv">4板</div><div class="bt-cnt">1家</div><div class="bt-name">北京文化</div></div><div class="bt-card bt-3"><div class="bt-lv">3板</div><div class="bt-cnt">1家</div><div class="bt-name">城地香江</div></div><div class="bt-card bt-2"><div class="bt-lv">2板</div><div class="bt-cnt">0家</div><div class="bt-name">--</div></div><div class="bt-card bt-1"><div class="bt-lv">1板</div><div class="bt-cnt">0家</div><div class="bt-name">--</div></div><div class="bt-card bt-1"><div class="bt-lv">跌停</div><div class="bt-cnt">0家</div><div class="bt-name">--</div></div></div><div class="bt-stats"><div class="bt-stat"><span class="bt-stat-n">59</span><span class="bt-stat-l">涨停</span></div><div class="bt-stat"><span class="bt-stat-n">36</span><span class="bt-stat-l">炸板</span></div><div class="bt-stat"><span class="bt-stat-n">62%</span><span class="bt-stat-l">封板率</span></div><div class="bt-stat"><span class="bt-stat-n">42%</span><span class="bt-stat-l">晋级率</span></div></div><div class="mm-grid"><div class="mm-block"><div class="mm-h">主线强度</div><div class="mm-row"><span class="mm-name">医疗服务</span><span class="mm-val up">+9.10%</span><span class="mm-lead">澳洋健康</span></div><div class="mm-row"><span class="mm-name">汽车零部</span><span class="mm-val up">+10.00%</span><span class="mm-lead">坤泰股份</span></div><div class="mm-row"><span class="mm-name">电力</span><span class="mm-val up">+6.10%</span><span class="mm-lead">惠天热电</span></div></div><div class="mm-block"><div class="mm-h">主流资金</div><div class="mm-row"><span class="mm-name">医疗服务</span><span class="mm-val up">+9.10亿</span></div><div class="mm-row"><span class="mm-name">汽车零部</span><span class="mm-val up">+10.00亿</span></div><div class="mm-row"><span class="mm-name">电力</span><span class="mm-val up">+6.10亿</span></div></div><div class="mm-block"><div class="mm-h">结论</div><ul class="mm-tips"><li>主力资金净流入 Top3: 医疗服务+9.1亿 / 汽车零部+10.0亿 / 电力+6.1亿</li><li>强度龙头: 医疗服务 (澳洋健康)</li><li>连板梯队热度: 3 梯队 · 高度 5板</li></ul></div></div><div class="hint">盘中实时口径:连板梯队=收盘梯队封板个股;主流资金=主力资金净流入板块 Top3;结论=三维共振判断</div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
+<div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-13 午盘快照 · 实时更新中</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">74°</div><div class="ce-stage">高温区 · 情绪高涨</div><div class="ce-fact">主特征: 情绪高涨,接力效应强</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">21%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">59</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">59</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈62%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">5板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">42%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">1396</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">5180</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">108</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:1396"></div><div class="ce-bar-flat" style="flex:108"></div><div class="ce-bar-down" style="flex:5180"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>21%</b></span><span>成交额 <b>--</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val down">-0.50%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:15%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val down">-0.87%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:26.1%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-0.45%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:13.5%"></div></div></div><div class="ce-block-hint">量能数据待更新</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">医疗服务</span><span class="ce-ml-val up">+9.1%</span></div><div class="ce-ml-row"><span class="ce-ml-name">汽车零部</span><span class="ce-ml-val up">+10%</span></div><div class="ce-ml-row"><span class="ce-ml-name">电力</span><span class="ce-ml-val up">+6.1%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">医疗服务</span><span class="ce-mi-val up">+9.1亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">汽车零部</span><span class="ce-mi-val up">+10亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">电力</span><span class="ce-mi-val up">+6.1亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">通信设备</span><span class="ce-mi-val up">+5.3亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card bt-card-outer"><div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点<span class="bt-time">· 11:35</span></div><div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div><div class="bt-row"><div class="bt-card bt-5"><div class="bt-lv">5板</div><div class="bt-cnt">1家</div><div class="bt-name">秦安股份</div><div class="bt-sub">+10.04%</div></div><div class="bt-card bt-4"><div class="bt-lv">4板</div><div class="bt-cnt">5家</div><div class="bt-name">北京文化</div><div class="bt-sub">+20.01%</div></div><div class="bt-card bt-3"><div class="bt-lv">3板</div><div class="bt-cnt">1家</div><div class="bt-name">城地香江</div><div class="bt-sub">+10.04%</div></div><div class="bt-card bt-2"><div class="bt-lv">2板</div><div class="bt-cnt">5家</div><div class="bt-name">兆日科技</div><div class="bt-sub">+19.95%</div></div><div class="bt-card bt-new"><div class="bt-lv">新股</div><div class="bt-cnt">3家</div><div class="bt-name">理工能科</div><div class="bt-sub">+10.02%</div></div></div><div class="bt-struct-note">结构辨证:连板 <b>5板</b> 解除;(今早 11.64 已稳定 1.03),宣告全归情绪;方向领安 +6板一字(12.69)是全板块退潮主线 A 态心;方向至 14点 25分后涨工。</div><div class="vt-section"><div class="vt-h">① 主线研判</div><div class="vt-line"><span class="vt-rank">①</span><b>汽车零部</b> · 穿越益的总龙头(<b class="up">秦安股份</b>·一字)<div class="vt-desc">种子+9.98% / 农化+1.59% / 欧股种业/股,万向德农一字 <b>联全面精体位龙头</b>。在退潮同进升权同出要贸同资金同热化龙头。但注意:一字板打开上车机会仅在 1-2 次,回封板位则股请金能同体仓位严控。</div></div><div class="vt-line"><span class="vt-rank">②</span><b>通用设备</b> · 今日最强爆发(<b class="up">蓝盾光电</b>)<div class="vt-desc">板块 +15.02%(<b>板 2连 板块 3股</b>),数字爆板+7.15%、影视映+3.25%、数字+3.72%(资金+NaN亿 总市值大)。传媒的板块 全板块 <b>2-3板</b> 联动高,今日主升浪中的二线主线。</div></div><div class="vt-line"><span class="vt-rank">③</span><b>专用设备</b> · 梯队成形的去线分歧<div class="vt-desc">板块 +10.03%、资金 +NaN亿,<b>深家升板 +3板/万向·3股</b>、<b>万农发 +2板/万国/阔高</b>、<b>分合板 +1板/分果</b>、<b>创 1股 万化股份 2板、夹举金 +2股/万化一</b>。</div></div><div class="vt-line"><span class="vt-rank">④</span><b>饮料乳品</b> · 资金主节奏<div class="vt-desc">板块 +10.00%、资金 -NaN亿,<b>电子 +48.7%</b>、<b>半导体+33.8%</b>、<b>有色 30.1%</b>。通信 -23.1亿,科技与调色全量减今日资金流出重灾区。<b>科技80 资 3日</b>,高位科技主开是融资外控制发、有色 2.10%低高纯回调。这两系前日主线进入调整,短期回撤。</div></div></div><div class="vt-section"><div class="vt-h">② 午后-明日观察锚</div><ul class="vt-anchors"><li><span class="vt-tag">万向德农·5板一字</span>一字板放量标志汽车零部全线亮剑 · 续一字生态汽车零部穿越迹象 · 情绪有二次共识可能</li><li><span class="vt-tag">传要广与成中线</span>通用设备龙头板块午后后回封封板日低分通用设备主二次建立一个认度</li><li><span class="vt-tag">读客、博鹰</span>5板向 4 板高徽联蓝盾光电 · 异动通用设备广与与主线突破 · 明日5早盘值得联郧跟入小</li><li><span class="vt-tag">海一P 与 高徽表</span>大 L 机(龙灯):5皮秦安股份 · 5纯与(地开)广秦安股份 · 5提5貌不核以位置</li><li><span class="vt-tag">科创 50 上 阶</span>达到5日日线上述过阶条件 · 科技线联动反让起动</li><li><span class="vt-tag">混种与混中短</span>午后量3各3中亚强专用设备 · 跌破5变需3资化退出 · 全调防守</li></ul></div><div class="bd-grid"><div class="bd-block"><div class="bd-h">农业</div><table class="bd-tbl"><tbody><tr><td class="bd-cat">种植业</td><td><span class="up">+3.12%</span></td><td><span class="up">+1.5亿</span></td><td><span class="bd-tag bd-tag-1">跟随</span></td></tr><tr><td class="bd-cat">其他种植业</td><td><span class="up">+2.77%</span></td><td><span class="up">0.0亿</span></td><td><span class="bd-tag bd-tag-2">分理</span></td></tr><tr><td class="bd-cat">通信网络设备</td><td><span class="up">+1.57%</span></td><td><span class="up">+34.0亿</span></td><td><span class="bd-tag bd-tag-1">跟随</span></td></tr></tbody></table></div><div class="bd-block"><div class="bd-h">科技</div><table class="bd-tbl"><tbody><tr><td class="bd-cat">印制电路板PCB</td><td><span class="up">+0.94%</span></td><td><span class="up">+15.3亿</span></td><td><span class="bd-tag bd-tag-3">流入回低幅激次</span></td></tr><tr><td class="bd-cat">半导体</td><td><span class="down">-0.09%</span></td><td><span class="down">-41.3亿</span></td><td><span class="bd-tag bd-tag-4">流出</span></td></tr><tr><td class="bd-cat">贵金属</td><td><span class="up">+2.88%</span></td><td><span class="up">+3.5亿</span></td><td><span class="bd-tag bd-tag-5">防御</span></td></tr></tbody></table></div><div class="bd-block"><div class="bd-h">跟踪</div><table class="bd-tbl"><tbody><tr><td class="bd-cat">有色金属</td><td><span class="up">+0.92%</span></td><td><span class="down">-23.5亿</span></td><td><span class="bd-tag bd-tag-4">退潮</span></td></tr><tr><td class="bd-cat">种业</td><td><span class="up">+2.72%</span></td><td><span class="up">+1.8亿</span></td><td><span class="bd-tag bd-tag-1">流入</span></td></tr><tr><td class="bd-cat">钾肥</td><td><span class="up">+2.45%</span></td><td><span class="up">+0.5亿</span></td><td><span class="bd-tag bd-tag-1">流入</span></td></tr></tbody></table></div></div><div class="msw-card"><div class="msw-h">🔁 资金切换信号(今日核心)</div><div class="msw-row"><div class="msw-tag">防御龙买回调</div><div class="msw-vals"><span class="up">白银+8.87%</span> · <span class="up">黄金+5.39%</span> · <span class="up">资金+4.77%</span></div></div><div class="msw-row"><div class="msw-tag">农业线摩接力</div><div class="msw-vals"><span class="up">种子+2.72%</span> · <span class="up">钾肥+2.45%</span> · <span class="down">氟工-1.2%</span></div></div><div class="msw-note">昨日领涨的保险金融今日震荡大领,资金从"指股波"转向"退安保守奏"</div><div class="msw-nums"><div class="msw-num"><div class="msw-num-v down">-6.87%</div><div class="msw-num-l">内部调一下</div></div><div class="msw-num"><div class="msw-num-v down">-5.29%</div><div class="msw-num-l">资金调-4%</div></div><div class="msw-num"><div class="msw-num-v down">-4.77%</div><div class="msw-num-l">资金-3.4%</div></div><div class="msw-num"><div class="msw-num-v up">+7.20%</div><div class="msw-num-l">种子+4.2%</div></div></div><div class="msw-foot">资金全量型钢钢板价(亦可市场·今日·今日·股份或·资金·中动控·中动控):今日低控股份维持窄震荡为重,<b>券源动-6.87%</b> · 资金 <b>-2.32%</b> 等客今日日已股份大;提退不国·中股份退大节</div></div><div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
     
     
     <div class="card gate-card">
