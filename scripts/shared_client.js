@@ -408,8 +408,16 @@ function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
   if(!card)return;
   if(s&&s.code&&document.querySelector('.wl-stock[data-stock-code="'+String(s.code).replace(/"/g,'\\"')+'"]'))return;
-  var stocksWrap=card.querySelector(".wl-stocks");
-  if(!stocksWrap){stocksWrap=document.createElement("div");stocksWrap.className="wl-stocks";var head=card.querySelector(".wl-stocks-head");if(head&&head.nextSibling){card.insertBefore(stocksWrap,head.nextSibling);}else{card.appendChild(stocksWrap);}}
+  // v8.1 修复: 优先找 .wl-stocks-scroll(蓝色滚动容器),手动新增的股票也要在容器内
+  // 找不到时 fallback 到 .wl-stocks(老结构兼容)
+  var stocksWrap=card.querySelector(".wl-stocks-scroll")||card.querySelector(".wl-stocks");
+  if(!stocksWrap){
+    stocksWrap=document.createElement("div");
+    stocksWrap.className="wl-stocks-scroll";
+    var wlStocks=card.querySelector(".wl-stocks");
+    if(wlStocks){wlStocks.appendChild(stocksWrap);}
+    else{var head=card.querySelector(".wl-stocks-head");if(head&&head.nextSibling){card.insertBefore(stocksWrap,head.nextSibling);}else{card.appendChild(stocksWrap);}}
+  }
   var n=stocksWrap.querySelectorAll(".wl-stock").length+1;
   var v=Number(s.pct)||0;
   var cls=v>=0?"up":"down";
