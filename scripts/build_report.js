@@ -1107,8 +1107,8 @@ function renderWatchlist(report) {
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
       '</div>' +
     '</div>' +
-    '<div class="wl-scroll-hint">← 左右滑动查看全部列 →</div>' +
-    '<div class="wl-stocks"><div class="wl-stocks-scroll">' + stocks + '</div></div>' +
+    '<div class="wl-scroll-hint">← 左右滑动查看全部列 · 右侧 ↕ 上下滚动查看更多个股</div>' +
+    '<div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll">' + stocks + '</div></div></div>' +
     '<div class="wl-details"></div>' +
     '</div>';
   const modals = '';  // v12b: 不再静态生成个股 modal,统一由 openStockResearch/showDynamicResearch 动态生成,避免 id 重复导致关闭失效
@@ -1332,50 +1332,116 @@ function renderPerStockTodayStrategy(s) {
 }
 
 function renderPremarketStrategy(report) {
-  const mr = report.mainRank || [];
+  const mr = (report.mainRank || []).slice(0, 3);     // A/B/C 三块
   const playbook = report.playbook || {};
-  const off = (playbook.offense || []).slice(0, 5);
   const pit = (playbook.pitfall || []).slice(0, 3);
   const ms = report.marketStats || {};
-  // 统计数据
+  // 顶部小banner数据
   const totalZT = ms.limitUpCount || 0;
   const zhaBan = ms.zhaBanCount || 0;
-  const zhaBanRate = totalZT + zhaBan > 0 ? Math.round(zhaBan / (totalZT + zhaBan) * 100) : 0;
-  // 取前5个主线板块构建A-E类别
-  const top5 = mr.slice(0, 5);
-  const catNames = ['A', 'B', 'C', 'D', 'E'];
-  const catTitles = ['领涨主线', '强势题材', '资金聚焦', '轮动方向', '异动关注'];
-  let catSections = top5.map((s, i) => {
+  const mainLine = ((playbook.offense || [])[0] || {}).name || (mr[0] && (mr[0].mappedName || mr[0].name)) || '--';
+  const date = (report.meta && report.meta.date) || '';
+  const topLine = ms.maxLianBan || (mr[0] && mr[0].maxLB) || 1;
+  // A/B/C 三块渲染
+  const catLetters = ['A', 'B', 'C'];
+  const blocks = mr.map((s, i) => {
     const nm = s.mappedName || s.name || '--';
     const pct = Number(s.changePct) || 0;
-    const cls = upDownClass(pct);
-    const ztCnt = s.limitUpMax || 0;
+    const pctCls = upDownClass(pct);
     const lead = s.leadStock || '--';
-    const picks = (s.picks || []).slice(0, 2);
-    const picksHtml = picks.length ? picks.map(p => {
-      const pc = upDownClass(p.pct);
-      return '<span class="em-pick"><b>' + esc(p.name) + '</b> <span class="' + pc + '">' + (p.pct > 0 ? '+' : '') + fmtPct(p.pct) + '</span></span>';
-    }).join('') : '';
-    return '<div class="em-cat"><div class="em-cat-h"><span class="em-cat-tag">' + catNames[i] + '</span><span class="em-cat-title">' + esc(nm) + '</span><span class="em-cat-status ' + cls + '">' + (s.status === '主线确认' ? '主线确认' : '轮动') + '</span></div>' +
-      '<div class="em-cat-body">涨停 <b>' + ztCnt + '</b>家 · 领涨 ' + esc(lead) + ' · 涨幅 <b class="' + cls + '">' + fmtPct(pct) + '</b></div>' +
-      (picksHtml ? '<div class="em-cat-picks">' + picksHtml + '</div>' : '') +
+    const techTag = s.techTag || '主线+趋势技术';
+    const trendSub = s.trendSub || ('+' + pct.toFixed(1) + '%');
+    const inflow = Number(s.inflowYi || 0).toFixed(2);
+    const ztSummary = s.limitUpMax || ('0家 / 0板');
+    const strongOpen = s.leadOpen ? Number(s.leadOpen).toFixed(2) : '--';
+    const strongHigh = s.leadHigh ? Number(s.leadHigh).toFixed(2) : '--';
+    const strongLow = s.leadLow ? Number(s.leadLow).toFixed(2) : '--';
+    const strongTurn = s.leadTurnover != null && s.leadTurnover !== 0 ? s.leadTurnover + '%' : '--';
+    const flowMain = s.flowMain || inflow;
+    const flowMid = s.flowMid || '--';
+    // 强势股 = 主升浪主图(图4右侧) 来自 picks[0]
+    const topPick = (s.picks || [])[0] || null;
+    const strongName = (topPick && topPick.name) || lead;
+    const strongCode = (topPick && topPick.code) || (s.leadCode || '');
+    const strongPct = topPick && topPick.pct != null ? Number(topPick.pct).toFixed(2) : '--';
+    return '<div class="em-bk">' +
+      '<div class="em-bk-h">' +
+        '<span class="em-bk-tag">' + catLetters[i] + '</span>' +
+        '<div class="em-bk-meta">' +
+          '<div class="em-bk-title">' + esc(nm) + ' <span class="em-bk-sub">(' + esc(trendSub) + ')</span></div>' +
+          '<div class="em-bk-tech">' + esc(techTag) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="em-bk-body">' +
+        '<div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">' + inflow + ' <span class="em-bk-u">亿</span></span></div>' +
+        '<div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">' + esc(ztSummary) + ' · ' + esc(lead) + ' · <b class="' + pctCls + '">' + fmtPct(pct) + '</b></span></div>' +
+        '<div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>' + esc(strongName) + '</b> <span class="em-bk-tag-mini">' + esc(String(strongCode)) + '</span> · <b class="' + pctCls + '">' + (strongPct !== '--' ? '+' + strongPct + '%' : '--') + '</b></span></div>' +
+        '<div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>' + strongOpen + '</b> · 最高 <b>' + strongHigh + '</b> · 最低 <b>' + strongLow + '</b> · 换手 <b>' + strongTurn + '</b></span></div>' +
+        '<div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">' + flowMain + '</b>亿 · 中 <b class="up">' + flowMid + '</b>亿</span></div>' +
+      '</div>' +
       '</div>';
   }).join('');
-  // 补齐到5个类别
-  for (let i = top5.length; i < 5; i++) {
-    const offItem = off[i - top5.length];
-    const nm = offItem ? offItem.name : catTitles[i];
-    catSections += '<div class="em-cat em-cat-dim"><div class="em-cat-h"><span class="em-cat-tag">' + catNames[i] + '</span><span class="em-cat-title">' + esc(nm) + '</span></div><div class="em-cat-body">暂无数据</div></div>';
+  // 候补:不足3块时填充占位
+  let blocksHtml = blocks;
+  for (let i = mr.length; i < 3; i++) {
+    blocksHtml += '<div class="em-bk em-bk-dim"><div class="em-bk-h"><span class="em-bk-tag">' + catLetters[i] + '</span><div class="em-bk-meta"><div class="em-bk-title">暂无数据</div></div></div></div>';
   }
+  // 观察池关键建议(主线 + 进攻 + 主题)
+  const off = (playbook.offense || []).slice(0, 3);
+  const theme = (playbook.themes || []).slice(0, 2);
+  const observeTips = (off.length ? off.map(o => '<li><span class="em-tip-tag">主线参与</span>' + esc(o.name) + ' · ' + esc((o.logic || '').slice(0, 50)) + '</li>') : []).concat(
+    theme.length ? theme.map(t => '<li><span class="em-tip-tag em-tip-tag-blue">主题</span>' + esc(t.name) + ' · ' + esc((t.logic || '').slice(0, 50)) + '</li>') : []
+  ).slice(0, 4);
+  const observeTipsHtml = observeTips.length ? '<ul class="em-tips">' + observeTips.join('') + '</ul>' : '<div class="em-tips-empty">盘中观察池暂无特别建议</div>';
   // 风险提示
-  const riskHtml = pit.length ? pit.map(p => '<div class="em-risk-item"><span class="em-risk-name">' + esc(p.name) + '</span><span class="em-risk-logic">' + esc(p.logic || '') + '</span></div>').join('') : '<div class="em-risk-item">暂无</div>';
-  const date = (report.meta && report.meta.date) || '';
+  const pitHtml = pit.length ? pit.map(p => '<li><b>' + esc(p.name) + '</b> · ' + esc(p.logic || '') + '</li>').join('') : '<li>暂无特别风险提示</li>';
+  // 主升浪周期分类(根据最强板块特性派生3类)
+  const top3 = mr.slice(0, 3);
+  // 周期类型分别锚定到 3 个板块
+  const cycleItems = [
+    { key: '启动股', tagClass: 'em-cyc-1', body: top3[0] || mr[0] || {} },
+    { key: '强度股', tagClass: 'em-cyc-2', body: top3[1] || top3[0] || mr[0] || {} },
+    { key: '龙头股', tagClass: 'em-cyc-3', body: top3[2] || top3[0] || mr[0] || {} }
+  ].map(c => {
+    const b = c.body || {};
+    const pct = Number(b.changePct || 0).toFixed(2);
+    const lead = b.leadStock || '--';
+    return '<div class="em-cyc ' + c.tagClass + '">' +
+      '<div class="em-cyc-h">' + c.key + '</div>' +
+      '<div class="em-cyc-b">' +
+        '<div>' + esc(b.mappedName || b.name || '--') + ' · ' + esc(lead) + '</div>' +
+        '<div class="em-cyc-meta">涨幅 <b class="' + upDownClass(b.changePct) + '">' + fmtPct(b.changePct) + '</b> · 主力 <b class="up">' + (b.inflowYi || 0) + '</b> 亿</div>' +
+      '</div>' +
+      '</div>';
+  }).join('');
+  // 止盈/止损法则(根据 maxLB 派生连板梯队)
+  const lb = Number(topLine || 1);
+  let tierHtml;
+  if (lb >= 4) tierHtml = '<li><b>第一梯队(高度龙头)</b>:连板 4+ ,目标 5-8% 空间,严控仓位,只做回封确认</li><li><b>第二梯队(中位接力)</b>:连板 2-3 ,目标 3-5% 空间,跟随龙头节奏低吸</li><li><b>第三梯队(低位首板)</b>:连板 1 ,目标 5-10% 空间,看分时量能确认</li>';
+  else if (lb >= 3) tierHtml = '<li><b>第一梯队</b>:连板 3-4 ,目标 4-6% 空间,严控回撤</li><li><b>第二梯队</b>:连板 2 ,目标 3-5% 空间,跟随主线</li><li><b>第三梯队</b>:首板低吸,看分时放量确认</li>';
+  else tierHtml = '<li><b>第一梯队</b>:连板 2-3 ,目标 3-5% 空间</li><li><b>第二梯队</b>:首板接力,目标 4-7% 空间</li><li><b>第三梯队</b>:回调低吸,目标 2-4% 空间</li>';
+  // 顶部简短说明 banner
+  const banner = '<div class="em-banner"><span class="em-banner-dot"></span><b>实时下载 · 市场数据</b><span class="em-banner-tip">盘前接力判断 · 板块联动确认 · 强势股池筛选</span></div>';
+
   return '<div class="card em-card">' +
-    '<div class="em-header"><span class="em-title">主升浪·新周期</span><span class="em-date">' + esc(date) + '</span></div>' +
-    '<div class="em-stats"><span class="em-stat em-stat-green"><b>' + totalZT + '</b> 涨停</span><span class="em-stat em-stat-gray">--</span><span class="em-stat em-stat-red"><b>' + zhaBan + '</b> 炸板</span></div>' +
-    '<div class="em-cats">' + catSections + '</div>' +
-    '<div class="em-risk"><span class="em-risk-tag">⚠ 风险提示</span>' + riskHtml + '</div>' +
-    '</div>';
+    '<div class="em-header">' +
+      '<span class="em-title">主升浪·新周期</span>' +
+      '<span class="em-date">' + esc(date) + '</span>' +
+    '</div>' +
+    banner +
+    '<div class="em-stats-mini">' +
+      '<span class="em-stat-mini"><b>' + totalZT + '</b> 涨停</span>' +
+      '<span class="em-stat-mini-dot">·</span>' +
+      '<span class="em-stat-mini"><b>' + zhaBan + '</b> 炸板</span>' +
+      '<span class="em-stat-mini-dot">·</span>' +
+      '<span class="em-stat-mini">主线 <b>' + esc(mainLine) + '</b></span>' +
+    '</div>' +
+    '<div class="em-bks">' + blocksHtml + '</div>' +
+    '<div class="em-section"><div class="em-section-h">📌 观察池关键建议</div>' + observeTipsHtml + '</div>' +
+    '<div class="em-section"><div class="em-section-h">🎯 主升浪周期分类</div><div class="em-cycle">' + cycleItems + '</div></div>' +
+    '<div class="em-section"><div class="em-section-h">⚖️ 止盈止损法则</div><ul class="em-tier">' + tierHtml + '</ul></div>' +
+    '<div class="em-section"><div class="em-section-h">⚠️ 主升浪低位洞察 · 风险提示</div><ul class="em-risk-list">' + pitHtml + '</ul></div>' +
+  '</div>';
 }
 
 function renderPremarketCockpit(report) {

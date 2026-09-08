@@ -310,6 +310,14 @@
 .modal-box .modal-footer{background:#fafafa;padding:10px 16px;font-size:9px;color:#999;border-top:1px solid #f0f0f0;text-align:center}
 /* v16: 每只股票独立卡片(自带表头+数据+拉杆+详情) */
 .wl-stocks{display:flex;flex-direction:column;gap:10px}
+/* v17: 观察池可上下滚动容器(右侧滚动条+首条默认可见+提示徽章) */
+.wl-stocks-scroll{overflow-y:auto;max-height:380px;-webkit-overflow-scrolling:touch;scrollbar-width:6px;padding-right:4px;border-radius:6px;background:rgba(56,189,248,0.02)}
+.wl-stocks-scroll::-webkit-scrollbar{width:6px;background:rgba(56,189,248,0.04);border-radius:3px}
+.wl-stocks-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#38bdf8,#0ea5e9);border-radius:3px;border:1px solid rgba(255,255,255,0.4)}
+.wl-stocks-scroll::-webkit-scrollbar-track{background:rgba(56,189,248,0.06);border-radius:3px}
+.wl-stocks-scroll-wrap{position:relative}
+.wl-stocks-scroll-wrap::after{content:"↕ 上下滚动";position:absolute;right:6px;top:6px;font-size:9px;color:#0284c7;background:rgba(186,230,253,0.85);padding:1px 5px;border-radius:8px;pointer-events:none;z-index:2;font-weight:600;letter-spacing:0.5px}
+.wl-stocks-scroll-wrap::before{content:"";position:absolute;right:0;top:0;bottom:0;width:8px;background:linear-gradient(90deg,transparent,rgba(56,189,248,0.05));pointer-events:none;border-radius:0 6px 6px 0;z-index:1}
 .wl-stock{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0}
 .wl-stock-scroll{display:block;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%}
 .wl-stock-scroll::-webkit-scrollbar{height:5px}
@@ -1698,6 +1706,83 @@
   .tw-d-pick { font-size: 11px; padding: 1px 8px; }
   .tw-d-reason { font-size: 11px; padding: 6px 10px; }
 }
+
+/* ============ 主线参与策略 - 主升浪·新周期 (2026-09-08) ============ */
+.em-card { background: linear-gradient(180deg, #fff7ed 0%, #fff 80%); border: 1px solid rgba(225,29,72,0.18); }
+.em-header { display: flex; align-items: baseline; gap: 8px; padding: 8px 0 4px 0; }
+.em-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+.em-date { font-size: 11px; color: #64748b; }
+.em-banner { display: flex; align-items: center; gap: 6px; padding: 5px 9px; margin: 8px 0 4px 0; background: linear-gradient(90deg, rgba(225,29,72,0.08), rgba(225,29,72,0.02)); border-left: 2px solid #e11d48; border-radius: 0 6px 6px 0; }
+.em-banner-dot { width: 6px; height: 6px; background: #e11d48; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(225,29,72,0.18); }
+.em-banner b { font-size: 12px; color: #e11d48; }
+.em-banner-tip { font-size: 10px; color: #64748b; }
+.em-stats-mini { display: flex; align-items: center; gap: 4px; padding: 4px 0 8px 0; font-size: 11px; color: #475569; }
+.em-stat-mini-dot { color: #cbd5e1; }
+.em-stats { display: flex; gap: 10px; padding: 6px 0 10px 0; }
+.em-stat { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
+.em-stat-green { background: rgba(22,163,74,0.12); color: #16a34a; }
+.em-stat-gray { background: rgba(100,116,139,0.1); color: #94a3b8; }
+.em-stat-red { background: rgba(225,29,72,0.12); color: #e11d48; }
+.em-bks { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 10px 0; }
+.em-bk { background: #fff; border: 1px solid rgba(225,29,72,0.15); border-radius: 8px; padding: 8px 10px; box-shadow: 0 1px 0 rgba(225,29,72,0.04); }
+.em-bk-dim { opacity: 0.55; }
+.em-bk-h { display: flex; align-items: flex-start; gap: 8px; padding-bottom: 6px; border-bottom: 1px dashed rgba(100,116,139,0.18); margin-bottom: 6px; }
+.em-bk-tag { background: #e11d48; color: #fff; font-size: 11px; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(225,29,72,0.3); }
+.em-bk-meta { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.em-bk-title { font-size: 13px; font-weight: 700; color: #0f172a; }
+.em-bk-sub { font-size: 10px; color: #e11d48; font-weight: 600; margin-left: 4px; }
+.em-bk-tech { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 7px; background: rgba(225,29,72,0.08); color: #e11d48; border-radius: 8px; align-self: flex-start; }
+.em-bk-body { display: flex; flex-direction: column; gap: 4px; }
+.em-bk-row { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+.em-bk-k { color: #94a3b8; flex-shrink: 0; min-width: 92px; }
+.em-bk-v { color: #475569; flex: 1; word-break: break-all; }
+.em-bk-v b { color: #0f172a; font-weight: 700; }
+.em-bk-v b.up { color: #e11d48; }
+.em-bk-v b.down { color: #16a34a; }
+.em-bk-v .up { color: #e11d48; }
+.em-bk-v .down { color: #16a34a; }
+.em-bk-u { font-size: 9px; color: #94a3b8; margin-left: 1px; }
+.em-strong { font-size: 14px !important; color: #e11d48 !important; font-weight: 700; }
+.em-bk-tag-mini { display: inline-block; font-size: 9px; color: #64748b; padding: 0 4px; border-radius: 4px; background: rgba(100,116,139,0.1); font-family: monospace; }
+.em-bk-strong b { color: #0f172a; }
+.em-bk-bar { display: flex; gap: 6px; padding: 4px 8px; background: rgba(56,189,248,0.05); border-radius: 4px; border-left: 2px solid #38bdf8; font-size: 10px; }
+.em-bk-bar-k { color: #0284c7; flex-shrink: 0; font-weight: 600; min-width: 92px; }
+.em-bk-bar-v { color: #475569; flex: 1; }
+.em-bk-bar-v b { color: #0f172a; font-weight: 700; padding: 0 1px; }
+.em-section { margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(100,116,139,0.2); }
+.em-section-h { font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 6px; padding-left: 4px; border-left: 3px solid #e11d48; padding: 1px 0 1px 6px; }
+.em-tips { list-style: none; padding: 0; margin: 0; }
+.em-tips li { font-size: 11px; color: #475569; padding: 4px 8px; background: rgba(225,29,72,0.03); border-radius: 4px; margin-bottom: 4px; display: flex; align-items: flex-start; gap: 6px; }
+.em-tip-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 5px; background: rgba(225,29,72,0.12); color: #e11d48; border-radius: 3px; flex-shrink: 0; }
+.em-tip-tag-blue { background: rgba(2,132,199,0.12) !important; color: #0284c7 !important; }
+.em-tips-empty { font-size: 11px; color: #94a3b8; padding: 4px 8px; }
+.em-cycle { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.em-cyc { padding: 8px 6px; border-radius: 6px; text-align: center; }
+.em-cyc-1 { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+.em-cyc-2 { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); }
+.em-cyc-3 { background: rgba(225,29,72,0.08); border: 1px solid rgba(225,29,72,0.2); }
+.em-cyc-h { font-size: 11px; font-weight: 700; padding-bottom: 3px; margin-bottom: 3px; border-bottom: 1px dashed rgba(100,116,139,0.2); }
+.em-cyc-1 .em-cyc-h { color: #16a34a; }
+.em-cyc-2 .em-cyc-h { color: #f59e0b; }
+.em-cyc-3 .em-cyc-h { color: #e11d48; }
+.em-cyc-b { font-size: 10px; line-height: 1.5; color: #475569; }
+.em-cyc-meta { font-size: 9px; color: #94a3b8; margin-top: 2px; }
+.em-cyc-meta b.up { color: #e11d48; }
+.em-tier { list-style: none; padding: 0; margin: 0; }
+.em-tier li { font-size: 11px; color: #475569; padding: 4px 8px; background: rgba(245,158,11,0.04); border-radius: 4px; margin-bottom: 4px; border-left: 2px solid #f59e0b; }
+.em-tier b { color: #0f172a; }
+.em-risk-list { list-style: none; padding: 4px 8px; margin: 0; background: rgba(225,29,72,0.04); border-radius: 4px; border-left: 2px solid #e11d48; }
+.em-risk-list li { font-size: 11px; color: #475569; padding: 2px 0; }
+.em-risk-list b { color: #e11d48; }
+
+@media (max-width: 480px) {
+  .em-cycle { grid-template-columns: 1fr 1fr 1fr; }
+  .em-bk-k { min-width: 76px; font-size: 10px; }
+  .em-bk-bar-k { min-width: 76px; font-size: 10px; }
+  .em-bk-title { font-size: 12px; }
+  .em-bk-v { font-size: 10px; }
+  .em-bk-row { font-size: 10px; }
+}
 </style>
 </head>
 <body>
@@ -1711,7 +1796,7 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-08-18_11-35.html">午盘</a><a href="2026-08-18_15-20.html" class="active">收盘</a><a href="2026-09-08_08-30.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-08-18_11-35.html">午盘</a><a href="2026-08-18_15-20.html" class="active">收盘</a><a href="2026-09-08_11-35.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘</div><h1 class="hero-title">2026-08-18 · <span class="hero-time">15:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 85°</span></div></div>
@@ -1775,18 +1860,7 @@
   </div>
   
   
-  <div class="card">
-    <div class="card-title">策略状态</div>
-    <div class="str-block">
-      <div class="str-h">⚔️ 进攻方向</div><div class="str-line"><b>种植业</b> 涨停 5家 / 2板 · 领涨 农发种业</div><div class="str-line"><b>化学制药</b> 涨停 3家 / 4板 · 领涨 神奇制药</div><div class="str-line"><b>养殖业</b> 涨停 3家 / 2板 · 领涨 天山生物</div>
-    </div>
-    <div class="str-block">
-      <div class="str-h">🛡️ 防守方向</div><div class="str-line"><b>高股息红利</b> 低波动+稳定分红</div><div class="str-line"><b>公用事业</b> 现金流稳定+刚性需求</div><div class="str-line"><b>银行(大行)</b> 高股息+低估值</div>
-    </div>
-    <div class="str-block">
-      <div class="str-h">⚠️ 风险提示</div><div class="str-line pit"><b>高位连板股(连板≥4)</b> 当前连板≥4 共 1 只,承接强度需复核</div><div class="str-line pit"><b>当日炸板股</b> 近 0 只炸板,分歧加大</div><div class="str-line pit"><b>北证/微盘股</b> 波动放大+流动性敏感</div>
-    </div>
-  </div>
+  <div class="card em-card"><div class="em-header"><span class="em-title">主升浪·新周期</span><span class="em-date">2026-08-18</span></div><div class="em-banner"><span class="em-banner-dot"></span><b>实时下载 · 市场数据</b><span class="em-banner-tip">盘前接力判断 · 板块联动确认 · 强势股池筛选</span></div><div class="em-stats-mini"><span class="em-stat-mini"><b>79</b> 涨停</span><span class="em-stat-mini-dot">·</span><span class="em-stat-mini"><b>23</b> 炸板</span><span class="em-stat-mini-dot">·</span><span class="em-stat-mini">主线 <b>种植业</b></span></div><div class="em-bks"><div class="em-bk"><div class="em-bk-h"><span class="em-bk-tag">A</span><div class="em-bk-meta"><div class="em-bk-title">化学制药 <span class="em-bk-sub">(+10.0%)</span></div><div class="em-bk-tech">主线+趋势技术</div></div></div><div class="em-bk-body"><div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">0.00 <span class="em-bk-u">亿</span></span></div><div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">3家 / 4板 · 神奇制药 · <b class="up">+10.03%</b></span></div><div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>神奇制药</b> <span class="em-bk-tag-mini"></span> · <b class="up">--</b></span></div><div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>--</b> · 最高 <b>--</b> · 最低 <b>--</b> · 换手 <b>--</b></span></div><div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">0.00</b>亿 · 中 <b class="up">--</b>亿</span></div></div></div><div class="em-bk"><div class="em-bk-h"><span class="em-bk-tag">B</span><div class="em-bk-meta"><div class="em-bk-title">种植业 <span class="em-bk-sub">(+12.0%)</span></div><div class="em-bk-tech">主线+趋势技术</div></div></div><div class="em-bk-body"><div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">0.00 <span class="em-bk-u">亿</span></span></div><div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">5家 / 2板 · 农发种业 · <b class="up">+11.99%</b></span></div><div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>农发种业</b> <span class="em-bk-tag-mini"></span> · <b class="up">--</b></span></div><div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>--</b> · 最高 <b>--</b> · 最低 <b>--</b> · 换手 <b>--</b></span></div><div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">0.00</b>亿 · 中 <b class="up">--</b>亿</span></div></div></div><div class="em-bk"><div class="em-bk-h"><span class="em-bk-tag">C</span><div class="em-bk-meta"><div class="em-bk-title">休闲食品 <span class="em-bk-sub">(+10.0%)</span></div><div class="em-bk-tech">主线+趋势技术</div></div></div><div class="em-bk-body"><div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">0.00 <span class="em-bk-u">亿</span></span></div><div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">2家 / 3板 · 桂发祥 · <b class="up">+10.04%</b></span></div><div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>桂发祥</b> <span class="em-bk-tag-mini"></span> · <b class="up">--</b></span></div><div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>--</b> · 最高 <b>--</b> · 最低 <b>--</b> · 换手 <b>--</b></span></div><div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">0.00</b>亿 · 中 <b class="up">--</b>亿</span></div></div></div></div><div class="em-section"><div class="em-section-h">📌 观察池关键建议</div><ul class="em-tips"><li><span class="em-tip-tag">主线参与</span>种植业 · </li><li><span class="em-tip-tag">主线参与</span>化学制药 · </li><li><span class="em-tip-tag">主线参与</span>养殖业 · </li></ul></div><div class="em-section"><div class="em-section-h">🎯 主升浪周期分类</div><div class="em-cycle"><div class="em-cyc em-cyc-1"><div class="em-cyc-h">启动股</div><div class="em-cyc-b"><div>化学制药 · 神奇制药</div><div class="em-cyc-meta">涨幅 <b class="up">+10.03%</b> · 主力 <b class="up">0</b> 亿</div></div></div><div class="em-cyc em-cyc-2"><div class="em-cyc-h">强度股</div><div class="em-cyc-b"><div>种植业 · 农发种业</div><div class="em-cyc-meta">涨幅 <b class="up">+11.99%</b> · 主力 <b class="up">0</b> 亿</div></div></div><div class="em-cyc em-cyc-3"><div class="em-cyc-h">龙头股</div><div class="em-cyc-b"><div>休闲食品 · 桂发祥</div><div class="em-cyc-meta">涨幅 <b class="up">+10.04%</b> · 主力 <b class="up">0</b> 亿</div></div></div></div></div><div class="em-section"><div class="em-section-h">⚖️ 止盈止损法则</div><ul class="em-tier"><li><b>第一梯队(高度龙头)</b>:连板 4+ ,目标 5-8% 空间,严控仓位,只做回封确认</li><li><b>第二梯队(中位接力)</b>:连板 2-3 ,目标 3-5% 空间,跟随龙头节奏低吸</li><li><b>第三梯队(低位首板)</b>:连板 1 ,目标 5-10% 空间,看分时量能确认</li></ul></div><div class="em-section"><div class="em-section-h">⚠️ 主升浪低位洞察 · 风险提示</div><ul class="em-risk-list"><li><b>高位连板股(连板≥4)</b> · 当前连板≥4 共 1 只,承接强度需复核</li><li><b>当日炸板股</b> · 近 0 只炸板,分歧加大</li><li><b>北证/微盘股</b> · 波动放大+流动性敏感</li></ul></div></div>
   <div class="card">
     <div class="card-title">核心指数</div>
     <div class="index-row"><div class="index-item" data-code="000001" data-prefix="sh">

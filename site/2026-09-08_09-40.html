@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>ATDS PRO · 盘前简报</title>
+<html lang="zh-CN" data-page-node-id="TIH5KOdj9ORZp2FY7gmqsk">
+<head data-page-node-id="nC6aqFXX28ZqM8H4rp05o0">
+<meta charset="UTF-8" data-page-node-id="81FiNCpBvNCyjC0wzWFe18">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="mM6VfvvGFAvyaOXUWBA14Z">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" data-page-node-id="QbMzgUztrGyigr7gX4OG5A"><meta http-equiv="Pragma" content="no-cache" data-page-node-id="D2A68QEft87qxfJXWxhXYQ"><meta http-equiv="Expires" content="0" data-page-node-id="PmJ25iv8P9J85pMionp8Ti"><title>ATDS PRO · 盘前简报</title>
 <style>.modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0}
 .modal-mask.show{display:flex}
 .modal{background:#fff;border-radius:20px;max-width:414px;width:92%;margin:0 auto;padding:0;overflow:hidden}
@@ -306,9 +306,14 @@
 .modal-box .modal-footer{background:#fafafa;padding:10px 16px;font-size:9px;color:#999;border-top:1px solid #f0f0f0;text-align:center}
 /* v16: 每只股票独立卡片(自带表头+数据+拉杆+详情) */
 .wl-stocks{display:flex;flex-direction:column;gap:10px}
-.wl-stocks-scroll{overflow-y:auto;max-height:260px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-.wl-stocks-scroll::-webkit-scrollbar{width:4px}
-.wl-stocks-scroll::-webkit-scrollbar-thumb{background:#c33;border-radius:3px}
+/* v17: 观察池可上下滚动容器(右侧滚动条+首条默认可见+提示徽章) */
+.wl-stocks-scroll{overflow-y:auto;max-height:380px;-webkit-overflow-scrolling:touch;scrollbar-width:6px;padding-right:4px;border-radius:6px;background:rgba(56,189,248,0.02)}
+.wl-stocks-scroll::-webkit-scrollbar{width:6px;background:rgba(56,189,248,0.04);border-radius:3px}
+.wl-stocks-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#38bdf8,#0ea5e9);border-radius:3px;border:1px solid rgba(255,255,255,0.4)}
+.wl-stocks-scroll::-webkit-scrollbar-track{background:rgba(56,189,248,0.06);border-radius:3px}
+.wl-stocks-scroll-wrap{position:relative}
+.wl-stocks-scroll-wrap::after{content:"↕ 上下滚动";position:absolute;right:6px;top:6px;font-size:9px;color:#0284c7;background:rgba(186,230,253,0.85);padding:1px 5px;border-radius:8px;pointer-events:none;z-index:2;font-weight:600;letter-spacing:0.5px}
+.wl-stocks-scroll-wrap::before{content:"";position:absolute;right:0;top:0;bottom:0;width:8px;background:linear-gradient(90deg,transparent,rgba(56,189,248,0.05));pointer-events:none;border-radius:0 6px 6px 0;z-index:1}
 .wl-stock{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0}
 .wl-stock-scroll{display:block;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%}
 .wl-stock-scroll::-webkit-scrollbar{height:5px}
@@ -1703,301 +1708,345 @@
 .em-header { display: flex; align-items: baseline; gap: 8px; padding: 8px 0 4px 0; }
 .em-title { font-size: 16px; font-weight: 700; color: #0f172a; }
 .em-date { font-size: 11px; color: #64748b; }
+.em-banner { display: flex; align-items: center; gap: 6px; padding: 5px 9px; margin: 8px 0 4px 0; background: linear-gradient(90deg, rgba(225,29,72,0.08), rgba(225,29,72,0.02)); border-left: 2px solid #e11d48; border-radius: 0 6px 6px 0; }
+.em-banner-dot { width: 6px; height: 6px; background: #e11d48; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(225,29,72,0.18); }
+.em-banner b { font-size: 12px; color: #e11d48; }
+.em-banner-tip { font-size: 10px; color: #64748b; }
+.em-stats-mini { display: flex; align-items: center; gap: 4px; padding: 4px 0 8px 0; font-size: 11px; color: #475569; }
+.em-stat-mini-dot { color: #cbd5e1; }
 .em-stats { display: flex; gap: 10px; padding: 6px 0 10px 0; }
 .em-stat { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
 .em-stat-green { background: rgba(22,163,74,0.12); color: #16a34a; }
 .em-stat-gray { background: rgba(100,116,139,0.1); color: #94a3b8; }
 .em-stat-red { background: rgba(225,29,72,0.12); color: #e11d48; }
-.em-cats { display: flex; flex-direction: column; gap: 6px; }
-.em-cat { background: #fff; border: 1px solid rgba(100,116,139,0.12); border-radius: 8px; padding: 8px 10px; }
-.em-cat-dim { opacity: 0.5; }
-.em-cat-h { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-.em-cat-tag { background: #e11d48; color: #fff; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.em-cat-title { font-size: 13px; font-weight: 700; color: #0f172a; flex: 1; }
-.em-cat-status { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 8px; }
-.em-cat-status.up { background: rgba(225,29,72,0.1); color: #e11d48; }
-.em-cat-status.down { background: rgba(22,163,74,0.1); color: #16a34a; }
-.em-cat-body { font-size: 11px; color: #475569; line-height: 1.6; }
-.em-cat-body b { color: #0f172a; }
-.em-cat-body .up { color: #e11d48; }
-.em-cat-body .down { color: #16a34a; }
-.em-cat-picks { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-.em-pick { font-size: 11px; padding: 1px 8px; background: rgba(56,189,248,0.06); border-radius: 10px; border: 1px solid rgba(2,132,199,0.15); }
-.em-pick b { color: #0f172a; }
-.em-pick .up { color: #e11d48; font-weight: 600; }
-.em-pick .down { color: #16a34a; font-weight: 600; }
-.em-risk { margin-top: 10px; padding: 8px 10px; background: rgba(225,29,72,0.05); border-radius: 6px; border-left: 3px solid #e11d48; }
-.em-risk-tag { font-size: 11px; font-weight: 700; color: #e11d48; display: block; margin-bottom: 4px; }
-.em-risk-item { font-size: 11px; color: #475569; padding: 3px 0; }
-.em-risk-name { font-weight: 600; color: #e11d48; }
+.em-bks { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 10px 0; }
+.em-bk { background: #fff; border: 1px solid rgba(225,29,72,0.15); border-radius: 8px; padding: 8px 10px; box-shadow: 0 1px 0 rgba(225,29,72,0.04); }
+.em-bk-dim { opacity: 0.55; }
+.em-bk-h { display: flex; align-items: flex-start; gap: 8px; padding-bottom: 6px; border-bottom: 1px dashed rgba(100,116,139,0.18); margin-bottom: 6px; }
+.em-bk-tag { background: #e11d48; color: #fff; font-size: 11px; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(225,29,72,0.3); }
+.em-bk-meta { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.em-bk-title { font-size: 13px; font-weight: 700; color: #0f172a; }
+.em-bk-sub { font-size: 10px; color: #e11d48; font-weight: 600; margin-left: 4px; }
+.em-bk-tech { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 7px; background: rgba(225,29,72,0.08); color: #e11d48; border-radius: 8px; align-self: flex-start; }
+.em-bk-body { display: flex; flex-direction: column; gap: 4px; }
+.em-bk-row { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+.em-bk-k { color: #94a3b8; flex-shrink: 0; min-width: 92px; }
+.em-bk-v { color: #475569; flex: 1; word-break: break-all; }
+.em-bk-v b { color: #0f172a; font-weight: 700; }
+.em-bk-v b.up { color: #e11d48; }
+.em-bk-v b.down { color: #16a34a; }
+.em-bk-v .up { color: #e11d48; }
+.em-bk-v .down { color: #16a34a; }
+.em-bk-u { font-size: 9px; color: #94a3b8; margin-left: 1px; }
+.em-strong { font-size: 14px !important; color: #e11d48 !important; font-weight: 700; }
+.em-bk-tag-mini { display: inline-block; font-size: 9px; color: #64748b; padding: 0 4px; border-radius: 4px; background: rgba(100,116,139,0.1); font-family: monospace; }
+.em-bk-strong b { color: #0f172a; }
+.em-bk-bar { display: flex; gap: 6px; padding: 4px 8px; background: rgba(56,189,248,0.05); border-radius: 4px; border-left: 2px solid #38bdf8; font-size: 10px; }
+.em-bk-bar-k { color: #0284c7; flex-shrink: 0; font-weight: 600; min-width: 92px; }
+.em-bk-bar-v { color: #475569; flex: 1; }
+.em-bk-bar-v b { color: #0f172a; font-weight: 700; padding: 0 1px; }
+.em-section { margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(100,116,139,0.2); }
+.em-section-h { font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 6px; padding-left: 4px; border-left: 3px solid #e11d48; padding: 1px 0 1px 6px; }
+.em-tips { list-style: none; padding: 0; margin: 0; }
+.em-tips li { font-size: 11px; color: #475569; padding: 4px 8px; background: rgba(225,29,72,0.03); border-radius: 4px; margin-bottom: 4px; display: flex; align-items: flex-start; gap: 6px; }
+.em-tip-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 5px; background: rgba(225,29,72,0.12); color: #e11d48; border-radius: 3px; flex-shrink: 0; }
+.em-tip-tag-blue { background: rgba(2,132,199,0.12) !important; color: #0284c7 !important; }
+.em-tips-empty { font-size: 11px; color: #94a3b8; padding: 4px 8px; }
+.em-cycle { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.em-cyc { padding: 8px 6px; border-radius: 6px; text-align: center; }
+.em-cyc-1 { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+.em-cyc-2 { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); }
+.em-cyc-3 { background: rgba(225,29,72,0.08); border: 1px solid rgba(225,29,72,0.2); }
+.em-cyc-h { font-size: 11px; font-weight: 700; padding-bottom: 3px; margin-bottom: 3px; border-bottom: 1px dashed rgba(100,116,139,0.2); }
+.em-cyc-1 .em-cyc-h { color: #16a34a; }
+.em-cyc-2 .em-cyc-h { color: #f59e0b; }
+.em-cyc-3 .em-cyc-h { color: #e11d48; }
+.em-cyc-b { font-size: 10px; line-height: 1.5; color: #475569; }
+.em-cyc-meta { font-size: 9px; color: #94a3b8; margin-top: 2px; }
+.em-cyc-meta b.up { color: #e11d48; }
+.em-tier { list-style: none; padding: 0; margin: 0; }
+.em-tier li { font-size: 11px; color: #475569; padding: 4px 8px; background: rgba(245,158,11,0.04); border-radius: 4px; margin-bottom: 4px; border-left: 2px solid #f59e0b; }
+.em-tier b { color: #0f172a; }
+.em-risk-list { list-style: none; padding: 4px 8px; margin: 0; background: rgba(225,29,72,0.04); border-radius: 4px; border-left: 2px solid #e11d48; }
+.em-risk-list li { font-size: 11px; color: #475569; padding: 2px 0; }
+.em-risk-list b { color: #e11d48; }
+
+@media (max-width: 480px) {
+  .em-cycle { grid-template-columns: 1fr 1fr 1fr; }
+  .em-bk-k { min-width: 76px; font-size: 10px; }
+  .em-bk-bar-k { min-width: 76px; font-size: 10px; }
+  .em-bk-title { font-size: 12px; }
+  .em-bk-v { font-size: 10px; }
+  .em-bk-row { font-size: 10px; }
+}
 </style>
 </head>
-<body>
-<div class="phone">
-<div class="header">
-    <div class="brand">
-      <div class="logo">A</div>
-      <div class="brand-text">
-        <div class="brand-name">ATDS <span class="pro-badge">PRO</span> 复盘</div>
-        <div class="brand-sub">GLOBAL LINKAGE V4.0 · 2026-09-08 09:40</div>
+<body data-page-node-id="bhdS8n8wWm3Bd4QFBhFRID">
+<div class="phone" data-page-node-id="OqEVe2ktynPZnyi7FIbfRN">
+<div class="header" data-page-node-id="ud03BiEiDOBpPXPUkFuEd8">
+    <div class="brand" data-page-node-id="rDNFZduJy13cHKZx7y0jaU">
+      <div class="logo" data-page-node-id="XzEDo8K4VtDQSWWoOMs2Ca">A</div>
+      <div class="brand-text" data-page-node-id="JNGZzra6zTAcabEZN0b0ms">
+        <div class="brand-name" data-page-node-id="QjY4eA6kwYSwsL1ZPwzSDC">ATDS <span class="pro-badge" data-page-node-id="LCe3xyOot750pj2tDRIzDP">PRO</span> 复盘</div>
+        <div class="brand-sub" data-page-node-id="uO9aBMkzBi9UEZhMiRLoDg">GLOBAL LINKAGE V4.0 · 2026-09-08 09:40</div>
       </div>
     </div>
-    <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-09-08_11-35.html">午盘</a><a href="2026-09-07_16-20.html">收盘</a><a href="2026-09-08_11-35.html">复盘</a>
+    <div class="time-nav" data-page-node-id="yMeOQbcidm8v9ZFFTuHUks">
+      <a href="index.html" data-page-node-id="bLX7Bc386af1zFeO4OX6DC">盘前</a><a href="2026-09-08_11-35.html" data-page-node-id="lwrPnrurlf2spPLL9u3yOC">午盘</a><a href="2026-09-07_16-20.html" data-page-node-id="ko3hLXwDYLNxOcTmrDbg2G">收盘</a><a href="2026-09-08_11-35.html" data-page-node-id="bK1ODgUWmtc5eE4zG7tByd">复盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-09-08 · <span class="hero-time">09:40</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 82°</span></div></div>
-<div class="section">
-  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● 2026-09-08 19:29:20</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 →</div><div class="wl-stocks"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="600487">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">1</span><span class="wl-name">亨通光电</span><span class="wl-code">600487</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">63.11</span></span>
-    <span class="wl-cell wl-cell-pct down">-1.39%</span>
-    <span class="wl-cell wl-cell-amt">97.0亿</span>
-    <span class="wl-cell wl-cell-atds">70</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-press">走势承压</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600487" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600487" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="600487">
-    <div class="wl-meta"><span class="wl-cat">光通信</span><span class="wl-tag">首选参与</span></div>
-    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">海缆+光模块双主线,受益AI算力需求爆发+海上风电招标回暖,在手订单充足</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入2.3亿(通信板块前三),量比放大,资金连续吸筹</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑60 / 压力68.5</div></div><div class="detail-block detail-block-par">
-      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
-      <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩60-61低吸<b>500股</b>(3万-3.05万),放量突破68.5加仓,止损-5%</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">信号尚不充分:现价运行于MA20(63.96)下方,趋势未修复。建议先观望,待重新站上MA20并放量后再评估<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-low">低风险</span><ul><li>回调 2-3%,观察支撑</li><li>放量活跃</li></ul></span></div></div>
+<div class="hero" data-page-node-id="A1oFNwQCueuSt6VgrNVRG3"><div class="hero-eyebrow" data-page-node-id="uriFQwfUIJTAaBsIFShCOz">A 股每日复盘 · 盘前简报</div><h1 class="hero-title" data-page-node-id="UgDqbpbqcgSXZH2Gsdkmcv">2026-09-08 · <span class="hero-time" data-page-node-id="vapWTwfc6AbjlKRxqVFYbe">09:40</span></h1><div class="hero-sub" data-page-node-id="USarSBEJwnY2kTHQyQnF75">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh" data-page-node-id="Rud9KLcxU01dTMLUosoCzP"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()" data-page-node-id="13MmYE6cwwpy3ApT7Iba2l">🔄 一键刷新最新数据</button></div><div class="hero-tags" data-page-node-id="CH14sNp1nJxSfZkxRP41R0"><span class="hero-temp-tag" data-page-node-id="h31ocNmN5r3Sg8FuVke5Rb">过热区 · 86°</span></div></div>
+<div class="section" data-page-node-id="Bj1p6MIaAx4u2EbnGJmGBQ">
+  <div class="card watchlist-card" data-page-node-id="OVAphnTuLtGsl993sHPEeL"><div class="wl-header" data-page-node-id="HzCvu78GiJvzUkIPAEaH0O"><div class="wl-title" data-page-node-id="aoZHUgGIGBOUqk12OeisQ9">LIVE 我的实时观察池 <span class="wl-time" data-page-node-id="DGj3Mbkb9XvFtJJhrnynHP">● 2026-09-08 21:05:19</span></div><div class="wl-tools" data-page-node-id="3mSzYvzXNvQ6cBgLPJMskl"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric" data-page-node-id="zzopdSYcGCKt02Gid17NzB"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()" data-page-node-id="q1Fugfn1JbsMafV6iGHf7Z">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()" data-page-node-id="qEcutgRJ31bQRcfyiAHgqL">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')" data-page-node-id="0g7d5XhHA78T5ZdJmBqdWk">↥ 批量导入</button></div></div><div class="wl-scroll-hint" data-page-node-id="5u1Ask6yUAEcnYXk24ybAf">← 左右滑动查看全部列 · 右侧 ↕ 上下滚动查看更多个股</div><div class="wl-stocks" data-page-node-id="LXlUlZMpLCI7ofjlxQDn28"><div class="wl-stocks-scroll-wrap" data-page-node-id="80vxACHsPLAfGQSuLnFJvx"><div class="wl-stocks-scroll" data-page-node-id="mJoNFyBeHlSMMunnShnWtv"><div class="wl-stock" data-stock-code="600487" data-page-node-id="qgcgYuqV04omwruVFstJLn"><div class="wl-stock-scroll" data-page-node-id="SkqlEiYSmomC12WZkHyBPB"><div class="wl-stock-row wl-stock-head" data-page-node-id="83UiMTg12oNiFOsOCGsNjm">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="fNP8hHCaMY4MCJXb9jqBGg"><b data-page-node-id="7sFcE6qb73zTJIMDNGHkpX">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="1oN5w58QvciY1X8XeUesZQ"><b data-page-node-id="Xexn2998rRtyNoBgDz9TpJ">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="d9EZnOUyuoihvEPcgTKGLP"><b data-page-node-id="DQtxd2SpzCJpjGa8uqmkDt">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="sEZGDtL2FvD376cNiF4DFZ"><b data-page-node-id="VWlyEAeLtDS31WARM44krp">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="i8ZQXqLgyxg2ARMoEB3TD1"><b data-page-node-id="rwSnLzplJgB5QaePK6XJQ2">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="FKkFEzNkY92bGgRaiIRTlT"><b data-page-node-id="8SCGLMhPETC4a9GjVFhCBW">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="Tmgz1GvaLc2KccxU2EuhhT"><b data-page-node-id="dUSXxbdeQ3KP8NVHNQKBtK">操作</b></span>
+  </div><div class="wl-stock-row" data-code="600487" data-page-node-id="KX1Bqj74wlHHH3U3frF0yO">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="nbuGWn6yMDWWFaLlOMjHCL"><span class="rank-no" data-page-node-id="wvYbeJIT3QlXtrybjrJfgW">1</span><span class="wl-name" data-page-node-id="HjE2Ux5rP8jq3w1ix7AVAV">亨通光电</span><span class="wl-code" data-page-node-id="kqfZe1jOUqpMevGqVr1ehK">600487</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="ICykKN8ZQf5GbcAVNQ8TnE"><span class="price down" data-page-node-id="xsmDA9W6wwfnb8c7sy4hZs">63.11</span></span>
+    <span class="wl-cell wl-cell-pct down" data-page-node-id="rgqP4IZSfHF6xLX7tPqTYm">-1.39%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="3hDX8UJBoOqHGpppwSqat9">97.0亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="bJYBWXCdm8ox1iocnVIvkl">70</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="5N9hrAm4ZLjA6goMRIgoel"><span class="sig sig-press" data-page-node-id="6cc2hLMEryHEkPGt54GcdC">走势承压</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="aPXMrZVKlPpix880oMTieG"><button class="wl-btn wl-btn-primary" data-code="600487" onclick="openStockResearch(this.dataset.code)" data-page-node-id="ybnxE44YJZqzjD6ZnRJ0HK">全面分析</button><button class="wl-btn wl-btn-del" data-code="600487" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="sRXUmNee3K02YqYQaxVa7s">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="600487" data-page-node-id="RUrPKqEm86AimUH9HtFEWD">
+    <div class="wl-meta" data-page-node-id="tXT0bkayDvB7p29AE8evej"><span class="wl-cat" data-page-node-id="xFgSAWLaBhR4hJIoFco8qJ">光通信</span><span class="wl-tag" data-page-node-id="pErFcKSt7AedmV51kvX3bK">首选参与</span></div>
+    <div class="detail-grid detail-grid-strategy" data-page-node-id="wT8JcAir7m7l44A4uY4Zaf"><div class="detail-block" data-page-node-id="RqrWpc5Clzm7EPrmpu4YJy"><div class="detail-h detail-h-custom" data-page-node-id="4j9ahHDaaWSWtzJO8krQic">📐 逻辑</div><div class="detail-line" data-page-node-id="jxNFM9eR3VFKrIrLFky2K2">海缆+光模块双主线,受益AI算力需求爆发+海上风电招标回暖,在手订单充足</div></div><div class="detail-block" data-page-node-id="eoq70RqWPifwVFlGJogyTh"><div class="detail-h detail-h-custom" data-page-node-id="vOFZxJFwm56HYyHs4rzySA">💰 资金</div><div class="detail-line" data-page-node-id="WVGNXa7N03gbgSB1vmwMcy">主力净流入2.3亿(通信板块前三),量比放大,资金连续吸筹</div></div><div class="detail-block" data-page-node-id="vZOn1CMKzeKw5DVn6bQOJh"><div class="detail-h detail-h-custom" data-page-node-id="aCyOmeJIUHrK3xTZRqYjQG">🎯 关键位</div><div class="detail-line" data-page-node-id="zkR0lxqd3kojDas4QRQyxl">支撑60 / 压力68.5</div></div><div class="detail-block detail-block-par" data-page-node-id="n9PaQfPclu0RPFeXkTBODY">
+      <div class="detail-h detail-h-custom" data-page-node-id="wB8GmdenSAnOxyVISWBXOS">⚡ 操作 + 建议 + 风险</div>
+      <div class="par-body" data-page-node-id="sfo7kTmO7hsYFZ0dGPkSC7"><div class="par-line" data-page-node-id="MfhHTEwEM85wOZF6nWNpd8"><span class="par-tag par-tag-plan" data-page-node-id="HV1Y44UFok8gP8H6QHP15D">操作</span><span class="par-content" data-page-node-id="xZ9U4Ar1AoebXpEVSCxGKF">回踩60-61低吸<b data-page-node-id="9zMyvsbHAP4lfIFsLDj9qg">500股</b>(3万-3.05万),放量突破68.5加仓,止损-5%</span></div><div class="par-line" data-page-node-id="SFgOYaQQp9clu4xYXjBvwt"><span class="par-tag par-tag-advice" data-page-node-id="LkzsUmAmcNLBqdg5hYuv9q">建议</span><span class="par-content" data-page-node-id="5XhPY35XjiQHHKfFuZwTYD">信号尚不充分:现价运行于MA20(63.96)下方,趋势未修复。建议先观望,待重新站上MA20并放量后再评估<span class="advice-tag-mini advice-hold" data-page-node-id="dr8BAHNc8flHGpi4YrdDCY">持有观察</span></span></div><div class="par-risk" data-page-node-id="yFhwp0E1jI7aeCfrcNmekz"><span class="par-tag par-tag-risk" data-page-node-id="hjpv0l1uowvUUEiuUGGelZ">风险</span><span class="par-risk-content" data-page-node-id="JVSULpFH6gOIwXS9oO4337"><span class="risk-tag risk-low" data-page-node-id="XrdvjmXVqSH0scmyId0ggC">低风险</span><ul data-page-node-id="HhxMYPgYTYJGrMgyYWyV5G"><li data-page-node-id="fOn42BtmAEijsKJ8cP1nje">回调 2-3%,观察支撑</li><li data-page-node-id="HrJlW8CiacoKjy1SkKfFJ6">放量活跃</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA5/8/31(突破)锚平台,靠稳 · 价格:<span class="wl-st-num">突破 3.93</span> · 仓位:1000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:3.58 · 清仓 · 止盈:跌破3/9/1平台,趋势走坏 · 目标:<span class="wl-st-num">3.95 → 4.10</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">放量突破今日高点,待确认</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入价 3.68,止损 3.58,可损约 2.7%,可控。跌破 3.58 必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>不追现价,等回踩低吸区或放量突破关键位再买。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 60-61 区间分两批低吸 500 股(3万-3.05万),均价确认靠稳。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 68.5 加仓 200 股,确认后看 70 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限先做方案 A 回踩,控制单只仓位在 35% 以内,留足对冲空间。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金的 40-50%,留 50% 现金应对回踩加仓。</li></ul><div class="ts-alert"><b>关键提醒</b>: 光通信板块若整体走弱(中际旭创跌破支撑),放弃买入等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="600392">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">2</span><span class="wl-name">盛和资源</span><span class="wl-code">600392</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">21.87</span></span>
-    <span class="wl-cell wl-cell-pct up">+0.09%</span>
-    <span class="wl-cell wl-cell-amt">6.1亿</span>
-    <span class="wl-cell wl-cell-atds">71</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-wait">等待确认</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600392" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="600392">
+    <div class="wl-st-table" data-page-node-id="Xf41hyoorv8xLbEiNgTDkk"><div class="wl-st-title" data-page-node-id="2rMqVPkQsUfHi9ZbIkYey7">🎯 个股风控</div><div class="wl-st-line" data-page-node-id="SXmvJULbX7zTlgcowsEoU9"><span class="par-tag par-tag-plan" data-page-node-id="eYWUZ3snU1BKSMxqXVdf8w">入场</span><span class="wl-st-content" data-page-node-id="BE3AcKmugKA02qkLQyvo0n">策略:回踩MA5/8/31(突破)锚平台,靠稳 · 价格:<span class="wl-st-num" data-page-node-id="dOL5HMmcLqvEkhO8XxZ3Ee">突破 3.93</span> · 仓位:1000股</span></div><div class="wl-st-line" data-page-node-id="PDSNHyrNMR1mUFtLpV7dvi"><span class="par-tag par-tag-advice" data-page-node-id="6LHC4SIqQgfWqKRzA6DOPM">风控</span><span class="wl-st-content" data-page-node-id="t6n75WbYA6DYkGLDHAd9c0">止损:3.58 · 清仓 · 止盈:跌破3/9/1平台,趋势走坏 · 目标:<span class="wl-st-num" data-page-node-id="CruatmSTUkJQcdgKp0Fac2">3.95 → 4.10</span></span></div><div class="wl-st-line" data-page-node-id="8cWWdHSFAN0UdCva6mwJd3"><span class="par-tag par-tag-plan" data-page-node-id="TAAVlRHuHtFo24nrfCiS8g">入场说明</span><span class="wl-st-content" data-page-node-id="yxyYOSwXMuouOqg73mNvAz">放量突破今日高点,待确认</span></div><div class="wl-st-line wl-st-risk-line" data-page-node-id="VWbFXYxERf1QpDD7DqX2SG"><span class="par-tag par-tag-risk" data-page-node-id="qIxvLVbg1BMXKZnW1OTWnS">风险</span><span class="wl-st-content" data-page-node-id="QwNiGbYCI8kmUEYGcaYojq">买入价 3.68,止损 3.58,可损约 2.7%,可控。跌破 3.58 必须走,不恋战。</span></div></div>
+    <div class="card ts-stock-card" data-page-node-id="ZwGAX30Gy81vv3JrbpO2QT"><div class="ts-title" data-page-node-id="8gaKUY4MMIjm9inqv1fvi4">🎯 今日执行策略 <span class="ts-sub" data-page-node-id="UnXnUmtyjEMu1c9tshtBXV">(二选一或分批)</span></div><div class="ts-core" data-page-node-id="N0iBdT1ZXYdehEa3I517OY"><span class="ts-core-tag" data-page-node-id="UPtRrLn9WwwFjq9BeMFQHl">核心</span>不追现价,等回踩低吸区或放量突破关键位再买。</div><ul class="ts-plans" data-page-node-id="FXVHbxz5sRSKHNykezJVQs"><li data-page-node-id="C4Eg5UlFMYtTwfsPbh6L1f"><span class="ts-dot ts-dot-a" data-page-node-id="n06tse8KoJDZ2W2bSIP1cA"></span><b data-page-node-id="3R9FAiiIb2TZzX5MW9Yk8z">方案A (求稳回踩)</b>: 回踩 60-61 区间分两批低吸 500 股(3万-3.05万),均价确认靠稳。</li><li data-page-node-id="LvRKisgnkQHNEp6tDqF9as"><span class="ts-dot ts-dot-b" data-page-node-id="vPALVu4FvYz4AqcmLZBPIP"></span><b data-page-node-id="VRAuStxmdd8KOe9n5qvjvZ">方案B (突破确认)</b>: 若放量突破 68.5 加仓 200 股,确认后看 70 趋势延伸。</li></ul><ul class="ts-plans" data-page-node-id="ffBmrCDnFXLdQgAUUjdCJL"><li data-page-node-id="xQEBX7xxus3W0d9xuN889J"><span class="ts-dot" data-page-node-id="6z7raCh1JCWSheaXmXen18"></span><b data-page-node-id="LSedCZ9DPkIqk6trsFfHTv">二选一建议</b>: 资金有限先做方案 A 回踩,控制单只仓位在 35% 以内,留足对冲空间。</li><li data-page-node-id="P93JO9UeZW2XxJsO2eVRoE"><span class="ts-dot" data-page-node-id="wgGFNVLvc3kM6QzAncRONW"></span><b data-page-node-id="awmHBsbeHsave17eB4HpJI">仓位控制</b>: 总仓位控制在回笼资金的 40-50%,留 50% 现金应对回踩加仓。</li></ul><div class="ts-alert" data-page-node-id="7F9OgIi8csqxKpzlZgiuNC"><b data-page-node-id="9N04EPcOF0Xshz3OjGVVxC">关键提醒</b>: 光通信板块若整体走弱(中际旭创跌破支撑),放弃买入等待二次确认。</div></div>
+  </div></div><div class="wl-stock" data-stock-code="600392" data-page-node-id="o04dA1q8o9u44O6lqybKz1"><div class="wl-stock-scroll" data-page-node-id="o4mH9QzfpARjMG1HguENgV"><div class="wl-stock-row wl-stock-head" data-page-node-id="cQPGx1JhjR8iNgghUuG4Es">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="7hk64uEFsaQB9so4AQU24s"><b data-page-node-id="02XkMFTpzqiElGj51BcxkC">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="kpQqKmcybj4YBuIo45zHAt"><b data-page-node-id="VuPsoL02zHYCYtlqP3p8kY">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="XeiUkh33uid66zVg1PqZG7"><b data-page-node-id="GYYSMeMe4BScyGO4kCufa8">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="BHzj6ESW2eTHpBBDmKqm76"><b data-page-node-id="gMEHYmT4eIJWtvA0OhIEMP">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="mH5l9mPWocxcTqOwPjexYa"><b data-page-node-id="otBePtGqjhIxx2SeQQ4mcZ">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="bpgboyeK8RVZm2wgeT6Qgu"><b data-page-node-id="COl1lmlaTXYqyHNMXcoiRf">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="3ooUBb2BmeAnuXMTOYFsAG"><b data-page-node-id="Jjg9vUrhHkkQwLirGM2Miu">操作</b></span>
+  </div><div class="wl-stock-row" data-code="600392" data-page-node-id="5oz6DwfR9EQPLGCQ9Mx3tH">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="kJNsIDzxTFl8kkoDzRjpgF"><span class="rank-no" data-page-node-id="tsGfFz15H5t2BtAC54LFaS">2</span><span class="wl-name" data-page-node-id="rnokxE6uQrMkbmQRG6XUp3">盛和资源</span><span class="wl-code" data-page-node-id="GWPeGlq6MTHM5NaBihj1pS">600392</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="fLWcFc1vGMMioBRvpQgSAp"><span class="price up" data-page-node-id="DCrjHSwdBhuqhSnAC91IwN">21.87</span></span>
+    <span class="wl-cell wl-cell-pct up" data-page-node-id="eW7IHMs4EhECZAbZbOK6WV">+0.09%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="j08cKtihmhs7tg0KbBa5k5">6.1亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="TRdFn4qiYH9Rm4GlLSczPf">71</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="IVKn7VzEZIdnjqGMWeblEG"><span class="sig sig-wait" data-page-node-id="ygwGBWzsYWll7EMki5fL3t">等待确认</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="iJS6qrJjQL7mKyLHLaGCtR"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="openStockResearch(this.dataset.code)" data-page-node-id="Szp8XtBjKEe0VR5RQOncho">全面分析</button><button class="wl-btn wl-btn-del" data-code="600392" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="ERiHsY8hV7cS141cGnZV9g">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="600392" data-page-node-id="77cJAoCQKkpA0rBhRMwhBc">
     
     
     
     
-  </div></div><div class="wl-stock" data-stock-code="300285"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="300285">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">3</span><span class="wl-name">国瓷材料</span><span class="wl-code">300285</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">60.34</span></span>
-    <span class="wl-cell wl-cell-pct down">-3.07%</span>
-    <span class="wl-cell wl-cell-amt">35.2亿</span>
-    <span class="wl-cell wl-cell-atds">67</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-weak">弱势回调</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300285" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300285" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="300285">
+  </div></div><div class="wl-stock" data-stock-code="300285" data-page-node-id="Q9wcgc7DZ5qvp8ylsVoHgm"><div class="wl-stock-scroll" data-page-node-id="i8gzQkQ00K7KCaHeaAl99f"><div class="wl-stock-row wl-stock-head" data-page-node-id="9G9vw0sTzqHZr5puaqMuGh">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="HVlegjUAzxNBAvfhCJHPv7"><b data-page-node-id="wKH40nIub3ACeYfgCiL4cu">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="48aoOpizQvZVsdU7BsBA4w"><b data-page-node-id="baLPZcrloXVQb8EB0Trec2">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="RZ15LXFW3M51QwbKIkRkod"><b data-page-node-id="g4hdp3TKwyvCBtlfxUjg1E">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="1hRtEo7m0dHeeZGEbF79AC"><b data-page-node-id="xLVo6wo8UHGOkgxbvMAbLw">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="kAvqj8Aga9H5pKwmRraJaJ"><b data-page-node-id="DwjBbDssDj3Ceq8iAuIeHS">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="MmskGv05fpmyWi1960wIcR"><b data-page-node-id="oCvKV0fXoUCeO6IKK0U2xz">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="ZUmYl0qZCMuueXYwB1PBwO"><b data-page-node-id="Ji2QQqNoxRl1PI8g7IyTJa">操作</b></span>
+  </div><div class="wl-stock-row" data-code="300285" data-page-node-id="4DQsuroFyHuKtKIYystxtd">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="f6yNsTOUSnFU6WqOmKfdRu"><span class="rank-no" data-page-node-id="5kuVEiRpix4V4qQh3kTXuU">3</span><span class="wl-name" data-page-node-id="DoDIFp0Qd6YHYngrxV4ax5">国瓷材料</span><span class="wl-code" data-page-node-id="m3vGEv8ywzcajSD5FhAdEf">300285</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="zMmjHDZBd5blVUKM3xskZK"><span class="price down" data-page-node-id="eAeJKGkLO7D923zvuHhHO1">60.34</span></span>
+    <span class="wl-cell wl-cell-pct down" data-page-node-id="9wJE7PKBoDyVLqrb8lD4f1">-3.07%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="9UKSYDkDG6n5WqVHN9B9FJ">35.2亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="ctAkM0yRSCiyt0Ok7LX2mI">67</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="LtgP0jAHMGlUyF1H1fLWq7"><span class="sig sig-weak" data-page-node-id="gxhiuydyehiJs8rG4HDXyA">弱势回调</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="83Cm8TQymUgx5KSiYf6JVv"><button class="wl-btn wl-btn-primary" data-code="300285" onclick="openStockResearch(this.dataset.code)" data-page-node-id="rSXGj9ovZ1eQdPxFFj4akR">全面分析</button><button class="wl-btn wl-btn-del" data-code="300285" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="AKnsffOj5RslePx2BMER3F">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="300285" data-page-node-id="6b0bHBcOBjmXx4mPogVXNS">
     
     
     
     
-  </div></div><div class="wl-stock" data-stock-code="300308"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="300308">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">4</span><span class="wl-name">中际旭创</span><span class="wl-code">300308</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">902.37</span></span>
-    <span class="wl-cell wl-cell-pct up">+0.44%</span>
-    <span class="wl-cell wl-cell-amt">262.2亿</span>
-    <span class="wl-cell wl-cell-atds">72</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-wait">等待确认</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300308" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300308" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="300308">
+  </div></div><div class="wl-stock" data-stock-code="300308" data-page-node-id="NoYbyGheiIuBkzBDcSVBEy"><div class="wl-stock-scroll" data-page-node-id="2UxrgStEYrWJ934FUI7qpQ"><div class="wl-stock-row wl-stock-head" data-page-node-id="mfcK7hJOaLA8evAHCuKGT5">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="iGmiaRWvD3RA0fGkZRgHQ0"><b data-page-node-id="3gCE6MY8bEPaozR7tBMD4i">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="pkwEgeQB2PatLy2rxXcMwB"><b data-page-node-id="8Gp07SEGJJMXk1puHJ48gU">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="h3YSys5PLQqkqyE7zj8oGR"><b data-page-node-id="IIHl0LRMdtEmRjlWBAjozj">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="JIrLr26ksHK8fYG93oeF5p"><b data-page-node-id="7wyS2SdT1Hs67ZUSwdZTjD">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="MvbvE1AS1n9GkpQBY0nr9P"><b data-page-node-id="ckDpPUZscB0CmpXCa4npsJ">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="24K07WOnz8btR0CIn4qkMs"><b data-page-node-id="actRZzJ8kiu1gnhjbwBhWe">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="vibl1DsF7yBo36fZNfJeGA"><b data-page-node-id="fRdPFzNTvZIXdSBoCKBGYb">操作</b></span>
+  </div><div class="wl-stock-row" data-code="300308" data-page-node-id="q3kq9KWrdhprbkwUsRnDbl">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="Dro2IUaYQNClbm6YwXKpbH"><span class="rank-no" data-page-node-id="7doN2HAaJL4GQLFbAvRLdv">4</span><span class="wl-name" data-page-node-id="m3DRtwvWCzzix3EeKh48Mg">中际旭创</span><span class="wl-code" data-page-node-id="ZtonrCRdkvBbjs7YbZB6mH">300308</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="dE6QoWO4pgpxGNz460Ndxk"><span class="price up" data-page-node-id="cdCgXC2lmQX9K7qzZZJCaB">902.37</span></span>
+    <span class="wl-cell wl-cell-pct up" data-page-node-id="GpYQk0TPz6XO83yJemJTeo">+0.44%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="SmXXzSxM9Ixs0DdfnsDca3">262.2亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="ORTzDfLjc9zbH2FJEplv47">72</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="HecL2ABAIJhyS33xhjjBtH"><span class="sig sig-wait" data-page-node-id="KoJsFBWnVDsAdftPNVZQFI">等待确认</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="QNbGxxV2yRoBtBHOuTcQjQ"><button class="wl-btn wl-btn-primary" data-code="300308" onclick="openStockResearch(this.dataset.code)" data-page-node-id="xGfoUekYMvQKC45uDKWP6L">全面分析</button><button class="wl-btn wl-btn-del" data-code="300308" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="gdbAXeConFdmDef66bJ7At">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="300308" data-page-node-id="O2du4XVf4QroYwdpJMu7h4">
     
     
     
     
-  </div></div><div class="wl-stock" data-stock-code="603538"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="603538">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">5</span><span class="wl-name">美诺华</span><span class="wl-code">603538</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">28.07</span></span>
-    <span class="wl-cell wl-cell-pct up">+2.22%</span>
-    <span class="wl-cell wl-cell-amt">13.1亿</span>
-    <span class="wl-cell wl-cell-atds">81</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-strong">强势承接</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="603538" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="603538" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="603538">
+  </div></div><div class="wl-stock" data-stock-code="603538" data-page-node-id="Y0lBqgdcBdEdwWQeOVAfmP"><div class="wl-stock-scroll" data-page-node-id="QjfH2xNcO5XB052Xslr9zS"><div class="wl-stock-row wl-stock-head" data-page-node-id="VyFzPHhHD9oCVlGSHEs0q1">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="70ioSho3vGSuaSaVb3hkC4"><b data-page-node-id="0AXUnHpth2xewNL5Kstq8T">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="5OdE02l9bAjQhfhKYRbjVG"><b data-page-node-id="kEhjxsWrqIysjwED1jdPhX">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="Ua7o6sE78ij3dFthwGs79K"><b data-page-node-id="6d3FGStEhsodxREE8QJ2mh">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="pdjBKyKZVboEeD2eiV1Ofx"><b data-page-node-id="JTYAYEACTFKUhXAkb3E4U6">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="ikSq81TpACLmO09rq5DJGB"><b data-page-node-id="qfc7IHWfEYEkjNXzCbiIUG">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="syOn9D4iItoIUt9P4aqL1G"><b data-page-node-id="sDMy9bSXGlIvv0FaaPLylk">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="ZHf0FH1MNDD7KnTByCn8Gv"><b data-page-node-id="HsJJ69ENaG4wjeJEEYAgJy">操作</b></span>
+  </div><div class="wl-stock-row" data-code="603538" data-page-node-id="YPVpRAPnEHaYNxW2MbvYpA">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="xAYaTeDZ2GR6Yvl6csHpiQ"><span class="rank-no" data-page-node-id="06h2ZONWN2VAdDLq6CMc7c">5</span><span class="wl-name" data-page-node-id="lSJpRxSpsClyNTt04Xouje">美诺华</span><span class="wl-code" data-page-node-id="F1McpN9xNgBLBPi2ZJ2ams">603538</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="hexX4T9s5kO8rjC40wpGjo"><span class="price up" data-page-node-id="AUnFTDbaCAEUclzMsm9JFW">28.07</span></span>
+    <span class="wl-cell wl-cell-pct up" data-page-node-id="0mhzsECSDtPD4g7aF7uqcv">+2.22%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="UGpHdO0xHOFoAwAEvEPsVF">13.1亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="GlkuDie0LGu5elpXGKURwG">81</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="sVMfFdwr6I2tVV866jCYSs"><span class="sig sig-strong" data-page-node-id="d5tY8b6hmI6pKmqubNjacs">强势承接</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="dFLMS92fpISmgDLeUr4SC2"><button class="wl-btn wl-btn-primary" data-code="603538" onclick="openStockResearch(this.dataset.code)" data-page-node-id="8ayQbuqkypCSPAnw5TNshV">全面分析</button><button class="wl-btn wl-btn-del" data-code="603538" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="eLaQamxzLj54C4crWGGY0i">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="603538" data-page-node-id="scSF8lpJQEZ07NgZQdrmWO">
     
     
     
     
-  </div></div><div class="wl-stock" data-stock-code="300342"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="300342">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">6</span><span class="wl-name">天银机电</span><span class="wl-code">300342</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">32.46</span></span>
-    <span class="wl-cell wl-cell-pct down">-0.12%</span>
-    <span class="wl-cell wl-cell-amt">2.7亿</span>
-    <span class="wl-cell wl-cell-atds">71</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-wait">等待确认</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300342" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300342" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="300342">
+  </div></div><div class="wl-stock" data-stock-code="300342" data-page-node-id="RXCiM7oF4OmuBrvTfQky8V"><div class="wl-stock-scroll" data-page-node-id="Uxs3pGGVof1C6uu9BERKPH"><div class="wl-stock-row wl-stock-head" data-page-node-id="TCASLO8gUwkHTp4B3mztHe">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="orxnR8IrofhuZIF0uoA75r"><b data-page-node-id="lWpT2H8ZA3rPAFGm11LqwO">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="fFxiSQXTEK2WX0vunHFldD"><b data-page-node-id="wmdPkC1oEdqRFtXPlXi9jy">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="HsLPbCmChPSKj5nXvGTbYt"><b data-page-node-id="vUESwGh4WlIphtBK6VChmu">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="Qf9AGEHez4G6uztXhyQTdP"><b data-page-node-id="G5LV8xtOTaQBCp1ngiQBLe">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="X9UzinviuA4Gx9k9hoCUe1"><b data-page-node-id="otZUJEhJfHuOKYeL9j889Z">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="Ge4hKid1dYAwms0t3pBuxW"><b data-page-node-id="eXJ5OoFinBsRIajjkovHUK">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="tQEEpsfcsJxBjLrHnW9WQp"><b data-page-node-id="961MPXGyXsgKPxzg4hSNAV">操作</b></span>
+  </div><div class="wl-stock-row" data-code="300342" data-page-node-id="62zIPjbdewsDWFX7xBuEKM">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="FTAzMAE5hf9HCrqMH53BR3"><span class="rank-no" data-page-node-id="e2AeEjpd0QQkryfpzoIoav">6</span><span class="wl-name" data-page-node-id="39w01uvwmyJgJIUog55MOs">天银机电</span><span class="wl-code" data-page-node-id="6G8tp0l7s4ycHX0dCFCGfN">300342</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="Nw5tqMhMAIqzicYvvCS1sr"><span class="price down" data-page-node-id="qMnOCkMvZlxOvIlXdGxdyH">32.46</span></span>
+    <span class="wl-cell wl-cell-pct down" data-page-node-id="iDt5a3vaMZZQQ9tRZhyduI">-0.12%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="APBwvdbIyt4ihXqFCXL1cF">2.7亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="DfOogEa7n237AfOJwRmWWb">71</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="3gcRE2L72KfGo81frViHmV"><span class="sig sig-wait" data-page-node-id="6ibQoHEzD2H09Wd1EQ6sMw">等待确认</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="5tZngTBGEfbDkkG9qTJtje"><button class="wl-btn wl-btn-primary" data-code="300342" onclick="openStockResearch(this.dataset.code)" data-page-node-id="tmsBXFp1ZLu8vYXGCr5iog">全面分析</button><button class="wl-btn wl-btn-del" data-code="300342" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="NMQWWUSLLbtuogy7h0N3mM">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="300342" data-page-node-id="JLhBF4rOhGhluCKEuHwlXo">
     
     
     
     
-  </div></div><div class="wl-stock" data-stock-code="300607"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="300607">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">7</span><span class="wl-name">拓斯达</span><span class="wl-code">300607</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">38.51</span></span>
-    <span class="wl-cell wl-cell-pct up">+2.56%</span>
-    <span class="wl-cell wl-cell-amt">18.8亿</span>
-    <span class="wl-cell wl-cell-atds">82</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-strong">强势承接</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300607" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300607" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="300607">
-    <div class="wl-meta"><span class="wl-cat">机器人</span><span class="wl-tag">稳健参与</span></div>
-    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">工业机器人+注塑机双主业,人形机器人产业链受益,业绩环比改善</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入0.8亿,换手2.83%活跃,短线资金关注</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑33 / 压力38</div></div><div class="detail-block detail-block-par">
-      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
-      <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩33-34低吸<b>300股</b>(1万-1.02万),突破38确认,止损-5%</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">站上MA20(35.53)但趋势尚未走强,建议观察:放量突破MA20并站稳2-3日后再确认纳入<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-mid">中风险</span><ul><li>涨幅 2-5%,技术偏强</li><li>放量活跃</li></ul></span></div></div>
+  </div></div><div class="wl-stock" data-stock-code="300607" data-page-node-id="j3CcuYbLhKuDsOXfnSxIMG"><div class="wl-stock-scroll" data-page-node-id="j6JMPiSxPJhQAYUK8lteAX"><div class="wl-stock-row wl-stock-head" data-page-node-id="1yKdHc8AIIrd2ej3TZ4ja2">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="gysRx3g4uY8O7xMaPg7E8c"><b data-page-node-id="LIX1gnlsFc9zfPMjzJqzff">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="vZqpc9grKc9RRu9JVSkFSQ"><b data-page-node-id="OyvKKDtG2VxdlLYj1Zo9Py">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="XvYsfYfOLFeZCsKDOVdXhP"><b data-page-node-id="a4v5q8ifUOzR0eSSCnP1cf">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="y45Ej9chfxsDtO2vMujcnv"><b data-page-node-id="vQKDElgWxuyvf4nsMu2IlB">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="FkW3dvo3oohDvRhF6af17o"><b data-page-node-id="12t1IgplsdbAwn6LEcyTwI">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="BeX53dHtPdAVkqxJ1Ctrj6"><b data-page-node-id="co6FsAPBeBHNWMLL9Lu5xe">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="eqmVU6cm4JOYTpIYWec6BA"><b data-page-node-id="5N7H6QaaoCEn3XGZa8amTW">操作</b></span>
+  </div><div class="wl-stock-row" data-code="300607" data-page-node-id="TtTcx2Dle34anbF58HSRJn">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="SBhjk3AYfpHrHas7D2Ou7j"><span class="rank-no" data-page-node-id="EFl7zdl4hQDLhGfdoEJtvN">7</span><span class="wl-name" data-page-node-id="HEeHZBqWFJn7TXR4SHao1D">拓斯达</span><span class="wl-code" data-page-node-id="9A9HnL2lTfHuhCfGLz9IsE">300607</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="iVtL2f7f5vaFdU56ihCM74"><span class="price up" data-page-node-id="keRcLxx3avcZ0UmwfjMqmB">38.51</span></span>
+    <span class="wl-cell wl-cell-pct up" data-page-node-id="EnSFS5ll6G6elCn5BXidVA">+2.56%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="eCW3p383SAJM7PvtpW91Df">18.8亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="LInq1MjiEwZIAoqRnp3K63">82</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="rWFEHcoeiShPrVSBFRBIcb"><span class="sig sig-strong" data-page-node-id="swuYIYDpakOZ1RWreprVmd">强势承接</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="FI9Q5otbZh6AqPWXA2ICrc"><button class="wl-btn wl-btn-primary" data-code="300607" onclick="openStockResearch(this.dataset.code)" data-page-node-id="QmbdStal26Y2W1n9SwEqRg">全面分析</button><button class="wl-btn wl-btn-del" data-code="300607" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="cHu4uiXuNANGM9Lsm3CZZi">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="300607" data-page-node-id="C8vkSBTiWkGH7EnEuSsGPu">
+    <div class="wl-meta" data-page-node-id="xhv4QfTv4nupvQS2OOrxsh"><span class="wl-cat" data-page-node-id="wv1YnCX7ATHnUBT9zcG2AD">机器人</span><span class="wl-tag" data-page-node-id="JCJ4Biq0B4gm6FsGisVna5">稳健参与</span></div>
+    <div class="detail-grid detail-grid-strategy" data-page-node-id="WolOGx8dDUHCbFYAO9gDnh"><div class="detail-block" data-page-node-id="tQLGxJcwEJpx0pqgqvc2qc"><div class="detail-h detail-h-custom" data-page-node-id="vg7QdDSge9MCAlc1hnq7YD">📐 逻辑</div><div class="detail-line" data-page-node-id="xJ1nFOu89IckkXDz2umome">工业机器人+注塑机双主业,人形机器人产业链受益,业绩环比改善</div></div><div class="detail-block" data-page-node-id="NuQggsbA2mwZ8Rkb67vKIE"><div class="detail-h detail-h-custom" data-page-node-id="DCp0g4clQh080dk2xbNfgp">💰 资金</div><div class="detail-line" data-page-node-id="WF2xGhGRUZZrg7vw6CVCc6">主力净流入0.8亿,换手2.83%活跃,短线资金关注</div></div><div class="detail-block" data-page-node-id="HGg6XZp58ZQt36dRYV913E"><div class="detail-h detail-h-custom" data-page-node-id="ExAZAV0RjfEn8Eaotg3CAq">🎯 关键位</div><div class="detail-line" data-page-node-id="Xnh8VOAHFloBGJ8v9dmAL8">支撑33 / 压力38</div></div><div class="detail-block detail-block-par" data-page-node-id="xMVqf1AHV8cZZxCI5IbR9h">
+      <div class="detail-h detail-h-custom" data-page-node-id="kOrw2Edgz3ZeGjeUzy9R9a">⚡ 操作 + 建议 + 风险</div>
+      <div class="par-body" data-page-node-id="d0PhA4isjASfdYE73Fyfnm"><div class="par-line" data-page-node-id="FIB7XadWICqHbBqfVS66w3"><span class="par-tag par-tag-plan" data-page-node-id="FatfqBM6yWtG0JYE5ewDeb">操作</span><span class="par-content" data-page-node-id="nMuInL9SYjE8c4K6fEXANs">回踩33-34低吸<b data-page-node-id="nFz8UcJ6uDkteKcuWAQUyL">300股</b>(1万-1.02万),突破38确认,止损-5%</span></div><div class="par-line" data-page-node-id="CT3EmP8MpssXJdjwHd3yGd"><span class="par-tag par-tag-advice" data-page-node-id="Cx93THobCf9Ba3gOBHTiuw">建议</span><span class="par-content" data-page-node-id="2nM9uj6hZANBc2GEX6Jgix">站上MA20(35.53)但趋势尚未走强,建议观察:放量突破MA20并站稳2-3日后再确认纳入<span class="advice-tag-mini advice-hold" data-page-node-id="ArqxO5yDgQdpOB2HS4pcdg">持有观察</span></span></div><div class="par-risk" data-page-node-id="96OAoZdXg4jwDJ1MBY6Yij"><span class="par-tag par-tag-risk" data-page-node-id="pLLGyE2Na8NjKLuVSorszn">风险</span><span class="par-risk-content" data-page-node-id="RKgB8NhMhBMOEIB9UAEfL5"><span class="risk-tag risk-mid" data-page-node-id="TjruxSaSDZcDRam0PBFjTF">中风险</span><ul data-page-node-id="XpatwJj0X1wiSnULdvLpxd"><li data-page-node-id="AOmogIvm7eC3j7dDIlb2pN">涨幅 2-5%,技术偏强</li><li data-page-node-id="kNPsMihaAvYvVO3F7aEl8F">放量活跃</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:突破前期平台+回踩10日线确认 · 价格:<span class="wl-st-num">回踩 33-34</span> · 仓位:300股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:32.00 · 清仓 · 止盈:突破38加仓,40看趋势延伸 · 目标:<span class="wl-st-num">38 → 40</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">机器人板块轮动,仓位确认跟随</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入区33-34,止损32,可损约3-6%。跌破32必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>机器人板块轮动,跟随主线但严控仓位,只做回踩不追高。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 33-34 区间分批低吸 300 股(1万-1.02万),分两批确认。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 38 加仓 100 股,目标 40 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 建议先做方案 A 回踩,小仓位试错,跌破 32 立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金的 15-20%,机器人板块波动大要严控。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若人形机器人板块整体走弱(产业链龙头断板),放弃买入等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="002385"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="002385">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">8</span><span class="wl-name">大北农</span><span class="wl-code">002385</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">3.61</span></span>
-    <span class="wl-cell wl-cell-pct up">+3.14%</span>
-    <span class="wl-cell wl-cell-amt">9.4亿</span>
-    <span class="wl-cell wl-cell-atds">80</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-strong">强势承接</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="002385" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="002385" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="002385">
-    <div class="wl-meta"><span class="wl-cat">农业主线</span><span class="wl-tag">首选参与</span></div>
-    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">转基因种子+生猪养殖双主业,农业主升的核心受益,低位(3.5元)弹性大。</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入0.9亿,占比12.8%,真实资金在抢筹。</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑3.26 / 压力3.57 / 今日低点3.26 / 买在3.6下</div></div><div class="detail-block detail-block-par">
-      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
-      <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回笼资金后可买<b>1000-2000股</b>(3500-<span class="wl-num">7000元</span>),回踩3.3附近低吸,追高不超3.6</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">满足跟踪条件:均线多头排列,沿MA10(3.40)上行。回踩不破可跟踪介入,跌破MA20(3.29)止盈离场<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-mid">中风险</span><ul><li>涨幅 2-5%,技术偏强</li><li>放量活跃</li></ul></span></div></div>
+    <div class="wl-st-table" data-page-node-id="Ie1MbdIyEHdJBds3AWHXZJ"><div class="wl-st-title" data-page-node-id="jEPVRxuddzmGsN44sYoOz7">🎯 个股风控</div><div class="wl-st-line" data-page-node-id="Xnml0qo8eKd8gjWHAFSGXs"><span class="par-tag par-tag-plan" data-page-node-id="KoQ3AnIy19TGnHlazYZu1n">入场</span><span class="wl-st-content" data-page-node-id="mVEvTWQVeETIKZqubXsX0C">策略:突破前期平台+回踩10日线确认 · 价格:<span class="wl-st-num" data-page-node-id="5Y3TvQ0Py9s7FpnGhEC5Bf">回踩 33-34</span> · 仓位:300股</span></div><div class="wl-st-line" data-page-node-id="1AqcmsPcyBECO0kaK9S21V"><span class="par-tag par-tag-advice" data-page-node-id="gOVHhoBhMHqQdVmtWC0ylH">风控</span><span class="wl-st-content" data-page-node-id="Y3nuf3FGX18vgFQTCVWZ7A">止损:32.00 · 清仓 · 止盈:突破38加仓,40看趋势延伸 · 目标:<span class="wl-st-num" data-page-node-id="DW9IghRWWS4Jc6YdTxsOZh">38 → 40</span></span></div><div class="wl-st-line" data-page-node-id="PvOgN1uMln3V42ubML5JGk"><span class="par-tag par-tag-plan" data-page-node-id="EfoCUsUFvf9Gp9a0JKnMeM">入场说明</span><span class="wl-st-content" data-page-node-id="nAbvZgEdGu9VXKS3Ay8C3n">机器人板块轮动,仓位确认跟随</span></div><div class="wl-st-line wl-st-risk-line" data-page-node-id="DIzVTjpfbNPVC5ef7vgIUU"><span class="par-tag par-tag-risk" data-page-node-id="QPhf0fl9gjvYyoiPHx6wDD">风险</span><span class="wl-st-content" data-page-node-id="jnfgSTi3bD0KpmBEenmAo9">买入区33-34,止损32,可损约3-6%。跌破32必须走,不恋战。</span></div></div>
+    <div class="card ts-stock-card" data-page-node-id="O3ukpTox6B9tfASDjRIX3e"><div class="ts-title" data-page-node-id="UUOQMyn127IJkpZAANGpyd">🎯 今日执行策略 <span class="ts-sub" data-page-node-id="hCVFY8t3aGzXUTlAViG2Bx">(二选一或分批)</span></div><div class="ts-core" data-page-node-id="52yq6MKRjIZK3FXuvCbDYm"><span class="ts-core-tag" data-page-node-id="qKsmxAipMhdTDMUGEG0Ctk">核心</span>机器人板块轮动,跟随主线但严控仓位,只做回踩不追高。</div><ul class="ts-plans" data-page-node-id="4kpRyEGMy9AB3bvB6MwCkI"><li data-page-node-id="hDjKbAUmqdVgNJCOsy6uIE"><span class="ts-dot ts-dot-a" data-page-node-id="twvIXk2gAZJPgH6mDNbGG1"></span><b data-page-node-id="EvYAJKw1XyIlicwN3aOfOS">方案A (求稳回踩)</b>: 回踩 33-34 区间分批低吸 300 股(1万-1.02万),分两批确认。</li><li data-page-node-id="hEpnAR4ACOGfAJJyS7BTpG"><span class="ts-dot ts-dot-b" data-page-node-id="ezN5CSvQ4AMvZ5E2Nwbh78"></span><b data-page-node-id="j9fpAsoy174hAw8GPtjLFH">方案B (突破确认)</b>: 若放量突破 38 加仓 100 股,目标 40 趋势延伸。</li></ul><ul class="ts-plans" data-page-node-id="G0iyQXgOqX57AQCmJymnjI"><li data-page-node-id="KL1fHY8RA7yl1RUOjsHrdq"><span class="ts-dot" data-page-node-id="MAC4unYIa6FmCzQbscLmFS"></span><b data-page-node-id="BgfgF6JiC7B25giDI8hk2N">二选一建议</b>: 建议先做方案 A 回踩,小仓位试错,跌破 32 立即止损。</li><li data-page-node-id="1nVJDIeUj9sE8lL7qd4e6R"><span class="ts-dot" data-page-node-id="TNU54q9eEzcsDXtAIpb9Wy"></span><b data-page-node-id="azKYjwryAft775PkS6Tdcz">仓位控制</b>: 总仓位控制在回笼资金的 15-20%,机器人板块波动大要严控。</li></ul><div class="ts-alert" data-page-node-id="R62QnATErjldckXd3IHpgb"><b data-page-node-id="DcfZBNPXJpinpLde0AhouG">关键提醒</b>: 若人形机器人板块整体走弱(产业链龙头断板),放弃买入等待二次确认。</div></div>
+  </div></div><div class="wl-stock" data-stock-code="002385" data-page-node-id="C8uVT3LwW5ERj8vxZjWldY"><div class="wl-stock-scroll" data-page-node-id="yOprg8tcOLZ91ZUCFHHJr6"><div class="wl-stock-row wl-stock-head" data-page-node-id="KoSLGe6HHOzkhgILUNgvAT">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="aDANR8fsQ2AX4i29kKdFUn"><b data-page-node-id="5hFqWHdy298Vjgvn5DmxtE">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="EM34fGFCdqUA37gGOGNNHa"><b data-page-node-id="162PNFqP6pMrUOu6EEo9bY">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="CC2FPQYvFBUPDj8opreTN4"><b data-page-node-id="956LWlefWZZVJTKVzoWwOb">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="S4U8A84KggolEIfMrEKSkX"><b data-page-node-id="5EnvXvrBDnPOESoSaLi0b1">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="qfIaEb0Ds6ccwHK8AGof1p"><b data-page-node-id="ZPcjjmV09ad3zpueYODJEB">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="LXCVx6CzbvkCRoK9OFkLEZ"><b data-page-node-id="pN0Z2C23GPUVFVIdKEltqs">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="yi4FSEx5Hl3g4JqcGzQ0Lb"><b data-page-node-id="8HU84vGgmpj4DiNHI8XEx4">操作</b></span>
+  </div><div class="wl-stock-row" data-code="002385" data-page-node-id="hArfZkolND931tPMt0dyYJ">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="fXeHUx98W3CYhfIEbens6O"><span class="rank-no" data-page-node-id="GReNYgqBB2v6PUVtMVK2qC">8</span><span class="wl-name" data-page-node-id="ATzEnXYkFjKETBMAzRHcWw">大北农</span><span class="wl-code" data-page-node-id="Vg59QsmbzNOypwa37m1g13">002385</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="dXZER3aeDCQlglit6rxWlC"><span class="price up" data-page-node-id="ocJvy4kkD1KTHNfZ54pAgN">3.61</span></span>
+    <span class="wl-cell wl-cell-pct up" data-page-node-id="MV4Y1mqjrfdJ4EbDOpf6QR">+3.14%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="H9UHV6tD4pNYWMpBqyHCRR">9.4亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="rbX6ZeFgIsVVPDSYACJ3L7">80</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="OkAVtGoxD0EAAx5tnJxXmF"><span class="sig sig-strong" data-page-node-id="utzteswQ85u3u6XVY215D6">强势承接</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="hh5wvdowGXKGK4GB79yEpK"><button class="wl-btn wl-btn-primary" data-code="002385" onclick="openStockResearch(this.dataset.code)" data-page-node-id="Crv9etLAC6CHSrSDTrwmK6">全面分析</button><button class="wl-btn wl-btn-del" data-code="002385" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="e1S2vk3PIIamFt2dkCcqzH">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="002385" data-page-node-id="dzr2ITgvpVc3Lm8K1JmeYF">
+    <div class="wl-meta" data-page-node-id="XSyfGktD7jfH0PQzJLot0b"><span class="wl-cat" data-page-node-id="uOoyEWKpyeINU5sA0bkkeC">农业主线</span><span class="wl-tag" data-page-node-id="JpeGnTGN0tRk0zFWjKUwli">首选参与</span></div>
+    <div class="detail-grid detail-grid-strategy" data-page-node-id="rvdzvWcMk5cyMgo32MaYVW"><div class="detail-block" data-page-node-id="ocv0PIYR7i6UZmWyoqtIZ9"><div class="detail-h detail-h-custom" data-page-node-id="J1kJwrEz7ewokB55ROPpcV">📐 逻辑</div><div class="detail-line" data-page-node-id="wsqrrGaCBwaXon7Bw6v88L">转基因种子+生猪养殖双主业,农业主升的核心受益,低位(3.5元)弹性大。</div></div><div class="detail-block" data-page-node-id="CxK8ADx3CW7nReeaDYNyva"><div class="detail-h detail-h-custom" data-page-node-id="MKpMSuEqOfA1sz3iw85L7O">💰 资金</div><div class="detail-line" data-page-node-id="hawFxJZMvtAqQQFYcFnEbA">主力净流入0.9亿,占比12.8%,真实资金在抢筹。</div></div><div class="detail-block" data-page-node-id="9jPfdT0WL2COdPfVWWOgQF"><div class="detail-h detail-h-custom" data-page-node-id="KL1L3kjPVhjJkVgIKw6Wgx">🎯 关键位</div><div class="detail-line" data-page-node-id="t9jZyAx5OcWWBmSfHGTy0r">支撑3.26 / 压力3.57 / 今日低点3.26 / 买在3.6下</div></div><div class="detail-block detail-block-par" data-page-node-id="2V8ry8EBWVMd2Z7GN6BHWZ">
+      <div class="detail-h detail-h-custom" data-page-node-id="MHlSseUBI9gvLduQ7eezLw">⚡ 操作 + 建议 + 风险</div>
+      <div class="par-body" data-page-node-id="p79Pwg1Fuf7AszMBGJXvMY"><div class="par-line" data-page-node-id="qRrDc39iciI7JGHeYCZuYz"><span class="par-tag par-tag-plan" data-page-node-id="3k8P8tkzOYQ9zrZsou6mou">操作</span><span class="par-content" data-page-node-id="RSOozMFkZiAjAiFGlR3Dcx">回笼资金后可买<b data-page-node-id="4lU0v7pRV0EVjdGENtMNYO">1000-2000股</b>(3500-<span class="wl-num" data-page-node-id="8HJ0Y6DBCqCaDL7Ar70Juc">7000元</span>),回踩3.3附近低吸,追高不超3.6</span></div><div class="par-line" data-page-node-id="Yrz3keGlIERxamgHPZ5Bdj"><span class="par-tag par-tag-advice" data-page-node-id="9cfnHxWMwdVJc2UXmAGcz6">建议</span><span class="par-content" data-page-node-id="xy9wVgw6X1kwOVb0Z0Yl5T">满足跟踪条件:均线多头排列,沿MA10(3.40)上行。回踩不破可跟踪介入,跌破MA20(3.29)止盈离场<span class="advice-tag-mini advice-hold" data-page-node-id="YMudMZI9ue3n4mgKQxD9jA">持有观察</span></span></div><div class="par-risk" data-page-node-id="eC1RqcjeCUwccrQzHMX8eC"><span class="par-tag par-tag-risk" data-page-node-id="jgGFAIn77U0V0hXH3ymfCa">风险</span><span class="par-risk-content" data-page-node-id="iT0RTOuZNfLIgXsTQpNuiW"><span class="risk-tag risk-mid" data-page-node-id="82Avvkgvs6aspUW6GGKU8D">中风险</span><ul data-page-node-id="9Dio46IxtAbrACLUGr8MUV"><li data-page-node-id="jyKn7yeC2DZVnYmCPDJKFD">涨幅 2-5%,技术偏强</li><li data-page-node-id="F2ODyqiNP0SXxkOcfwZqaN">放量活跃</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA5/8/31(突破)锚平台,靠稳 · 价格:<span class="wl-st-num">突破 3.57</span> · 仓位:1000-2000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:3.26 · 清仓 · 止盈:跌破3/9/1平台,趋势走坏 · 目标:<span class="wl-st-num">3.57 → 3.70</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">放量突破今日高点,待确认</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入区3.30-3.50,止损3.26,可损约 2.7%-5%。跌破3.26必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>两只都不追现价,等回踩低吸区再买,或突破关键位确认后追。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 3.30-3.35 区间低吸 2000 股(6600-6700元),均价确认靠稳。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 3.57 加仓 1000 股(3570元),确认后看 3.70 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限建议先做方案A回踩,小仓位试错,跌破3.26立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 30-35%(6000-7000元),留足对冲空间。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若农业主线退潮(万向开板/传媒断板),放弃买入等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="300459"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="300459">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">9</span><span class="wl-name">汤姆猫</span><span class="wl-code">300459</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">3.82</span></span>
-    <span class="wl-cell wl-cell-pct up">+0.79%</span>
-    <span class="wl-cell wl-cell-amt">3.8亿</span>
-    <span class="wl-cell wl-cell-atds">73</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-up">震荡上行</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300459" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300459" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="300459">
-    <div class="wl-meta"><span class="wl-cat">传媒/IP</span><span class="wl-tag">稳健参与</span></div>
-    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">汤姆猫IP+游戏+AI玩具,主线轮动跟随,弹性大但波动也大。</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入待补,需关注开盘后资金变化;板块联动性强(传媒/AI应用)。</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑3.66 / 压力3.93</div></div><div class="detail-block detail-block-par">
-      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
-      <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩3.66-3.70低吸<b>1000股</b>(3700-<span class="wl-num">3900元</span>),突破3.93确认,止损3.58</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">满足跟踪条件:均线多头排列,沿MA10(3.71)上行。回踩不破可跟踪介入,跌破MA20(3.64)止盈离场<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-low">低风险</span><ul><li>震荡整理,方向未明</li><li>量能温和</li></ul></span></div></div>
+    <div class="wl-st-table" data-page-node-id="qz75CBLkrPRCtICx6J3Qze"><div class="wl-st-title" data-page-node-id="8iZQMPLO5tR9WV9hgDgn9y">🎯 个股风控</div><div class="wl-st-line" data-page-node-id="mvZOdFnBDJPXrRlfs76Rmd"><span class="par-tag par-tag-plan" data-page-node-id="rHDS4AhYg18qrRZhM5sUl2">入场</span><span class="wl-st-content" data-page-node-id="K8Hq6bBWmM3AOrZA1tC5e0">策略:回踩MA5/8/31(突破)锚平台,靠稳 · 价格:<span class="wl-st-num" data-page-node-id="eDCZS0hZXpICBz6Cchm3hk">突破 3.57</span> · 仓位:1000-2000股</span></div><div class="wl-st-line" data-page-node-id="Z42LSOPXJHeZa2jHCZfMey"><span class="par-tag par-tag-advice" data-page-node-id="kWNLHF6WxC2vEEWtOMuiGw">风控</span><span class="wl-st-content" data-page-node-id="07ZUw0TJfSm1AeCDJMzhX4">止损:3.26 · 清仓 · 止盈:跌破3/9/1平台,趋势走坏 · 目标:<span class="wl-st-num" data-page-node-id="cwriN4jEOn76OifkB9JYHm">3.57 → 3.70</span></span></div><div class="wl-st-line" data-page-node-id="BsHSRT1fQRsYnYls6jKbiy"><span class="par-tag par-tag-plan" data-page-node-id="WKkAsfIO5WPDHJXmLHWtsA">入场说明</span><span class="wl-st-content" data-page-node-id="dqDJ296cDChRDUhMgqCEr5">放量突破今日高点,待确认</span></div><div class="wl-st-line wl-st-risk-line" data-page-node-id="5O15BzOaglECtMAwOqroeN"><span class="par-tag par-tag-risk" data-page-node-id="YnsY9GVnC1ZeHRCtIFzVoY">风险</span><span class="wl-st-content" data-page-node-id="mB5WUxGvhQ0ENP32JBwcbq">买入区3.30-3.50,止损3.26,可损约 2.7%-5%。跌破3.26必须走,不恋战。</span></div></div>
+    <div class="card ts-stock-card" data-page-node-id="XGOobVUSWCE06PfVVALgK0"><div class="ts-title" data-page-node-id="xFPM0YtIyMdC9ppjlSk91e">🎯 今日执行策略 <span class="ts-sub" data-page-node-id="SAc8un8YyiutGdAaCxFl1G">(二选一或分批)</span></div><div class="ts-core" data-page-node-id="kMSJJL276mm9W38UmaHINw"><span class="ts-core-tag" data-page-node-id="mafUzPMSfDIotptCnknmdf">核心</span>两只都不追现价,等回踩低吸区再买,或突破关键位确认后追。</div><ul class="ts-plans" data-page-node-id="8Cs1Zphx4xkZmM6bh668Hx"><li data-page-node-id="ZBiCwEcVZG4QXGGiEWxEyD"><span class="ts-dot ts-dot-a" data-page-node-id="GmSavCLPnEomeAHoR47e9X"></span><b data-page-node-id="A7OlKghguCyjYiA6VRyFVH">方案A (求稳回踩)</b>: 回踩 3.30-3.35 区间低吸 2000 股(6600-6700元),均价确认靠稳。</li><li data-page-node-id="BGJtL3l7G4K5Hpw9BuBci2"><span class="ts-dot ts-dot-b" data-page-node-id="rEUQjLP4vAQ4XFWVWBCs2G"></span><b data-page-node-id="BRTvWqPzx8Bf51psffiLAw">方案B (突破确认)</b>: 若放量突破 3.57 加仓 1000 股(3570元),确认后看 3.70 趋势延伸。</li></ul><ul class="ts-plans" data-page-node-id="TxUkaAIeL3nSSLyqtXtfSE"><li data-page-node-id="Ctb45H5IhU8wU2oFvVcicg"><span class="ts-dot" data-page-node-id="riLtb9V4MwKD7W3qN2TkrF"></span><b data-page-node-id="7NcQfShVKyyNzqjvfVbhOP">二选一建议</b>: 资金有限建议先做方案A回踩,小仓位试错,跌破3.26立即止损。</li><li data-page-node-id="6vj9Bc7OaVu88SvIQfJRX6"><span class="ts-dot" data-page-node-id="9ey8918z1cOvoLNyX9R7cJ"></span><b data-page-node-id="yUpG4FW7deThD8tWpBRLAu">仓位控制</b>: 总仓位控制在回笼资金(约2万)的 30-35%(6000-7000元),留足对冲空间。</li></ul><div class="ts-alert" data-page-node-id="W0ffNDasYXyqgUjDOTnFo1"><b data-page-node-id="i4elfQe1adKfoTVrYxs0A0">关键提醒</b>: 若农业主线退潮(万向开板/传媒断板),放弃买入等待二次确认。</div></div>
+  </div></div><div class="wl-stock" data-stock-code="300459" data-page-node-id="GbjFuPxjeAgbqXNGxDHcKp"><div class="wl-stock-scroll" data-page-node-id="DI7YDeOaKxCixV8M6orwya"><div class="wl-stock-row wl-stock-head" data-page-node-id="h7Mrw1PXhG3S2plIm7xNLH">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="ASU8nNkkBajjZCmKCIl5Mc"><b data-page-node-id="lkiqc1RPivWTWpVUTE5buL">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="8lOmieNFarGp2jwDFtfL0W"><b data-page-node-id="qTs5coWInWB7qBLcM5H4B9">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="m9hzDce1oXKU0zb4EG62kq"><b data-page-node-id="O62ObeCUnCckyC78hDNazo">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="2gTAlRDKKve0TH5jR0KWfg"><b data-page-node-id="UTLET172pXfcgDu5QTsarK">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="MB1AO23GCcu8ejZAT2t3k7"><b data-page-node-id="F7bBxAFxf5o1bAs7pwFYBt">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="L0O0Dr8bYxGo94iIcHJr1L"><b data-page-node-id="pRC0ToiJeExLEPtQEH8HLf">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="iT5E1O7X5sJkwaRVZKiLWe"><b data-page-node-id="FOXFzQdzSivDEsCosDjd6w">操作</b></span>
+  </div><div class="wl-stock-row" data-code="300459" data-page-node-id="0EYBR2Akee3NViPHCG0yHi">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="j8ACyqfLrIP7soNVckR7Bz"><span class="rank-no" data-page-node-id="ybWyhjaigFcW8kp7OAbeqo">9</span><span class="wl-name" data-page-node-id="cEud84K0nvrMnSQkkORvIa">汤姆猫</span><span class="wl-code" data-page-node-id="BuWKPgWtXa8DLdSHeqn7Zw">300459</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="B1Zm2Rd7256qhCKeBeT1Tr"><span class="price up" data-page-node-id="jgWPA1RDSzmZP4JYaScOtK">3.82</span></span>
+    <span class="wl-cell wl-cell-pct up" data-page-node-id="fbGqyRkqf8B4Pizp9IRt4a">+0.79%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="aAmtiKluN9qdiNGAUK4QJA">3.8亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="o810DyXRw3LNhXTC4TUEJN">73</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="I4Tsjf3pt1fm0HbJRxyqBT"><span class="sig sig-up" data-page-node-id="0hCvMBqJacjREA7mvTFN0S">震荡上行</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="PkXm9MZPuF0yFLsiIKzIVH"><button class="wl-btn wl-btn-primary" data-code="300459" onclick="openStockResearch(this.dataset.code)" data-page-node-id="jMJC9ND98aT9EmZJKXriAy">全面分析</button><button class="wl-btn wl-btn-del" data-code="300459" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="8OPhyIF6QFH27ph7acZHBR">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="300459" data-page-node-id="dUZ9TVK8E9chxxTJnJCzty">
+    <div class="wl-meta" data-page-node-id="RofCGhzqB6ZQmh5uRzAREk"><span class="wl-cat" data-page-node-id="Lvao2XeEHeZMdVsYTSOW5i">传媒/IP</span><span class="wl-tag" data-page-node-id="7pMKJIIa4xsRfGmr06RiwV">稳健参与</span></div>
+    <div class="detail-grid detail-grid-strategy" data-page-node-id="JknueIcmkEhAJ6au6EIrFQ"><div class="detail-block" data-page-node-id="QC5j8jiu3NdsApf9gaJ2xV"><div class="detail-h detail-h-custom" data-page-node-id="2JM7im8X2S3tbTUgWR468H">📐 逻辑</div><div class="detail-line" data-page-node-id="GykTEjLZdQhZO04crtB3gM">汤姆猫IP+游戏+AI玩具,主线轮动跟随,弹性大但波动也大。</div></div><div class="detail-block" data-page-node-id="qriEQ0p1xpE0gtHzykD6eL"><div class="detail-h detail-h-custom" data-page-node-id="Wts3ZUlnwLpL8SaTJKlnFf">💰 资金</div><div class="detail-line" data-page-node-id="VsZjh1ckew7UbPBySfKeVS">主力净流入待补,需关注开盘后资金变化;板块联动性强(传媒/AI应用)。</div></div><div class="detail-block" data-page-node-id="qE3RKswQF6KpB741U9Ssbz"><div class="detail-h detail-h-custom" data-page-node-id="94epSvR91PyOIlua1tL37q">🎯 关键位</div><div class="detail-line" data-page-node-id="8GkKfrxuJUcJmwHG2hNUF5">支撑3.66 / 压力3.93</div></div><div class="detail-block detail-block-par" data-page-node-id="c7js5HHyTxw7wDyLdc6qCY">
+      <div class="detail-h detail-h-custom" data-page-node-id="SbN6yGda6wlUyufU9agLFf">⚡ 操作 + 建议 + 风险</div>
+      <div class="par-body" data-page-node-id="Nts0ebgvOU5kMSFlFeWQn3"><div class="par-line" data-page-node-id="24KAMVRACEBmTSY86BF828"><span class="par-tag par-tag-plan" data-page-node-id="NGSz1QRBbYV14r9JhGhNzS">操作</span><span class="par-content" data-page-node-id="FggCjDtCRREsGj1gAhtAtB">回踩3.66-3.70低吸<b data-page-node-id="6t66FqvDnPi6DSJxfQ8CEy">1000股</b>(3700-<span class="wl-num" data-page-node-id="fHNf79Q9rKwU8EolA3Aqkv">3900元</span>),突破3.93确认,止损3.58</span></div><div class="par-line" data-page-node-id="XCe68l9iHUremTjHfEiQnb"><span class="par-tag par-tag-advice" data-page-node-id="OqGS2B6MnkCeyGkasZhEiJ">建议</span><span class="par-content" data-page-node-id="iFDP8YzxoHRU1cVs1F2GK4">满足跟踪条件:均线多头排列,沿MA10(3.71)上行。回踩不破可跟踪介入,跌破MA20(3.64)止盈离场<span class="advice-tag-mini advice-hold" data-page-node-id="0bu8BNH2hOWkBJNhtvHUsB">持有观察</span></span></div><div class="par-risk" data-page-node-id="sUQgy0d2XHY7wArLxon3O9"><span class="par-tag par-tag-risk" data-page-node-id="KhonhxUIA1oviwbfYMoqnf">风险</span><span class="par-risk-content" data-page-node-id="GuKvf9Su6VKvmVoQB3jmQc"><span class="risk-tag risk-low" data-page-node-id="BeXwJl9755xvETuwZRA6EE">低风险</span><ul data-page-node-id="WePMZ3mgDE0nO0N8VEQhMD"><li data-page-node-id="ni5pNZssgmfcrSKRS0uxo4">震荡整理,方向未明</li><li data-page-node-id="2vK806zdfVsIZ6PeG7QdZc">量能温和</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA10不破+万向开板联动确认 · 价格:<span class="wl-st-num">回踩 3.66-3.70</span> · 仓位:1000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:3.58 · 清仓 · 止盈:跌破3/9/1平台,趋势走坏 · 目标:<span class="wl-st-num">3.93 → 4.10</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">传媒板块轮动,跟随万向开板节奏</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入区3.66-3.70,止损3.58,可损约 3-5%。跌破3.58必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>不追现价,等回踩低吸区或突破关键位再买,跟随传媒主线。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 3.66-3.70 区间低吸 1000 股(3680-3700元),确认均线支撑。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 3.93 加仓 500 股(1965元),确认后看 4.10 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限建议先做方案A回踩,跟随万向开板节奏,跌破3.58立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 18-20%(3700-3900元),严控单股风险。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若传媒主线断板(万向开板炸板),放弃买入等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="600737"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="600737">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">10</span><span class="wl-name">中粮糖业</span><span class="wl-code">600737</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">18.16</span></span>
-    <span class="wl-cell wl-cell-pct up">+9.99%</span>
-    <span class="wl-cell wl-cell-amt">17.7亿</span>
-    <span class="wl-cell wl-cell-atds">92</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-break">强势突破</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600737" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600737" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="600737">
-    <div class="wl-meta"><span class="wl-cat">农业主线</span><span class="wl-tag">稳健参与</span></div>
-    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">中粮集团旗下,粮食+糖业央企,确定性高、波动小,适合稳健配置。</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入1.03亿(农业板块前三),占比10.7%。</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑14.96 / 压力15.78</div></div><div class="detail-block detail-block-par">
-      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
-      <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩15附近低吸买<b>200-300股</b>(3000-<span class="wl-num">4600元</span>),央企防御性强</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">强势加速、短线乖离偏大,不建议追高。可关注回踩MA10(15.70)企稳后的买入机会<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-high">高风险</span><ul><li>涨幅&gt;5%,RSI 超买区</li><li>量能温和</li></ul></span></div></div>
+    <div class="wl-st-table" data-page-node-id="aYBsGIx13G42q4BrUFa7wZ"><div class="wl-st-title" data-page-node-id="mcaEyp4OC5E3TYzTBIFVQg">🎯 个股风控</div><div class="wl-st-line" data-page-node-id="k09WIE6a1torS7lJtbVPAi"><span class="par-tag par-tag-plan" data-page-node-id="7Ru7OoTQEZydunkRdV89sT">入场</span><span class="wl-st-content" data-page-node-id="VimZCDI3r8bIiU2dnHHN3Z">策略:回踩MA10不破+万向开板联动确认 · 价格:<span class="wl-st-num" data-page-node-id="LBnHChLV6aMqkTf8QSTglg">回踩 3.66-3.70</span> · 仓位:1000股</span></div><div class="wl-st-line" data-page-node-id="ZhZYU6q10KdOcCIMqyRZGO"><span class="par-tag par-tag-advice" data-page-node-id="pJk08HPGNQqpGbU0nFbr7z">风控</span><span class="wl-st-content" data-page-node-id="ENyPO1sNJ9IRz8BZAthczr">止损:3.58 · 清仓 · 止盈:跌破3/9/1平台,趋势走坏 · 目标:<span class="wl-st-num" data-page-node-id="rUOcVLAMgQ5OPDybZf9zvA">3.93 → 4.10</span></span></div><div class="wl-st-line" data-page-node-id="D9OLeZd4dFgZImSHyZkzVZ"><span class="par-tag par-tag-plan" data-page-node-id="psvmVt8FlktNupojdHQesM">入场说明</span><span class="wl-st-content" data-page-node-id="tp9yyR6uobUy1eNPFTxG8V">传媒板块轮动,跟随万向开板节奏</span></div><div class="wl-st-line wl-st-risk-line" data-page-node-id="lEEp4uWwowg5oBHhONxtMR"><span class="par-tag par-tag-risk" data-page-node-id="43sFWhJUtdzB26vaa2Z2YN">风险</span><span class="wl-st-content" data-page-node-id="WuhtjECHzEOEHsrDERu5rO">买入区3.66-3.70,止损3.58,可损约 3-5%。跌破3.58必须走,不恋战。</span></div></div>
+    <div class="card ts-stock-card" data-page-node-id="mr7GV9zTcHz44GGVFivNPN"><div class="ts-title" data-page-node-id="znjOPTwjjkmBvUkivrvTJh">🎯 今日执行策略 <span class="ts-sub" data-page-node-id="RvEt2jChEkOruMpUHYl0yD">(二选一或分批)</span></div><div class="ts-core" data-page-node-id="8lC6zUdvqQNx8OF9GfsvJH"><span class="ts-core-tag" data-page-node-id="xMLyi1Vt7A9BNQcXrlQdJj">核心</span>不追现价,等回踩低吸区或突破关键位再买,跟随传媒主线。</div><ul class="ts-plans" data-page-node-id="IBdSkAUaYIsx658KfbZwRj"><li data-page-node-id="wDLxZ2QuIVHKO7KQx295xe"><span class="ts-dot ts-dot-a" data-page-node-id="PXSFFI2yB82ZiVPmkIvLa3"></span><b data-page-node-id="LDZ9vF51XO521G3jAKpBKv">方案A (求稳回踩)</b>: 回踩 3.66-3.70 区间低吸 1000 股(3680-3700元),确认均线支撑。</li><li data-page-node-id="04pZEzdGQTQAVcfT1iFiY1"><span class="ts-dot ts-dot-b" data-page-node-id="K3JSqg9U917BIxwHrHcMOV"></span><b data-page-node-id="FqGZ9yPMBY2T7UfHQTGPeo">方案B (突破确认)</b>: 若放量突破 3.93 加仓 500 股(1965元),确认后看 4.10 趋势延伸。</li></ul><ul class="ts-plans" data-page-node-id="bfpKsCLI8sLxs6h4J7puyW"><li data-page-node-id="feRDdPUTmosfTxBRReDlMa"><span class="ts-dot" data-page-node-id="NFEMOevLcxhT5tCC2Kuy3P"></span><b data-page-node-id="xuGLzUILkScWDJyMeD6prZ">二选一建议</b>: 资金有限建议先做方案A回踩,跟随万向开板节奏,跌破3.58立即止损。</li><li data-page-node-id="5c8BovUfVJWBrfQfLa1tBP"><span class="ts-dot" data-page-node-id="mrkl6h6poHskjuJ3yh3RNn"></span><b data-page-node-id="1CYesGC0N0NnwJdjYu0b4o">仓位控制</b>: 总仓位控制在回笼资金(约2万)的 18-20%(3700-3900元),严控单股风险。</li></ul><div class="ts-alert" data-page-node-id="dUDRp1RM9MGwSdbO2I9qjK"><b data-page-node-id="XELOp7tjSANZjD4tvPO75n">关键提醒</b>: 若传媒主线断板(万向开板炸板),放弃买入等待二次确认。</div></div>
+  </div></div><div class="wl-stock" data-stock-code="600737" data-page-node-id="H87w8j7ad8foJTrG1JMLzG"><div class="wl-stock-scroll" data-page-node-id="yl3sK1qlQbcRkFU4mAAWiE"><div class="wl-stock-row wl-stock-head" data-page-node-id="MrGGOptTHrAHqoQbe2OlHu">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="mOkeJdyMBQ9meBDZEJAk4d"><b data-page-node-id="PTSARR6Gqu25iLAWvC6VIK">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="hT9kNSzCKnTtg1JT3Oic6L"><b data-page-node-id="3j8VPUCMAIwz7uif6JEGIA">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="R6VhXZQMYvIbGSTuzV2aHw"><b data-page-node-id="zC9wBOBDcV4r7QBvdpFFmf">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="wLUn4yOdR3tmo2TzsXXy3z"><b data-page-node-id="KDhmvMfMVA7tmGf2uY4xFw">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="6hW3fNf75HB0f8EvwF6GJe"><b data-page-node-id="xRasRlOaDpAP2mmE0G7llN">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="oa8bGEf6vjRkt4I2hlk5un"><b data-page-node-id="GQAbLhwFwW5yoyxVpUfHCw">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="8LlIjRmi414j95dcrCDdfF"><b data-page-node-id="SOuui3F2naRMmGjK5ISCbJ">操作</b></span>
+  </div><div class="wl-stock-row" data-code="600737" data-page-node-id="y0CoDAraAfsZo5UYC7n22i">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="SesTo1ITGqcHFbdo9qGbaV"><span class="rank-no" data-page-node-id="GVhZqudKcaoTCRKhOrBr3u">10</span><span class="wl-name" data-page-node-id="LDn4NuGE7pOCwluiPd2dxS">中粮糖业</span><span class="wl-code" data-page-node-id="ppGJjqh4ukIlmtVxssUUVt">600737</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="NljykQq1hciAOmpgsgoNln"><span class="price up" data-page-node-id="79EPpmYVpQe0qsDd17zcsj">18.16</span></span>
+    <span class="wl-cell wl-cell-pct up" data-page-node-id="745Rz1SwTLukLsppymBy3s">+9.99%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="JrcDksnpqsBaBnhCUxy65q">17.7亿</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="lATbjq9vvaRnYa4R7ysVDM">92</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="SD0jSHbaQ4TRM0fYgumDEm"><span class="sig sig-break" data-page-node-id="WEjNmjDcPxuZg1P0Kwg5qB">强势突破</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="3ZeAnTo5kwhHCgPLVlz4Ho"><button class="wl-btn wl-btn-primary" data-code="600737" onclick="openStockResearch(this.dataset.code)" data-page-node-id="ngUcjAI4KAHAeP7z9y08NW">全面分析</button><button class="wl-btn wl-btn-del" data-code="600737" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="aAvDmv8lnGUa4orZlDaS9F">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="600737" data-page-node-id="7QoX5WG6GQ9dHKgXA7qeWt">
+    <div class="wl-meta" data-page-node-id="9zX3DNtXgan2Obg7AhE5Ac"><span class="wl-cat" data-page-node-id="BGdVC2PZ2kg6X0SlzuOWlv">农业主线</span><span class="wl-tag" data-page-node-id="gMvQEs4AU9oDmA5FEsCwCF">稳健参与</span></div>
+    <div class="detail-grid detail-grid-strategy" data-page-node-id="2vLh2a84SvBnnpZK4MxSk8"><div class="detail-block" data-page-node-id="y0VZCQADhKc1I53WJmzGD9"><div class="detail-h detail-h-custom" data-page-node-id="xCmDGczHYQUl2D9G3aFKK4">📐 逻辑</div><div class="detail-line" data-page-node-id="TfNDzfL2DuSXyyWXNGcuAY">中粮集团旗下,粮食+糖业央企,确定性高、波动小,适合稳健配置。</div></div><div class="detail-block" data-page-node-id="6FnSITgbQAS5JZVwU5FFcS"><div class="detail-h detail-h-custom" data-page-node-id="JF5Dc7Hmo5ox1mOa8tKooD">💰 资金</div><div class="detail-line" data-page-node-id="2QqMmKjAf7aEgB3TF1Q3O9">主力净流入1.03亿(农业板块前三),占比10.7%。</div></div><div class="detail-block" data-page-node-id="j6DJkbPpIybcibNSg9uylQ"><div class="detail-h detail-h-custom" data-page-node-id="REhMQLumgSes8jAm6q9KGR">🎯 关键位</div><div class="detail-line" data-page-node-id="yhIHMvq2cbFJBapfcYvO3J">支撑14.96 / 压力15.78</div></div><div class="detail-block detail-block-par" data-page-node-id="AprYMapwCGI3Ayh2WYeV8Y">
+      <div class="detail-h detail-h-custom" data-page-node-id="Ddqz2JAZ4U8iTQqT89YIhm">⚡ 操作 + 建议 + 风险</div>
+      <div class="par-body" data-page-node-id="2B9MbJTC3jDkpqWg2I5QjT"><div class="par-line" data-page-node-id="ZpN3ikwq8gZv0C55EhQGgH"><span class="par-tag par-tag-plan" data-page-node-id="8qujd8USMClcSzCgnUhubY">操作</span><span class="par-content" data-page-node-id="WOJZHfwTG7tWfeRx8vlOZo">回踩15附近低吸买<b data-page-node-id="sUwomSKN1Fzh7oUyL9tQFo">200-300股</b>(3000-<span class="wl-num" data-page-node-id="5PVXHy8SLk7bpKBgFGIdV5">4600元</span>),央企防御性强</span></div><div class="par-line" data-page-node-id="RGtIAG1sAeJTZZJHQclijr"><span class="par-tag par-tag-advice" data-page-node-id="7xrxRQTU0CSLJi6EGdGLQY">建议</span><span class="par-content" data-page-node-id="4VCOwV12HEdjukwoJaj0ct">强势加速、短线乖离偏大,不建议追高。可关注回踩MA10(15.70)企稳后的买入机会<span class="advice-tag-mini advice-hold" data-page-node-id="kFovboWmW4BFDXCW4OueLZ">持有观察</span></span></div><div class="par-risk" data-page-node-id="EBpaJfQrwxgMrEedb5vlyy"><span class="par-tag par-tag-risk" data-page-node-id="8DCfyJlxSmM8B27VhIMq9H">风险</span><span class="par-risk-content" data-page-node-id="my7UPdLlacVH93g6b0uyQ7"><span class="risk-tag risk-high" data-page-node-id="eNY9oUM6UqlANeVoQsfYgz">高风险</span><ul data-page-node-id="zgbZA080Ffebjh1O5iFiop"><li data-page-node-id="K5NL3jn0Wtr4hTQuJZjt2H">涨幅&gt;5%,RSI 超买区</li><li data-page-node-id="FwiUd9IywdSziTqumilmnp">量能温和</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA20+央企防御确认 · 价格:<span class="wl-st-num">回踩 15.00 附近</span> · 仓位:200-300股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:14.80 · 清仓 · 止盈:跌破14.96支撑,趋势走弱 · 目标:<span class="wl-st-num">15.78 → 16.20</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">央企防御性配置,作为农业主线底仓</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入区15附近,止损14.80,可损约 1.3-2%。央企波动小,严控仓位即可。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>央企防御性配置,作为农业主线底仓,稳健低吸不追高。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 15.00 附近低吸 200-300 股(3000-4600元),央企防御性强。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 15.78 加仓 100 股(1578元),确认后看 16.20 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 稳健型配置,作为农业主线底仓持有,严控单股仓位不超过20%。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 15-20%(3000-4600元),波动小可适度持有。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若中粮系整体走弱(粮食板块退潮),减仓观望等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="600108"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="600108">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">11</span><span class="wl-name">亚盛集团</span><span class="wl-code">600108</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">5.28</span></span>
-    <span class="wl-cell wl-cell-pct up">+10.00%</span>
-    <span class="wl-cell wl-cell-amt">8,895万</span>
-    <span class="wl-cell wl-cell-atds">90</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-break">强势突破</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600108" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600108" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="600108">
-    <div class="wl-meta"><span class="wl-cat">农业主线</span><span class="wl-tag">补涨参与</span></div>
-    <div class="detail-grid detail-grid-strategy"><div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">甘肃农业种植+土地流转,农业主升的低价补涨方向。</div></div><div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">主力净流入0.35亿,100股仅¥390(低价小盘弹性大)。</div></div><div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">支撑3.66 / 压力4.06</div></div><div class="detail-block detail-block-par">
-      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
-      <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">激进者可买<b>1000股</b>(<span class="wl-num">3900元</span>),博农业扩散,突破4.06看高</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">强势加速、短线乖离偏大,不建议追高。可关注回踩MA10(4.06)企稳后的买入机会<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-high">高风险</span><ul><li>涨幅&gt;5%,RSI 超买区</li><li>量能一般</li></ul></span></div></div>
+    <div class="wl-st-table" data-page-node-id="qiryT3QFeMhMlDBEQ4pLvV"><div class="wl-st-title" data-page-node-id="nGmC0gpPNswKWqlHEcIYZe">🎯 个股风控</div><div class="wl-st-line" data-page-node-id="IB9nxEDRdI3g443kG7MMW1"><span class="par-tag par-tag-plan" data-page-node-id="lyudCMEuNIrObSpfvQVWAo">入场</span><span class="wl-st-content" data-page-node-id="WAPbifCbJyzPGG3n19bHgZ">策略:回踩MA20+央企防御确认 · 价格:<span class="wl-st-num" data-page-node-id="8DnIWfVJo7ZPYAEoHBgrhN">回踩 15.00 附近</span> · 仓位:200-300股</span></div><div class="wl-st-line" data-page-node-id="tOpZlQzNHaZWbmAKAsYMEn"><span class="par-tag par-tag-advice" data-page-node-id="a6NPEZAuK5AqA87MGQXLKZ">风控</span><span class="wl-st-content" data-page-node-id="Q5AFuouPYkrlx2nj5FGqs0">止损:14.80 · 清仓 · 止盈:跌破14.96支撑,趋势走弱 · 目标:<span class="wl-st-num" data-page-node-id="DFESepqer2YVsTzWBKFMTK">15.78 → 16.20</span></span></div><div class="wl-st-line" data-page-node-id="42TL6yXCQfqjrJZ9cuWVLb"><span class="par-tag par-tag-plan" data-page-node-id="2CCRHbsAgzgnuflZbaiWBY">入场说明</span><span class="wl-st-content" data-page-node-id="JulGopHFwtDRAw6WB0mBfI">央企防御性配置,作为农业主线底仓</span></div><div class="wl-st-line wl-st-risk-line" data-page-node-id="Dl713HVpjhfbeSSnEKLAW7"><span class="par-tag par-tag-risk" data-page-node-id="6GNtXJA53XzYNoh5iFUEn6">风险</span><span class="wl-st-content" data-page-node-id="VyOy56JgvgSU5L743MT7xq">买入区15附近,止损14.80,可损约 1.3-2%。央企波动小,严控仓位即可。</span></div></div>
+    <div class="card ts-stock-card" data-page-node-id="XSCprRzydtDhrEeoHO7QnG"><div class="ts-title" data-page-node-id="qUvTxwYSMji11M9L4gFC0Y">🎯 今日执行策略 <span class="ts-sub" data-page-node-id="lWLFX6YOTsk6MghehEPxUL">(二选一或分批)</span></div><div class="ts-core" data-page-node-id="Xuorylr0yf1JmByXuU7OjH"><span class="ts-core-tag" data-page-node-id="P9RkHYOrUmkDjQLoyWZT8G">核心</span>央企防御性配置,作为农业主线底仓,稳健低吸不追高。</div><ul class="ts-plans" data-page-node-id="l6CGckVFa8iEedyAnOAymz"><li data-page-node-id="Bfa489BkXdfia0DI3K93OD"><span class="ts-dot ts-dot-a" data-page-node-id="R38pnNsdg9CgvS1iEmlvK0"></span><b data-page-node-id="Uhu1VAKHfQty39xt91RKja">方案A (求稳回踩)</b>: 回踩 15.00 附近低吸 200-300 股(3000-4600元),央企防御性强。</li><li data-page-node-id="bbcDRhwmfkRpsdYPABrT4s"><span class="ts-dot ts-dot-b" data-page-node-id="80D55G7mhduir5WJFsFjAJ"></span><b data-page-node-id="trmhKM1h7BoFOIYJ69nslM">方案B (突破确认)</b>: 若放量突破 15.78 加仓 100 股(1578元),确认后看 16.20 趋势延伸。</li></ul><ul class="ts-plans" data-page-node-id="c9aJXchoZld6VykjJq4VAW"><li data-page-node-id="nzges7aWQUn3x5GbL7xVIt"><span class="ts-dot" data-page-node-id="U0d5KoToDUjCiHW5jqvxg9"></span><b data-page-node-id="7HafxZG8RRpSkoH1W3O4Cp">二选一建议</b>: 稳健型配置,作为农业主线底仓持有,严控单股仓位不超过20%。</li><li data-page-node-id="PsIibSFn6JRucBvG2l3Sgs"><span class="ts-dot" data-page-node-id="0FkjIh2rLIcdbM1l7i0CwQ"></span><b data-page-node-id="Ldxswp9OQzyTHy8A4Hbsdi">仓位控制</b>: 总仓位控制在回笼资金(约2万)的 15-20%(3000-4600元),波动小可适度持有。</li></ul><div class="ts-alert" data-page-node-id="8Yzx2PYXgYG90zx7ILbCYG"><b data-page-node-id="MWWyk68E28X1cSabN2GxYX">关键提醒</b>: 若中粮系整体走弱(粮食板块退潮),减仓观望等待二次确认。</div></div>
+  </div></div><div class="wl-stock" data-stock-code="600108" data-page-node-id="nESxWT6kOGF3AgTTNW6btu"><div class="wl-stock-scroll" data-page-node-id="TNJergtBeJhCNDv1yfQwFq"><div class="wl-stock-row wl-stock-head" data-page-node-id="sPcon40bZHVkDKdsjCK7dR">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="497PKfVjQEUaauLTsuBBkt"><b data-page-node-id="XOA1p4Tt7A2VwowtusWkCs">排名/标的</b></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="rbNTKLrGz3tYh7rwqCxiAD"><b data-page-node-id="GsbXEFAOLGq7vsCBRi3ni6">最新价</b></span>
+    <span class="wl-cell wl-cell-pct" data-page-node-id="gVGvqdzUBJAdIkFD4dARHe"><b data-page-node-id="IcIRIStxtE8LA9GAGYYC2Q">涨跌幅</b></span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="hqO44rdxcfdXdIkVhOpxRn"><b data-page-node-id="634PJDzz3LTNsUlk2tS51M">成交额</b></span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="cX7kcm6J0yZ5ERP51pKVCz"><b data-page-node-id="InBfo1FELjtudMDvXrkPE6">ATDS</b></span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="vp3HZZGzZNd8qKQryKAd1a"><b data-page-node-id="MSF6LCwD1sgUxjisKKxmaw">策略信号</b></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="Gff86TAUoZ3GHsght5u0KM"><b data-page-node-id="Dao91hiBZgi0UA5MBypvnE">操作</b></span>
+  </div><div class="wl-stock-row" data-code="600108" data-page-node-id="XW8lRstvp3zTiMN0fFIPgX">
+    <span class="wl-cell wl-cell-rank" data-page-node-id="BC8ZEJtDH72qHLs5Xjkx9U"><span class="rank-no" data-page-node-id="sxEPCMqRl80Mvb46hWIJe5">11</span><span class="wl-name" data-page-node-id="FX3DoGfzIDKIFIcNwKxFE7">亚盛集团</span><span class="wl-code" data-page-node-id="ybbyJTo3S5bYoMfXUItzOB">600108</span></span>
+    <span class="wl-cell wl-cell-price" data-page-node-id="qqF2ygVozTbAuGohtzRKGY"><span class="price up" data-page-node-id="35fJzCDhajOp0a424xJkTj">5.28</span></span>
+    <span class="wl-cell wl-cell-pct up" data-page-node-id="bytpLUJTKoL8CDKwMtm2HA">+10.00%</span>
+    <span class="wl-cell wl-cell-amt" data-page-node-id="WUljnrcvd4mbfJAzJFeY6L">8,895万</span>
+    <span class="wl-cell wl-cell-atds" data-page-node-id="yskT7yS2MIHcZ5CUE85BN0">90</span>
+    <span class="wl-cell wl-cell-sig" data-page-node-id="AVjIPe3MnIIhz4AFuY9EEM"><span class="sig sig-break" data-page-node-id="alkRhZBNPobIFr4UNEwgND">强势突破</span></span>
+    <span class="wl-cell wl-cell-act" data-page-node-id="nBled67fBDOauCsDMTAC2K"><button class="wl-btn wl-btn-primary" data-code="600108" onclick="openStockResearch(this.dataset.code)" data-page-node-id="HCRMiAOtuPoSJRbFLpsECS">全面分析</button><button class="wl-btn wl-btn-del" data-code="600108" onclick="removeWatchlistRow(this.dataset.code)" data-page-node-id="vGAefPFzXeDLs9Ycvd23fG">删</button></span>
+  </div></div><div class="wl-detail" data-detail-code="600108" data-page-node-id="rbLkqdBPYC1fsOVhJMaoRP">
+    <div class="wl-meta" data-page-node-id="xfN9OMQqMT51GUCLzyZUQc"><span class="wl-cat" data-page-node-id="uCGWGkCQPqrkUbNXFZrmaS">农业主线</span><span class="wl-tag" data-page-node-id="fQNoPoGQrYP5m7yOneBsdc">补涨参与</span></div>
+    <div class="detail-grid detail-grid-strategy" data-page-node-id="W28fV3kRnKAliV7Ou5YKb6"><div class="detail-block" data-page-node-id="SD1wKW1jLb39lJVFDsjmHm"><div class="detail-h detail-h-custom" data-page-node-id="aYjZMMG4iX3w8F0eh07d3G">📐 逻辑</div><div class="detail-line" data-page-node-id="X01YHRDm7InwLbv80i2ygY">甘肃农业种植+土地流转,农业主升的低价补涨方向。</div></div><div class="detail-block" data-page-node-id="K457H3YSJwzrRwJffW87Bi"><div class="detail-h detail-h-custom" data-page-node-id="9xPC1EFNQpRQyMLNk9SFfa">💰 资金</div><div class="detail-line" data-page-node-id="LeoyFJGzLqLFMH9DtHQmpF">主力净流入0.35亿,100股仅¥390(低价小盘弹性大)。</div></div><div class="detail-block" data-page-node-id="m8ZnUXEdMc8aiYqdshupEC"><div class="detail-h detail-h-custom" data-page-node-id="cAWT1nzrPDLkGMAx192ukt">🎯 关键位</div><div class="detail-line" data-page-node-id="40DkAFeVHiCKwnmPf9SXOM">支撑3.66 / 压力4.06</div></div><div class="detail-block detail-block-par" data-page-node-id="AQ6SCOW0A7DYuDar5EJgvd">
+      <div class="detail-h detail-h-custom" data-page-node-id="nO5klU1AVWJ9M4tloPHBOk">⚡ 操作 + 建议 + 风险</div>
+      <div class="par-body" data-page-node-id="Jimnoj2PwpaCEwTlePomtT"><div class="par-line" data-page-node-id="NsWjg1zywgg4CtnBelfZxx"><span class="par-tag par-tag-plan" data-page-node-id="ABWFklhuW2WFdzW7DeP6EF">操作</span><span class="par-content" data-page-node-id="WNdVpJlIfql57gAKAcMjo5">激进者可买<b data-page-node-id="UoqehnM6YPPOUAuY62taKn">1000股</b>(<span class="wl-num" data-page-node-id="GOHqzbETmgJfAC4u7fOpYL">3900元</span>),博农业扩散,突破4.06看高</span></div><div class="par-line" data-page-node-id="7vOCR4XoCqnyBzJRWOPhpE"><span class="par-tag par-tag-advice" data-page-node-id="ACOsuRjydNPenrgfsyTPkF">建议</span><span class="par-content" data-page-node-id="zduiZ5ogZzwKmXl2nhi9WY">强势加速、短线乖离偏大,不建议追高。可关注回踩MA10(4.06)企稳后的买入机会<span class="advice-tag-mini advice-hold" data-page-node-id="Zsn8dEsAhaw9duaMI6TXAE">持有观察</span></span></div><div class="par-risk" data-page-node-id="yeXELvQJ6bYMXCqblQjW9m"><span class="par-tag par-tag-risk" data-page-node-id="e3JmFm8F7qZEgr9rQMIn6X">风险</span><span class="par-risk-content" data-page-node-id="oHfEcjFSsd1TVwKCCqfw3e"><span class="risk-tag risk-high" data-page-node-id="6IiM7oeFJK9KIBfV87GBDc">高风险</span><ul data-page-node-id="00RH80fym6InPZrZ82vfdU"><li data-page-node-id="Sw0bloox1ypr3qLCBLJoGj">涨幅&gt;5%,RSI 超买区</li><li data-page-node-id="sSCzCkjhvvEcGWDG3aRhE0">量能一般</li></ul></span></div></div>
     </div></div>
-    <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:突破4.06+农业扩散跟随 · 价格:<span class="wl-st-num">突破 4.06</span> · 仓位:1000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:3.66 · 清仓 · 止盈:跌破3.66支撑,扩散失败 · 目标:<span class="wl-st-num">4.06 → 4.30</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">低价小盘弹性大,博农业扩散</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入价3.90,止损3.66,可损约 6.1%,弹性大波动大。跌破3.66必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>低价补涨弹性大,激进参与,严控止损跟随农业扩散。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (突破追涨)</b>: 若放量突破 4.06 确认 1000 股(4060元),博农业扩散,看高 4.30。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (回踩试错)</b>: 回踩 3.66 不破试错 500 股(1830元),农业主线退潮立即止损。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 激进配置,严控止损3.66,跌破立即离场不恋战。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 10-12%(1830-4060元),低价小盘严控风险。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若农业扩散失败(主线退潮),跌破3.66立即清仓不恋战。</div></div>
-  </div></div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
+    <div class="wl-st-table" data-page-node-id="HWw3ATr2VFW6NoSJvNaD2S"><div class="wl-st-title" data-page-node-id="wANaIEmIl4ncTNY4kPnALx">🎯 个股风控</div><div class="wl-st-line" data-page-node-id="Va15pGPLqfbrA9fMDlZINc"><span class="par-tag par-tag-plan" data-page-node-id="sdRE0BbmXDY8cRRBsVUnrs">入场</span><span class="wl-st-content" data-page-node-id="lekG9FNYCoQ6CjnPqvt7JC">策略:突破4.06+农业扩散跟随 · 价格:<span class="wl-st-num" data-page-node-id="iL3PeStYNngcnKHDpfsdYT">突破 4.06</span> · 仓位:1000股</span></div><div class="wl-st-line" data-page-node-id="rGRibLc10jRLD3LZG3keFA"><span class="par-tag par-tag-advice" data-page-node-id="lgmev4zTScqGY6pCEhFzx2">风控</span><span class="wl-st-content" data-page-node-id="LQPOpgNrQcVPiEdRA3KFVq">止损:3.66 · 清仓 · 止盈:跌破3.66支撑,扩散失败 · 目标:<span class="wl-st-num" data-page-node-id="vUPSl1p4mii2F2qDj1rdg0">4.06 → 4.30</span></span></div><div class="wl-st-line" data-page-node-id="K01I2kcBzus9nMANADaZdd"><span class="par-tag par-tag-plan" data-page-node-id="pAxIJTDJ4hFAkwEABQwhoA">入场说明</span><span class="wl-st-content" data-page-node-id="aIA9QsxveUulTi3eXqPMdG">低价小盘弹性大,博农业扩散</span></div><div class="wl-st-line wl-st-risk-line" data-page-node-id="N0mdeFiklFA4HorLELZJtx"><span class="par-tag par-tag-risk" data-page-node-id="faSPVsmT9HZkfMCXETwy6W">风险</span><span class="wl-st-content" data-page-node-id="HwfMSZHjMCJ4FXc2RtDuQ8">买入价3.90,止损3.66,可损约 6.1%,弹性大波动大。跌破3.66必须走,不恋战。</span></div></div>
+    <div class="card ts-stock-card" data-page-node-id="BVs35QL81DCmA5lhSt0oL3"><div class="ts-title" data-page-node-id="FRQqbVypXlE6FJTaFa7Mbw">🎯 今日执行策略 <span class="ts-sub" data-page-node-id="Lj99EL3ZZdCUuFENjhLVCR">(二选一或分批)</span></div><div class="ts-core" data-page-node-id="2RwqJAKjcu3UyGrjVaeQsH"><span class="ts-core-tag" data-page-node-id="Y75UY2ECyoaEW3mh4voscP">核心</span>低价补涨弹性大,激进参与,严控止损跟随农业扩散。</div><ul class="ts-plans" data-page-node-id="Cwx79mDMbBMsIYjqER4gOn"><li data-page-node-id="oF9zd4tVTMZRdn4FwXlFHW"><span class="ts-dot ts-dot-a" data-page-node-id="7zSZJDCAJx7RcacdHDbGci"></span><b data-page-node-id="XVHWy1TapAw3F0D7y4aSFo">方案A (突破追涨)</b>: 若放量突破 4.06 确认 1000 股(4060元),博农业扩散,看高 4.30。</li><li data-page-node-id="CA41GuMYSRuV8Cw0LRcU8r"><span class="ts-dot ts-dot-b" data-page-node-id="Y4Lw7FsO0eB8ydY3wBfBN8"></span><b data-page-node-id="BDi0E4VdUIjJIY85Am2tIr">方案B (回踩试错)</b>: 回踩 3.66 不破试错 500 股(1830元),农业主线退潮立即止损。</li></ul><ul class="ts-plans" data-page-node-id="gwjW0Q1a1ESgIlEfyQP0sb"><li data-page-node-id="EHx3f6TXhsenGeWAO7flNq"><span class="ts-dot" data-page-node-id="nSmD9kBoNe8BTrDqU39fFs"></span><b data-page-node-id="sqNoz8sOzPki3GPENCDeqs">二选一建议</b>: 激进配置,严控止损3.66,跌破立即离场不恋战。</li><li data-page-node-id="IxrYz35dK2a3mgmwVCJEsA"><span class="ts-dot" data-page-node-id="1EeO7CuDb1NcU5fU7uVvQo"></span><b data-page-node-id="hqyAERROZqDPXK7VVYUPvd">仓位控制</b>: 总仓位控制在回笼资金(约2万)的 10-12%(1830-4060元),低价小盘严控风险。</li></ul><div class="ts-alert" data-page-node-id="8HBEMzCUmD7rf7PVW3qnEI"><b data-page-node-id="dowZoAfqawSG46R4GUGEHz">关键提醒</b>: 若农业扩散失败(主线退潮),跌破3.66立即清仓不恋战。</div></div>
+  </div></div></div></div></div><div class="wl-details" data-page-node-id="ZELZR3tABAcGf1BLmqVEig"></div></div><div class="card knowledge-card" data-page-node-id="itUpD7OHIJUCEIokeBkre8"><div class="knowledge-title" data-page-node-id="G9XNAJ9QGHiO07iXTvdMAZ">KNOWLEDGE SYNC</div><div class="knowledge-h" data-page-node-id="ucSSihPUBxWo77H8kwGkw3">沉淀到 Obsidian</div><div class="knowledge-desc" data-page-node-id="x0uARlYZV1yUA4SNGkuBu0">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md" data-page-node-id="PBL2B1rZ2PoAvKlJRIDAY2">---
 title: ATDS Pro V4.0 盘前简报
 tags: [ATDS, 交易复盘]
 ---
@@ -2013,191 +2062,191 @@ tags: [ATDS, 交易复盘]
 - 汤姆猫 (300459): 3.82 +0.79%
 - 中粮糖业 (600737): 18.16 +9.99%
 - 亚盛集团 (600108): 5.28 +10.00%
-</pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
-  <div class="card">
-    <div class="card-title">盘前交易驾驶舱</div>
-    <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">82° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">73 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">爱仕达</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">55 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">农化制品 / 种植业 / 出版</div></div></div>
+</pre><div class="wl-tools" style="margin-top:10px;" data-page-node-id="EAInj1t9Uy6RroruELgA5c"><button class="wl-tool wl-tool-red" onclick="downloadMd()" data-page-node-id="37REOMxoBFM2K0o7na1ruY">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()" data-page-node-id="wHAIpkhtneOfd7DIsfUYPz">复制 Markdown</button></div></div>
+  <div class="card" data-page-node-id="rWKbIiVwmjvRt3wzBcDH8q">
+    <div class="card-title" data-page-node-id="RiR6aSURwVGiP6g1yXrxSF">盘前交易驾驶舱</div>
+    <div class="cp-grid" data-page-node-id="8oMHaLZuKsGMbUE3UckP7i"><div class="cp-item" data-page-node-id="tJPCmk0jiS5UJmkZAaNa9B"><div class="cp-k" data-page-node-id="bMylYzJCR1GNh3qIz4HpAp">情绪温度</div><div class="cp-v" data-page-node-id="krxpVz3BN904sd2BrrGXwO">86° · 过热区 · 极度亢奋</div></div><div class="cp-item" data-page-node-id="6FO03vgr1xWVsm5AAFZNwh"><div class="cp-k" data-page-node-id="0O1IUxfoqD9aa6uFHyZdfW">涨停家数</div><div class="cp-v" data-page-node-id="oBoWQBrEfHOsfSx6nhNNDa">73 家 · 最高 -- 板</div></div><div class="cp-item" data-page-node-id="0Mv2OcICE72WYnuOfqE0GB"><div class="cp-k" data-page-node-id="AKbMdNdXhLipQf52VRFBXC">连板龙头</div><div class="cp-v" data-page-node-id="q9YwYeWc8CEfK0aOmH7Qi2">--</div></div><div class="cp-item" data-page-node-id="MylA9EWqhBMnTOC2R0fukC"><div class="cp-k" data-page-node-id="324EXVAgBAxEDBobAoeSeX">炸板家数</div><div class="cp-v" data-page-node-id="4g290nLN0Z6p4yq8MKdSKm">37 家</div></div><div class="cp-item" data-page-node-id="DCHTzXucQOEoHc7PtH5rMR"><div class="cp-k" data-page-node-id="1GDiVsBS79HA94tetIzBXA">60日新高</div><div class="cp-v" data-page-node-id="3moUrkWBXY8i4YtN516qKN">55 只</div></div><div class="cp-item" data-page-node-id="jog037Hf9kAREDe4OYKqdu"><div class="cp-k" data-page-node-id="npJCC2bn3sAjDeJ0I4u7cw">进攻主线</div><div class="cp-v" data-page-node-id="rCTKyE3HYFuBkOAGdOCvb0">农化制品 / 种植业 / 出版</div></div></div>
   </div>
-  <div class="card em-card"><div class="em-header"><span class="em-title">主升浪·新周期</span><span class="em-date">2026-09-08</span></div><div class="em-stats"><span class="em-stat em-stat-green"><b>73</b> 涨停</span><span class="em-stat em-stat-gray">--</span><span class="em-stat em-stat-red"><b>0</b> 炸板</span></div><div class="em-cats"><div class="em-cat"><div class="em-cat-h"><span class="em-cat-tag">A</span><span class="em-cat-title">种植业</span><span class="em-cat-status up">主线确认</span></div><div class="em-cat-body">涨停 <b>3家 / 4板</b>家 · 领涨 亚盛集团 · 涨幅 <b class="up">+9.98%</b></div><div class="em-cat-picks"><span class="em-pick"><b>海南橡胶</b> <span class="up">++9.31%</span></span><span class="em-pick"><b>北大荒</b> <span class="up">++5.63%</span></span></div></div><div class="em-cat"><div class="em-cat-h"><span class="em-cat-tag">B</span><span class="em-cat-title">一般零售</span><span class="em-cat-status up">主线确认</span></div><div class="em-cat-body">涨停 <b>2家 / 4板</b>家 · 领涨 百大集团 · 涨幅 <b class="up">+10.00%</b></div><div class="em-cat-picks"><span class="em-pick"><b>国芳集团</b> <span class="up">++7.40%</span></span><span class="em-pick"><b>浙江东日</b> <span class="up">++6.46%</span></span></div></div><div class="em-cat"><div class="em-cat-h"><span class="em-cat-tag">C</span><span class="em-cat-title">出版</span><span class="em-cat-status up">主线确认</span></div><div class="em-cat-body">涨停 <b>3家 / 3板</b>家 · 领涨 中国出版 · 涨幅 <b class="up">+13.31%</b></div><div class="em-cat-picks"><span class="em-pick"><b>龙版传媒</b> <span class="up">++9.12%</span></span><span class="em-pick"><b>粤 传 媒</b> <span class="up">++5.11%</span></span></div></div><div class="em-cat"><div class="em-cat-h"><span class="em-cat-tag">D</span><span class="em-cat-title">小家电</span><span class="em-cat-status up">主线确认</span></div><div class="em-cat-body">涨停 <b>1家 / 4板</b>家 · 领涨 爱仕达 · 涨幅 <b class="up">+9.99%</b></div><div class="em-cat-picks"><span class="em-pick"><b>北鼎股份</b> <span class="up">++5.55%</span></span><span class="em-pick"><b>彩虹集团</b> <span class="up">++5.01%</span></span></div></div><div class="em-cat"><div class="em-cat-h"><span class="em-cat-tag">E</span><span class="em-cat-title">农化制品</span><span class="em-cat-status up">主线确认</span></div><div class="em-cat-body">涨停 <b>4家 / 2板</b>家 · 领涨 金正大 · 涨幅 <b class="up">+10.00%</b></div><div class="em-cat-picks"><span class="em-pick"><b>川金诺</b> <span class="up">++11.69%</span></span><span class="em-pick"><b>雅本化学</b> <span class="up">++9.13%</span></span></div></div></div><div class="em-risk"><span class="em-risk-tag">⚠ 风险提示</span><div class="em-risk-item"><span class="em-risk-name">高位连板股(连板≥4)</span><span class="em-risk-logic">当前连板≥4 共 3 只,承接强度需复核</span></div><div class="em-risk-item"><span class="em-risk-name">当日炸板股</span><span class="em-risk-logic">近 0 只炸板,分歧加大</span></div><div class="em-risk-item"><span class="em-risk-name">北证/微盘股</span><span class="em-risk-logic">波动放大+流动性敏感</span></div></div></div>
-  <div class="card">
-    <div class="card-title">当前最强主线方向 <span class="card-sub">点击板块查看可观察个股</span></div>
-    <div class="md-list"><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(0)">
-        <div class="md-rank">1</div>
-        <div class="md-main">
-          <div class="md-name">种植业 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 3家 / 4板 · 领涨 亚盛集团 · ATDS 96</div>
+  <div class="card em-card" data-page-node-id="UG3naPDadDyqPVoq39pr6M"><div class="em-header" data-page-node-id="THoLDpMJgLR3Vv1zIKKhnW"><span class="em-title" data-page-node-id="Xtchni6S4LbKG3a7p9FZFJ">主升浪·新周期</span><span class="em-date" data-page-node-id="k5OvutjsaaesYyPqSDzeLV">2026-09-08</span></div><div class="em-banner" data-page-node-id="ZCVRASKLjt4BFgfRpm2vSq"><span class="em-banner-dot" data-page-node-id="jaGax6nlLljh5Nd4oTLzOg"></span><b data-page-node-id="BMAvW4bOsF54hhuHLYjhkC">实时下载 · 市场数据</b><span class="em-banner-tip" data-page-node-id="uOAyuboFTPT1ZXDgTGoKoE">盘前接力判断 · 板块联动确认 · 强势股池筛选</span></div><div class="em-stats-mini" data-page-node-id="nftx0KJhdVdIUDn8pr1Qux"><span class="em-stat-mini" data-page-node-id="eAnEXQM6XBlallXWh2ZXEH"><b data-page-node-id="dtkYWKCyweVszC7li4ox6Q">73</b> 涨停</span><span class="em-stat-mini-dot" data-page-node-id="CnrqAZqPYtklMmD9UeHMVg">·</span><span class="em-stat-mini" data-page-node-id="sNl5PY7vA3sEroOiowf1dQ"><b data-page-node-id="TEBAv3CRCmq2ONKrNM3PzV">0</b> 炸板</span><span class="em-stat-mini-dot" data-page-node-id="dVbqmNbweF6srnvcb4yaby">·</span><span class="em-stat-mini" data-page-node-id="WCLG1XTaaYuz1g5ATLXBEb">主线 <b data-page-node-id="XmGNh9SVhYDXN3O00YqgZi">农化制品</b></span></div><div class="em-bks" data-page-node-id="yrRtXf1OD0xcV5zSW4elCv"><div class="em-bk" data-page-node-id="uAoJwzFsqsDkJc2txq45YM"><div class="em-bk-h" data-page-node-id="PXBXiu0Nxg9W1g9gPSFurF"><span class="em-bk-tag" data-page-node-id="T7b2gT9u6whoIBvuspygsM">A</span><div class="em-bk-meta" data-page-node-id="y5SHGj7pfuOYELgmoJp827"><div class="em-bk-title" data-page-node-id="P1gWE92eezCDBWpU3SLo55">种植业 <span class="em-bk-sub" data-page-node-id="XDYJNApENmMTc4gtmvu1A3">(连续强势 / +1.5%)</span></div><div class="em-bk-tech" data-page-node-id="Mi91b8KE5JA7gHYY7xD2Cb">主线+趋势技术</div></div></div><div class="em-bk-body" data-page-node-id="eB9WXBtYsQqwNZsIrtkt8k"><div class="em-bk-row" data-page-node-id="Bfp2rCmolfDZG82rPkCphw"><span class="em-bk-k" data-page-node-id="h996n00TdhOIvhO27KFOjk">主力净流入</span><span class="em-bk-v em-strong" data-page-node-id="bFv2qKMzVcyiZkNAul2KQ7">5.05 <span class="em-bk-u" data-page-node-id="lpAG3YS38PsdoQE0glE0yE">亿</span></span></div><div class="em-bk-row" data-page-node-id="d3IFA2pHj0Mllo479DsMcB"><span class="em-bk-k" data-page-node-id="CnuGijhn1Z72qQ4ze0qlF2">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v" data-page-node-id="XFMp7fsCHCp6mFmQ5AWg4s">3家 / 4板 · 亚盛集团 · <b class="up" data-page-node-id="MBhMgUn7Xl4XcuEBCdorSR">+9.98%</b></span></div><div class="em-bk-row em-bk-strong" data-page-node-id="eCJkgoYBAzq7G74dVtHX9T"><span class="em-bk-k" data-page-node-id="Td4bBfBaN9kgwMacAvf56h">强势股</span><span class="em-bk-v" data-page-node-id="YSsnUAxH9BT9hgLo3DU457"><b data-page-node-id="MUvt16coR1ndpACN9kwwUi">海南橡胶</b> <span class="em-bk-tag-mini" data-page-node-id="eZoyJi6I5Y6fe88yLfNs1D">601118</span> · <b class="up" data-page-node-id="gEOPad3zWE9PnPUMqq7XwH">+9.31%</b></span></div><div class="em-bk-bar" data-page-node-id="HbOrNppQsE8GpF9jS5dv2u"><span class="em-bk-bar-k" data-page-node-id="1fj5yGZfu06TH25UATjXqe">龙虎榜(今日)</span><span class="em-bk-bar-v" data-page-node-id="DbjFZUrQ3mkuBAHLLuGQse">开盘 <b data-page-node-id="M9wTCKXhr6k0rV9Z6tAUKR">4.91</b> · 最高 <b data-page-node-id="x4qVrQlA1l5uoTp9ujBMgf">5.28</b> · 最低 <b data-page-node-id="zB4AVyr9dNJ4l3lhGRhngJ">4.80</b> · 换手 <b data-page-node-id="gVrlXRggNSg1O02Kl1HNNc">7.52%</b></span></div><div class="em-bk-row" data-page-node-id="vSwHw75iyuGMAumOMUt8I8"><span class="em-bk-k" data-page-node-id="X5rVpj2MZaIWyl6u1AGjjw">资金流入(主/中单)</span><span class="em-bk-v" data-page-node-id="BephEdppxEZBrxq6REoAls">主 <b class="up" data-page-node-id="nDUPFYFXIOzw5xn7u85bux">5.05</b>亿 · 中 <b class="up" data-page-node-id="rrdWawMAewUNjxEMlFEqYx">3.94</b>亿</span></div></div></div><div class="em-bk" data-page-node-id="SQWCajNZfbmqka5EJ8s8KA"><div class="em-bk-h" data-page-node-id="cgKqBF34hcaKqdNgAsjzNC"><span class="em-bk-tag" data-page-node-id="AyYZeuXZiylDmoP7feYHtp">B</span><div class="em-bk-meta" data-page-node-id="1bQYLn2Sfd57ybSz5ZGlTw"><div class="em-bk-title" data-page-node-id="66Gxck1xWfqzey2cwTSJsX">一般零售 <span class="em-bk-sub" data-page-node-id="jsjyaVAlifFetVZR4lzfNn">(政策驱动 / +2.1%)</span></div><div class="em-bk-tech" data-page-node-id="J7Uu38oFUHllAxtAtRtZUe">异动高+空间+高</div></div></div><div class="em-bk-body" data-page-node-id="PUovbVFr0Ckg9IA95hLrnD"><div class="em-bk-row" data-page-node-id="FU0AZlmJYq6uDF2Ad2Jxny"><span class="em-bk-k" data-page-node-id="eoEaVOgdvAlGDHmHjATvHr">主力净流入</span><span class="em-bk-v em-strong" data-page-node-id="LeFP2HI2IpECMy9AwZqljm">3.60 <span class="em-bk-u" data-page-node-id="icEg1u6lJYs5PdyuNEAcxE">亿</span></span></div><div class="em-bk-row" data-page-node-id="5pKQ7o8k4JrENzQFDV02YP"><span class="em-bk-k" data-page-node-id="TV0yw2Ev57o9sdU7XEmPJB">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v" data-page-node-id="EQq3iBrAkird4echJ8CyHG">2家 / 4板 · 百大集团 · <b class="up" data-page-node-id="9HIQv81SRwToHrTN5xHzXG">+10.00%</b></span></div><div class="em-bk-row em-bk-strong" data-page-node-id="8MQGgwFlCZvV6zeeKpmbAY"><span class="em-bk-k" data-page-node-id="GqCTnfm0NUIUkdtbM0bceC">强势股</span><span class="em-bk-v" data-page-node-id="ZmMu1gdRlbHXN0vpXJ0ymB"><b data-page-node-id="UG4WMvQWaB3JESdEkT283f">国芳集团</b> <span class="em-bk-tag-mini" data-page-node-id="89AVrxxC5FgLwBvs3CUY9S">601086</span> · <b class="up" data-page-node-id="a44vYxHm8RoxAAuYgTmvVX">+7.40%</b></span></div><div class="em-bk-bar" data-page-node-id="fiADZFhYuqzsbZMSDiaWCO"><span class="em-bk-bar-k" data-page-node-id="5iCVljzgQ8qbmIsCey3Gkw">龙虎榜(今日)</span><span class="em-bk-bar-v" data-page-node-id="XvDIGD4ilN1pUpohMhXeF1">开盘 <b data-page-node-id="nrOijno5dxTNPt5hjhDBlO">12.78</b> · 最高 <b data-page-node-id="3hnIOiJbyF5ZMKuczZrYwQ">13.74</b> · 最低 <b data-page-node-id="JwDKuWzBJexE9KO9kF5u7e">12.50</b> · 换手 <b data-page-node-id="szZJ5hK1HXyfWn7kZdXvx4">17.84%</b></span></div><div class="em-bk-row" data-page-node-id="j6xZ6157CiUALfH3cbZsW4"><span class="em-bk-k" data-page-node-id="pBuCVssZYsGK4tBTnydGje">资金流入(主/中单)</span><span class="em-bk-v" data-page-node-id="PZewTfU7pV1PKt1JXW51GG">主 <b class="up" data-page-node-id="4wWZqjgqYrbkKkOJNJD3CC">3.6</b>亿 · 中 <b class="up" data-page-node-id="qVrDTj8fu0pHYNyuC3AY0o">2.81</b>亿</span></div></div></div><div class="em-bk" data-page-node-id="k3UbW9marYhIFtUZxgyW1H"><div class="em-bk-h" data-page-node-id="6aPAGh0lpaT42WbNZBLTyI"><span class="em-bk-tag" data-page-node-id="7jK5RSjtQXTqyx6fVwtP4E">C</span><div class="em-bk-meta" data-page-node-id="rJpzZEFWPVMn3WwpACjuAZ"><div class="em-bk-title" data-page-node-id="nSDAeYgpWjyDX2EVwLbfXA">出版 <span class="em-bk-sub" data-page-node-id="enNHNvz9MWWGVAIGNzHcBQ">(连续强势 / +1.5%)</span></div><div class="em-bk-tech" data-page-node-id="ehyv5XvA7pm8Rm70jhoe2i">主线+成长</div></div></div><div class="em-bk-body" data-page-node-id="APx2kPY2ZsLuCYECJW4sWF"><div class="em-bk-row" data-page-node-id="9d4FUa0PwxCWQQiUslDpjF"><span class="em-bk-k" data-page-node-id="L4XsXX0wFV9WAPEz6H8JS4">主力净流入</span><span class="em-bk-v em-strong" data-page-node-id="Z7voCWqIQJATBrbBYVsMQ8">4.31 <span class="em-bk-u" data-page-node-id="iouE0iTTZRIfrDdJkYIXB1">亿</span></span></div><div class="em-bk-row" data-page-node-id="0iiopsDy5ta8Ymg1sQno89"><span class="em-bk-k" data-page-node-id="yydx8oL3OKRoLoiCznBE0W">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v" data-page-node-id="SPSd4bnFMwElQGQm1pply9">3家 / 3板 · 中国出版 · <b class="up" data-page-node-id="Qfhfa46SwcKpg5XqF8td7w">+13.31%</b></span></div><div class="em-bk-row em-bk-strong" data-page-node-id="IhWkFiOthJsL2uqBPuyNBX"><span class="em-bk-k" data-page-node-id="9gjHkifhtXCc2xcPCFv0jl">强势股</span><span class="em-bk-v" data-page-node-id="5EyaGVBi2Us7rgPrNvDo6R"><b data-page-node-id="kDyDdHhCdFalZExtx6Fl8Y">龙版传媒</b> <span class="em-bk-tag-mini" data-page-node-id="J6tggUW9UeG5GkdSw1gl3M">605577</span> · <b class="up" data-page-node-id="5SRM5oHbmOrD3eB08Q1vxa">+9.12%</b></span></div><div class="em-bk-bar" data-page-node-id="ls5Xc6oGARs0Y0Q5AsDYar"><span class="em-bk-bar-k" data-page-node-id="bCNOgLwi6e58j4BA6Xih99">龙虎榜(今日)</span><span class="em-bk-bar-v" data-page-node-id="3OeZMxgdcIosLiMFmujsvh">开盘 <b data-page-node-id="a7mWdTtxyxRgC2IY8SlmXO">6.56</b> · 最高 <b data-page-node-id="pmZI5kVHcExH0oUAmxx103">7.05</b> · 最低 <b data-page-node-id="EkKa6U9NshCH23W1io6DGU">6.42</b> · 换手 <b data-page-node-id="qki7b7RIhs0UzCY8ymzsGQ">15.05%</b></span></div><div class="em-bk-row" data-page-node-id="vxaZppKzmr3cCBbk1pmWSB"><span class="em-bk-k" data-page-node-id="hIW7dVzW4tmlVgG2LTJhtb">资金流入(主/中单)</span><span class="em-bk-v" data-page-node-id="kF4GRQyrIJKsSP9HuxRzTl">主 <b class="up" data-page-node-id="4zNMDOIk4mwAYSBWAcsMtx">4.31</b>亿 · 中 <b class="up" data-page-node-id="8GzwRfVaCtsdxBnaHsEcuD">3.36</b>亿</span></div></div></div></div><div class="em-section" data-page-node-id="BVo7AHWcgMDktID2ijbROn"><div class="em-section-h" data-page-node-id="pekigSWNFDiEc3H2SDAwB7">📌 观察池关键建议</div><ul class="em-tips" data-page-node-id="72mAIfx9IDHk8FNUPOjFQN"><li data-page-node-id="T71DhBbTjpHbHpcjzQziBH"><span class="em-tip-tag" data-page-node-id="G06BWZfH3XceS1CjySYKEO">主线参与</span>农化制品 · </li><li data-page-node-id="LaLDHBp2aojQh7WCBJyXvw"><span class="em-tip-tag" data-page-node-id="4c1fK7Da2p3CTPcpqNS61N">主线参与</span>种植业 · </li><li data-page-node-id="ori011Jcy9tDjTiCY9SHBC"><span class="em-tip-tag" data-page-node-id="cEu5cwOnF8eu9PUswaSoxF">主线参与</span>出版 · </li><li data-page-node-id="oZIoYsQYCNMRMRT1HLleTl"><span class="em-tip-tag em-tip-tag-blue" data-page-node-id="akG1qDbsnJiRkWUEzXdeYe">主题</span>数字 · </li></ul></div><div class="em-section" data-page-node-id="yI6zVglw7NCcwYMF7cIVwo"><div class="em-section-h" data-page-node-id="qHI4RxIsEd0MLj2ZbBPHup">🎯 主升浪周期分类</div><div class="em-cycle" data-page-node-id="vloDghA7SP7h2PbEUVxfLK"><div class="em-cyc em-cyc-1" data-page-node-id="WE7kvw3sySn52GtRE34pf8"><div class="em-cyc-h" data-page-node-id="g1H153tqYGVT31EYmQBy0V">启动股</div><div class="em-cyc-b" data-page-node-id="Bdm5enboFxKVpuiQ8bcgEN"><div data-page-node-id="dm0Oudmcc9JFyWU1nRCEgF">种植业 · 亚盛集团</div><div class="em-cyc-meta" data-page-node-id="VBRNmHUO66cDn9vTmBH3Em">涨幅 <b class="up" data-page-node-id="C4bwGHUYM68J8eLW8BUlG7">+9.98%</b> · 主力 <b class="up" data-page-node-id="Smo1HLz91qJc5fM8CJZBVC">5.05</b> 亿</div></div></div><div class="em-cyc em-cyc-2" data-page-node-id="kUoLg0cWjXSj5p2WtH6xv4"><div class="em-cyc-h" data-page-node-id="KntEBu6PELYpnVJoYgrmI7">强度股</div><div class="em-cyc-b" data-page-node-id="gbT4pt8YtevT6Li0k4kXIN"><div data-page-node-id="FrHiGlzc2Oi8vBX6F0lEl6">一般零售 · 百大集团</div><div class="em-cyc-meta" data-page-node-id="Q94NGtFTxLgGtycBSYD3uD">涨幅 <b class="up" data-page-node-id="kxbhPEPGfbrVNZOROz7S8O">+10.00%</b> · 主力 <b class="up" data-page-node-id="Y7L4pyYBikujSrIjQSXvqa">3.6</b> 亿</div></div></div><div class="em-cyc em-cyc-3" data-page-node-id="H7JM2Kk0Gg80KEcPWevxEE"><div class="em-cyc-h" data-page-node-id="RS1M3DnUDBoKMo5fCO2tr0">龙头股</div><div class="em-cyc-b" data-page-node-id="nJFK3FD8Z9HK9m0jLmQHSN"><div data-page-node-id="0PS540sjb5EcoxwaSAZP2S">出版 · 中国出版</div><div class="em-cyc-meta" data-page-node-id="kTPsHq5NNi1q1cnYKTdbt9">涨幅 <b class="up" data-page-node-id="N6DUCHrt7Ll7rIpHMsUPyy">+13.31%</b> · 主力 <b class="up" data-page-node-id="XGeeripEpvKbWRJWZOx255">4.31</b> 亿</div></div></div></div></div><div class="em-section" data-page-node-id="nQikCriFpKKicN06fUPuiS"><div class="em-section-h" data-page-node-id="IIZDxJwhHlRsi9BZS18TU6">⚖️ 止盈止损法则</div><ul class="em-tier" data-page-node-id="gKf8p3R7Fq4ltB7fsWv958"><li data-page-node-id="dCjwU3CXZ59dsPAxgiyKGr"><b data-page-node-id="j0AKTavOATsVDWmXsw2Sra">第一梯队</b>:连板 2-3 ,目标 3-5% 空间</li><li data-page-node-id="XuZeQ761hRQgOFf3UGzV2J"><b data-page-node-id="zrNSLhDSkkoUfE1czQ1Jaa">第二梯队</b>:首板接力,目标 4-7% 空间</li><li data-page-node-id="xnJfaJQyzZuDycVt3buBDk"><b data-page-node-id="XlmHbyzpUJ4hvuAGtBbosp">第三梯队</b>:回调低吸,目标 2-4% 空间</li></ul></div><div class="em-section" data-page-node-id="CQ1T0bcgJARfK3cAfQuJoV"><div class="em-section-h" data-page-node-id="K9t2ycgMVWOdjEK7k1Xw5H">⚠️ 主升浪低位洞察 · 风险提示</div><ul class="em-risk-list" data-page-node-id="JCHdxGL72QuqGLcLb5sZzM"><li data-page-node-id="VtRvYvd65vCRYv8cDJftLL"><b data-page-node-id="xTNbp3IoKfmHWVQzO3GrIr">高位连板股(连板≥4)</b> · 当前连板≥4 共 3 只,承接强度需复核</li><li data-page-node-id="GCQFIvvCmEcjeih4wvKsiK"><b data-page-node-id="w3OhLyd4NQgnnWBXYJuP8q">当日炸板股</b> · 近 0 只炸板,分歧加大</li><li data-page-node-id="2iH38CiluDVdGxBEFDDAPM"><b data-page-node-id="1pj5pr0HudTiS30w0BiQlw">北证/微盘股</b> · 波动放大+流动性敏感</li></ul></div></div>
+  <div class="card" data-page-node-id="WXlDe6B7kCnanyoWG0axhW">
+    <div class="card-title" data-page-node-id="84ncOmAf6i88dMsmSdwRBA">当前最强主线方向 <span class="card-sub" data-page-node-id="vnF0J0OLPfT52aACqeyN6j">点击板块查看可观察个股</span></div>
+    <div class="md-list" data-page-node-id="xjKfjIsU6FgtkuWBjb1nHu"><div class="md-card" data-page-node-id="8BK3USjjW6WXtPwifPX8cr">
+      <div class="md-item" onclick="toggleMdPicks(0)" data-page-node-id="Ba3kOv736rStvV699gokPb">
+        <div class="md-rank" data-page-node-id="3CwPB0rg9SMPr369fxZVtw">1</div>
+        <div class="md-main" data-page-node-id="AEEHiVjMeO2ztLmZGLEGFf">
+          <div class="md-name" data-page-node-id="niVAalBIltUmKVKxBWGJNb">种植业 <span class="md-status ok" data-page-node-id="dklooICLFmyQnEc04FllKm">主线确认</span></div>
+          <div class="md-sub" data-page-node-id="DGMDuNCwk0fHHFcXUmYmOS">涨停 3家 / 4板 · 领涨 亚盛集团 · ATDS 96</div>
         </div>
-        <div class="md-pct up">+9.98%</div>
-        <div class="md-arrow">▾</div>
+        <div class="md-pct up" data-page-node-id="PKcUPr6JwBw1sHMAp7JghU">+9.98%</div>
+        <div class="md-arrow" data-page-node-id="Fyh7enDgJfsTxLwUSJ19DR">▾</div>
       </div>
-      <div class="md-picks-wrap" id="md-picks-0">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-pick" data-code="601118" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">海南橡胶</span><span class="md-pick-code">601118</span><span class="md-pick-pct up">+9.31%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="600598" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">北大荒</span><span class="md-pick-code">600598</span><span class="md-pick-pct up">+5.63%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="603336" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">宏辉果蔬</span><span class="md-pick-code">603336</span><span class="md-pick-pct up">+5.44%</span><span class="md-pick-hint">未涨停 · 可观察</span></div>
+      <div class="md-picks-wrap" id="md-picks-0" data-page-node-id="BqIjYGTymJDODEleGAUQrp">
+        <div class="md-picks-h" data-page-node-id="v1dtXD37OEeRP2QV2vvvpK">排除涨停 · 优先可观察前3</div>
+        <div class="md-pick" data-code="601118" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="BBwoG2WuHAuVSx3v4bXeCg"><span class="md-pick-name" data-page-node-id="6OV8zdOTC0yvR1mQnCacoy">海南橡胶</span><span class="md-pick-code" data-page-node-id="k3gMnxuQuwzflIC21uZFEd">601118</span><span class="md-pick-pct up" data-page-node-id="LFeGOtytpdcOxx6hSEg1a9">+9.31%</span><span class="md-pick-hint" data-page-node-id="6qOZggobUKpQBZnyX2ABLU">未涨停 · 可观察</span></div><div class="md-pick" data-code="600598" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="lRGkvf4fGtBEZ5unV7aZGp"><span class="md-pick-name" data-page-node-id="eVknWV7U31JeRCve2Lz9qI">北大荒</span><span class="md-pick-code" data-page-node-id="kRauhdhfTAvUvO81AQ9H2n">600598</span><span class="md-pick-pct up" data-page-node-id="Ia3F5stqbiuhAJ2hHPLzgM">+5.63%</span><span class="md-pick-hint" data-page-node-id="icHH9sEqqMuF3Ti1v0Xqfl">未涨停 · 可观察</span></div><div class="md-pick" data-code="603336" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="s1lgDXInCfoUApR3nbD7Ud"><span class="md-pick-name" data-page-node-id="vlK30VUXbzv1aApmBFlQeJ">宏辉果蔬</span><span class="md-pick-code" data-page-node-id="Osqwzc79UZiOLcsQDbUGjd">603336</span><span class="md-pick-pct up" data-page-node-id="58etOg21D8HbrWYb4DWoPB">+5.44%</span><span class="md-pick-hint" data-page-node-id="I5t0UQlGOP7RXWexBoQ1Vg">未涨停 · 可观察</span></div>
       </div>
-    </div><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(1)">
-        <div class="md-rank">2</div>
-        <div class="md-main">
-          <div class="md-name">一般零售 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 2家 / 4板 · 领涨 百大集团 · ATDS 96</div>
+    </div><div class="md-card" data-page-node-id="8fXtE1BqikZYmTwY8lK3in">
+      <div class="md-item" onclick="toggleMdPicks(1)" data-page-node-id="u3akTuVO4HJMdAxL7Rgm14">
+        <div class="md-rank" data-page-node-id="q5mDSmGtoltDArhHyFVBLS">2</div>
+        <div class="md-main" data-page-node-id="BbtwxGsGKHpoDNm0mqH4At">
+          <div class="md-name" data-page-node-id="LYc7B9wXQFrTbJklI7oBxw">一般零售 <span class="md-status ok" data-page-node-id="q4UyE6oHAg8OtN79pUGYDB">主线确认</span></div>
+          <div class="md-sub" data-page-node-id="BfJTGltk0UXpGAHUMOSpFU">涨停 2家 / 4板 · 领涨 百大集团 · ATDS 96</div>
         </div>
-        <div class="md-pct up">+10.00%</div>
-        <div class="md-arrow">▾</div>
+        <div class="md-pct up" data-page-node-id="Ra2vdDq8ltVJI4wYsga1yt">+10.00%</div>
+        <div class="md-arrow" data-page-node-id="z2FR9lDcJBqgDDg7qLWk5q">▾</div>
       </div>
-      <div class="md-picks-wrap" id="md-picks-1">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-pick" data-code="601086" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">国芳集团</span><span class="md-pick-code">601086</span><span class="md-pick-pct up">+7.40%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="600113" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">浙江东日</span><span class="md-pick-code">600113</span><span class="md-pick-pct up">+6.46%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="000564" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">供销大集</span><span class="md-pick-code">000564</span><span class="md-pick-pct up">+4.85%</span><span class="md-pick-hint">未涨停 · 可观察</span></div>
+      <div class="md-picks-wrap" id="md-picks-1" data-page-node-id="TXL6e3tgsFGV5DTDSId8od">
+        <div class="md-picks-h" data-page-node-id="7JWAh6btHB97gJREjlOf3k">排除涨停 · 优先可观察前3</div>
+        <div class="md-pick" data-code="601086" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="ngpYB4PalqAgeKa2SZliht"><span class="md-pick-name" data-page-node-id="65vB7gRFtaxBaBExbmELtw">国芳集团</span><span class="md-pick-code" data-page-node-id="k4X0Xcnu7CJcXNcr9lP7bc">601086</span><span class="md-pick-pct up" data-page-node-id="4Ijn6h6LsvfwCNhJJYICyc">+7.40%</span><span class="md-pick-hint" data-page-node-id="D3Fww2DJhzn40TBXWkk4UJ">未涨停 · 可观察</span></div><div class="md-pick" data-code="600113" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="vIjkeOWGiKCUd6bjJU6zwH"><span class="md-pick-name" data-page-node-id="aovqUSHU4nJbOcOFmAJDCU">浙江东日</span><span class="md-pick-code" data-page-node-id="9RBANETWB4aJgB4FDghkPb">600113</span><span class="md-pick-pct up" data-page-node-id="4IHLQGZuDmEriTMYZYDjst">+6.46%</span><span class="md-pick-hint" data-page-node-id="M1qn8ADoWIF6W7BblYDL4Z">未涨停 · 可观察</span></div><div class="md-pick" data-code="000564" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="lLTIVkCBJyJxvDVt7fdvQs"><span class="md-pick-name" data-page-node-id="ikizh7SUR0GSD1qrZ08oMC">供销大集</span><span class="md-pick-code" data-page-node-id="cYaWAuvFyotPKiawBLFCQZ">000564</span><span class="md-pick-pct up" data-page-node-id="0YQ0dRz1EA5s59fvooCz6W">+4.85%</span><span class="md-pick-hint" data-page-node-id="UeIJE4DmigcHoFJ3PAENDi">未涨停 · 可观察</span></div>
       </div>
-    </div><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(2)">
-        <div class="md-rank">3</div>
-        <div class="md-main">
-          <div class="md-name">出版 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 3家 / 3板 · 领涨 中国出版 · ATDS 96</div>
+    </div><div class="md-card" data-page-node-id="oc49P05H1GVeklHVt4gx2k">
+      <div class="md-item" onclick="toggleMdPicks(2)" data-page-node-id="pAzuJAvpqReME78EpwGveW">
+        <div class="md-rank" data-page-node-id="gVn5BtKspAdqLh2RRmHtD1">3</div>
+        <div class="md-main" data-page-node-id="DgraYA8NLK3SqGbF5kA0ZK">
+          <div class="md-name" data-page-node-id="CUQLseXw8tNm0amrIpmXb8">出版 <span class="md-status ok" data-page-node-id="oFA6cB3qUwezJ8qBVYEEM6">主线确认</span></div>
+          <div class="md-sub" data-page-node-id="RtnGDW2gxE0dvuscQhj46p">涨停 3家 / 3板 · 领涨 中国出版 · ATDS 96</div>
         </div>
-        <div class="md-pct up">+13.31%</div>
-        <div class="md-arrow">▾</div>
+        <div class="md-pct up" data-page-node-id="SwC8Y1oiBxeHvZI4XfBdtc">+13.31%</div>
+        <div class="md-arrow" data-page-node-id="JqFKeLLB4b7s4t74MDqWBJ">▾</div>
       </div>
-      <div class="md-picks-wrap" id="md-picks-2">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-pick" data-code="605577" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">龙版传媒</span><span class="md-pick-code">605577</span><span class="md-pick-pct up">+9.12%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="002181" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">粤 传 媒</span><span class="md-pick-code">002181</span><span class="md-pick-pct up">+5.11%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="301025" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">读客文化</span><span class="md-pick-code">301025</span><span class="md-pick-pct up">+4.78%</span><span class="md-pick-hint">未涨停 · 可观察</span></div>
+      <div class="md-picks-wrap" id="md-picks-2" data-page-node-id="DTfUroX2o4pPRQ5oXkAQ1K">
+        <div class="md-picks-h" data-page-node-id="du9J6kbpg2aUNVJe7SekNl">排除涨停 · 优先可观察前3</div>
+        <div class="md-pick" data-code="605577" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="t13NQL5RndjLOc9WPa9DgC"><span class="md-pick-name" data-page-node-id="DhMJO9Lt58SLa5Q3jvZT3b">龙版传媒</span><span class="md-pick-code" data-page-node-id="EolXkb7w642MiYNSiNk3F6">605577</span><span class="md-pick-pct up" data-page-node-id="evrIBNOJuziQwpM6ZxTbC3">+9.12%</span><span class="md-pick-hint" data-page-node-id="n5w86D34BHdt5AAI0kMjDs">未涨停 · 可观察</span></div><div class="md-pick" data-code="002181" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="wcRFo5JAjbDyX5jSzzh8r3"><span class="md-pick-name" data-page-node-id="SvjaUYgfAt1Pp5XuDPyMFg">粤 传 媒</span><span class="md-pick-code" data-page-node-id="7iZH0oQZrgLkt4Cl9LoKNE">002181</span><span class="md-pick-pct up" data-page-node-id="NxTXtSo9ulLzD0yGMs5o6k">+5.11%</span><span class="md-pick-hint" data-page-node-id="AEjKtaF0ngiZJgMQIsW9Oj">未涨停 · 可观察</span></div><div class="md-pick" data-code="301025" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="AJ84XUyQU1TXX9ETn8XbPK"><span class="md-pick-name" data-page-node-id="NV4PggAS9gePubG9V0pZjm">读客文化</span><span class="md-pick-code" data-page-node-id="zg4VyYPoY2Mz1BK14yKqax">301025</span><span class="md-pick-pct up" data-page-node-id="3D6H6MQd4MK5C1qlfZpAmd">+4.78%</span><span class="md-pick-hint" data-page-node-id="5AglwEaZLrF2P8dzCnJSUb">未涨停 · 可观察</span></div>
       </div>
-    </div><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(3)">
-        <div class="md-rank">4</div>
-        <div class="md-main">
-          <div class="md-name">小家电 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 1家 / 4板 · 领涨 爱仕达 · ATDS 96</div>
+    </div><div class="md-card" data-page-node-id="ctzkgEz9qf3FpPF342gaEY">
+      <div class="md-item" onclick="toggleMdPicks(3)" data-page-node-id="DwSxMgaeMK4OZYDQ82gE62">
+        <div class="md-rank" data-page-node-id="GdVbs5E5es2ba7jE3awlNV">4</div>
+        <div class="md-main" data-page-node-id="CukNIDry962CKQVXFoGHb8">
+          <div class="md-name" data-page-node-id="8xeVmWgxt0y3glf7uRGzmL">小家电 <span class="md-status ok" data-page-node-id="SjRWceMtPAVkQpsHVDUEIX">主线确认</span></div>
+          <div class="md-sub" data-page-node-id="RNCZkaDVMC4eEEH7WrQv7g">涨停 1家 / 4板 · 领涨 爱仕达 · ATDS 96</div>
         </div>
-        <div class="md-pct up">+9.99%</div>
-        <div class="md-arrow">▾</div>
+        <div class="md-pct up" data-page-node-id="ooSNDjdkmtlQDcGosizhLq">+9.99%</div>
+        <div class="md-arrow" data-page-node-id="Cz9YaFXpB3gcQpsJLURDCE">▾</div>
       </div>
-      <div class="md-picks-wrap" id="md-picks-3">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-pick" data-code="300824" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">北鼎股份</span><span class="md-pick-code">300824</span><span class="md-pick-pct up">+5.55%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="003023" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">彩虹集团</span><span class="md-pick-code">003023</span><span class="md-pick-pct up">+5.01%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="002242" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">九阳股份</span><span class="md-pick-code">002242</span><span class="md-pick-pct up">+1.40%</span><span class="md-pick-hint">未涨停 · 可观察</span></div>
+      <div class="md-picks-wrap" id="md-picks-3" data-page-node-id="fO75kD8phx3AyBzG9LYnvV">
+        <div class="md-picks-h" data-page-node-id="hQebErrwiSHKwfmITLHVO6">排除涨停 · 优先可观察前3</div>
+        <div class="md-pick" data-code="300824" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="3DsEIhbV9H9jUoW9tNtSJX"><span class="md-pick-name" data-page-node-id="RvNkHXteFYwc4Kx7tYJyVz">北鼎股份</span><span class="md-pick-code" data-page-node-id="C7XLDwntfLQoGbO5dPFKn0">300824</span><span class="md-pick-pct up" data-page-node-id="RDPjAKoPKyZvMBJLmeviEf">+5.55%</span><span class="md-pick-hint" data-page-node-id="RI2RId4tr6G7CiOtb2aVQG">未涨停 · 可观察</span></div><div class="md-pick" data-code="003023" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="54vJSU07GjABHfdenPfvXK"><span class="md-pick-name" data-page-node-id="rFM4DWKyS7YKnTMOEiqdTC">彩虹集团</span><span class="md-pick-code" data-page-node-id="1F3OTrjGecxftYLANLHnVt">003023</span><span class="md-pick-pct up" data-page-node-id="GI4xQHdCeW7bLVBrbNyXCG">+5.01%</span><span class="md-pick-hint" data-page-node-id="w4lixT18bZcvTHmACgVb1n">未涨停 · 可观察</span></div><div class="md-pick" data-code="002242" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="S2hVYtjDwEjtbkMUfTvUDV"><span class="md-pick-name" data-page-node-id="lY6fAPFIwy3tsypTNUMjie">九阳股份</span><span class="md-pick-code" data-page-node-id="mC6zGdRfP7B0dyczMUIsk8">002242</span><span class="md-pick-pct up" data-page-node-id="APM1w6HHA1CnUS8zzw8NL6">+1.40%</span><span class="md-pick-hint" data-page-node-id="r1mwSLDVrMZOZpoeNcS5hn">未涨停 · 可观察</span></div>
       </div>
-    </div><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(4)">
-        <div class="md-rank">5</div>
-        <div class="md-main">
-          <div class="md-name">农化制品 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 4家 / 2板 · 领涨 金正大 · ATDS 96</div>
+    </div><div class="md-card" data-page-node-id="1H9BAgZgCeE65hETMVFkl1">
+      <div class="md-item" onclick="toggleMdPicks(4)" data-page-node-id="iDBzNF0zlSYoX9IbXRwCMF">
+        <div class="md-rank" data-page-node-id="2HcSr52Q1mp4Z9JcH2f0DM">5</div>
+        <div class="md-main" data-page-node-id="e8xATD5pJfjQWCrwCbmYIq">
+          <div class="md-name" data-page-node-id="0XfxioLFHq0I0JfiAh4gWr">农化制品 <span class="md-status ok" data-page-node-id="zcgxmBAdft5Uy8KiyYVOZE">主线确认</span></div>
+          <div class="md-sub" data-page-node-id="gJVKPX8GlUyScRgYkKbkU2">涨停 4家 / 2板 · 领涨 金正大 · ATDS 96</div>
         </div>
-        <div class="md-pct up">+10.00%</div>
-        <div class="md-arrow">▾</div>
+        <div class="md-pct up" data-page-node-id="XwUFOpPgGQQv5sS9WBTQUw">+10.00%</div>
+        <div class="md-arrow" data-page-node-id="vGvZRBpFvofph0GuJpImMu">▾</div>
       </div>
-      <div class="md-picks-wrap" id="md-picks-4">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-pick" data-code="300505" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">川金诺</span><span class="md-pick-code">300505</span><span class="md-pick-pct up">+11.69%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="300261" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">雅本化学</span><span class="md-pick-code">300261</span><span class="md-pick-pct up">+9.13%</span><span class="md-pick-hint">未涨停 · 可观察</span></div><div class="md-pick" data-code="600470" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">六国化工</span><span class="md-pick-code">600470</span><span class="md-pick-pct up">+8.48%</span><span class="md-pick-hint">未涨停 · 可观察</span></div>
+      <div class="md-picks-wrap" id="md-picks-4" data-page-node-id="6XJIRegcmC6DupJFFu1ucy">
+        <div class="md-picks-h" data-page-node-id="NGYnEGEvN2B9BglPOQVPvC">排除涨停 · 优先可观察前3</div>
+        <div class="md-pick" data-code="300505" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="QFMwK0YUFilcQDDy3VZFCS"><span class="md-pick-name" data-page-node-id="KBHfXSvQ9AZIR3H6MGHjhG">川金诺</span><span class="md-pick-code" data-page-node-id="bVClhMz8bSTIEkqOz5L7tH">300505</span><span class="md-pick-pct up" data-page-node-id="9vdMrvilojiuqemtm2x2xl">+11.69%</span><span class="md-pick-hint" data-page-node-id="xb6R4bYs43B8LDcVdF9je6">未涨停 · 可观察</span></div><div class="md-pick" data-code="300261" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="vDzX7fSXsU1OZkVykxTjv3"><span class="md-pick-name" data-page-node-id="6BzoNZEaDWlxbJX4yclQ5A">雅本化学</span><span class="md-pick-code" data-page-node-id="DvBAwEqPsGkjkNd5xj9K0n">300261</span><span class="md-pick-pct up" data-page-node-id="3uuKlb3ImzbGCktuQ8YNM8">+9.13%</span><span class="md-pick-hint" data-page-node-id="9gWWvdDeZqtvLqVCcu17QI">未涨停 · 可观察</span></div><div class="md-pick" data-code="600470" onclick="event.stopPropagation();openStockResearch(this.dataset.code)" data-page-node-id="bQnZFI0CEHELFwan2K5CjM"><span class="md-pick-name" data-page-node-id="R1hzvSR44NndIlEh0Dnudj">六国化工</span><span class="md-pick-code" data-page-node-id="Moz5vZkrlmMCmygqhslZpN">600470</span><span class="md-pick-pct up" data-page-node-id="T3NFSu3AFrKiEtz9KtmtdU">+8.48%</span><span class="md-pick-hint" data-page-node-id="5CxqIHs3uBuzir1YONutkb">未涨停 · 可观察</span></div>
       </div>
     </div></div>
   </div>
-  <div class="card">
-    <div class="card-title">全部方向实时强度排名 · 前 10 名</div>
-    <table class="table"><thead><tr><th>#</th><th>主线</th><th>涨幅</th><th>涨停数</th><th>领涨</th></tr></thead><tbody><tr>
-      <td>1</td>
-      <td>种植业</td>
-      <td class="up">+9.98%</td>
-      <td>3家 / 4板</td>
-      <td>亚盛集团</td>
-    </tr><tr>
-      <td>2</td>
-      <td>一般零售</td>
-      <td class="up">+10.00%</td>
-      <td>2家 / 4板</td>
-      <td>百大集团</td>
-    </tr><tr>
-      <td>3</td>
-      <td>出版</td>
-      <td class="up">+13.31%</td>
-      <td>3家 / 3板</td>
-      <td>中国出版</td>
-    </tr><tr>
-      <td>4</td>
-      <td>小家电</td>
-      <td class="up">+9.99%</td>
-      <td>1家 / 4板</td>
-      <td>爱仕达</td>
-    </tr><tr>
-      <td>5</td>
-      <td>农化制品</td>
-      <td class="up">+10.00%</td>
-      <td>4家 / 2板</td>
-      <td>金正大</td>
-    </tr><tr>
-      <td>6</td>
-      <td>食品加工</td>
-      <td class="up">+10.05%</td>
-      <td>1家 / 3板</td>
-      <td>海欣食品</td>
-    </tr><tr>
-      <td>7</td>
-      <td>通信设备</td>
-      <td class="up">+10.00%</td>
-      <td>2家 / 2板</td>
-      <td>华脉科技</td>
-    </tr><tr>
-      <td>8</td>
-      <td>光学光电</td>
-      <td class="up">+10.02%</td>
-      <td>2家 / 2板</td>
-      <td>华体科技</td>
-    </tr><tr>
-      <td>9</td>
-      <td>化学制品</td>
-      <td class="up">+9.98%</td>
-      <td>2家 / 2板</td>
-      <td>百合花</td>
-    </tr><tr>
-      <td>10</td>
-      <td>影视院线</td>
-      <td class="up">+9.97%</td>
-      <td>2家 / 2板</td>
-      <td>上海电影</td>
+  <div class="card" data-page-node-id="CLMEryEVIzqMtNZxBsV24W">
+    <div class="card-title" data-page-node-id="bv1TEU1C5hZGPTXPGqHebt">全部方向实时强度排名 · 前 10 名</div>
+    <table class="table" data-page-node-id="50xiAwFKghmLKVfVsTnLyu"><thead data-page-node-id="cD6c6IztmbqkHAKtSX9e1U"><tr data-page-node-id="EhjhYYlZFsO9Q5YpC6Dr62"><th data-page-node-id="BC0cRiFCmvPR864ao2kX4J">#</th><th data-page-node-id="b3JvimlnmiAPht0DB1xXMh">主线</th><th data-page-node-id="iDmye7ytlTMb0oZxcvLKyR">涨幅</th><th data-page-node-id="SYp9udRla157i5tHr56kKA">涨停数</th><th data-page-node-id="KP3y9JwEMlnbov0gn8xDyx">领涨</th></tr></thead><tbody data-page-node-id="VLnyMp36FFR10MixPEhl85"><tr data-page-node-id="1Jygdc3T90Xj2q2d4bnHJK">
+      <td data-page-node-id="PFyqGGeivx32kq3lvpdf5h">1</td>
+      <td data-page-node-id="VLLXxEtXCyZRmnG4uD2Ld6">种植业</td>
+      <td class="up" data-page-node-id="eGdvm0vbieVu5VueqPkXpt">+9.98%</td>
+      <td data-page-node-id="VsNGjKcsxWdF9qV5nt90tD">3家 / 4板</td>
+      <td data-page-node-id="feBeBf768MccJnbtgkEdca">亚盛集团</td>
+    </tr><tr data-page-node-id="8XzVHlqvOxc5ix7Q7frSLJ">
+      <td data-page-node-id="YU14cFaeKGKBY2MA5xkZW6">2</td>
+      <td data-page-node-id="0FIXssfVlLoUTEXRFm0nNd">一般零售</td>
+      <td class="up" data-page-node-id="9OBfDxG8mBht67QBx3YrDb">+10.00%</td>
+      <td data-page-node-id="L0WQxO7E8juVWQG71XFtgy">2家 / 4板</td>
+      <td data-page-node-id="loQueY2DK33t2Dpq4zHn9l">百大集团</td>
+    </tr><tr data-page-node-id="6DzqxAn4zBzk5VXt642rPU">
+      <td data-page-node-id="vl1gsOiTQXG0wztAhEq2ys">3</td>
+      <td data-page-node-id="IzQE7akXBKIoDfEx8iI1Tk">出版</td>
+      <td class="up" data-page-node-id="dNa0j1mDB0kCb4lcjJMkCz">+13.31%</td>
+      <td data-page-node-id="QlQ2agk64wJnqDNbq0MnSy">3家 / 3板</td>
+      <td data-page-node-id="ODa9M3XEMlymdaxUDaCtCa">中国出版</td>
+    </tr><tr data-page-node-id="nsBn05emQ2uGir8kpXTj9e">
+      <td data-page-node-id="KVP2yoDVZPNj8ZH767Togc">4</td>
+      <td data-page-node-id="iEBNJylmDWZysOKiMTz22s">小家电</td>
+      <td class="up" data-page-node-id="Y7yrLTrOB09ypne5kb37MO">+9.99%</td>
+      <td data-page-node-id="4BLTTvVfXpaHgYahHbRBme">1家 / 4板</td>
+      <td data-page-node-id="2EcWko89l6YfgadmKLIREv">爱仕达</td>
+    </tr><tr data-page-node-id="f9Hdadp7coCpw9ChGAHDVl">
+      <td data-page-node-id="a6BMxEDmWFJgxA44Xys6TD">5</td>
+      <td data-page-node-id="SrNIDeuHGu1wu1TAm1ioA6">农化制品</td>
+      <td class="up" data-page-node-id="pmMuuWJqTlHX1a3Xi8o0KI">+10.00%</td>
+      <td data-page-node-id="AF0G8krvc0bEddFZpifXUq">4家 / 2板</td>
+      <td data-page-node-id="jVyDzSaaZtFTIm3beLXUa6">金正大</td>
+    </tr><tr data-page-node-id="YbGoeBecJJ5f5k6FU1XEI4">
+      <td data-page-node-id="Ati6iDMlu1jBArjBT6rgGe">6</td>
+      <td data-page-node-id="GEA3EsXJCCKiAI4EsS8cx5">食品加工</td>
+      <td class="up" data-page-node-id="fYLs3XdkE8wWJmxZS4wzWo">+10.05%</td>
+      <td data-page-node-id="Lew5QiOTCBotXSbpzcvAHO">1家 / 3板</td>
+      <td data-page-node-id="ITXa6WwXWAUTXd07XGqRiV">海欣食品</td>
+    </tr><tr data-page-node-id="iD0xT1UbvuuZLmb2RF0BPa">
+      <td data-page-node-id="rwoLDZ7AU24xxOP155mY11">7</td>
+      <td data-page-node-id="oMPhrRSuR3WA1jzsZywvYz">通信设备</td>
+      <td class="up" data-page-node-id="efQwcteU76VBuf6SSQk0sY">+10.00%</td>
+      <td data-page-node-id="R1fno1abW4HLnSwuhkfkOG">2家 / 2板</td>
+      <td data-page-node-id="mEVAKcGfJx1PN8k6fiTCqa">华脉科技</td>
+    </tr><tr data-page-node-id="wLIBXwRaw5aS5KzU3GmJeA">
+      <td data-page-node-id="Jpwt4BG60gWtD82k7oAiBz">8</td>
+      <td data-page-node-id="tSQ01SMi3HiJsxxKY3DMHS">光学光电</td>
+      <td class="up" data-page-node-id="7bBFDUAbHDzFt9rDGbDkaP">+10.02%</td>
+      <td data-page-node-id="Rmu7hbjaxZzgEDfQEwJknL">2家 / 2板</td>
+      <td data-page-node-id="7jTIW3FHlD0oa349R3F3hm">华体科技</td>
+    </tr><tr data-page-node-id="amxZPGlXjhlKtqCoMvatEC">
+      <td data-page-node-id="icPPeunnmNR8q1PXS0v4oC">9</td>
+      <td data-page-node-id="vO9BCQC9bCeZErmuKfx8xk">化学制品</td>
+      <td class="up" data-page-node-id="cvkvUGH6AEyBHP0RQEsJuv">+9.98%</td>
+      <td data-page-node-id="dp1uG9SyYQhp8t2uPGHSRc">2家 / 2板</td>
+      <td data-page-node-id="jt5zs8GftrJx0mWsZPrEak">百合花</td>
+    </tr><tr data-page-node-id="EUuPDsFriZNfNXsZHLdLPr">
+      <td data-page-node-id="suo8jQLffiGumzXXn2hmA0">10</td>
+      <td data-page-node-id="n0nKYvEMhgAgsR270zDavf">影视院线</td>
+      <td class="up" data-page-node-id="JBMOzYDqj6cigFrqQBgrc9">+9.97%</td>
+      <td data-page-node-id="ag1lqeJJ0cVH6juPtRPoJv">2家 / 2板</td>
+      <td data-page-node-id="qslIoq5JT6q801x0cXSYjd">上海电影</td>
     </tr></tbody></table>
   </div>
-  <div class="card">
-    <div class="card-title">个股研究摘要</div>
-    <div class="sr-list"><div class="sr-item" data-code="002483" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">1</div>
-      <div class="sr-main">
-        <div class="sr-name">润邦股份 <small>002483</small></div>
-        <div class="sr-reason">启动+老鸭头+拉升·量比2.0·5日涨16.8%</div>
+  <div class="card" data-page-node-id="5DlUtTM9oZOlGOUARYGUhG">
+    <div class="card-title" data-page-node-id="GKGjaX1biCTI9nTa74hRn9">个股研究摘要</div>
+    <div class="sr-list" data-page-node-id="ku4ECpKJuY3Few1ope1SIK"><div class="sr-item" data-code="002483" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)" data-page-node-id="R5QyvrT4q6xAdMQSDTW8ow">
+      <div class="sr-rank" data-page-node-id="7US6BF9LE5n62SEh2f8MAb">1</div>
+      <div class="sr-main" data-page-node-id="YV3SGgmkAUyHiVhEFbWA99">
+        <div class="sr-name" data-page-node-id="BC5lG3kMewSUSPaJqTetbV">润邦股份 <small data-page-node-id="NruBDHXZ6bWgZgaYcGFg2v">002483</small></div>
+        <div class="sr-reason" data-page-node-id="ZvuyJ7YF0N7Q1TBGcLN3Sm">启动+老鸭头+拉升·量比2.0·5日涨16.8%</div>
       </div>
-      <div class="sr-pct up">+6.48%</div>
-    </div><div class="sr-item" data-code="603321" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">2</div>
-      <div class="sr-main">
-        <div class="sr-name">梅轮电梯 <small>603321</small></div>
-        <div class="sr-reason">启动+老鸭头+拉升·量比2.0·5日涨11.6%</div>
+      <div class="sr-pct up" data-page-node-id="2ryRwdZHHMLyqe5vkqzBNH">+6.48%</div>
+    </div><div class="sr-item" data-code="603321" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)" data-page-node-id="v8WGJq09O3rqDHDtI4N8eP">
+      <div class="sr-rank" data-page-node-id="WZsJfKE4Z39z0pWZf1t46F">2</div>
+      <div class="sr-main" data-page-node-id="1XmRG6jb6wt4XsMhBWzzPW">
+        <div class="sr-name" data-page-node-id="R2NCkomvRHyrmFG12EUxvg">梅轮电梯 <small data-page-node-id="jznTnvq80oQSxTrZnx6jEy">603321</small></div>
+        <div class="sr-reason" data-page-node-id="VJjeDtB8Nxu1pvPMxQNJam">启动+老鸭头+拉升·量比2.0·5日涨11.6%</div>
       </div>
-      <div class="sr-pct up">+7.78%</div>
-    </div><div class="sr-item" data-code="601086" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">3</div>
-      <div class="sr-main">
-        <div class="sr-name">国芳集团 <small>601086</small></div>
-        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨48.2%</div>
+      <div class="sr-pct up" data-page-node-id="fLBQW8i3StN91zhfgeHuCI">+7.78%</div>
+    </div><div class="sr-item" data-code="601086" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)" data-page-node-id="3Vf215O9j0MvrrCLxKr0Hn">
+      <div class="sr-rank" data-page-node-id="jzPVXh6bGKUgjbZDajZTNx">3</div>
+      <div class="sr-main" data-page-node-id="UfTagrneGwny9apguK1hON">
+        <div class="sr-name" data-page-node-id="jOLmGuqf8XXOiwvbDTxvdv">国芳集团 <small data-page-node-id="WC5vo283DCrUYu5FUL2qLO">601086</small></div>
+        <div class="sr-reason" data-page-node-id="GSe3j7aI2P6FxuMXaUqu3P">老鸭头+拉升·量比2.0·5日涨48.2%</div>
       </div>
-      <div class="sr-pct up">+7.40%</div>
-    </div><div class="sr-item" data-code="600770" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">4</div>
-      <div class="sr-main">
-        <div class="sr-name">综艺股份 <small>600770</small></div>
-        <div class="sr-reason">启动+拉升·量比2.0·5日涨13.9%</div>
+      <div class="sr-pct up" data-page-node-id="XdZjLlg9EzmvHYGKcTKuls">+7.40%</div>
+    </div><div class="sr-item" data-code="600770" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)" data-page-node-id="lBWTlHJLUHFJfkJQxOLrcO">
+      <div class="sr-rank" data-page-node-id="6qcKeuC0wjuZezsLMDQudr">4</div>
+      <div class="sr-main" data-page-node-id="HOwcYvg1Gw6CyybxtFljV5">
+        <div class="sr-name" data-page-node-id="fparomAoIZpLofW9dKV0Nh">综艺股份 <small data-page-node-id="CebF9s41yrtefuo0lyc56r">600770</small></div>
+        <div class="sr-reason" data-page-node-id="Wi2HpvwqFoqtR1OXXl5E2C">启动+拉升·量比2.0·5日涨13.9%</div>
       </div>
-      <div class="sr-pct up">+5.55%</div>
-    </div><div class="sr-item" data-code="688719" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">5</div>
-      <div class="sr-main">
-        <div class="sr-name">爱科赛博 <small>688719</small></div>
-        <div class="sr-reason">启动+拉升·量比2.0·5日涨12.4%</div>
+      <div class="sr-pct up" data-page-node-id="xEmg1OpA7iVgWyqC8Bpr67">+5.55%</div>
+    </div><div class="sr-item" data-code="688719" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)" data-page-node-id="TrmOd18Bs0BuqWHNQ9EMGQ">
+      <div class="sr-rank" data-page-node-id="2F3YqNbqZlH4XvEpBpK2lQ">5</div>
+      <div class="sr-main" data-page-node-id="wh4GopVbUoxKUO6jrmQv5X">
+        <div class="sr-name" data-page-node-id="ZRJknzIfZCxcfDs6Uglvit">爱科赛博 <small data-page-node-id="UwItfcEQZpKtH5klRY2CTN">688719</small></div>
+        <div class="sr-reason" data-page-node-id="fY365poDIJODWp8rE6ir5t">启动+拉升·量比2.0·5日涨12.4%</div>
       </div>
-      <div class="sr-pct up">+6.81%</div>
+      <div class="sr-pct up" data-page-node-id="yOF9w98psMqYXZ0N8XsZuP">+6.81%</div>
     </div></div>
   </div>
 </div>
-<div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
+<div class="footer" data-page-node-id="j3owGr8evqTEBilUCnyB6d">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
 </div>
 <script>
 function getBaseUrl(){var h=location.href.split("#")[0];if(/index\.html/i.test(h)){return h.replace(/index\.html.*$/i,"");}if(h.slice(-1)==="/"){return h;}var i=h.lastIndexOf("/");return h.slice(0,i+1);}
