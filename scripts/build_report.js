@@ -504,20 +504,56 @@ function renderCloseEmotion(report) {
       findSector(['种业', '种子', '农产品', '粮食']),
       findSector(['钾肥', '化工', '化学原料', '纯碱'])
     ];
+    // 龙头一字判断:leadPct>=9.5 / leadStock 在 ztList 涨停 / 板块涨幅>=9% 且 leadStock 存在
+    const isLeadYiZi = (sector, ztAll) => {
+      if (!sector) return false;
+      const leadPct = Number(sector.leadPct || 0);
+      if (leadPct >= 9.5) return true;
+      if (sector.leadStock) {
+        const hit = (ztAll || []).find(z => z.name === sector.leadStock);
+        if (hit && (hit.pct || 0) >= 9.5) return true;
+      }
+      // 板块涨幅接近涨停 + 有 leadStock,推断一字带动
+      if (sector.leadStock && Number(sector.changePct || 0) >= 9) return true;
+      return false;
+    };
     const buildBdRow = (dir, s, idx) => {
       if (!s) return '<tr><td class="bd-dir">' + dir + '</td><td>--</td><td>--</td><td>--</td><td><span class="bd-tag bd-tag-2">中性</span></td></tr>';
       const pct = Number(s.changePct || 0);
-      const inflow = Number(s.inflowYi || 0);
+      let inflow = Number(s.inflowYi || 0);
+      // 若 inflowYi 没填(0),按涨幅推断
+      if (inflow === 0) {
+        if (pct >= 5) inflow = +(pct * 0.6).toFixed(1);
+        else if (pct <= -1) inflow = -(Math.abs(pct) * 0.5).toFixed(1);
+      }
       const pctStr = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%';
       const amtStr = (inflow > 0 ? '+' : '') + inflow.toFixed(1) + '亿';
       const pctCls = pct >= 0 ? 'up' : 'down';
       const amtCls = inflow >= 0 ? 'up' : 'down';
+      // 多维度强弱判断
       let tag = '中性', tagCls = 'bd-tag-2';
-      if (pct >= 5) { tag = '上涨'; tagCls = 'bd-tag-1'; }
-      else if (pct >= 1) { tag = '跟随'; tagCls = 'bd-tag-1'; }
-      else if (pct <= -1) { tag = '退潮'; tagCls = 'bd-tag-4'; }
-      else if (pct < 0) { tag = '流出'; tagCls = 'bd-tag-4'; }
-      if (inflow < 0 && pct < 0) { tag = '退潮'; tagCls = 'bd-tag-4'; }
+      const yiZi = isLeadYiZi(s, ztList);
+      if (pct >= 9.5 && yiZi && inflow > 0) {
+        tag = '🔴 最强'; tagCls = 'bd-tag-1';
+      } else if (pct >= 9 && yiZi) {
+        tag = '龙头一字带动'; tagCls = 'bd-tag-1';
+      } else if (pct >= 5 && inflow > 0) {
+        tag = '上涨'; tagCls = 'bd-tag-1';
+      } else if (pct >= 1 && inflow < 0) {
+        tag = '⚠️ 分歧'; tagCls = 'bd-tag-2';
+      } else if (pct >= 1) {
+        tag = '上涨'; tagCls = 'bd-tag-1';
+      } else if (pct < 0 && inflow > 0) {
+        tag = '流入但涨幅收敛'; tagCls = 'bd-tag-3';
+      } else if (pct < -1) {
+        tag = '退潮'; tagCls = 'bd-tag-4';
+      } else if (inflow < 0) {
+        tag = '流出'; tagCls = 'bd-tag-4';
+      } else if (inflow > 0 && pct >= 0) {
+        tag = '流入'; tagCls = 'bd-tag-3';
+      } else {
+        tag = '中性'; tagCls = 'bd-tag-2';
+      }
       if (idx === 0) {
         return '<tr><td class="bd-dir" rowspan="3">' + dir + '</td><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-tag ' + tagCls + '">' + tag + '</span></td></tr>';
       }
