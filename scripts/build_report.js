@@ -1304,12 +1304,15 @@ function buildStockRow(s, i, report) {
   const perStockTS = report.meta && report.meta.type === 'premarket' ? renderPerStockTodayStrategy(s) : '';
   // 关键修复: perStockTS 移到 wl-detail 外,避免 div 嵌套不平衡
   // (renderPerStockTodayStrategy 返回 <div class="card ts-stock-card">...</div>,嵌入到 wl-detail 会让 watchlist-card div 延伸到所有 ts-stock-card)
+  // v8 强滚: 把 detail 和 perStockTS 从 .wl-stock 内拆出,scroll 容器只装标题行
+  // 返回 {row, detail, perStockTS} 让 renderWatchlist 决定如何排版
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
     ${meta}
     ${strategyBlocks}
     ${todayStrategyBlock}
   </div>`;
-  return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}${perStockTS}</div>`;
+  const row = `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div></div>`;
+  return { row, detail, perStockTS };
 }
 
 function buildStockModal(s) {
@@ -1335,11 +1338,14 @@ function buildStockModal(s) {
 function renderWatchlist(report) {
   const list = report.watchlist || [];
   const time = (report.meta && report.meta.generatedAt) || '';
-  // 全部股票都在同一个滚动容器里(包含第一只),用户上下滚动查看(图1 70597501 风格)
-  const stocks = list.map((s, idx) => buildStockRow(s, idx, report)).join('');
+  // v8 强滚: 11 只股标题行紧凑在 .wl-stocks-scroll 内(滚动容器),
+  // 第 1 只股的 detail + perStockTS 移到 .wl-stocks 之后(卡片底部)展示
+  const parts = list.map((s, idx) => buildStockRow(s, idx, report));
+  const stocks = parts.map(p => p.row).join('');
+  const firstDetail = parts.length > 0 ? (parts[0].detail + (parts[0].perStockTS || '')) : '';
   const head = '<div class="card watchlist-card">' +
     '<div class="wl-header">' +
-      '<div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v4-滚动版</span> <span class="wl-time">● ' + esc(time) + '</span></div>' +
+      '<div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● ' + esc(time) + '</span></div>' +
       '<div class="wl-tools">' +
         '<input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric">' +
         '<button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button>' +
@@ -1347,8 +1353,9 @@ function renderWatchlist(report) {
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
       '</div>' +
     '</div>' +
-    '<div class="wl-scroll-hint">← 左右滑动查看全部列 · ↕ 上下滚动查看更多个股</div>' +
+    '<div class="wl-scroll-hint">↕ 上下滚动查看 11 只个股 · ← → 左右滑动 7 列</div>' +
     '<div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll">' + stocks + '</div></div></div>' +
+    firstDetail +
     '<div class="wl-details"></div>' +
     '</div>';
   const modals = '';  // v12b: 不再静态生成个股 modal,统一由 openStockResearch/showDynamicResearch 动态生成,避免 id 重复导致关闭失效
