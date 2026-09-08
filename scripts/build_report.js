@@ -1338,7 +1338,7 @@ function renderWatchlist(report) {
   const stocks = list.map((s, idx) => buildStockRow(s, idx, report)).join('');
   const head = '<div class="card watchlist-card">' +
     '<div class="wl-header">' +
-      '<div class="wl-title">LIVE 我的实时观察池 <span class="wl-time">● ' + esc(time) + '</span></div>' +
+      '<div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v4-滚动版</span> <span class="wl-time">● ' + esc(time) + '</span></div>' +
       '<div class="wl-tools">' +
         '<input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric">' +
         '<button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button>' +
