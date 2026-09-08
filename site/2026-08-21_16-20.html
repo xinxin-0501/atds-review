@@ -1532,7 +1532,7 @@
   font-weight: 600;
 }
 
-/* ============ 今天怎么看 · 5 主题卡片 (2026-09-07) ============ */
+/* ============ 今天怎么看 · 双层紧凑布局 (2026-09-07) ============ */
 .tw-card-outer {
   background: linear-gradient(180deg, #fff7ed 0%, #fff 80%);
   border: 1px solid rgba(225,29,72,0.18);
@@ -1548,94 +1548,129 @@
   margin-right: 6px;
   letter-spacing: 0.5px;
 }
-.tw-cards {
+/* 上半:横向紧凑 tab(仅 编号+主题名+分类 chip) */
+.tw-tabs {
   display: flex;
-  gap: 8px;
-  margin: 10px 0 12px 0;
+  gap: 6px;
+  margin: 8px 0 6px 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 4px;
+  scrollbar-width: thin;
 }
-.tw-card {
+.tw-tab {
   flex: 1 1 0;
   min-width: 0;
-  background: #fff;
-  border: 1px solid rgba(225,29,72,0.16);
-  border-radius: 10px;
-  padding: 8px 10px 10px 10px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 4px;
+  padding: 6px 4px 7px 4px;
+  background: #fff;
+  border: 1px solid rgba(100,116,139,0.18);
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.18s ease;
   position: relative;
 }
-.tw-h {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.tw-tab:active { transform: scale(0.97); }
+.tw-tab.active {
+  border-color: #e11d48;
+  background: linear-gradient(180deg, rgba(225,29,72,0.06), rgba(225,29,72,0.02));
+  box-shadow: 0 1px 4px rgba(225,29,72,0.12);
 }
-.tw-rank {
+.tw-tab.active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: 18px;
+  height: 2px;
+  background: #e11d48;
+  border-radius: 2px;
+  transform: translateX(-50%);
+}
+.tw-tab-rank {
   background: #e11d48;
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 1px 7px;
-  border-radius: 12px;
-  line-height: 1.5;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
-.tw-name {
-  font-size: 14px;
+.tw-tab.active .tw-tab-rank { background: #fff; color: #e11d48; box-shadow: inset 0 0 0 1.5px #e11d48; }
+.tw-tab-name {
+  font-size: 11px;
   font-weight: 700;
   color: #0f172a;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
+  line-height: 1.3;
 }
-.tw-hint {
-  font-size: 10px;
-  color: #94a3b8;
-  font-weight: 600;
-}
-.tw-picks {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 4px 0;
-}
-.tw-pick {
-  font-size: 12px;
-  color: #0f172a;
-  line-height: 1.5;
-  padding-left: 4px;
-  border-left: 2px solid rgba(225,29,72,0.25);
-}
-.tw-pick-empty { color: #94a3b8; font-style: italic; }
-.tw-cat {
-  align-self: flex-start;
-  font-size: 11px;
+.tw-tab.active .tw-tab-name { color: #e11d48; }
+.tw-tab-cat {
+  font-size: 9px;
   font-weight: 700;
+  padding: 0 6px;
+  border-radius: 8px;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+}
+.tw-cat-watch { background: rgba(225,29,72,0.12); color: #e11d48; }
+.tw-cat-wait  { background: rgba(245,158,11,0.14); color: #b45309; }
+
+/* 下半:激活主题的详情面板 */
+.tw-details {
+  position: relative;
+  min-height: 60px;
+}
+.tw-detail {
+  display: none;
+  animation: twFadeIn 0.18s ease;
+}
+.tw-detail.active { display: block; }
+@keyframes twFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tw-d-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 6px 0 8px 0;
+}
+.tw-d-pick {
+  background: rgba(225,29,72,0.08);
+  border: 1px solid rgba(225,29,72,0.16);
+  border-radius: 14px;
   padding: 2px 10px;
-  border-radius: 12px;
-  letter-spacing: 1px;
-}
-.tw-cat-watch {
-  background: rgba(225,29,72,0.12);
-  color: #e11d48;
-}
-.tw-cat-wait {
-  background: rgba(245,158,11,0.14);
-  color: #b45309;
-}
-.tw-reason {
-  font-size: 11px;
-  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
   line-height: 1.6;
-  background: rgba(100,116,139,0.06);
-  padding: 5px 7px;
-  border-radius: 5px;
-  margin-top: 2px;
 }
+.tw-d-empty { color: #94a3b8; font-style: italic; font-size: 12px; }
+.tw-d-reason {
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.7;
+  background: rgba(100,116,139,0.06);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid rgba(225,29,72,0.4);
+}
+
 .tw-caution {
-  margin-top: 12px;
+  margin-top: 10px;
   background: linear-gradient(90deg, rgba(225,29,72,0.12), rgba(225,29,72,0.04));
   border-left: 3px solid #e11d48;
   padding: 8px 12px;
@@ -1656,9 +1691,12 @@
   letter-spacing: 0.5px;
 }
 @media (max-width: 720px) {
-  .tw-cards { gap: 6px; }
-  .tw-card { min-width: 138px; flex: 0 0 138px; }
-  .tw-name { font-size: 13px; }
+  .tw-tabs { gap: 4px; }
+  .tw-tab { padding: 5px 3px 6px 3px; gap: 3px; }
+  .tw-tab-name { font-size: 10px; }
+  .tw-tab-cat  { font-size: 8px; padding: 0 4px; }
+  .tw-d-pick { font-size: 11px; padding: 1px 8px; }
+  .tw-d-reason { font-size: 11px; padding: 6px 10px; }
 }
 </style>
 </head>
@@ -1673,12 +1711,12 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-08-21_11-35.html">午盘</a><a href="2026-08-21_16-20.html" class="active">收盘</a><a href="2026-09-07_16-20.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-08-21_11-35.html">午盘</a><a href="2026-08-21_16-20.html" class="active">收盘</a><a href="2026-09-08_08-30.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘</div><h1 class="hero-title">2026-08-21 · <span class="hero-time">16:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 75°</span></div></div>
 <div class="section">
-<div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-21 收盘复盘 · 数据截至 16:20</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">75°</div><div class="ce-stage">高温区 · 情绪高涨</div><div class="ce-fact">主特征: 情绪高涨,接力效应强</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">47%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">54</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">54</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈75%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">3板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">22%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">3154</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">3310</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">221</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:3154"></div><div class="ce-bar-flat" style="flex:221"></div><div class="ce-bar-down" style="flex:3310"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>47%</b></span><span>成交额 <b>18793亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val up">+0.04%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:1.2%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val up">+0.87%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:26.1%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val up">+1.43%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:42.9%"></div></div></div><div class="ce-block-hint">量能 1.88 万亿 (18793 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">通信设备</span><span class="ce-ml-val up">+10.6%</span></div><div class="ce-ml-row"><span class="ce-ml-name">消费电子</span><span class="ce-ml-val up">+7.6%</span></div><div class="ce-ml-row"><span class="ce-ml-name">专用设备</span><span class="ce-ml-val up">+6.8%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">通信设备</span><span class="ce-mi-val up">+10.6亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">消费电子</span><span class="ce-mi-val up">+7.6亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">专用设备</span><span class="ce-mi-val up">+6.8亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制品</span><span class="ce-mi-val up">+6.8亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title">04 情绪高度(连板梯队)</div><div class="ce-ladder"><span class="ce-ladder-pill">3板 · 汉森制药</span><span class="ce-ladder-pill">2板 · 深中华A</span><span class="ce-ladder-pill">1板 · 达 意 隆</span></div></div><div class="card"><div class="card-title">05 明日观察锚点</div><div class="ce-anchor-grid"><div class="ce-anchor-card"><div class="ce-anchor-h">🎯 主线持续性</div><div class="ce-anchor-desc">观察中际旭创 / 新易盛 / 天孚通信能否继续表态</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">⚠️ 情绪退潮阈值</div><div class="ce-anchor-desc">炸板率 &gt; 40% 或晋级率 &lt; 50% 需警惕</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">📊 量能验证</div><div class="ce-anchor-desc">2.15 万亿基础上能否重拾放量</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">🛡️ 高位风险</div><div class="ce-anchor-desc">百花医药 7 板与医药板块背离</div></div></div></div><div class="card tw-card-outer"><div class="card-title"><span class="tw-eyebrow">02</span> 今天怎么看</div><div class="tw-cards"></div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
+<div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-21 收盘复盘 · 数据截至 16:20</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">75°</div><div class="ce-stage">高温区 · 情绪高涨</div><div class="ce-fact">主特征: 情绪高涨,接力效应强</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">47%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">54</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">54</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈75%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">3板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">22%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">3154</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">3310</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">221</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:3154"></div><div class="ce-bar-flat" style="flex:221"></div><div class="ce-bar-down" style="flex:3310"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>47%</b></span><span>成交额 <b>18793亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val up">+0.04%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:1.2%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val up">+0.87%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:26.1%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val up">+1.43%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:42.9%"></div></div></div><div class="ce-block-hint">量能 1.88 万亿 (18793 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">通信设备</span><span class="ce-ml-val up">+10.6%</span></div><div class="ce-ml-row"><span class="ce-ml-name">消费电子</span><span class="ce-ml-val up">+7.6%</span></div><div class="ce-ml-row"><span class="ce-ml-name">专用设备</span><span class="ce-ml-val up">+6.8%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">通信设备</span><span class="ce-mi-val up">+10.6亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">消费电子</span><span class="ce-mi-val up">+7.6亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">专用设备</span><span class="ce-mi-val up">+6.8亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制品</span><span class="ce-mi-val up">+6.8亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title">04 情绪高度(连板梯队)</div><div class="ce-ladder"><span class="ce-ladder-pill">3板 · 汉森制药</span><span class="ce-ladder-pill">2板 · 深中华A</span><span class="ce-ladder-pill">1板 · 达 意 隆</span></div></div><div class="card"><div class="card-title">05 明日观察锚点</div><div class="ce-anchor-grid"><div class="ce-anchor-card"><div class="ce-anchor-h">🎯 主线持续性</div><div class="ce-anchor-desc">观察中际旭创 / 新易盛 / 天孚通信能否继续表态</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">⚠️ 情绪退潮阈值</div><div class="ce-anchor-desc">炸板率 &gt; 40% 或晋级率 &lt; 50% 需警惕</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">📊 量能验证</div><div class="ce-anchor-desc">2.15 万亿基础上能否重拾放量</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">🛡️ 高位风险</div><div class="ce-anchor-desc">百花医药 7 板与医药板块背离</div></div></div></div><div class="card tw-card-outer"><div class="card-title"><span class="tw-eyebrow">02</span> 明日看什么</div><div class="tw-tabs"></div><div class="tw-details"></div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
     
     
     
@@ -2184,6 +2222,17 @@ function toggleMdPicks(i){
   var card=w.closest?w.closest(".md-card"):w.parentElement;
   if(card)card.classList.toggle("open");
 }
+// 今天怎么看 · 5 主题切换(收盘复盘,02 模块);点击 tab 切换 detail
+function toggleTwCard(i){
+  var tabs=document.querySelectorAll(".tw-tab");
+  var details=document.querySelectorAll(".tw-detail");
+  for(var j=0;j<tabs.length;j++){
+    if(j===i){ tabs[j].classList.add("active"); }else{ tabs[j].classList.remove("active"); }
+  }
+  for(var j=0;j<details.length;j++){
+    if(j===i){ details[j].classList.add("active"); }else{ details[j].classList.remove("active"); }
+  }
+}
 function deriveRiskLevelF(pct){var v=Number(pct)||0;if(v>=5||v<=-5)return{name:'高风险',tone:'high'};if(v>=2||v<=-2)return{name:'中风险',tone:'mid'};return{name:'低风险',tone:'low'};}
 function deriveTimeHorizonF(pct,turnover){var v=Number(pct)||0,t=Number(turnover)||0;if(v>=3&&t>=2)return{name:'短线',tone:'short'};if(v>=-1&&v<=3&&t>=0.5)return{name:'波段',tone:'wave'};return{name:'长线',tone:'long'};}
 function deriveAdviceF(pct,atds,riskTone){var v=Number(pct)||0,a=Number(atds)||0;if(v<=-5)return{name:'减仓规避',tone:'cut'};if(a>=85&&riskTone!='high')return{name:'重点关注',tone:'focus'};if(a>=70)return{name:'持有观察',tone:'hold'};if(a<60&&v<=-1)return{name:'观望',tone:'wait'};return{name:'持有观察',tone:'hold'};}
@@ -2499,6 +2548,14 @@ function restoreSavedWatchlist(){
         var f=m[1].split("~");if(f.length<40)continue;
         var data={code:rawCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
         if(!data.name)continue;
+        // 补拉 K 线 + 技术画像 → 让手动加的股也走五类文案(与亨通光电等 config 观察池一致)
+        try{
+          var full=(c0==="6"||c0==="5")?("sh"+rawCode):("sz"+rawCode);
+          var kl=await fetchKlineF(full,70);
+          if(kl&&kl.length>=20){
+            data.tech=computeTechMetrics(kl);
+          }
+        }catch(e){/* K 线失败降级用粗逻辑 */}
         addToWatchlistUI(data);
       }catch(e){}
     }
@@ -2575,6 +2632,42 @@ async function refreshWatchlistQuotes(){
     if(timeEl)timeEl.textContent='● '+new Date().toLocaleString('zh-CN',{hour12:false});
   }catch(e){}
   if(btn){btn.disabled=false;btn.textContent='↻ 刷新';}
+  // 异步补丁:对没有 tech 数据的行补拉 K 线 → 写入 data-tech → 重建 detail
+  // (本地老版手动加股此前未经过 K 线补全,需要走一遍让它享受五类文案)
+  try{
+    var noTechRows=document.querySelectorAll('.wl-stock-row[data-code]:not([data-tech]),.wl-stock-row[data-code][data-tech="null"]');
+    if(noTechRows.length){
+      (async function(){
+        for(var k=0;k<noTechRows.length;k++){
+          var rEl=noTechRows[k];
+          var c=rEl.getAttribute('data-code');if(!c)continue;
+          try{
+            var c0=c.charAt(0);
+            var full=(c0==="6"||c0==="5")?("sh"+c):("sz"+c);
+            var kl=await fetchKlineF(full,70);
+            if(!kl||kl.length<20)continue;
+            var t=computeTechMetrics(kl);
+            rEl.setAttribute('data-tech',JSON.stringify(t));
+            // 重建该股的 detail,让建议切换为五类技术画像文案
+            var priceEl=rEl.querySelector('.wl-cell-price .price');
+            var pctEl=rEl.querySelector('.wl-cell-pct');
+            var amtEl=rEl.querySelector('.wl-cell-amt');
+            var turnEl=rEl.querySelector('.wl-cell-pct');
+            var price=priceEl?parseFloat(priceEl.textContent)||0:0;
+            var pct=0;
+            if(pctEl){var pm=pctEl.textContent.match(/([+\-]?[\d.]+)%/);if(pm)pct=parseFloat(pm[1])||0;}
+            var amount=amtEl?amtEl.textContent:'--';
+            var turnover='--';
+            var d=document.querySelector('.wl-detail[data-detail-code="'+c+'"]');
+            var name=rEl.querySelector('.wl-name')?rEl.querySelector('.wl-name').textContent:c;
+            if(d){
+              d.innerHTML=buildWatchlistDetailHtml({code:c,name:name,price:price,pct:pct,amount:amount,turnover:turnover,setcode:'',tech:t});
+            }
+          }catch(e){}
+        }
+      })();
+    }
+  }catch(e){}
 }
 function addWatchlistRefreshBtn(){
   var tools=document.querySelector('.watchlist-card .wl-tools');
