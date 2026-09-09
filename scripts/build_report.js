@@ -528,7 +528,7 @@ function renderCloseEmotion(report) {
     for (const { theme, count } of sortedThemes) {
       if (count >= 3) themeParts.push(theme + '独强');
       else if (count >= 2) themeParts.push(theme + '分化');
-      else themeParts.push(theme + '走弱');
+      else themeParts.push(theme + '活跃');
     }
     const dynamicSubtitle = themeParts.length ? '· ' + themeParts.join(' · ') : '· 板块普涨';
     const buildBdRow = (s, i) => {
