@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ATDS PRO · 盘前简报</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>ATDS PRO · 盘前简报</title>
 <style>.modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0}
 .modal-mask.show{display:flex}
 .modal{background:#fff;border-radius:20px;max-width:414px;width:92%;margin:0 auto;padding:0;overflow:hidden}
@@ -56,7 +56,7 @@
 .wl-cell-sig{min-width:70px}
 .wl-cell-stop,.wl-cell-support,.wl-cell-pressure{min-width:55px;text-align:right}
 .wl-cell-act{min-width:80px}
-.wl-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:10px;border-bottom:1px solid #f0f0f0}
+.wl-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-bottom:10px;border-bottom:1px solid #f0f0f0;flex-shrink:0}
 .wl-title{font-size:13px;font-weight:700;color:#333}
 .wl-time{font-size:10px;color:#999;font-weight:400;margin-left:6px}
 .wl-time::before{content:'●';color:#c33;margin-right:3px}
@@ -286,7 +286,7 @@
 .wl-btn-del{background:#fff;border:1px solid #ddd;color:#888}
 .wl-btn-del:active{background:#fee}
 /* v11: 观察池表头+数据合并进 .wl-scroll 横向滑动容器,消除 width:100% 覆盖导致的列被压缩 */
-.wl-scroll-hint{font-size:9px;color:#999;text-align:right;padding:2px 4px 6px 0}
+.wl-scroll-hint{font-size:9px;color:#999;text-align:right;padding:2px 4px 6px 0;flex-shrink:0}
 .wl-scroll{display:block;overflow-x:auto;overflow-y:hidden;max-width:100%;-webkit-overflow-scrolling:touch;scrollbar-width:thin;margin-bottom:6px;border-bottom:1px solid #f0f0f0}
 .wl-scroll::-webkit-scrollbar{height:6px}
 .wl-scroll::-webkit-scrollbar-thumb{background:#c33;border-radius:3px}
@@ -305,7 +305,16 @@
 .modal-box .modal-b{font-size:11px;color:#444;line-height:1.6;background:#fafafa;border-radius:8px;padding:8px 10px}
 .modal-box .modal-footer{background:#fafafa;padding:10px 16px;font-size:9px;color:#999;border-top:1px solid #f0f0f0;text-align:center}
 /* v16: 每只股票独立卡片(自带表头+数据+拉杆+详情) */
-.wl-stocks{display:flex;flex-direction:column;gap:10px}
+.wl-stocks{display:flex;flex-direction:column;gap:10px;flex:0 1 auto;min-height:0;overflow:hidden}
+/* v17: 观察池可上下滚动容器(右侧滚动条+首条默认可见+提示徽章) */
+.wl-stocks-scroll{overflow-y:auto;overflow-x:hidden;height:auto;max-height:480px;-webkit-overflow-scrolling:touch;scrollbar-width:6px;padding-right:4px;border-radius:6px;background:rgba(56,189,248,0.02);min-height:200px}
+.wl-stocks-scroll::-webkit-scrollbar{width:6px;background:rgba(56,189,248,0.04);border-radius:3px}
+.wl-stocks-scroll::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#38bdf8,#0ea5e9);border-radius:3px;border:1px solid rgba(255,255,255,0.4)}
+.wl-stocks-scroll::-webkit-scrollbar-track{background:rgba(56,189,248,0.06);border-radius:3px}
+.wl-stocks-scroll-wrap{position:relative;flex:0 1 auto;min-height:220px;max-height:480px;overflow:hidden;border:1px solid rgba(56,189,248,0.15);border-radius:8px;background:linear-gradient(180deg,rgba(56,189,248,0.03),rgba(56,189,248,0.01))}
+.wl-stocks-scroll-wrap::after{content:"↕ 上下滚动查看更多";position:absolute;right:8px;top:8px;font-size:10px;color:#fff;background:linear-gradient(135deg,#0ea5e9,#0284c7);padding:2px 8px;border-radius:10px;pointer-events:none;z-index:3;font-weight:700;letter-spacing:0.5px;box-shadow:0 2px 4px rgba(2,132,199,0.3);animation:pulse-badge 2s ease-in-out infinite}
+.wl-stocks-scroll-wrap::before{content:"";position:absolute;right:0;top:0;bottom:0;width:8px;background:linear-gradient(90deg,transparent,rgba(56,189,248,0.05));pointer-events:none;border-radius:0 6px 6px 0;z-index:1}
+@keyframes pulse-badge{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.85;transform:scale(1.03)}}
 .wl-stock{background:#fff;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0}
 .wl-stock-scroll{display:block;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;max-width:100%}
 .wl-stock-scroll::-webkit-scrollbar{height:5px}
@@ -1694,125 +1703,305 @@
   .tw-d-pick { font-size: 11px; padding: 1px 8px; }
   .tw-d-reason { font-size: 11px; padding: 6px 10px; }
 }
+
+/* ============ 主线参与策略 - 主升浪·新周期 (2026-09-08) ============ */
+.em-card { background: linear-gradient(180deg, #fff7ed 0%, #fff 80%); border: 1px solid rgba(225,29,72,0.18); }
+.em-header { display: flex; align-items: baseline; gap: 8px; padding: 8px 0 4px 0; }
+.em-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+.em-date { font-size: 11px; color: #64748b; }
+.em-banner { display: flex; align-items: center; gap: 6px; padding: 5px 9px; margin: 8px 0 4px 0; background: linear-gradient(90deg, rgba(225,29,72,0.08), rgba(225,29,72,0.02)); border-left: 2px solid #e11d48; border-radius: 0 6px 6px 0; }
+.em-banner-dot { width: 6px; height: 6px; background: #e11d48; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(225,29,72,0.18); }
+.em-banner b { font-size: 12px; color: #e11d48; }
+.em-banner-tip { font-size: 10px; color: #64748b; }
+.em-stats-mini { display: flex; align-items: center; gap: 4px; padding: 4px 0 8px 0; font-size: 11px; color: #475569; }
+.em-stat-mini-dot { color: #cbd5e1; }
+.em-stats { display: flex; gap: 10px; padding: 6px 0 10px 0; }
+.em-stat { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
+.em-stat-green { background: rgba(22,163,74,0.12); color: #16a34a; }
+.em-stat-gray { background: rgba(100,116,139,0.1); color: #94a3b8; }
+.em-stat-red { background: rgba(225,29,72,0.12); color: #e11d48; }
+.em-bks { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 10px 0; }
+.em-bk { background: #fff; border: 1px solid rgba(225,29,72,0.15); border-radius: 8px; padding: 8px 10px; box-shadow: 0 1px 0 rgba(225,29,72,0.04); }
+.em-bk-dim { opacity: 0.55; }
+.em-bk-h { display: flex; align-items: flex-start; gap: 8px; padding-bottom: 6px; border-bottom: 1px dashed rgba(100,116,139,0.18); margin-bottom: 6px; }
+.em-bk-tag { background: #e11d48; color: #fff; font-size: 11px; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 1px 2px rgba(225,29,72,0.3); }
+.em-bk-meta { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.em-bk-title { font-size: 13px; font-weight: 700; color: #0f172a; }
+.em-bk-sub { font-size: 10px; color: #e11d48; font-weight: 600; margin-left: 4px; }
+.em-bk-tech { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 7px; background: rgba(225,29,72,0.08); color: #e11d48; border-radius: 8px; align-self: flex-start; }
+.em-bk-body { display: flex; flex-direction: column; gap: 4px; }
+.em-bk-row { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+.em-bk-k { color: #94a3b8; flex-shrink: 0; min-width: 92px; }
+.em-bk-v { color: #475569; flex: 1; word-break: break-all; }
+.em-bk-v b { color: #0f172a; font-weight: 700; }
+.em-bk-v b.up { color: #e11d48; }
+.em-bk-v b.down { color: #16a34a; }
+.em-bk-v .up { color: #e11d48; }
+.em-bk-v .down { color: #16a34a; }
+.em-bk-u { font-size: 9px; color: #94a3b8; margin-left: 1px; }
+.em-strong { font-size: 14px !important; color: #e11d48 !important; font-weight: 700; }
+.em-bk-tag-mini { display: inline-block; font-size: 9px; color: #64748b; padding: 0 4px; border-radius: 4px; background: rgba(100,116,139,0.1); font-family: monospace; }
+.em-bk-strong b { color: #0f172a; }
+.em-bk-bar { display: flex; gap: 6px; padding: 4px 8px; background: rgba(56,189,248,0.05); border-radius: 4px; border-left: 2px solid #38bdf8; font-size: 10px; }
+.em-bk-bar-k { color: #0284c7; flex-shrink: 0; font-weight: 600; min-width: 92px; }
+.em-bk-bar-v { color: #475569; flex: 1; }
+.em-bk-bar-v b { color: #0f172a; font-weight: 700; padding: 0 1px; }
+.em-section { margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(100,116,139,0.2); }
+.em-section-h { font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 6px; padding-left: 4px; border-left: 3px solid #e11d48; padding: 1px 0 1px 6px; }
+.em-tips { list-style: none; padding: 0; margin: 0; }
+.em-tips li { font-size: 11px; color: #475569; padding: 4px 8px; background: rgba(225,29,72,0.03); border-radius: 4px; margin-bottom: 4px; display: flex; align-items: flex-start; gap: 6px; }
+.em-tip-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 5px; background: rgba(225,29,72,0.12); color: #e11d48; border-radius: 3px; flex-shrink: 0; }
+.em-tip-tag-blue { background: rgba(2,132,199,0.12) !important; color: #0284c7 !important; }
+.em-tips-empty { font-size: 11px; color: #94a3b8; padding: 4px 8px; }
+.em-cycle { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.em-cyc { padding: 8px 6px; border-radius: 6px; text-align: center; }
+.em-cyc-1 { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+.em-cyc-2 { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); }
+.em-cyc-3 { background: rgba(225,29,72,0.08); border: 1px solid rgba(225,29,72,0.2); }
+.em-cyc-h { font-size: 11px; font-weight: 700; padding-bottom: 3px; margin-bottom: 3px; border-bottom: 1px dashed rgba(100,116,139,0.2); }
+.em-cyc-1 .em-cyc-h { color: #16a34a; }
+.em-cyc-2 .em-cyc-h { color: #f59e0b; }
+.em-cyc-3 .em-cyc-h { color: #e11d48; }
+.em-cyc-b { font-size: 10px; line-height: 1.5; color: #475569; }
+.em-cyc-meta { font-size: 9px; color: #94a3b8; margin-top: 2px; }
+.em-cyc-meta b.up { color: #e11d48; }
+.em-tier { list-style: none; padding: 0; margin: 0; }
+.em-tier li { font-size: 11px; color: #475569; padding: 4px 8px; background: rgba(245,158,11,0.04); border-radius: 4px; margin-bottom: 4px; border-left: 2px solid #f59e0b; }
+.em-tier b { color: #0f172a; }
+.em-risk-list { list-style: none; padding: 4px 8px; margin: 0; background: rgba(225,29,72,0.04); border-radius: 4px; border-left: 2px solid #e11d48; }
+.em-risk-list li { font-size: 11px; color: #475569; padding: 2px 0; }
+.em-risk-list b { color: #e11d48; }
+/* em-card 副标题(主升浪参与策略) */
+.em-sub { font-size: 11px; color: #64748b; font-weight: 400; padding-left: 4px; border-left: 1px solid rgba(15,23,42,0.1); margin-left: 2px; }
+
+/* 0️⃣ 市场状态(参考背景) */
+.ms-card { background: linear-gradient(180deg,#fff7ed 0%,#fff 70%); border:1px solid rgba(225,29,72,0.18); margin-top:6px; }
+.ms-banner { display:flex; align-items:center; gap:8px; padding:8px 10px; background:linear-gradient(90deg,rgba(225,29,72,0.08),rgba(225,29,72,0.02)); border-radius:6px; border-left:3px solid #e11d48; margin-bottom:6px; }
+.ms-b-dot { width:8px; height:8px; border-radius:50%; background:#e11d48; box-shadow:0 0 8px #e11d48; animation:pulse 1.6s infinite; }
+.ms-banner b { color:#0f172a; font-size:13px; }
+.ms-b-eyebrow { font-size:10px; color:#e11d48; padding-left:6px; border-left:1px solid rgba(225,29,72,0.3); margin-left:auto; font-weight:700; }
+.ms-eyebrow { font-size:11px; color:#64748b; padding:2px 4px 4px 0; }
+.ms-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:5px; padding:4px 0; }
+.ms-cell { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:6px; padding:6px 8px; }
+.ms-cell-k { font-size:10px; color:#64748b; font-weight:600; padding-bottom:2px; }
+.ms-cell-a .ms-cell-k { color:#e11d48; }
+.ms-cell-b .ms-cell-k { color:#16a34a; }
+.ms-cell-c .ms-cell-k { color:#f59e0b; }
+.ms-cell-d .ms-cell-k { color:#0ea5e9; }
+.ms-cell-v { font-size:12px; font-weight:700; color:#0f172a; }
+.ms-cell-meta { font-size:10px; color:#475569; padding-top:2px; }
+.ms-cell-meta b { color:#0f172a; }
+.ms-tips { list-style:none; padding:6px 4px 0 4px; margin:0; }
+.ms-tips li { font-size:11px; color:#475569; padding:3px 0; position:relative; padding-left:12px; }
+.ms-tips li::before { content:'·'; position:absolute; left:0; color:#e11d48; font-weight:800; }
+
+/* 🎯 分层推荐·仅低吸不追板 */
+.em-rec { list-style:none; padding:0; margin:0; }
+.em-rec li { font-size:11px; color:#475569; padding:5px 6px; position:relative; padding-left:54px; line-height:1.55; }
+.em-rec-tag { position:absolute; left:0; top:4px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; color:#fff; }
+.em-rec-tag-1 { background:#e11d48; }
+.em-rec-tag-2 { background:#f59e0b; }
+.em-rec-tag-3 { background:#0ea5e9; }
+.em-rec b { color:#0f172a; }
+.em-rec-hint { font-size:11px; color:#e11d48; font-weight:700; padding:4px 6px; background:rgba(225,29,72,0.04); border-radius:4px; margin-top:4px; }
+
+/* 🎯 分层推荐·仅低吸不追板(图1: ABC 3 层 × 3 只个股) */
+.rec-layer { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:8px; padding:8px 8px 6px 8px; margin-bottom:8px; }
+.rec-layer-h { display:flex; align-items:baseline; gap:6px; padding-bottom:4px; border-bottom:1px dashed rgba(15,23,42,0.1); margin-bottom:6px; }
+.rec-layer-tag { font-size:13px; font-weight:800; color:#fff; background:linear-gradient(135deg,#e11d48,#f43f5e); width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.rec-layer-b .rec-layer-tag { background:linear-gradient(135deg,#f59e0b,#fb923c); }
+.rec-layer-c .rec-layer-tag { background:linear-gradient(135deg,#0ea5e9,#38bdf8); }
+.rec-layer-name { font-size:13px; font-weight:800; color:#0f172a; }
+.rec-layer-sub { font-size:11px; color:#64748b; font-weight:400; padding-left:6px; border-left:1px solid rgba(15,23,42,0.1); }
+.rec-layer-desc { font-size:10px; color:#64748b; padding:2px 0 6px 0; line-height:1.45; }
+.rec-cards { display:flex; flex-direction:column; gap:4px; }
+.rec-card { background:#fff; border:1px solid rgba(15,23,42,0.06); border-radius:6px; padding:6px 8px; }
+.rec-card-h { display:flex; align-items:baseline; justify-content:space-between; gap:6px; }
+.rec-card-name { font-size:12px; font-weight:700; color:#0f172a; }
+.rec-card-meta { font-size:10px; color:#475569; }
+.rec-card-meta .up { color:#e11d48; font-weight:700; }
+.rec-card-meta .down { color:#16a34a; font-weight:700; }
+.rec-card-sub { font-size:10px; color:#64748b; padding:1px 0 4px 0; }
+.rec-card-prices { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; padding:0; }
+.rec-p { background:rgba(15,23,42,0.02); border-radius:4px; padding:4px 2px; text-align:center; }
+.rec-p-l { display:block; font-size:9px; color:#94a3b8; padding-bottom:1px; }
+.rec-p-v { display:block; font-size:11px; font-weight:700; color:#0f172a; }
+.rec-p-stop { color:#e11d48; }
+.rec-p-tgt { color:#16a34a; }
+
+/* 🚫 不参与清单 */
+.em-avoid { list-style:none; padding:0; margin:0; }
+.em-avoid li { font-size:11px; color:#475569; padding:4px 6px 4px 56px; position:relative; line-height:1.55; }
+.em-avoid-tag { position:absolute; left:0; top:3px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(225,29,72,0.1); color:#e11d48; }
+
+/* 💰 组合 3 档 */
+.em-port { display:flex; flex-direction:column; gap:5px; padding:4px 0; }
+.em-port-row { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:6px; padding:8px 8px 6px 8px; position:relative; }
+.em-port-lv { position:absolute; right:6px; top:4px; font-size:11px; font-weight:800; color:#fff; background:linear-gradient(135deg,#0ea5e9,#38bdf8); width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.em-port-2 .em-port-lv { background:linear-gradient(135deg,#f59e0b,#fb923c); }
+.em-port-3 .em-port-lv { background:linear-gradient(135deg,#e11d48,#f43f5e); }
+.em-port-name { font-size:11px; font-weight:700; color:#0f172a; padding-bottom:2px; }
+.em-port-name .em-port-target { display:inline-block; margin-left:6px; font-size:10px; color:#475569; font-weight:400; }
+.em-port-stocks { display:flex; flex-wrap:wrap; gap:4px; padding-top:2px; }
+.em-port-stock { font-size:10px; padding:2px 6px; background:rgba(15,23,42,0.06); border-radius:4px; color:#0f172a; font-weight:600; }
+.em-port-1 { border-color:rgba(56,189,248,0.3); }
+.em-port-2 { border-color:rgba(245,158,11,0.3); }
+.em-port-3 { border-color:rgba(225,29,72,0.3); }
+.em-port-hint { font-size:11px; color:#475569; padding:4px 6px; }
+.em-port-hint { font-size:11px; color:#475569; padding:4px 6px; }
+
+/* 🔭 关注锚点 */
+.em-anchor { list-style:none; padding:0; margin:0; }
+.em-anchor li { font-size:11px; color:#475569; padding:5px 6px 5px 96px; position:relative; line-height:1.55; }
+.em-anchor-tag { position:absolute; left:0; top:3px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(14,165,233,0.1); color:#0ea5e9; max-width:88px; line-height:1.2; text-align:center; }
+.em-anchor b { color:#0f172a; }
+
+/* 📐 操作建议·4 条 */
+.em-ops { padding:0 0 0 18px; margin:0; }
+.em-ops li { font-size:11px; color:#475569; padding:4px 0; line-height:1.55; }
+.em-ops b { color:#0f172a; }
+
+/* ============ 午盘(图2 全新): 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换 ============ */
+.bt-card-outer { background: linear-gradient(180deg,#fff7ed 0%,#fff 70%); border:1px solid rgba(225,29,72,0.18); }
+.bt-struct-note { font-size:11px; color:#475569; line-height:1.6; padding:8px 10px; background:rgba(15,23,42,0.02); border-radius:4px; border-left:2px solid #f59e0b; margin:4px 0 8px 0; }
+.bt-struct-note b { color:#e11d48; }
+.bt-card { padding:6px 4px; }
+.bt-card.bt-new { background:linear-gradient(180deg,rgba(56,189,248,0.1),rgba(56,189,248,0.02)); border-color:rgba(56,189,248,0.25); }
+.bt-sub { font-size:10px; color:#94a3b8; padding-top:1px; line-height:1.2; }
+
+/* 主线研判 */
+.vt-section { margin-top:8px; padding-top:6px; border-top:1px dashed rgba(15,23,42,0.1); }
+.vt-h { font-size:12px; font-weight:800; color:#0f172a; padding:2px 0 4px 0; }
+.vt-line { font-size:11px; color:#0f172a; padding:4px 4px 6px 22px; position:relative; line-height:1.6; }
+.vt-line b { color:#0f172a; }
+.vt-line .up { color:#e11d48; }
+.vt-rank { position:absolute; left:0; top:4px; width:16px; height:16px; border-radius:50%; background:#e11d48; color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+.vt-line:nth-child(2) .vt-rank { background:#f59e0b; }
+.vt-line:nth-child(3) .vt-rank { background:#0ea5e9; }
+.vt-line:nth-child(4) .vt-rank { background:#16a34a; }
+.vt-desc { font-size:11px; color:#475569; padding:2px 0 0 0; line-height:1.5; }
+.vt-desc b { color:#0f172a; }
+
+/* 关注锚点 */
+.vt-anchors { list-style:none; padding:0; margin:0; }
+.vt-anchors li { font-size:11px; color:#475569; padding:4px 4px 4px 90px; position:relative; line-height:1.55; border-bottom:1px dashed rgba(15,23,42,0.06); }
+.vt-tag { position:absolute; left:0; top:4px; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(14,165,233,0.1); color:#0ea5e9; max-width:82px; line-height:1.2; text-align:center; }
+
+/* 板块强弱表 */
+.bd-section { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:6px; padding:6px 8px; margin-top:6px; }
+.bd-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:4px; }
+.bd-block { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.08); border-radius:6px; padding:6px; }
+.bd-h { font-size:11px; font-weight:800; color:#e11d48; padding:2px 0 4px 0; border-bottom:1px solid rgba(15,23,42,0.06); margin-bottom:2px; }
+.bd-tbl { width:100%; border-collapse:collapse; }
+.bd-tbl thead th { font-size:10px; font-weight:700; color:#94a3b8; padding:4px 2px; text-align:left; border-bottom:1px solid rgba(15,23,42,0.1); }
+.bd-tbl td { font-size:10px; color:#475569; padding:3px 2px; line-height:1.3; border-bottom:1px dashed rgba(15,23,42,0.05); }
+.bd-dir { font-size:11px; font-weight:800; color:#0f172a; text-align:center; vertical-align:middle; background:rgba(225,29,72,0.05); border-right:1px solid rgba(15,23,42,0.06); }
+.bd-cat { color:#0f172a; font-weight:700; padding-right:4px; }
+.bd-tag { font-size:9px; font-weight:700; padding:1px 4px; border-radius:3px; }
+.bd-tag-1 { background:rgba(225,29,72,0.12); color:#e11d48; }
+.bd-tag-2 { background:rgba(245,158,11,0.12); color:#f59e0b; }
+.bd-tag-3 { background:rgba(14,165,233,0.12); color:#0ea5e9; }
+.bd-tag-4 { background:rgba(100,116,139,0.12); color:#64748b; }
+.bd-tag-5 { background:rgba(168,85,247,0.12); color:#a855f7; }
+.bd-empty { color:#94a3b8; font-style:italic; }
+.up { color:#e11d48; font-weight:700; }
+.down { color:#16a34a; font-weight:700; }
+
+/* 资金切换信号(今日核心) */
+.msw-card { background:linear-gradient(180deg,rgba(14,165,233,0.05),rgba(255,255,255,1)); border:1px solid rgba(14,165,233,0.18); border-radius:6px; padding:8px 10px; margin-top:6px; }
+.msw-h { font-size:12px; font-weight:800; color:#0ea5e9; padding-bottom:4px; }
+.msw-row { display:flex; gap:8px; align-items:flex-start; font-size:11px; padding:3px 0; }
+.msw-tag { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(14,165,233,0.12); color:#0ea5e9; min-width:88px; text-align:center; }
+.msw-tag-def { background:rgba(245,158,11,0.15); color:#f59e0b; }
+.msw-tag-ag { background:rgba(22,163,74,0.15); color:#16a34a; }
+.msw-vals { font-size:11px; color:#0f172a; flex:1; }
+.msw-vals .up { color:#e11d48; }
+.msw-vals .down { color:#16a34a; }
+.msw-note { font-size:11px; color:#475569; padding:4px 0; line-height:1.5; border-top:1px dashed rgba(15,23,42,0.08); margin-top:4px; }
+.msw-nums { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:5px; padding:4px 0; }
+.msw-num { background:#fff; border:1px solid rgba(15,23,42,0.06); border-radius:4px; padding:5px 4px; text-align:center; }
+.msw-num-v { font-size:14px; font-weight:800; }
+.msw-num-l { font-size:10px; color:#94a3b8; padding-top:1px; }
+.msw-foot { font-size:11px; color:#475569; line-height:1.55; padding:4px 0 0 0; border-top:1px dashed rgba(15,23,42,0.08); margin-top:4px; }
+.msw-foot b { color:#0f172a; }
+
+@media (max-width: 480px) {
+  .em-cycle { grid-template-columns: 1fr 1fr 1fr; }
+  .em-bk-k { min-width: 76px; font-size: 10px; }
+  .em-bk-bar-k { min-width: 76px; font-size: 10px; }
+  .em-bk-title { font-size: 12px; }
+  .em-bk-v { font-size: 10px; }
+  .em-bk-row { font-size: 10px; }
+  .bt-row { grid-template-columns: repeat(5, minmax(0, 1fr)); gap:3px; }
+  .bt-card { padding:5px 2px; }
+  .bt-lv { font-size:13px; }
+  .bt-name { font-size:10px; }
+  .bt-sub { font-size:9px; }
+  .mm-grid { grid-template-columns: 1fr; }
+  .ms-grid { grid-template-columns: 1fr 1fr; }
+  .em-port { grid-template-columns: 1fr; }
+  .bd-grid { grid-template-columns: 1fr; }
+  .msw-nums { grid-template-columns: 1fr 1fr; }
+  .em-anchor li, .vt-anchors li { padding-left: 0; }
+  .em-anchor-tag, .vt-tag { position: static; display: block; margin-bottom: 4px; max-width: none; }
+.bt-eyebrow { background: linear-gradient(90deg,#10b981,#22c55e); color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:8px; margin-right:6px; }
+.bt-time { font-size:11px; color:#94a3b8; font-weight:400; }
+.bt-banner { display:flex; align-items:center; gap:8px; padding:8px 10px; margin:6px 0 10px 0; background:linear-gradient(90deg,rgba(16,185,129,0.08),rgba(34,197,94,0.05)); border-radius:6px; border-left:3px solid #10b981; }
+.bt-b-dot { width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981; animation:pulse 1.6s infinite; }
+.bt-banner b { color:#0f172a; font-size:13px; }
+.bt-b-tip { font-size:11px; color:#475569; padding-left:6px; border-left:1px solid rgba(15,23,42,0.1); margin-left:auto; }
+.bt-row { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:6px; padding:6px 0 4px 0; }
+.bt-card { background:linear-gradient(180deg,#1e293b,#0f172a); border:1px solid rgba(15,23,42,0.15); border-radius:8px; padding:8px 4px; text-align:center; position:relative; box-shadow:0 1px 3px rgba(15,23,42,0.08); }
+.bt-card.bt-6 { background:linear-gradient(180deg,#7f1d1d,#450a0a); border-color:rgba(225,29,72,0.5); }
+.bt-card.bt-5 { background:linear-gradient(180deg,#7f1d1d,#450a0a); border-color:rgba(225,29,72,0.4); }
+.bt-card.bt-4 { background:linear-gradient(180deg,#991b1b,#450a0a); border-color:rgba(225,29,72,0.3); }
+.bt-card.bt-3 { background:linear-gradient(180deg,#9a3412,#431407); border-color:rgba(245,158,11,0.3); }
+.bt-card.bt-2 { background:linear-gradient(180deg,#075985,#0c4a6e); border-color:rgba(56,189,248,0.3); }
+.bt-card.bt-1 { background:linear-gradient(180deg,#334155,#1e293b); border-color:rgba(148,163,184,0.25); }
+.bt-card.bt-new { background:linear-gradient(180deg,#4c1d95,#2e1065); border-color:rgba(168,85,247,0.3); }
+.bt-card.bt-zb { background:linear-gradient(180deg,#9a3412,#431407); border-color:rgba(245,158,11,0.3); }
+.bt-card.bt-down { background:linear-gradient(180deg,#334155,#1e293b); border-color:rgba(100,116,139,0.3); }
+.bt-lv { font-size:18px; font-weight:800; color:#fff; letter-spacing:0.5px; padding-bottom:2px; text-shadow:0 1px 2px rgba(0,0,0,0.3); }
+.bt-card.bt-6 .bt-lv, .bt-card.bt-5 .bt-lv, .bt-card.bt-4 .bt-lv { color:#fca5a5; }
+.bt-card.bt-3 .bt-lv { color:#fbbf24; }
+.bt-card.bt-2 .bt-lv { color:#7dd3fc; }
+.bt-card.bt-1 .bt-lv { color:#cbd5e1; }
+.bt-card.bt-new .bt-lv { color:#d8b4fe; }
+.bt-card.bt-zb .bt-lv { color:#fbbf24; }
+.bt-card.bt-down .bt-lv { color:#cbd5e1; }
+.bt-name { font-size:11px; font-weight:700; color:#fff; padding:2px 0; line-height:1.3; word-break:break-all; }
+.bt-sub { font-size:9px; color:#86efac; padding-top:2px; line-height:1.25; font-weight:600; }
+.bt-name { font-size:11px; font-weight:700; color:#0f172a; padding-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bt-stats { display:flex; gap:8px; padding:8px 0 10px 0; border-top:1px dashed rgba(15,23,42,0.08); margin-top:4px; }
+.bt-stat { flex:1; background:#fff; border:1px solid rgba(15,23,42,0.06); border-radius:6px; padding:6px 4px; text-align:center; }
+.bt-stat-n { display:block; font-size:16px; font-weight:800; color:#0f172a; }
+.bt-stat-l { display:block; font-size:10px; color:#94a3b8; padding-top:1px; }
+.mm-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; padding:6px 0; }
+.mm-block { background:rgba(15,23,42,0.02); border:1px solid rgba(15,23,42,0.06); border-radius:6px; padding:6px 8px; }
+.mm-h { font-size:11px; font-weight:700; color:#0f172a; padding-bottom:4px; border-bottom:1px solid rgba(15,23,42,0.06); margin-bottom:4px; }
+.mm-row { display:flex; gap:6px; align-items:center; font-size:11px; padding:3px 0; color:#475569; }
+.mm-name { flex:1; color:#0f172a; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mm-val { font-weight:700; color:#e11d48; min-width:54px; text-align:right; }
+.mm-lead { font-size:10px; color:#64748b; max-width:54px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mm-tips { list-style:none; padding:0; margin:0; }
+.mm-tips li { font-size:11px; color:#475569; padding:3px 0; position:relative; padding-left:10px; line-height:1.5; }
+.mm-tips li::before { content:'·'; position:absolute; left:0; color:#10b981; font-weight:800; }
+
+@media (max-width: 480px) {
+  .em-cycle { grid-template-columns: 1fr 1fr 1fr; }
+  .em-bk-k { min-width: 76px; font-size: 10px; }
+  .em-bk-bar-k { min-width: 76px; font-size: 10px; }
+  .em-bk-title { font-size: 12px; }
+  .em-bk-v { font-size: 10px; }
+  .em-bk-row { font-size: 10px; }
+  .bt-row { grid-template-columns: repeat(5, minmax(0, 1fr)); gap:3px; }
+  .bt-card { padding:5px 2px; }
+  .bt-lv { font-size:13px; }
+  .bt-name { font-size:10px; }
+  .bt-sub { font-size:9px; }
+  .mm-grid { grid-template-columns: 1fr; }
+}
 </style>
-<style id="atds-v8-mobile-scroll">
-/* v8 强滚修复 — 2026-09-09 — 单层滚动 + 详情移出 */
-.watchlist-card{overflow:hidden;padding:14px 12px;margin:0;position:relative}
-.wl-stocks{
-  display:block!important;
-  flex:none!important;
-  max-height:480px!important;
-  height:auto!important;
-  min-height:0!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  -webkit-overflow-scrolling:touch;
-  border:1px solid rgba(56,189,248,0.15);
-  border-radius:8px;
-  background:linear-gradient(180deg,rgba(56,189,248,0.03),rgba(56,189,248,0.01));
-  padding:8px 6px;
-  position:relative;
-}
-.wl-stocks-scroll-wrap{
-  position:static!important;
-  display:block!important;
-  height:auto!important;
-  max-height:none!important;
-  min-height:0!important;
-  overflow:visible!important;
-  border:none!important;
-  background:none!important;
-  border-radius:0!important;
-  flex:none!important;
-}
-.wl-stocks-scroll{
-  display:block!important;
-  height:auto!important;
-  max-height:none!important;
-  min-height:0!important;
-  overflow:visible!important;
-  background:none!important;
-  padding-right:0!important;
-  border-radius:0!important;
-}
-/* 滚动条美化 */
-.wl-stocks::-webkit-scrollbar{width:6px}
-.wl-stocks::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#0ea5e9,#0284c7);border-radius:3px}
-.wl-stocks::-webkit-scrollbar-track{background:rgba(56,189,248,0.05)}
-/* 顶部 sticky 提示 */
-.wl-stocks::before{
-  content:"↕ 上下滚动查看 11 只个股 · ← → 左右滑动 7 列";
-  position:sticky;
-  top:0;
-  display:block;
-  text-align:center;
-  font-size:10px;
-  color:#fff;
-  background:linear-gradient(135deg,#0ea5e9,#0284c7);
-  padding:3px 8px;
-  border-radius:10px;
-  margin:0 0 6px 0;
-  font-weight:700;
-  letter-spacing:0.5px;
-  box-shadow:0 2px 4px rgba(2,132,199,0.3);
-  z-index:2;
-  pointer-events:none;
-}
-.wl-stocks-scroll-wrap::after{display:none!important}
-.wl-stocks-scroll-wrap::before{display:none!important}
-/* 第 2-11 只股的详情折叠(只显示标题行) */
-.wl-stocks .wl-stock:not(:first-child) .wl-detail,
-.wl-stocks .wl-stock:not(:first-child) .ts-stock-card{
-  display:none!important;
-}
-/* 第 1 只股详情(已移出到 .wl-stocks 之后)的样式微调 */
-.watchlist-card > .wl-detail:first-of-type,
-.watchlist-card > .ts-stock-card:first-of-type{
-  margin-top:10px;
-}
-/* 移动端更紧凑 */
-@media (max-width:640px){
-  .wl-stocks{max-height:420px!important;padding:6px 4px}
-}
-</style>
-<script id="atds-v8-mobile-fix-js">
-/* v8 JS — 把第 1 只股的 .wl-detail + .ts-stock-card 移出滚动容器到 .wl-stocks 之后 */
-(function(){
-  function fix(){
-    var cards = document.querySelectorAll('.watchlist-card');
-    cards.forEach(function(card){
-      var stocksEl = card.querySelector('.wl-stocks');
-      if (!stocksEl) return;
-      var stocks = stocksEl.querySelectorAll(':scope > .wl-stocks-scroll-wrap > .wl-stocks-scroll > .wl-stock, :scope > .wl-stock');
-      // 兼容：直接 .wl-stocks > .wl-stock
-      if (!stocks.length) stocks = stocksEl.querySelectorAll('.wl-stock');
-      if (stocks.length < 1) return;
-      var first = stocks[0];
-      var det = first.querySelector('.wl-detail');
-      var ts = first.querySelector('.ts-stock-card');
-      // 标记第 1 只
-      first.classList.add('wl-stock-active');
-      // 把第 1 只的详情移到 .wl-stocks 之后(watchlist-card 内,卡片底部)
-      if (det && det.parentNode === first) {
-        stocksEl.parentNode.insertBefore(det, stocksEl.nextSibling);
-      }
-      if (ts && ts.parentNode === first) {
-        // 多个 ts-stock-card 一起移
-        var tsAll = first.querySelectorAll('.ts-stock-card');
-        tsAll.forEach(function(t){ stocksEl.parentNode.insertBefore(t, stocksEl.nextSibling); });
-      }
-    });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', fix);
-  } else {
-    fix();
-  }
-})();
-</script>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 </head>
 <body>
 <div class="phone">
@@ -1825,12 +2014,12 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">盘前</a><a href="2026-09-02_11-35.html">午盘</a><a href="2026-09-02_16-20.html">收盘</a><a href="2026-09-08_08-30.html">复盘</a>
+      <a href="index.html">盘前</a><a href="2026-09-02_11-35.html">盘中</a><a href="2026-09-02_16-20.html">收盘</a><a href="2026-09-09_16-20.html">复盘</a>
     </div>
   </div>
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-09-02 · <span class="hero-time">08:30</span></h1><div class="hero-sub">基于上一交易日数据 · 今日开盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 72°</span></div></div>
 <div class="section">
-  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-02 11:37:58</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">← 左右滑动查看全部列 →</div><div class="wl-stocks"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-02 11:37:58</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -1853,8 +2042,7 @@
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩60-61低吸<b>500股</b>(3万-3.05万),放量突破68.5加仓,止损-5%</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,等待放量催化<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-low">低风险</span><ul><li>震荡整理,方向未明</li><li>量能温和</li></ul></span></div></div>
     </div></div>
     <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA5/8/31(突破)锚平台,靠稳 · 价格:<span class="wl-st-num">突破 3.93</span> · 仓位:1000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:3.58 · 清仓 · 止盈:跌破3/9/1平台,趋势走坏 · 目标:<span class="wl-st-num">3.95 → 4.10</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">放量突破今日高点,待确认</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入价 3.68,止损 3.58,可损约 2.7%,可控。跌破 3.58 必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>不追现价,等回踩低吸区或放量突破关键位再买。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 60-61 区间分两批低吸 500 股(3万-3.05万),均价确认靠稳。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 68.5 加仓 200 股,确认后看 70 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限先做方案 A 回踩,控制单只仓位在 35% 以内,留足对冲空间。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金的 40-50%,留 50% 现金应对回踩加仓。</li></ul><div class="ts-alert"><b>关键提醒</b>: 光通信板块若整体走弱(中际旭创跌破支撑),放弃买入等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  </div><div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>不追现价,等回踩低吸区或放量突破关键位再买。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 60-61 区间分两批低吸 500 股(3万-3.05万),均价确认靠稳。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 68.5 加仓 200 股,确认后看 70 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限先做方案 A 回踩,控制单只仓位在 35% 以内,留足对冲空间。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金的 40-50%,留 50% 现金应对回踩加仓。</li></ul><div class="ts-alert"><b>关键提醒</b>: 光通信板块若整体走弱(中际旭创跌破支撑),放弃买入等待二次确认。</div></div></div><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -1871,7 +2059,6 @@
     <span class="wl-cell wl-cell-sig"><span class="sig sig-weak">弱势回调</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="600392" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600392">
-    
     
     
     
@@ -1895,7 +2082,6 @@
     
     
     
-    
   </div></div><div class="wl-stock" data-stock-code="300308"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
@@ -1913,7 +2099,6 @@
     <span class="wl-cell wl-cell-sig"><span class="sig sig-weak">弱势回调</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300308" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300308" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300308">
-    
     
     
     
@@ -1937,7 +2122,6 @@
     
     
     
-    
   </div></div><div class="wl-stock" data-stock-code="300342"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
@@ -1955,7 +2139,6 @@
     <span class="wl-cell wl-cell-sig"><span class="sig sig-wait">等待确认</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300342" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="300342" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300342">
-    
     
     
     
@@ -1982,8 +2165,7 @@
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩33-34低吸<b>300股</b>(1万-1.02万),突破38确认,止损-5%</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,关注量能配合<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-mid">中风险</span><ul><li>回调 2-3%,观察支撑</li><li>放量活跃</li></ul></span></div></div>
     </div></div>
     <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:突破前期平台+回踩10日线确认 · 价格:<span class="wl-st-num">回踩 33-34</span> · 仓位:300股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:32.00 · 清仓 · 止盈:突破38加仓,40看趋势延伸 · 目标:<span class="wl-st-num">38 → 40</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">机器人板块轮动,仓位确认跟随</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入区33-34,止损32,可损约3-6%。跌破32必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>机器人板块轮动,跟随主线但严控仓位,只做回踩不追高。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 33-34 区间分批低吸 300 股(1万-1.02万),分两批确认。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 38 加仓 100 股,目标 40 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 建议先做方案 A 回踩,小仓位试错,跌破 32 立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金的 15-20%,机器人板块波动大要严控。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若人形机器人板块整体走弱(产业链龙头断板),放弃买入等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="002385"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  </div><div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>机器人板块轮动,跟随主线但严控仓位,只做回踩不追高。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 33-34 区间分批低吸 300 股(1万-1.02万),分两批确认。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 38 加仓 100 股,目标 40 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 建议先做方案 A 回踩,小仓位试错,跌破 32 立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金的 15-20%,机器人板块波动大要严控。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若人形机器人板块整体走弱(产业链龙头断板),放弃买入等待二次确认。</div></div></div><div class="wl-stock" data-stock-code="002385"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -2006,8 +2188,7 @@
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回笼资金后可买<b>1000-2000股</b>(3500-<span class="wl-num">7000元</span>),回踩3.3附近低吸,追高不超3.6</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">跌幅较大,建议减仓规避<span class="advice-tag-mini advice-cut">减仓规避</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-high">高风险</span><ul><li>跌幅&gt;3%,风险增大</li><li>量能温和</li></ul></span></div></div>
     </div></div>
     <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA5/8/31(突破)锚平台,靠稳 · 价格:<span class="wl-st-num">突破 3.57</span> · 仓位:1000-2000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:3.26 · 清仓 · 止盈:跌破3/9/1平台,趋势走坏 · 目标:<span class="wl-st-num">3.57 → 3.70</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">放量突破今日高点,待确认</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入区3.30-3.50,止损3.26,可损约 2.7%-5%。跌破3.26必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>两只都不追现价,等回踩低吸区再买,或突破关键位确认后追。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 3.30-3.35 区间低吸 2000 股(6600-6700元),均价确认靠稳。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 3.57 加仓 1000 股(3570元),确认后看 3.70 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限建议先做方案A回踩,小仓位试错,跌破3.26立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 30-35%(6000-7000元),留足对冲空间。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若农业主线退潮(万向开板/传媒断板),放弃买入等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="300459"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  </div><div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>两只都不追现价,等回踩低吸区再买,或突破关键位确认后追。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 3.30-3.35 区间低吸 2000 股(6600-6700元),均价确认靠稳。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 3.57 加仓 1000 股(3570元),确认后看 3.70 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限建议先做方案A回踩,小仓位试错,跌破3.26立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 30-35%(6000-7000元),留足对冲空间。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若农业主线退潮(万向开板/传媒断板),放弃买入等待二次确认。</div></div></div><div class="wl-stock" data-stock-code="300459"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -2030,8 +2211,7 @@
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩3.66-3.70低吸<b>1000股</b>(3700-<span class="wl-num">3900元</span>),突破3.93确认,止损3.58</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,关注量能配合<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-mid">中风险</span><ul><li>回调 2-3%,观察支撑</li><li>量能温和</li></ul></span></div></div>
     </div></div>
     <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA10不破+万向开板联动确认 · 价格:<span class="wl-st-num">回踩 3.66-3.70</span> · 仓位:1000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:3.58 · 清仓 · 止盈:跌破3/9/1平台,趋势走坏 · 目标:<span class="wl-st-num">3.93 → 4.10</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">传媒板块轮动,跟随万向开板节奏</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入区3.66-3.70,止损3.58,可损约 3-5%。跌破3.58必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>不追现价,等回踩低吸区或突破关键位再买,跟随传媒主线。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 3.66-3.70 区间低吸 1000 股(3680-3700元),确认均线支撑。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 3.93 加仓 500 股(1965元),确认后看 4.10 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限建议先做方案A回踩,跟随万向开板节奏,跌破3.58立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 18-20%(3700-3900元),严控单股风险。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若传媒主线断板(万向开板炸板),放弃买入等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="600737"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  </div><div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>不追现价,等回踩低吸区或突破关键位再买,跟随传媒主线。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 3.66-3.70 区间低吸 1000 股(3680-3700元),确认均线支撑。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 3.93 加仓 500 股(1965元),确认后看 4.10 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 资金有限建议先做方案A回踩,跟随万向开板节奏,跌破3.58立即止损。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 18-20%(3700-3900元),严控单股风险。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若传媒主线断板(万向开板炸板),放弃买入等待二次确认。</div></div></div><div class="wl-stock" data-stock-code="600737"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -2054,8 +2234,7 @@
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">回踩15附近低吸买<b>200-300股</b>(3000-<span class="wl-num">4600元</span>),央企防御性强</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">持有观察,关注量能配合<span class="advice-tag-mini advice-hold">持有观察</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-low">低风险</span><ul><li>震荡整理,方向未明</li><li>量能温和</li></ul></span></div></div>
     </div></div>
     <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:回踩MA20+央企防御确认 · 价格:<span class="wl-st-num">回踩 15.00 附近</span> · 仓位:200-300股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:14.80 · 清仓 · 止盈:跌破14.96支撑,趋势走弱 · 目标:<span class="wl-st-num">15.78 → 16.20</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">央企防御性配置,作为农业主线底仓</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入区15附近,止损14.80,可损约 1.3-2%。央企波动小,严控仓位即可。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>央企防御性配置,作为农业主线底仓,稳健低吸不追高。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 15.00 附近低吸 200-300 股(3000-4600元),央企防御性强。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 15.78 加仓 100 股(1578元),确认后看 16.20 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 稳健型配置,作为农业主线底仓持有,严控单股仓位不超过20%。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 15-20%(3000-4600元),波动小可适度持有。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若中粮系整体走弱(粮食板块退潮),减仓观望等待二次确认。</div></div>
-  </div></div><div class="wl-stock" data-stock-code="600108"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  </div><div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>央企防御性配置,作为农业主线底仓,稳健低吸不追高。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (求稳回踩)</b>: 回踩 15.00 附近低吸 200-300 股(3000-4600元),央企防御性强。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (突破确认)</b>: 若放量突破 15.78 加仓 100 股(1578元),确认后看 16.20 趋势延伸。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 稳健型配置,作为农业主线底仓持有,严控单股仓位不超过20%。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 15-20%(3000-4600元),波动小可适度持有。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若中粮系整体走弱(粮食板块退潮),减仓观望等待二次确认。</div></div></div><div class="wl-stock" data-stock-code="600108"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -2078,8 +2257,7 @@
       <div class="par-body"><div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">激进者可买<b>1000股</b>(<span class="wl-num">3900元</span>),博农业扩散,突破4.06看高</span></div><div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">跌幅较大,建议减仓规避<span class="advice-tag-mini advice-cut">减仓规避</span></span></div><div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-high">高风险</span><ul><li>跌幅&gt;3%,风险增大</li><li>放量活跃</li></ul></span></div></div>
     </div></div>
     <div class="wl-st-table"><div class="wl-st-title">🎯 个股风控</div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:突破4.06+农业扩散跟随 · 价格:<span class="wl-st-num">突破 4.06</span> · 仓位:1000股</span></div><div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:3.66 · 清仓 · 止盈:跌破3.66支撑,扩散失败 · 目标:<span class="wl-st-num">4.06 → 4.30</span></span></div><div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">低价小盘弹性大,博农业扩散</span></div><div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">买入价3.90,止损3.66,可损约 6.1%,弹性大波动大。跌破3.66必须走,不恋战。</span></div></div>
-    <div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>低价补涨弹性大,激进参与,严控止损跟随农业扩散。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (突破追涨)</b>: 若放量突破 4.06 确认 1000 股(4060元),博农业扩散,看高 4.30。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (回踩试错)</b>: 回踩 3.66 不破试错 500 股(1830元),农业主线退潮立即止损。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 激进配置,严控止损3.66,跌破立即离场不恋战。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 10-12%(1830-4060元),低价小盘严控风险。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若农业扩散失败(主线退潮),跌破3.66立即清仓不恋战。</div></div>
-  </div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
+  </div><div class="card ts-stock-card"><div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div><div class="ts-core"><span class="ts-core-tag">核心</span>低价补涨弹性大,激进参与,严控止损跟随农业扩散。</div><ul class="ts-plans"><li><span class="ts-dot ts-dot-a"></span><b>方案A (突破追涨)</b>: 若放量突破 4.06 确认 1000 股(4060元),博农业扩散,看高 4.30。</li><li><span class="ts-dot ts-dot-b"></span><b>方案B (回踩试错)</b>: 回踩 3.66 不破试错 500 股(1830元),农业主线退潮立即止损。</li></ul><ul class="ts-plans"><li><span class="ts-dot"></span><b>二选一建议</b>: 激进配置,严控止损3.66,跌破立即离场不恋战。</li><li><span class="ts-dot"></span><b>仓位控制</b>: 总仓位控制在回笼资金(约2万)的 10-12%(1830-4060元),低价小盘严控风险。</li></ul><div class="ts-alert"><b>关键提醒</b>: 若农业扩散失败(主线退潮),跌破3.66立即清仓不恋战。</div></div></div></div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报
 tags: [ATDS, 交易复盘]
 ---
@@ -2100,39 +2278,7 @@ tags: [ATDS, 交易复盘]
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">72° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">40 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">竞业达</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">27 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">一般零售 / 化学原料 / 地面兵装</div></div></div>
   </div>
-  <div class="card">
-    <div class="card-title">策略状态</div>
-    <div class="str-block">
-      <div class="str-h">⚔️ 进攻方向</div><div class="str-line"><b>一般零售</b> 涨停 2家 / 4板 · 领涨 国芳集团</div><div class="str-line"><b>化学原料</b> 涨停 2家 / 2板 · 领涨 英 力 特</div><div class="str-line"><b>地面兵装</b> 涨停 2家 / 2板 · 领涨 内蒙一机</div>
-    </div>
-    <div class="str-block">
-      <div class="str-h">🛡️ 防守方向</div><div class="str-line"><b>高股息红利</b> 低波动+稳定分红</div><div class="str-line"><b>公用事业</b> 现金流稳定+刚性需求</div><div class="str-line"><b>银行(大行)</b> 高股息+低估值</div>
-    </div>
-    <div class="str-block">
-      <div class="str-h">⚠️ 风险提示</div><div class="str-line pit"><b>高位连板股(连板≥4)</b> 当前连板≥4 共 2 只,承接强度需复核</div><div class="str-line pit"><b>当日炸板股</b> 近 0 只炸板,分歧加大</div><div class="str-line pit"><b>北证/微盘股</b> 波动放大+流动性敏感</div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">核心指数</div>
-    <div class="index-row"><div class="index-item" data-code="000001" data-prefix="sh">
-      <div class="index-name">上证指数</div>
-      <div class="index-value down">3,947.26</div>
-      <div class="index-change down">-0.82%</div>
-    </div><div class="index-item" data-code="399001" data-prefix="sz">
-      <div class="index-name">深证成指</div>
-      <div class="index-value down">13,635.33</div>
-      <div class="index-change down">-1.71%</div>
-    </div><div class="index-item" data-code="399006" data-prefix="sz">
-      <div class="index-name">创业板指</div>
-      <div class="index-value down">3,319.39</div>
-      <div class="index-change down">-2.18%</div>
-    </div></div>
-    <div class="status-row">
-      <div class="status-item">生成时间<strong>2026-09-02 11:37:58</strong></div>
-      <div class="status-item">数据源<strong>通达信实时</strong></div>
-      <div class="status-item">类型<strong>盘前简报</strong></div>
-    </div>
-  </div>
+  <div class="card em-card"><div class="em-header"><span class="em-title">主升浪参与策略</span><span class="em-sub">盘前接力判断 · 板块联动确认 · 强势股池筛选</span><span class="em-date">2026-09-02</span></div><div class="card ms-card"><div class="ms-banner"><span class="ms-b-dot"></span><b>0️⃣ 市场状态 · 参考背景</b><span class="ms-b-eyebrow">高温区 · 高涨</span></div><div class="ms-eyebrow">主线机会律 · 顺大势逆小势</div><div class="ms-grid"><div class="ms-cell ms-cell-a"><div class="ms-cell-k">主线 A</div><div class="ms-cell-v">一般零售</div><div class="ms-cell-meta"><span class="up">+10.04%</span> · 资金 <b class="up">+0.0亿</b></div></div><div class="ms-cell ms-cell-b"><div class="ms-cell-k">主线 B</div><div class="ms-cell-v">IT服务Ⅱ</div><div class="ms-cell-meta"><span class="up">+10.01%</span> · 资金 <b class="up">+0.0亿</b></div></div><div class="ms-cell ms-cell-c"><div class="ms-cell-k">状态 C</div><div class="ms-cell-v">情绪高涨,接力效应强</div><div class="ms-cell-meta">情绪 <b>72°</b> · 高度 <b>4板</b></div></div><div class="ms-cell ms-cell-d"><div class="ms-cell-k">分歧 D</div><div class="ms-cell-v">33% 晋级</div><div class="ms-cell-meta">炸板 <b>0家</b> · 红盘 <b>0%</b></div></div></div><ul class="ms-tips"><li>今日 A 股早盘顺势开盘,需注意北证/科创板位下2千万/手控制位。</li><li>主线机会窗口为一般零售板块,下一日IT服务Ⅱ启动。</li><li>当前主线机会窗口:一般零售主升浪确认,成交额 12091亿 (沪深合计)。</li></ul></div><div class="em-bks"><div class="em-bk"><div class="em-bk-h"><span class="em-bk-tag">A</span><div class="em-bk-meta"><div class="em-bk-title">一般零售 <span class="em-bk-sub">(+10.0%)</span></div><div class="em-bk-tech">主线+趋势技术</div></div></div><div class="em-bk-body"><div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">0.00 <span class="em-bk-u">亿</span></span></div><div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">2家 / 4板 · 国芳集团 · <b class="up">+10.04%</b></span></div><div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>国芳集团</b> <span class="em-bk-tag-mini"></span> · <b class="up">--</b></span></div><div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>--</b> · 最高 <b>--</b> · 最低 <b>--</b> · 换手 <b>--</b></span></div><div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">0.00</b>亿 · 中 <b class="up">--</b>亿</span></div></div></div><div class="em-bk"><div class="em-bk-h"><span class="em-bk-tag">B</span><div class="em-bk-meta"><div class="em-bk-title">IT服务Ⅱ <span class="em-bk-sub">(+10.0%)</span></div><div class="em-bk-tech">主线+趋势技术</div></div></div><div class="em-bk-body"><div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">0.00 <span class="em-bk-u">亿</span></span></div><div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">1家 / 4板 · 竞业达 · <b class="up">+10.01%</b></span></div><div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>竞业达</b> <span class="em-bk-tag-mini"></span> · <b class="up">--</b></span></div><div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>--</b> · 最高 <b>--</b> · 最低 <b>--</b> · 换手 <b>--</b></span></div><div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">0.00</b>亿 · 中 <b class="up">--</b>亿</span></div></div></div><div class="em-bk"><div class="em-bk-h"><span class="em-bk-tag">C</span><div class="em-bk-meta"><div class="em-bk-title">游戏Ⅱ <span class="em-bk-sub">(+10.1%)</span></div><div class="em-bk-tech">主线+趋势技术</div></div></div><div class="em-bk-body"><div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">0.00 <span class="em-bk-u">亿</span></span></div><div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">1家 / 3板 · 大晟文化 · <b class="up">+10.08%</b></span></div><div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>大晟文化</b> <span class="em-bk-tag-mini"></span> · <b class="up">--</b></span></div><div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>--</b> · 最高 <b>--</b> · 最低 <b>--</b> · 换手 <b>--</b></span></div><div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">0.00</b>亿 · 中 <b class="up">--</b>亿</span></div></div></div></div><div class="em-section"><div class="em-section-h">🎯 分层推荐 · 仅低吸不追板</div><div class="rec-layer rec-layer-a"><div class="rec-layer-h"><span class="rec-layer-tag">A</span><span class="rec-layer-name">稳健层</span><span class="rec-layer-sub">· 一般零售</span></div><div class="rec-layer-desc">穿越点确认·放量启动·回踩低吸·首选埋伏</div><div class="rec-cards"><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">国芳集团</span><span class="rec-card-meta"> <span class="up">+10.0%</span></span></div><div class="rec-card-sub">一般零售</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div></div></div><div class="rec-layer rec-layer-b"><div class="rec-layer-h"><span class="rec-layer-tag">B</span><span class="rec-layer-name">进攻层</span><span class="rec-layer-sub">· IT服务Ⅱ · 游戏Ⅱ</span></div><div class="rec-layer-desc">风口未到·安全垫厚·仅轻仓·题材高度·板块辨识度</div><div class="rec-cards"><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">竞业达</span><span class="rec-card-meta"> <span class="up">+10.0%</span></span></div><div class="rec-card-sub">IT服务Ⅱ</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">大晟文化</span><span class="rec-card-meta"> <span class="up">+10.1%</span></span></div><div class="rec-card-sub">游戏Ⅱ</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div></div></div><div class="rec-layer rec-layer-c"><div class="rec-layer-h"><span class="rec-layer-tag">C</span><span class="rec-layer-name">防御层</span><span class="rec-layer-sub">· 化学制品 · 化学制药</span></div><div class="rec-layer-desc">指数回落+2.7%抗跌·机构配制·指数回落时相对抗跌</div><div class="rec-cards"><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">集泰股份</span><span class="rec-card-meta"> <span class="up">+10.0%</span></span></div><div class="rec-card-sub">化学制品</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">小方制药</span><span class="rec-card-meta"> <span class="up">+10.0%</span></span></div><div class="rec-card-sub">化学制药</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div></div></div><div class="em-rec-hint">⚠ 只低吸不追板:不打 1 字板首封,严防诱多陷阱;价格按当前 K 线自动派生,数据每日实时更新。</div></div><div class="em-section"><div class="em-section-h">🚫 不参与清单</div><ul class="em-avoid"><li><span class="em-avoid-tag">不参与</span><b>高位连板(竞业达、国芳集团)</b> · 连板≥4 承接强度需复核,高位接力风险大</li><li><span class="em-avoid-tag">不参与</span><b>一般零售(板块整体)</b> · 板块涨幅 10.0%·已透支·不追</li><li><span class="em-avoid-tag">不参与</span><b>IT服务Ⅱ(板块整体)</b> · 板块涨幅 10.0%·已透支·不追</li><li><span class="em-avoid-tag">不参与</span><b>ST/*ST 股</b> · 退市风险+流动性差</li></ul></div><div class="em-section"><div class="em-section-h">💰 组合 3 档</div><div class="em-port"><div class="em-port-row em-port-1"><div class="em-port-lv">1</div><div class="em-port-name">保守型(总仓 1/3)<span class="em-port-target">目标 3-5%</span></div><div class="em-port-stocks"><span class="em-port-stock">集泰股份</span><span class="em-port-stock">小方制药</span></div></div><div class="em-port-row em-port-2"><div class="em-port-lv">2</div><div class="em-port-name">稳健型(总仓 1/2)<span class="em-port-target">目标 5-8%</span></div><div class="em-port-stocks"><span class="em-port-stock">国芳集团</span></div></div><div class="em-port-row em-port-3"><div class="em-port-lv">3</div><div class="em-port-name">进取型(总仓 2/3)<span class="em-port-target">目标 8-12%</span></div><div class="em-port-stocks"><span class="em-port-stock">竞业达</span><span class="em-port-stock">大晟文化</span></div></div></div><div class="em-port-hint">建议组合:稳健仓 50% + 进取仓 30% + 保守仓 20%,价格每日 09:30 开盘后自动刷新。</div></div><div class="em-section"><div class="em-section-h">🔭 关注锚点</div><ul class="em-anchor"><li><span class="em-anchor-tag">顺势资金驱动</span> <b>一般零售</b> 资金 +0.0亿,主线低吸机会。</li><li><span class="em-anchor-tag">异动主线</span> <b>IT服务Ⅱ</b> +10.0% 加速,看分时承接。</li><li><span class="em-anchor-tag">低位资源</span> 黄金/有色资金切换,关注防御+科技双线联动。</li><li><span class="em-anchor-tag">错位节奏</span> 量能维持 2 万亿上方,主线分化后看二线品种接续。</li></ul></div><div class="em-section"><div class="em-section-h">📐 操作建议 · 4 条</div><ol class="em-ops"><li><b>低吸为主</b>:不开新仓 1 字板、不追高,只做回踩 MA5/MA10 后的低吸确认。</li><li><b>严控仓位</b>:进取型 2/3、稳健型 1/2、保守型 1/3,严格执行止盈止损。</li><li><b>主线聚焦</b>:只参与 A/B/C 三主线的强势品种,板块强度评分 &gt; 80 分。</li><li><b>盘中验证</b>:开盘 30 分钟看量能+主线表态,午后 14:00 后看尾盘抢筹或撤退。</li></ol></div><div class="em-section"><div class="em-section-h">⚠️ 风险提示</div><ul class="em-risk-list"><li><b>高位连板股(连板≥4)</b> · 当前连板≥4 共 2 只,承接强度需复核</li><li><b>当日炸板股</b> · 近 0 只炸板,分歧加大</li><li><b>北证/微盘股</b> · 波动放大+流动性敏感</li><li><b>⚠</b> 高位股抱团松动:情绪温度 86°·过热区,谨防高潮后分歧</li><li><b>⚠</b> 量能持续性:成交额 2 万亿维持,但主线分化加剧</li><li><b>⚠</b> 炸板率监控:当前 0%,&amp;gt; 40% 警惕</li><li><b>⚠</b> 主线切换风险:一般零售若放量跌破 MA5,考虑减仓</li><li><b>⚠</b> 北证/科创板位:打新 2 千万/手位下,流动性偏弱谨慎</li></ul></div></div>
   <div class="card">
     <div class="card-title">当前最强主线方向 <span class="card-sub">点击板块查看可观察个股</span></div>
     <div class="md-list"><div class="md-card">
@@ -2724,8 +2870,16 @@ function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
   if(!card)return;
   if(s&&s.code&&document.querySelector('.wl-stock[data-stock-code="'+String(s.code).replace(/"/g,'\\"')+'"]'))return;
-  var stocksWrap=card.querySelector(".wl-stocks");
-  if(!stocksWrap){stocksWrap=document.createElement("div");stocksWrap.className="wl-stocks";var head=card.querySelector(".wl-stocks-head");if(head&&head.nextSibling){card.insertBefore(stocksWrap,head.nextSibling);}else{card.appendChild(stocksWrap);}}
+  // v8.1 修复: 优先找 .wl-stocks-scroll(蓝色滚动容器),手动新增的股票也要在容器内
+  // 找不到时 fallback 到 .wl-stocks(老结构兼容)
+  var stocksWrap=card.querySelector(".wl-stocks-scroll")||card.querySelector(".wl-stocks");
+  if(!stocksWrap){
+    stocksWrap=document.createElement("div");
+    stocksWrap.className="wl-stocks-scroll";
+    var wlStocks=card.querySelector(".wl-stocks");
+    if(wlStocks){wlStocks.appendChild(stocksWrap);}
+    else{var head=card.querySelector(".wl-stocks-head");if(head&&head.nextSibling){card.insertBefore(stocksWrap,head.nextSibling);}else{card.appendChild(stocksWrap);}}
+  }
   var n=stocksWrap.querySelectorAll(".wl-stock").length+1;
   var v=Number(s.pct)||0;
   var cls=v>=0?"up":"down";
