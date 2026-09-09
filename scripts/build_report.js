@@ -2114,7 +2114,6 @@ ${renderHero(report)}
 <div class="section">
 ${renderCloseEmotion(report)}
     ${report.meta && (report.meta.type === 'midday' || report.meta.type === 'close') ? renderTopBoardPicks(report) : ''}
-    ${report.meta && report.meta.type === 'close' ? renderPremarketStrategy(report, { title: '主升浪·新周期', subtitle: '实时下载 · 市场数据 · A 股收盘数据全维度复盘' }) : ''}
     ${report.meta && report.meta.type === 'close' ? '' : renderRegimeGate(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
