@@ -488,24 +488,8 @@ function renderCloseEmotion(report) {
       anchors.map(a => '<li><span class="vt-tag">' + esc(a.tag) + '</span>' + esc(a.text) + '</li>').join('') +
       '</ul></div>';
 
-    // === 4) 板块强弱表(农业/科技/跟踪 × 3 子项) ===
+    // === 4) 板块强弱表(按真实强度排序,Top 9,不固定分类) ===
     const findSector = (keys) => mr4.find(s => keys.some(k => (s.name || '').indexOf(k) >= 0)) || null;
-    const ag = [
-      findSector(['种植', '种业', '农业']),
-      findSector(['农化', '化肥', '农药', '氟肥', '钾肥']),
-      findSector(['农产品加', '渔业', '林业', '饲料'])
-    ];
-    const tech = [
-      findSector(['印制电路', 'PCB', '元件', '电子']),
-      findSector(['半导体', '芯片', '集成电路']),
-      findSector(['贵金属', '黄金', '白银', '珠宝'])
-    ];
-    const track = [
-      findSector(['有色金属', '工业金属', '小金属']),
-      findSector(['种业', '种子', '农产品', '粮食']),
-      findSector(['钾肥', '化工', '化学原料', '纯碱'])
-    ];
-    // 龙头一字判断:leadPct>=9.5 / leadStock 在 ztList 涨停 / 板块涨幅>=9% 且 leadStock 存在
     const isLeadYiZi = (sector, ztAll) => {
       if (!sector) return false;
       const leadPct = Number(sector.leadPct || 0);
@@ -514,15 +498,42 @@ function renderCloseEmotion(report) {
         const hit = (ztAll || []).find(z => z.name === sector.leadStock);
         if (hit && (hit.pct || 0) >= 9.5) return true;
       }
-      // 板块涨幅接近涨停 + 有 leadStock,推断一字带动
       if (sector.leadStock && Number(sector.changePct || 0) >= 9) return true;
       return false;
     };
-    const buildBdRow = (dir, s, idx) => {
-      if (!s) return '<tr><td class="bd-dir">' + dir + '</td><td>--</td><td>--</td><td>--</td><td><span class="bd-tag bd-tag-2">中性</span></td></tr>';
+    // 强度评分:涨幅 0.6 + 资金净流入 0.3
+    const rankedSectors = (mr4 || []).map(s => {
+      const pct = Number(s.changePct || 0);
+      const inflow = Number(s.inflowYi || 0);
+      return Object.assign({}, s, { _pct: pct, _inflow: inflow, _score: pct * 0.6 + inflow * 0.3 });
+    }).sort((a, b) => b._score - a._score);
+    const topSectors = rankedSectors.slice(0, 9);
+    // 动态副标题:分析 Top 5 板块的主题分布
+    const themeKw = {
+      '农业': ['农', '种', '渔', '林', '饲料', '食品'],
+      '消费': ['零售', '消费', '家电', '服装', '商贸'],
+      '科技': ['科技', '半导', '元件', '电路', 'PCB', '通信', '电子', '计算机'],
+      '资源': ['有色', '金属', '黄金', '钢铁', '煤炭', '石油', '化工', '橡胶'],
+      '医药': ['医药', '生物', '制药', '中药'],
+      '金融': ['银行', '保险', '证券'],
+      '军工': ['军工', '船舶', '航空', '航天'],
+      '汽车': ['汽车', '零部件', '轮胎']
+    };
+    const top5Names = topSectors.slice(0, 5).map(s => s.name);
+    const themeParts = [];
+    const sortedThemes = Object.entries(themeKw).map(([theme, keys]) => ({
+      theme,
+      count: top5Names.filter(n => keys.some(k => n.indexOf(k) >= 0)).length
+    })).filter(t => t.count > 0).sort((a, b) => b.count - a.count).slice(0, 3);
+    for (const { theme, count } of sortedThemes) {
+      if (count >= 3) themeParts.push(theme + '独强');
+      else if (count >= 2) themeParts.push(theme + '分化');
+      else themeParts.push(theme + '走弱');
+    }
+    const dynamicSubtitle = themeParts.length ? '· ' + themeParts.join(' · ') : '· 板块普涨';
+    const buildBdRow = (s, i) => {
       const pct = Number(s.changePct || 0);
       let inflow = Number(s.inflowYi || 0);
-      // 若 inflowYi 没填(0),按涨幅推断
       if (inflow === 0) {
         if (pct >= 5) inflow = +(pct * 0.6).toFixed(1);
         else if (pct <= -1) inflow = -(Math.abs(pct) * 0.5).toFixed(1);
@@ -531,42 +542,24 @@ function renderCloseEmotion(report) {
       const amtStr = (inflow > 0 ? '+' : '') + inflow.toFixed(1) + '亿';
       const pctCls = pct >= 0 ? 'up' : 'down';
       const amtCls = inflow >= 0 ? 'up' : 'down';
-      // 多维度强弱判断
       let tag = '中性', tagCls = 'bd-tag-2';
       const yiZi = isLeadYiZi(s, ztList);
-      if (pct >= 9.5 && yiZi && inflow > 0) {
-        tag = '🔴 最强'; tagCls = 'bd-tag-1';
-      } else if (pct >= 9 && yiZi) {
-        tag = '龙头一字带动'; tagCls = 'bd-tag-1';
-      } else if (pct >= 5 && inflow > 0) {
-        tag = '上涨'; tagCls = 'bd-tag-1';
-      } else if (pct >= 1 && inflow < 0) {
-        tag = '⚠️ 分歧'; tagCls = 'bd-tag-2';
-      } else if (pct >= 1) {
-        tag = '上涨'; tagCls = 'bd-tag-1';
-      } else if (pct < 0 && inflow > 0) {
-        tag = '流入但涨幅收敛'; tagCls = 'bd-tag-3';
-      } else if (pct < -1) {
-        tag = '退潮'; tagCls = 'bd-tag-4';
-      } else if (inflow < 0) {
-        tag = '流出'; tagCls = 'bd-tag-4';
-      } else if (inflow > 0 && pct >= 0) {
-        tag = '流入'; tagCls = 'bd-tag-3';
-      } else {
-        tag = '中性'; tagCls = 'bd-tag-2';
-      }
-      if (idx === 0) {
-        return '<tr><td class="bd-dir" rowspan="3">' + dir + '</td><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-tag ' + tagCls + '">' + tag + '</span></td></tr>';
-      }
-      return '<tr><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-tag ' + tagCls + '">' + tag + '</span></td></tr>';
+      if (pct >= 9.5 && yiZi && inflow > 0) { tag = '🔴 最强'; tagCls = 'bd-tag-1'; }
+      else if (pct >= 9 && yiZi) { tag = '龙头一字'; tagCls = 'bd-tag-1'; }
+      else if (pct >= 5 && inflow > 0) { tag = '强势'; tagCls = 'bd-tag-1'; }
+      else if (pct >= 1 && inflow < 0) { tag = '⚠️ 分歧'; tagCls = 'bd-tag-2'; }
+      else if (pct >= 1) { tag = '上涨'; tagCls = 'bd-tag-1'; }
+      else if (pct < 0 && inflow > 0) { tag = '流入收敛'; tagCls = 'bd-tag-3'; }
+      else if (pct < -1) { tag = '退潮'; tagCls = 'bd-tag-4'; }
+      else if (inflow < 0) { tag = '流出'; tagCls = 'bd-tag-4'; }
+      else { tag = '流入'; tagCls = 'bd-tag-3'; }
+      return '<tr><td class="bd-rank">' + (i + 1) + '</td><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-tag ' + tagCls + '">' + tag + '</span></td></tr>';
     };
-    const blockTbl = '<div class="bd-section"><div class="bd-h">④ 板块强弱 · 农业独强 · 科技分化 · 跟踪退潮</div>' +
+    const blockTbl = '<div class="bd-section"><div class="bd-h">④ 板块强弱 ' + dynamicSubtitle + '</div>' +
       '<table class="bd-tbl"><thead><tr>' +
-      '<th>方向</th><th>板块</th><th>涨幅</th><th>资金</th><th>强弱</th>' +
+      '<th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>强弱</th>' +
       '</tr></thead><tbody>' +
-      buildBdRow('农业', ag[0], 0) + buildBdRow(null, ag[1], 1) + buildBdRow(null, ag[2], 2) +
-      buildBdRow('科技', tech[0], 0) + buildBdRow(null, tech[1], 1) + buildBdRow(null, tech[2], 2) +
-      buildBdRow('跟踪', track[0], 0) + buildBdRow(null, track[1], 1) + buildBdRow(null, track[2], 2) +
+      topSectors.map((s, i) => buildBdRow(s, i)).join('') +
       '</tbody></table></div>';
 
     // === 5) 资金切换信号(今日核心) ===
