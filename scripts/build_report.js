@@ -1938,7 +1938,7 @@ function renderPremarketStrategy(report, opts) {
 
   return '<div class="card em-card">' +
     '<div class="em-header">' +
-      '<span class="em-title">' + esc(o.title || '主升浪参与策略') + '</span>' +
+      '<span class="em-title">' + esc(o.title || '盘前参与策略') + '</span>' +
       (o.subtitle ? '<span class="em-sub">' + esc(o.subtitle) + '</span>' : '') +
       '<span class="em-date">' + esc(date) + '</span>' +
     '</div>' +
