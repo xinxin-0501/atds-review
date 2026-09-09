@@ -688,131 +688,83 @@ function loadTopBoardBacktest(dataDir, currentDateTime, dayLimit) {
   } catch (e) { return []; }
 }
 
-/* ============ "明日看什么" 5 主题观察锚 (2026-09-07) ============ */
-// 收盘专属:综合盘前(morning)/盘中(midday)/收盘(close)三段数据,聚合出 5 大主题明日观察
-// 输出:{ themes:[{icon,name,category,reason,picks[3]}], caution:[str,str,str,str] }
+/* ============ "明日看什么" 动态板块观察锚 (2026-09-12) ============ */
+// 收盘专属:基于 mainRank 实时强度排名,动态归类「可买入 / 可观察 / 等回调」三类板块
+// 输出:{ themes:[{name,category,reason,picks[3]}], caution:[str,...] }
 function deriveTodayWatchList(mainRank, playbook, zt, limitUpList, hotSectors, date, dataDir, closeStats) {
-  // 读取同日 premarket + midday 两份 JSON,辅助 reason 的"盘前/盘中"维度判断
-  let morning = null, midday = null;
-  try {
-    if (date && dataDir) {
-      const pFile = path.join(dataDir, date + '_08-30.json');
-      const mFile = path.join(dataDir, date + '_11-35.json');
-      if (fs.existsSync(pFile)) morning = JSON.parse(fs.readFileSync(pFile, 'utf8'));
-      if (fs.existsSync(mFile)) midday  = JSON.parse(fs.readFileSync(mFile, 'utf8'));
-    }
-  } catch (e) { /* 缺数据不影响 close 计算 */ }
-  // 主题定义:icon + 主题名 + 板块关键词(用于 mainRank/picks 匹配) + 兜底观察股池(用户预设典型龙头)
-  const themeDefs = [
-    { id: 'power', icon: '⚡', name: '算力电源/液冷', sectorKeys: ['元件', '消费电子', '电子化学', '通信设备', '电源', '液冷', '通信', '算力'],
-      defaults: ['科华数据', '科士达', '英维克'] },
-    { id: 'fin',   icon: '🏛️', name: '金融',          sectorKeys: ['银行', '保险', '证券', '多元金融', '金融'],
-      defaults: ['工商银行', '农业银行', '中国人保'] },
-    { id: 'ai',    icon: '🤖', name: 'AI应用/传媒',   sectorKeys: ['影视', '游戏', 'AI', '传媒', '数字', '广告', '互联网'],
-      defaults: ['三六零', '天娱数科', '掌阅科技'] },
-    { id: 'agri',  icon: '🌾', name: '农业/消费',     sectorKeys: ['种植业', '一般零售', '小家电', '食品加工', '调味', '养殖', '渔业', '饲料', '农产品', '消费', '零售'],
-      defaults: ['农发种业', '大北农', '王府井'] },
-    { id: 'mil',   icon: '✈️', name: '国防军工',       sectorKeys: ['国防军工', '军工', '船舶', '航空', '航天'],
-      defaults: ['中国船舶', '中航沈飞', '航发动力'] }
-  ];
-  // 辅助:从 mainRank 中按关键词匹配命中的板块,聚合 picks(去重)
-  const collectPicks = (keys) => {
-    const matched = [];
-    for (const r of (mainRank || [])) {
-      const nm = r.mappedName || r.name || '';
-      if (keys.some(k => nm.indexOf(k) >= 0)) matched.push(r);
-    }
-    const picks = [];
-    const seen = new Set();
-    for (const r of matched) {
-      for (const p of (r.picks || [])) {
-        if (!seen.has(p.code) && (p.name || '').length) { picks.push(p); seen.add(p.code); }
-        if (picks.length >= 3) break;
-      }
-      if (picks.length >= 3) break;
-    }
-    return { picks, matched };
-  };
-  // 兜底:从 themes.stocks + 主题 defaults(用户预设龙头) — 不再随机用 hotSectors leadStock 跨主题混
-  const fallbackPicks = (def) => {
-    const out = [];
-    const themes = (playbook && playbook.themes) || [];
-    // 1) themes 命中的同名 stocks
-    for (const t of themes) {
-      const tn = String(t.name || '');
-      const matched = def.sectorKeys.some(k => tn.indexOf(k) >= 0);
-      if (!matched) continue;
-      for (const s of (t.stocks || [])) if (out.indexOf(s) < 0) out.push(s);
-      for (const p of (t.picks || [])) if (out.indexOf(p.name) < 0) out.push(p.name);
-      if (out.length >= 3) break;
-    }
-    // 2) 用户预设龙头兜底
-    for (const s of (def.defaults || [])) if (out.indexOf(s) < 0) out.push(s);
-    return out.slice(0, 3);
-  };
-  // 综合 reason(盘前 → 盘中 → 收盘 三段拼接,根据命中板块三段数据综合判断)
-  const reasonText = (themeName, matched) => {
-    if (!matched.length) {
-      return '盘前未明确表态,盘中平稳,收盘中性偏弱,明日看验证承接力度再说';
-    }
-    const tops = matched.filter(m => m.status === '主线确认').length;
-    const avgPct = matched.reduce((s, m) => s + (Number(m.changePct) || 0), 0) / matched.length;
-    // 盘中:从 midday.marketStats.limitUpCount 与 close.marketStats.limitUpCount 对比得出"盘中→收盘"的方向
-    const middayTotalZT = (midday && midday.marketStats && midday.marketStats.limitUpCount) || null;
-    const closeTotalZT  = (closeStats && closeStats.limitUpCount) || (limitUpList && limitUpList.length) || null;
-    const middayShift = (middayTotalZT != null && closeTotalZT != null) ? (closeTotalZT - middayTotalZT) : null;
-    // 盘前:从 morning.playbook.offense 命中关键词板块数
-    const morningOffense = (morning && morning.playbook && morning.playbook.offense) || [];
-    const morningMatchCount = morningOffense.filter(o => matched.some(m => o.name === m.mappedName || o.name === m.name)).length;
-    // 拼三段
-    let preTxt, midTxt, closeTxt;
-    if (morningMatchCount >= 2) preTxt = '盘前已预定主线';
-    else if (morningMatchCount === 1) preTxt = '盘前预期偏强';
-    else preTxt = '盘前未明确表态';
-    if (middayShift != null && middayShift > 10) midTxt = '盘中走强(+' + middayShift + '家涨停),承接放量';
-    else if (middayShift != null && middayShift < -10) midTxt = '盘中走弱(' + middayShift + '家),资金切换';
-    else if (middayShift != null) midTxt = '盘中平稳(' + (middayShift > 0 ? '+' : '') + middayShift + '家)';
-    else midTxt = '盘中平稳';
-    if (tops >= 2 && avgPct >= 8) closeTxt = '收盘主线确认(' + tops + '板块)';
-    else if (tops >= 1) closeTxt = '收盘主线获强化';
-    else if (avgPct >= 5) closeTxt = '收盘资金流入';
-    else if (avgPct >= 0) closeTxt = '收盘中性偏强';
-    else closeTxt = '收盘偏弱(' + avgPct.toFixed(1) + '%)';
-    // 拼接 + 明日展望
-    let base = preTxt + ' → ' + midTxt + ' → ' + closeTxt + ',明日看验证 ' + themeName + '是否真承接';
-    if (tops >= 2 && avgPct >= 8) base += ',只做龙头不追高';
-    else if (tops >= 1) base += ',先看资金是否真实回流';
-    else if (avgPct >= 5) base += ',验证第二天承接力度';
-    else base += ',谨防一致兑现';
-    return base;
-  };
-  const themes = themeDefs.map(def => {
-    const { picks, matched } = collectPicks(def.sectorKeys);
-    let list = picks.map(p => p.name);
-    if (list.length < 3) {
-      const fb = fallbackPicks(def);
-      for (const n of fb) if (list.indexOf(n) < 0) list.push(n);
-      list = list.slice(0, 3);
-    }
-    // 分类:命中板块当日均涨 >= 4% → 观察;反之 → 等回调
-    const avgPct = matched.length ? matched.reduce((s, m) => s + (Number(m.changePct) || 0), 0) / matched.length : 0;
-    const confirmed = matched.some(m => m.status === '主线确认');
-    const category = (avgPct >= 4 || confirmed) ? '观察' : '等回调';
-    const reason = reasonText(def.name, matched);
-    return { id: def.id, icon: def.icon, name: def.name, picks: list, category, reason };
+  // 数值归一化辅助
+  const num = (v) => { const n = Number(v); return isFinite(n) ? n : 0; };
+  const pctOf    = (r) => num(r.changePct);
+  const inflowOf = (r) => num(r.inflowYi);
+  const ztOf     = (r) => num(r.ztCount != null ? r.ztCount : r.limitUpCount);
+  const lbOf     = (r) => num(r.maxLB);
+
+  // 有效板块池(剔除空名/占位;mainRank 已按强度降序,这里直接保序分组)
+  const pool = (mainRank || []).filter(r => {
+    const nm = (r.mappedName || r.name || '').trim();
+    return nm && nm !== '--' && nm !== '其他';
   });
-  // 谨慎方向:基于主线 + 题材 + 量能衍生的 4 条短文
+
+  // 三分类:可买入 / 可观察 / 等回调(弱势板块不进明日清单)
+  const classify = (r) => {
+    const p = pctOf(r), inf = inflowOf(r), lb = lbOf(r), zc = ztOf(r);
+    const confirmed = (r.status === '主线确认') || (zc >= 2 && p >= 2);
+    if (lb >= 5 || (p >= 7 && lb >= 4)) return '等回调';      // 龙头连板过高/过热,等回调
+    if (confirmed && zc >= 2 && inf >= 0) return '可买入';     // 主线确认+涨停梯队健康+资金净流入
+    if (p >= 1 || confirmed || zc >= 1) return '可观察';       // 活跃但待发酵(单只涨停/资金弱)
+    return null;                                              // 弱势,不进明日清单
+  };
+
+  const buckets = { '可买入': [], '可观察': [], '等回调': [] };
+  for (const r of pool) {
+    const cat = classify(r);
+    if (cat) buckets[cat].push(r);
+  }
+
+  const order = ['可买入', '可观察', '等回调'];
+
+  // reason 生成:基于板块真实数据 + 分类给出明日展望
+  const buildReason = (name, r, cat) => {
+    const p = pctOf(r), inf = inflowOf(r), zc = ztOf(r), lb = lbOf(r);
+    const parts = [];
+    if (r.status === '主线确认') parts.push('主线确认');
+    else if (p >= 2) parts.push('走强+' + p.toFixed(1) + '%');
+    else if (p >= 0) parts.push('窄幅+' + p.toFixed(1) + '%');
+    else parts.push('回撤' + p.toFixed(1) + '%');
+    if (zc > 0) parts.push(zc + '家涨停' + (lb >= 2 ? '·最高' + lb + '板' : ''));
+    if (inf > 0.05) parts.push('净流入' + inf.toFixed(1) + '亿');
+    else if (inf < -0.05) parts.push('净流出' + Math.abs(inf).toFixed(1) + '亿');
+    let outlook;
+    if (cat === '可买入') outlook = '明日只做龙头不追高,看量能能否延续';
+    else if (cat === '可观察') outlook = '明日看能否晋级主线,先观察资金是否真实回流';
+    else if (p >= 7 || lb >= 5) outlook = '短期过热,等回调企稳再择机';
+    else outlook = '偏弱,等放量企稳再介入';
+    return name + ' ' + parts.join('、') + ';' + outlook;
+  };
+
+  // 每类取前 2,拼 themes(随真实强度实时变动)
+  const themes = [];
+  for (const cat of order) {
+    for (const r of buckets[cat].slice(0, 2)) {
+      const name = r.mappedName || r.name;
+      let picks = (r.picks || []).map(p => (typeof p === 'string' ? p : (p && p.name))).filter(Boolean);
+      if (picks.length < 3 && r.leadStock && r.leadStock !== '--' && picks.indexOf(r.leadStock) < 0) picks.push(r.leadStock);
+      picks = picks.slice(0, 3);
+      themes.push({ name, category: cat, picks, reason: buildReason(name, r, cat) });
+    }
+  }
+
+  // 谨慎方向:基于真实强度动态生成
   const caution = [];
-  const ai = themes.find(t => t.id === 'ai');
-  caution.push(ai && ai.picks.length ? ai.name + '高位加速' : '题材高位加速');
-  const power = themes.find(t => t.id === 'power');
-  caution.push(power && power.picks.length ? power.name.replace('/', '·') + '一致高开' : '科技硬件一致高开');
-  const agri = themes.find(t => t.id === 'agri');
-  caution.push(agri ? agri.name + '追涨' : '消费板块追涨');
-  caution.push('无量追液冷');
+  const hot = pool.find(r => lbOf(r) >= 5 || pctOf(r) >= 7);
+  if (hot) caution.push((hot.mappedName || hot.name) + '高位加速谨防兑现');
+  const buyTop = buckets['可买入'][0];
+  if (buyTop) caution.push((buyTop.mappedName || buyTop.name) + '主线一致高开勿追高');
+  const outflow = pool.filter(r => inflowOf(r) < 0).sort((a, b) => inflowOf(a) - inflowOf(b))[0];
+  if (outflow) caution.push((outflow.mappedName || outflow.name) + '资金净流出暂避');
+  caution.push('无量不追,放量才跟');
   return { themes, caution };
 }
-
 /* ============ 观察池技术画像(盘前):MA/量比/KDJ/趋势 → 支撑"建议"五类文案 ============ */
 function calcTechFromKline(arr) {
   if (!Array.isArray(arr) || arr.length < 30) return null;
@@ -1963,8 +1915,8 @@ async function main() {
     for (const t of (playbook && playbook.themes) || []) sectorPickTargets.push(t.name);  // 主题方向(关键词/全名)
     const ztCodeSet = new Set(zt.list.map(s => String(s.code)));
     const sectorPicks = await attachSectorPicks(sectorPickTargets, ztCodeSet);
-    // 注入 mainRank 前5
-    for (const r of mainRank.slice(0, 5)) {
+    // 注入 mainRank 前9(覆盖"可观察/等回调"板块候选股)
+    for (const r of mainRank.slice(0, 9)) {
       const hit = sectorPicks[r.mappedName || r.name];
       if (hit && hit.picks.length) r.picks = hit.picks;
     }
@@ -2080,9 +2032,9 @@ async function main() {
     report.topBoardBacktest = topBoardBacktest;
     console.log('回测追踪:', topBoardBacktest.length, '条');
 
-    // 明日看什么 · 5 主题观察锚(收盘专属):综合盘前 + 盘中 + 收盘三段数据,产出"明日看什么"
+    // 明日看什么 · 动态板块观察锚(收盘专属):基于 mainRank 实时强度排名归类「可买入/可观察/等回调」
     report.todayWatchList = deriveTodayWatchList(mainRank, playbook, zt, zt.list, hotSectors, date, DATA_DIR, report.marketStats);
-    console.log('明日看什么 · 5 主题:', report.todayWatchList.themes.length, '主题,谨慎方向:', (report.todayWatchList.caution || []).length, '条');
+    console.log('明日看什么 · 动态板块:', report.todayWatchList.themes.length, '个板块,谨慎方向:', (report.todayWatchList.caution || []).length, '条');
   }
   fs.mkdirSync(DATA_DIR, { recursive: true });
   const outFile = path.join(DATA_DIR, `${date}_${time.replace(':', '-')}.json`);

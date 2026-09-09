@@ -618,7 +618,7 @@ function renderCloseEmotion(report) {
   const themesArr = todayWatch.themes || [];
   // 上半:5 个紧凑主题 tab(仅 编号 + 主题名 + 分类 chip)
   const themeTabs = themesArr.map((t, i) => {
-    const catCls = (t.category === '观察') ? 'tw-cat-watch' : 'tw-cat-wait';
+    const catCls = (t.category === '可买入') ? 'tw-cat-buy' : (t.category === '可观察' ? 'tw-cat-watch' : 'tw-cat-wait');
     return '<div class="tw-tab' + (i === 0 ? ' active' : '') + '" data-tw-idx="' + i + '" onclick="toggleTwCard(' + i + ')">' +
       '<span class="tw-tab-rank">' + (i + 1) + '</span>' +
       '<span class="tw-tab-name">' + esc(t.name) + '</span>' +
@@ -1074,20 +1074,6 @@ function renderDataAnalysis(report) {
     <div class="card-title">AI 数据分析 · 八步复盘</div>
     <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
     ${m1}${m2}${m3}${m4}${m5}${m6}${m7}${m8}
-  </div>`;
-}
-
-function renderIntlEvents(report) {
-  return `<div class="card">
-    <div class="card-title">GLOBAL EVENT RADAR · 国际重大事件监控</div>
-    <div class="hint">盘中由 Agent 扫描国际地缘、贸易、制裁与海外流动性事件,并推演对 A 股的传导路径。</div>
-  </div>`;
-}
-
-function renderNewsDigest(report) {
-  return `<div class="card">
-    <div class="card-title">LIVE NEWS CALIBRATION · 实时新闻驱动研判</div>
-    <div class="hint">盘中由 Agent 扫描中央政策原文、央行公告与隔夜外盘要闻,校准主线方向与风险评分。</div>
   </div>`;
 }
 
@@ -2167,9 +2153,9 @@ ${renderCloseEmotion(report)}
   ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderIntlMkt(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderTechAnalysis(report)}
-  ${renderIndices(report)}
+  ${report.meta && report.meta.type === 'midday' ? '' : renderIndices(report)}
   ${renderStatusBar(report)}
-  ${renderMarketStats(report)}
+  ${report.meta && report.meta.type === 'midday' ? '' : renderMarketStats(report)}
   ${report.meta && report.meta.type === 'midday' ? '' : renderSectors(report)}
   ${report.meta && report.meta.type === 'midday' ? '' : renderLimitUp(report)}
   ${report.meta && report.meta.type === 'midday' || report.meta && report.meta.type === 'close' ? '' : renderWatchlist(report)}
@@ -2177,8 +2163,6 @@ ${renderCloseEmotion(report)}
   ${renderVerdict(report)}
   ${report.meta && report.meta.type === 'close' ? renderTradeReviewEntry() : ''}
   ${report.meta && report.meta.type === 'close' ? renderBehaviorReviewEntry() : ''}
-  ${renderIntlEvents(report)}
-  ${renderNewsDigest(report)}
 </div>
 <div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
 </div>
