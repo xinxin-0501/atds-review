@@ -369,12 +369,12 @@ function renderCloseEmotion(report) {
     const L2 = mr4[1] || {};
     const L3 = mr4[2] || {};
     const L4 = mr4[3] || {};
-    const L1Name = L1.mappedName || L1.name || '农业种业';
-    const L2Name = L2.mappedName || L2.name || '传媒发展';
-    const L3Name = L3.mappedName || L3.name || '房地产';
-    const L4Name = L4.mappedName || L4.name || '科技/有色';
-    const L1Lead = L1.leadStock || '万向德农';
-    const L2Lead = L2.leadStock || '航发控制';
+    const L1Name = L1.mappedName || L1.name || '--';
+    const L2Name = L2.mappedName || L2.name || '--';
+    const L3Name = L3.mappedName || L3.name || '--';
+    const L4Name = L4.mappedName || L4.name || '--';
+    const L1Lead = L1.leadStock || '--';
+    const L2Lead = L2.leadStock || '--';
     const L1Pct = Number(L1.changePct || 0);
     const L2Pct = Number(L2.changePct || 0);
     const L3Pct = Number(L3.changePct || 0);
@@ -606,12 +606,20 @@ function renderCloseEmotion(report) {
       '</div>';
   }
 
-  // 05 明日观察锚点（午盘隐藏，收盘展示）
+  // 05 明日观察锚点（午盘隐藏，收盘展示）—— 全部基于当日真实数据动态生成
+  const mrTop = (report.mainRank && report.mainRank[0]) || {};
+  const mrTopName = mrTop.mappedName || mrTop.name || '主线';
+  const mrTopLead = mrTop.leadStock || '龙头';
+  const ztAllClose = report.limitUp || [];
+  const highestLB = ztAllClose.slice().sort((a, b) => (Number(b.lianban) || 0) - (Number(a.lianban) || 0))[0] || null;
+  const zbClose = ce.zbTotal || 0;
+  const promoClose = ce.promotionRate;
+  const totalAmtClose = (report.marketStats && report.marketStats.totalAmount) || '--';
   const anchors = [
-    { icon: '🎯', title: '主线持续性', desc: '观察中际旭创 / 新易盛 / 天孚通信能否继续表态' },
-    { icon: '⚠️', title: '情绪退潮阈值', desc: '炸板率 > 40% 或晋级率 < 50% 需警惕' },
-    { icon: '📊', title: '量能验证', desc: '2.15 万亿基础上能否重拾放量' },
-    { icon: '🛡️', title: '高位风险', desc: '百花医药 7 板与医药板块背离' }
+    { icon: '🎯', title: '主线持续性', desc: '观察 ' + mrTopName + ' 龙头 ' + mrTopLead + ' 能否继续表态' },
+    { icon: '⚠️', title: '情绪退潮阈值', desc: '今日炸板 ' + zbClose + ' 家' + (promoClose != null ? ' · 晋级率 ' + promoClose + '%' : '') + ',炸板率 > 40% 或晋级率 < 50% 需警惕' },
+    { icon: '📊', title: '量能验证', desc: '成交额 ' + totalAmtClose + ' 基础上能否重拾放量' },
+    { icon: '🛡️', title: '高位风险', desc: highestLB ? (highestLB.name + ' ' + (highestLB.lianban || 1) + ' 板,关注与所属板块是否背离') : '关注最高连板股与所属板块是否背离' }
   ];
   const anchorCards = anchors.map(a => {
     return '<div class="ce-anchor-card"><div class="ce-anchor-h">' + a.icon + ' ' + esc(a.title) + '</div><div class="ce-anchor-desc">' + esc(a.desc) + '</div></div>';
@@ -1600,7 +1608,7 @@ function renderPremarketStrategy(report, opts) {
     '<ul class="ms-tips">' +
       '<li>今日开盘关注 ' + esc(mr1.mappedName || mr1.name || '--') + ' 龙头 ' + esc(mr1.leadStock || '--') + ' 表态,北证/科创流动性偏弱谨慎参与。</li>' +
       '<li>主线机会窗口为' + esc(mr1.mappedName || mr1.name || '--') + '板块,下一日' + esc(mr2.mappedName || mr2.name || '--') + '启动。</li>' +
-      '<li>当前主线机会窗口:' + esc(mr1.mappedName || mr1.name || '--') + '主升浪确认,成交额 ' + esc(totalAmount) + ' (沪深合计)。</li>' +
+      '<li>当前主线机会窗口:' + esc(mr1.mappedName || mr1.name || '--') + (mr1.status ? esc(' ' + mr1.status) : '') + ',成交额 ' + esc(totalAmount) + ' (沪深合计)。</li>' +
     '</ul>' +
     '</div>';
 
@@ -1692,7 +1700,7 @@ function renderPremarketStrategy(report, opts) {
   const layerDesc = {
     A: '穿越点确认·放量启动·回踩低吸·首选埋伏',
     B: '风口未到·安全垫厚·仅轻仓·题材高度·板块辨识度',
-    C: '指数回落+2.7%抗跌·机构配制·指数回落时相对抗跌'
+    C: '防御避险·机构配制·低位抗跌·控制仓位'
   };
   // ===== 板块层描述动态生成(根据主板块真实情况) =====
   const genLayerDesc = (primary, fallback) => {
@@ -2050,7 +2058,7 @@ ${renderHero(report)}
 <div class="section">
   ${renderWatchlist(report)}
   ${renderPremarketCockpit(report)}
-  ${renderPremarketStrategy(report, { title: '主升浪参与策略', subtitle: '盘前接力判断 · 板块联动确认 · 强势股池筛选' })}
+  ${renderPremarketStrategy(report, { title: '盘前参与策略', subtitle: '盘前接力判断 · 板块联动确认 · 强势股池筛选' })}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
   ${renderStockResearch(report)}
