@@ -1778,10 +1778,19 @@ async function main() {
   // 技术分析:三大指数近 260 日 K 线(K线 URL 需要 sh/sz 前缀)
   const klineMap = {};
   for (const idx of config.indices) {
-    const fullCode = (idx.setcode === '1' ? 'sh' : 'sz') + idx.code;
-    const arr = await fetchKline(fullCode, 260);
+    const idxFullCode = (idx.setcode === '1' ? 'sh' : 'sz') + idx.code;
+    const arr = await fetchKline(idxFullCode, 260);
     if (arr.length) klineMap[idx.code] = arr;
   }
+  // fullCode 函数(给主升浪强势股 K 线富集用,不能与上面的字符串同名)
+  const fullCode = (raw) => {
+    const c = String(raw || '');
+    if (/^(sh|sz|bj)/i.test(c)) return c.toLowerCase();
+    const c0 = c.charAt(0);
+    if (c0 === '6') return 'sh' + c;
+    if (c0 === '4' || c0 === '8' || c0 === '92') return 'bj' + c;
+    return 'sz' + c;
+  };
   const techAnalysis = buildTechAnalysis(klineMap, config.indices);
   const playbook = derivePlaybook(zt.list, dragonPool);
 
@@ -1870,6 +1879,8 @@ async function main() {
       maxLB: v.maxLB,
       leadStock: v.leadStock || '--',
       leadCode: v.leadCode || '',
+      leadPct: v.leadPct || 0,
+      leadPrice: v.leadPrice || 0,
       _score: score,
       _hasZT: true
     });

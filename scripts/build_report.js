@@ -493,7 +493,7 @@ function renderCloseEmotion(report) {
     const ag = [
       findSector(['种植', '种业', '农业']),
       findSector(['农化', '化肥', '农药', '氟肥', '钾肥']),
-      findSector(['通信网络', '通信', '网络设备'])
+      findSector(['农产品加', '渔业', '林业', '饲料'])
     ];
     const tech = [
       findSector(['印制电路', 'PCB', '元件', '电子']),
@@ -1739,35 +1739,77 @@ function renderPremarketStrategy(report, opts) {
     '<div class="em-rec-hint">⚠ 只低吸不追板:不打 1 字板首封,严防诱多陷阱;价格按当前 K 线自动派生,数据每日实时更新。</div>' +
     '</div>';
 
-  // 🚫 不参与清单(具体个股 + 原因)
+  // 🚫 不参与清单(具体个股 + 板数 + 封单 + 原因)
   const ztAll = report.limitUp || [];
   const avoidItems = [];
-  // 1) 高位连板股(连板>=4):列出具体个股名
-  const highLbStocks = ztAll.filter(z => (z.lianban || 0) >= 4).slice(0, 3);
-  if (highLbStocks.length) {
-    const names = highLbStocks.map(z => z.name).join('、');
-    avoidItems.push({ name: '高位连板(' + names + ')', reason: '连板≥4 承接强度需复核,高位接力风险大' });
-  } else {
-    avoidItems.push({ name: '高位连板股(连板≥4)', reason: '承接强度需复核,高位接力风险大' });
-  }
-  // 2) 当日炸板股:列出具体个股名
-  const zhaBanStocks = ztAll.filter(z => z.status === '炸板' || z.status === '炸板回封' || z.zhaban);
-  if (zhaBanStocks.length) {
-    const names = zhaBanStocks.slice(0, 3).map(z => z.name).join('、');
-    avoidItems.push({ name: '当日炸板(' + names + ')', reason: '炸板分歧加大,次日低开风险' });
-  }
-  // 3) 板块涨幅过高(>=9.5%):不追
-  (mrFull || []).filter(s => Number(s.changePct || 0) >= 9.5).slice(0, 2).forEach(s => {
-    avoidItems.push({ name: (s.mappedName || s.name) + '(板块整体)', reason: '板块涨幅 ' + Number(s.changePct).toFixed(1) + '%·已透支·不追' });
+  const seenNames = new Set();
+  const push = (it) => { if (!seenNames.has(it.name.split('(')[0])) { avoidItems.push(it); seenNames.add(it.name.split('(')[0]); } };
+  // 板块涨跌幅 map(用于判断个股所在板块是否退潮)
+  const sectorPctMap = new Map();
+  (mrFull || []).forEach(s => sectorPctMap.set(s.name, Number(s.changePct || 0)));
+  // 1) 高位连板股(连板≥3):逐只列出板数+封单
+  const highLbStocks = ztAll.filter(z => (z.lianban || 0) >= 3).slice(0, 3);
+  highLbStocks.forEach(z => {
+    const tag20 = z.pct >= 19.5 ? '·20cm' : '';
+    push({
+      name: z.name + '(' + (z.lianban || 0) + '板' + tag20 + ')',
+      reason: z.name + '已' + (z.lianban || 0) + '板涨停' + (z.sealAmount ? ',封单' + z.sealAmount + '亿' : '') + ',追板风险大'
+    });
   });
-  // 4) 兜底补齐到 4 条
-  if (avoidItems.length < 4) {
+  // 2) 20cm 涨停(创业板/科创板):严重追高
+  const cm20Stocks = ztAll.filter(z => z.pct >= 19.5).slice(0, 2);
+  cm20Stocks.forEach(z => {
+    if ((z.lianban || 0) < 3) {
+      push({
+        name: z.name + '(20cm涨停)',
+        reason: z.name + '已20cm涨停(' + (z.price || 0).toFixed(2) + '),严重追高'
+      });
+    }
+  });
+  // 3) 板块已退潮但个股高封单的独苗:易炸板
+  const lonelyStocks = ztAll.filter(z => {
+    const secPct = sectorPctMap.get(z.reason || z.hybk);
+    return z.sealAmount && parseFloat(z.sealAmount) >= 3 && secPct != null && secPct < 2 && (z.lianban || 0) >= 1;
+  }).slice(0, 2);
+  lonelyStocks.forEach(z => {
+    const sec = z.reason || z.hybk || '';
+    push({
+      name: z.name + '(' + sec + '独苗)',
+      reason: (z.lianban || 0) + '板封单' + z.sealAmount + '亿,但' + sec + '板块退潮,独苗易炸板'
+    });
+  });
+  // 4) 板块整体已涨停或大涨:等回调
+  const hotSectorStocks = ztAll.filter(z => {
+    const secPct = sectorPctMap.get(z.reason || z.hybk);
+    return secPct != null && secPct >= 9 && (z.lianban || 0) >= 1;
+  }).slice(0, 2);
+  hotSectorStocks.forEach(z => {
+    const sec = z.reason || z.hybk || '';
+    push({
+      name: z.name + '/' + sec,
+      reason: sec + '已涨停或大涨,等回调'
+    });
+  });
+  // 5) 补涨位反而安全(连板≥2 但板块涨幅 3-8%):提示风险
+  const chaseStocks = ztAll.filter(z => {
+    const secPct = sectorPctMap.get(z.reason || z.hybk);
+    return secPct != null && secPct >= 3 && secPct < 9 && (z.lianban || 0) >= 2;
+  }).slice(0, 1);
+  chaseStocks.forEach(z => {
+    const sec = z.reason || z.hybk || '';
+    push({
+      name: z.name + '/' + sec,
+      reason: sec + '连板涨停追不进,补涨位反而安全'
+    });
+  });
+  // 6) 兜底补齐到 5 条
+  if (avoidItems.length < 5) {
     const defaults = [
       { name: 'ST/*ST 股', reason: '退市风险+流动性差' },
       { name: '一字板首封', reason: '开板即砸风险' },
       { name: '北证/微盘股', reason: '波动放大+流动性敏感' }
     ];
-    avoidItems.push(...defaults.slice(0, 4 - avoidItems.length));
+    defaults.forEach(d => push(d));
   }
   const avoidListHtml = avoidItems.slice(0, 5).map(a =>
     '<li><span class="em-avoid-tag">不参与</span><b>' + esc(a.name) + '</b> · ' + esc(a.reason) + '</li>'
