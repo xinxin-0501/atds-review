@@ -488,7 +488,7 @@ function renderCloseEmotion(report) {
       anchors.map(a => '<li><span class="vt-tag">' + esc(a.tag) + '</span>' + esc(a.text) + '</li>').join('') +
       '</ul></div>';
 
-    // === 4) 板块强弱表(按真实强度排序,Top 9,不固定分类) ===
+    // === 4) 板块强弱表(3 段式:最强/分歧/流出,每段 3 个板块) ===
     const findSector = (keys) => mr4.find(s => keys.some(k => (s.name || '').indexOf(k) >= 0)) || null;
     const isLeadYiZi = (sector, ztAll) => {
       if (!sector) return false;
@@ -501,39 +501,49 @@ function renderCloseEmotion(report) {
       if (sector.leadStock && Number(sector.changePct || 0) >= 9) return true;
       return false;
     };
-    // 强度评分:涨幅 0.6 + 资金净流入 0.3
-    const rankedSectors = (mr4 || []).map(s => {
+    // 强度评分(涨幅 0.6 + 资金 0.3 + 涨停梯队 0.5)
+    const allRanked = (mr4 || []).map(s => {
       const pct = Number(s.changePct || 0);
       const inflow = Number(s.inflowYi || 0);
-      return Object.assign({}, s, { _pct: pct, _inflow: inflow, _score: pct * 0.6 + inflow * 0.3 });
+      const zt = Number(s.ztCount || s.limitUpCount || 0);
+      return Object.assign({}, s, { _pct: pct, _inflow: inflow, _zt: zt, _score: pct * 0.6 + inflow * 0.3 + zt * 0.5 });
     }).sort((a, b) => b._score - a._score);
-    const topSectors = rankedSectors.slice(0, 9);
-    // 动态副标题:分析 Top 5 板块的主题分布
-    const themeKw = {
-      '农业': ['农', '种', '渔', '林', '饲料', '食品'],
-      '消费': ['零售', '消费', '家电', '服装', '商贸'],
-      '科技': ['科技', '半导', '元件', '电路', 'PCB', '通信', '电子', '计算机'],
-      '资源': ['有色', '金属', '黄金', '钢铁', '煤炭', '石油', '化工', '橡胶'],
-      '医药': ['医药', '生物', '制药', '中药'],
-      '金融': ['银行', '保险', '证券'],
-      '军工': ['军工', '船舶', '航空', '航天'],
-      '汽车': ['汽车', '零部件', '轮胎']
-    };
-    const top5Names = topSectors.slice(0, 5).map(s => s.name);
-    const themeParts = [];
-    const sortedThemes = Object.entries(themeKw).map(([theme, keys]) => ({
-      theme,
-      count: top5Names.filter(n => keys.some(k => n.indexOf(k) >= 0)).length
-    })).filter(t => t.count > 0).sort((a, b) => b.count - a.count).slice(0, 3);
-    for (const { theme, count } of sortedThemes) {
-      if (count >= 3) themeParts.push(theme + '独强');
-      else if (count >= 2) themeParts.push(theme + '分化');
-      else themeParts.push(theme + '活跃');
+
+    // 3 段分类
+    const segStrongest = [];  // 最强:涨幅>=9 且 一字带动 或 涨停>=3
+    const segDiverge   = [];  // 分歧:资金净流入 且 1<=涨幅<5
+    const segOutflow   = [];  // 流出/退潮:资金净流出 或 涨幅<0
+    for (const s of allRanked) {
+      const yiZi = isLeadYiZi(s, ztList);
+      if (segStrongest.length < 3 && s._pct >= 9 && (yiZi || s._zt >= 3)) {
+        segStrongest.push(s);
+      } else if (segDiverge.length < 3 && s._inflow > 0 && s._pct >= 1 && s._pct < 5) {
+        segDiverge.push(s);
+      } else if (segOutflow.length < 3 && (s._inflow < 0 || s._pct < 0)) {
+        segOutflow.push(s);
+      }
     }
-    const dynamicSubtitle = themeParts.length ? '· ' + themeParts.join(' · ') : '· 板块普涨';
-    const buildBdRow = (s, i) => {
-      const pct = Number(s.changePct || 0);
-      let inflow = Number(s.inflowYi || 0);
+    // 不足的按强度从剩余补齐
+    const usedNames = new Set();
+    [...segStrongest, ...segDiverge, ...segOutflow].forEach(s => usedNames.add(s.name));
+    const fillers = allRanked.filter(s => !usedNames.has(s.name));
+    for (const arr of [segStrongest, segDiverge, segOutflow]) {
+      while (arr.length < 3 && fillers.length) {
+        const f = fillers.shift();
+        arr.push(f);
+        usedNames.add(f.name);
+      }
+    }
+    // 段头
+    const segments = [
+      { name: '最强', sub: '一字带动 · 龙头确立', segCls: 'bd-seg-1' },
+      { name: '分歧', sub: '资金流入但涨幅收敛', segCls: 'bd-seg-2' },
+      { name: '流出', sub: '退潮 / 资金撤离',   segCls: 'bd-seg-3' }
+    ];
+    // 行渲染(段内 #,方向用段标签)
+    const buildBdRow = (s, idx, segIdx) => {
+      const pct = s._pct;
+      let inflow = s._inflow;
       if (inflow === 0) {
         if (pct >= 5) inflow = +(pct * 0.6).toFixed(1);
         else if (pct <= -1) inflow = -(Math.abs(pct) * 0.5).toFixed(1);
@@ -542,24 +552,20 @@ function renderCloseEmotion(report) {
       const amtStr = (inflow > 0 ? '+' : '') + inflow.toFixed(1) + '亿';
       const pctCls = pct >= 0 ? 'up' : 'down';
       const amtCls = inflow >= 0 ? 'up' : 'down';
-      let tag = '中性', tagCls = 'bd-tag-2';
-      const yiZi = isLeadYiZi(s, ztList);
-      if (pct >= 9.5 && yiZi && inflow > 0) { tag = '🔴 最强'; tagCls = 'bd-tag-1'; }
-      else if (pct >= 9 && yiZi) { tag = '龙头一字'; tagCls = 'bd-tag-1'; }
-      else if (pct >= 5 && inflow > 0) { tag = '强势'; tagCls = 'bd-tag-1'; }
-      else if (pct >= 1 && inflow < 0) { tag = '⚠️ 分歧'; tagCls = 'bd-tag-2'; }
-      else if (pct >= 1) { tag = '上涨'; tagCls = 'bd-tag-1'; }
-      else if (pct < 0 && inflow > 0) { tag = '流入收敛'; tagCls = 'bd-tag-3'; }
-      else if (pct < -1) { tag = '退潮'; tagCls = 'bd-tag-4'; }
-      else if (inflow < 0) { tag = '流出'; tagCls = 'bd-tag-4'; }
-      else { tag = '流入'; tagCls = 'bd-tag-3'; }
-      return '<tr><td class="bd-rank">' + (i + 1) + '</td><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-tag ' + tagCls + '">' + tag + '</span></td></tr>';
+      return '<tr><td class="bd-rank">' + (idx + 1) + '</td><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-seg-pill bd-seg-pill-' + (segIdx + 1) + '">' + segments[segIdx].name + '</span></td></tr>';
     };
+    // 段头分隔行
+    const segHdr = (seg, segIdx) => {
+      return '<tr class="bd-seg-h ' + seg.segCls + '"><td colspan="5"><span class="bd-seg-num">' + (segIdx + 1) + '</span><b>' + esc(seg.name) + '</b> · ' + esc(seg.sub) + '</td></tr>';
+    };
+    const dynamicSubtitle = '· ' + segStrongest.length + '最强 · ' + segDiverge.length + '分歧 · ' + segOutflow.length + '流出';
     const blockTbl = '<div class="bd-section"><div class="bd-h">④ 板块强弱 ' + dynamicSubtitle + '</div>' +
       '<table class="bd-tbl"><thead><tr>' +
-      '<th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>强弱</th>' +
+      '<th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>方向</th>' +
       '</tr></thead><tbody>' +
-      topSectors.map((s, i) => buildBdRow(s, i)).join('') +
+      segHdr(segments[0], 0) + segStrongest.map((s, i) => buildBdRow(s, i, 0)).join('') +
+      segHdr(segments[1], 1) + segDiverge.map((s, i) => buildBdRow(s, i, 1)).join('') +
+      segHdr(segments[2], 2) + segOutflow.map((s, i) => buildBdRow(s, i, 2)).join('') +
       '</tbody></table></div>';
 
     // === 5) 资金切换信号(今日核心) ===
@@ -1654,16 +1660,18 @@ function renderPremarketStrategy(report, opts) {
   const mrFull = report.mainRank || [];
   const mkLayer = (leadData, picks, fallbackSectorName) => {
     const items = [];
-    const leadPrice = (leadData && (leadData.leadPrice || leadData.price)) || 10;
-    const leadPct = (leadData && (leadData.leadPct != null ? leadData.leadPct : leadData.changePct)) || 0;
-    if (leadData && leadData.leadStock) {
+    if (!leadData) return items;
+    const leadPrice = (leadData.leadPrice || leadData.price) || 10;
+    const leadPct = (leadData.leadPct != null ? leadData.leadPct : leadData.changePct) || 0;
+    const sec = leadData.mappedName || leadData.name || fallbackSectorName || '';
+    if (leadData.leadStock) {
       const prices = makePriceTriple(leadPrice);
-      items.push({ name: leadData.leadStock, code: leadData.leadCode || '', sector: leadData.mappedName || leadData.name || fallbackSectorName || '', pct: leadPct, buy: prices[0], stop: prices[1], tgt: prices[2] });
+      items.push({ name: leadData.leadStock, code: leadData.leadCode || '', sector: sec, pct: leadPct, buy: prices[0], stop: prices[1], tgt: prices[2], _srcSector: leadData });
     }
     (picks || []).slice(0, 2).forEach(pk => {
       const estPrice = +(leadPrice * (1 + ((pk.pct || 0) - leadPct) / 100)).toFixed(2);
       const prices = makePriceTriple(estPrice);
-      items.push({ name: pk.name, code: pk.code, sector: leadData ? (leadData.mappedName || leadData.name) : (fallbackSectorName || ''), pct: pk.pct || 0, buy: prices[0], stop: prices[1], tgt: prices[2] });
+      items.push({ name: pk.name, code: pk.code, sector: sec, pct: pk.pct || 0, buy: prices[0], stop: prices[1], tgt: prices[2], _srcSector: leadData });
     });
     return items;
   };
@@ -1686,15 +1694,81 @@ function renderPremarketStrategy(report, opts) {
     B: '风口未到·安全垫厚·仅轻仓·题材高度·板块辨识度',
     C: '指数回落+2.7%抗跌·机构配制·指数回落时相对抗跌'
   };
-  const renderLayer = (cls, key, name, subDirs, items, hint) => {
-    const cards = items.map(it => {
+  // ===== 板块层描述动态生成(根据主板块真实情况) =====
+  const genLayerDesc = (primary, fallback) => {
+    if (!primary) return fallback || '';
+    const pct = Number(primary.changePct || 0);
+    const inflow = Number(primary.inflowYi || 0);
+    const zt = Number(primary.ztCount || primary.limitUpCount || 0);
+    const lb = Number(primary.maxLB || 0);
+    const status = primary.status || '';
+    // 盘前数据:limitUpMax 是字符串 "X家 / Y板",从中提取数字
+    const lum = String(primary.limitUpMax || '');
+    const lumNum = parseInt((lum.match(/(\d+)家/) || [])[1] || '0', 10);
+    const lumLB = parseInt((lum.match(/(\d+)板/) || [])[1] || '0', 10);
+    const hasLimitUp = (zt >= 1) || (lumNum >= 1) || (lb >= 1) || (lumLB >= 1);
+    // 1. 强启动型(穿越点确认):涨幅>=9 + 主线确认 / 有涨停梯队
+    if (pct >= 9 && (status === '主线确认' || hasLimitUp)) {
+      return '穿越点确认·放量启动·回踩低吸·首选埋伏';
+    }
+    // 2. 强启动但缺资金数据(盘前常见):涨幅>=9 + 无涨停 → 仍按强启动
+    if (pct >= 9) {
+      return '穿越点确认·放量启动·回踩低吸·首选埋伏';
+    }
+    // 3. 弱跟风(风口未到):涨幅 1-5%
+    if (pct >= 1 && pct < 5) {
+      return '风口未到·安全垫厚·仅轻仓·题材高度·板块梯队稳定';
+    }
+    // 4. 稳健启动(5-9% 涨幅 + 资金未流出)
+    if (pct >= 5 && pct < 9 && inflow >= 0) {
+      return '稳健启动·资金温和·安全垫厚·轻仓试错';
+    }
+    // 5. 退潮/资金撤离
+    if (inflow < 0 || pct < 0) {
+      return '资金退潮·龙头熄火·只看不碰·等低位再议';
+    }
+    return fallback || '分歧中·低吸不追板·严控仓位';
+  };
+  // ===== 个股 reason 动态生成(为什么选这只股) =====
+  const genItemReason = (item, isFirst) => {
+    const pct = Number(item.pct || 0);
+    const sec = item._srcSector;
+    const isLead = sec && sec.leadStock === item.name;
+    if (isLead && pct >= 9.5) return '板块龙头·一字带板·首选埋伏';
+    if (isLead && pct >= 9)   return '板块领涨股·放量启动·题材纯正';
+    if (isLead && pct >= 5)   return '板块龙头股·放量突破·低吸标的';
+    if (pct >= 9)             return '高位涨停·跟风挖掘·题材纯正';
+    if (pct >= 5)             return '放量启动·技术面突破·仅轻仓';
+    if (pct >= 1)             return '低位试探·板块梯队·仅轻仓';
+    return '分歧观察·等放量确认';
+  };
+  // ===== 个股 tag 动态(首选/龙头/保守/活跃/安全垫/弹性/突破) =====
+  const genItemTag = (item, isFirst) => {
+    const pct = Number(item.pct || 0);
+    const sec = item._srcSector;
+    const isLead = sec && sec.leadStock === item.name;
+    if (isFirst && isLead) return '首选';
+    if (isLead) return '龙头';
+    if (pct >= 9) return '弹性';
+    if (pct >= 5) return '突破';
+    if (pct >= 1) return '活跃';
+    if (isFirst)  return '保守';
+    return '跟单';
+  };
+  const renderLayer = (cls, key, name, subDirs, items, hint, primarySector) => {
+    const cards = items.map((it, i) => {
       const pct = Number(it.pct || 0);
+      const isFirst = i === 0;
+      const reason = genItemReason(it, isFirst);
+      const tag = genItemTag(it, isFirst);
       return '<div class="rec-card">' +
         '<div class="rec-card-h">' +
           '<span class="rec-card-name">' + esc(it.name) + '</span>' +
+          (tag ? '<span class="rec-card-tag rec-card-tag-' + cls + '">' + esc(tag) + '</span>' : '') +
           '<span class="rec-card-meta">' + esc(it.code || '') + ' <span class="' + (pct >= 0 ? 'up' : 'down') + '">' + (pct > 0 ? '+' : '') + pct.toFixed(1) + '%</span></span>' +
         '</div>' +
         '<div class="rec-card-sub">' + esc(it.sector || '--') + '</div>' +
+        '<div class="rec-card-reason">' + esc(reason) + '</div>' +
         '<div class="rec-card-prices">' +
           '<div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">' + it.buy + '</span></div>' +
           '<div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">' + it.stop + '</span></div>' +
@@ -1702,19 +1776,20 @@ function renderPremarketStrategy(report, opts) {
         '</div>' +
         '</div>';
     }).join('');
+    const dynamicHint = genLayerDesc(primarySector, hint);
     return '<div class="rec-layer rec-layer-' + cls + '">' +
       '<div class="rec-layer-h"><span class="rec-layer-tag">' + key + '</span><span class="rec-layer-name">' + esc(name) + '</span>' +
       (subDirs && subDirs.length ? '<span class="rec-layer-sub">· ' + esc(subDirs.join(' · ')) + '</span>' : '') +
       '</div>' +
-      '<div class="rec-layer-desc">' + esc(hint) + '</div>' +
+      '<div class="rec-layer-desc">' + esc(dynamicHint) + '</div>' +
       '<div class="rec-cards">' + cards + '</div>' +
       '</div>';
   };
   const recHtml = '<div class="em-section">' +
     '<div class="em-section-h">🎯 分层推荐 · 仅低吸不追板</div>' +
-    renderLayer('a', 'A', '稳健层', aSubDirs, aLayer, layerDesc.A) +
-    renderLayer('b', 'B', '进攻层', bSubDirs, bLayer, layerDesc.B) +
-    renderLayer('c', 'C', '防御层', cSubDirs, cLayer, layerDesc.C) +
+    renderLayer('a', 'A', '稳健层', aSubDirs, aLayer, layerDesc.A, mrFull[0]) +
+    renderLayer('b', 'B', '进攻层', bSubDirs, bLayer, layerDesc.B, mrFull[1] || mrFull[2]) +
+    renderLayer('c', 'C', '防御层', cSubDirs, cLayer, layerDesc.C, defSector) +
     '<div class="em-rec-hint">⚠ 只低吸不追板:不打 1 字板首封,严防诱多陷阱;价格按当前 K 线自动派生,数据每日实时更新。</div>' +
     '</div>';
 

@@ -1062,10 +1062,15 @@
 .rec-card { background:#fff; border:1px solid rgba(15,23,42,0.06); border-radius:6px; padding:6px 8px; }
 .rec-card-h { display:flex; align-items:baseline; justify-content:space-between; gap:6px; }
 .rec-card-name { font-size:12px; font-weight:700; color:#0f172a; }
+.rec-card-tag { font-size:9px; font-weight:700; padding:1px 5px; border-radius:3px; flex-shrink:0; line-height:1.2; }
+.rec-card-tag-a { background:rgba(225,29,72,0.12); color:#e11d48; }
+.rec-card-tag-b { background:rgba(245,158,11,0.12); color:#b45309; }
+.rec-card-tag-c { background:rgba(14,165,233,0.12); color:#0ea5e9; }
 .rec-card-meta { font-size:10px; color:#475569; }
 .rec-card-meta .up { color:#e11d48; font-weight:700; }
 .rec-card-meta .down { color:#16a34a; font-weight:700; }
 .rec-card-sub { font-size:10px; color:#64748b; padding:1px 0 4px 0; }
+.rec-card-reason { font-size:9px; color:#475569; padding:3px 6px; line-height:1.45; border-left:2px solid rgba(225,29,72,0.2); background:linear-gradient(90deg, rgba(225,29,72,0.04), transparent); margin:2px 0 4px 0; font-style:italic; }
 .rec-card-prices { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; padding:0; }
 .rec-p { background:rgba(15,23,42,0.02); border-radius:4px; padding:4px 2px; text-align:center; }
 .rec-p-l { display:block; font-size:9px; color:#94a3b8; padding-bottom:1px; }
@@ -1148,6 +1153,18 @@
 .bd-tag-3 { background:rgba(14,165,233,0.12); color:#0ea5e9; }
 .bd-tag-4 { background:rgba(100,116,139,0.12); color:#64748b; }
 .bd-tag-5 { background:rgba(168,85,247,0.12); color:#a855f7; }
+
+/* ④ 板块强弱 3 段式(最强 / 分歧 / 流出) */
+.bd-seg-h td { font-size:10px; font-weight:800; color:#e11d48; padding:7px 4px; text-align:center; border-top:1px solid rgba(225,29,72,0.2); border-bottom:1px solid rgba(225,29,72,0.2); background:linear-gradient(90deg, rgba(225,29,72,0.10), rgba(225,29,72,0.02)); }
+.bd-seg-h.bd-seg-2 td { color:#b45309; border-top-color:rgba(245,158,11,0.2); border-bottom-color:rgba(245,158,11,0.2); background:linear-gradient(90deg, rgba(245,158,11,0.10), rgba(245,158,11,0.02)); }
+.bd-seg-h.bd-seg-3 td { color:#475569; border-top-color:rgba(100,116,139,0.2); border-bottom-color:rgba(100,116,139,0.2); background:linear-gradient(90deg, rgba(100,116,139,0.10), rgba(100,116,139,0.02)); }
+.bd-seg-num { display:inline-block; width:16px; height:16px; line-height:16px; text-align:center; border-radius:50%; background:rgba(225,29,72,0.18); color:#e11d48; margin-right:5px; font-size:9px; font-weight:800; }
+.bd-seg-h.bd-seg-2 .bd-seg-num { background:rgba(245,158,11,0.18); color:#b45309; }
+.bd-seg-h.bd-seg-3 .bd-seg-num { background:rgba(100,116,139,0.18); color:#475569; }
+.bd-seg-pill { font-size:9px; font-weight:800; padding:2px 6px; border-radius:3px; display:inline-block; min-width:32px; text-align:center; }
+.bd-seg-pill-1 { background:rgba(225,29,72,0.14); color:#e11d48; }
+.bd-seg-pill-2 { background:rgba(245,158,11,0.14); color:#b45309; }
+.bd-seg-pill-3 { background:rgba(100,116,139,0.14); color:#475569; }
 .bd-empty { color:#94a3b8; font-style:italic; }
 .up { color:#e11d48; font-weight:700; }
 .down { color:#16a34a; font-weight:700; }
