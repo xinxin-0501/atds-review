@@ -947,7 +947,8 @@ async function fetchStockFundFlow(code) {
 async function fetchMinuteTrend(code, klt) {
   try {
     const num = String(code).replace(/^(sh|sz|bj)/, '');
-    const full = String(num).charAt(0) === '6' ? ('sh' + num) : ('sz' + num);
+    // 北交所(43/83/87/88/92 开头)需 bj 前缀,否则接口返回空导致 60/15 分钟数据缺失
+    const full = /^(4|8|92)/.test(num) ? ('bj' + num) : (num.charAt(0) === '6' || num.charAt(0) === '9' ? ('sh' + num) : ('sz' + num));
     const url = `https://ifzq.gtimg.cn/appstock/app/kline/mkline?param=${full},${klt},,30`;
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), 8000);

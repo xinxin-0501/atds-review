@@ -539,6 +539,31 @@
 .dc-summary{background:linear-gradient(90deg,#fff0f0,#fff5f5);border:1px solid #f0b0b0;border-bottom:1px dashed #f0b0b0;color:#b71c1c;font-size:10px;font-weight:700;padding:6px 10px;line-height:1.5}
 /* 执行纪律 */
 .dc-disc{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:3px 6px}
+/* 做T盈亏比不合格标红 + 建议放弃警告 */
+.tp-rr.rr-bad{color:#c62828;background:#ffebee;border-radius:3px;padding:1px 4px;font-weight:800}
+.tp-warn.tp-warn-bad{color:#b71c1c;background:#ffebee;border-color:#f0b0b0;font-weight:700}
+/* 今日交易计划折叠(强烈建议不参与时默认折叠,点击标题二次确认展开) */
+.dc-plan-toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.dc-plan-toggle:hover{color:#b71c1c}
+.dc-plan-caret{font-size:11px;color:#999}
+.dc-plan-lock{font-size:9px;font-weight:700;color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0;border-radius:4px;padding:1px 6px}
+.dc-plan-collapsed .dc-plan-body{display:none}
+/* 盘后复盘:交易状态按钮 + 系统模拟跟踪 + 胜率进度提示 */
+.dc-trade-status{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.ts-btn{font-size:9px;font-weight:600;color:#666;background:#fff;border:1px solid #ddd;border-radius:12px;padding:3px 9px;cursor:pointer;line-height:1.2;transition:all .15s}
+.ts-btn:hover{border-color:#999;color:#333}
+.ts-btn.ts-active[data-status="bought"]{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32;font-weight:800}
+.ts-btn.ts-active[data-status="not_bought"]{background:#fff7e6;border-color:#d49000;color:#d49000;font-weight:800}
+.ts-btn.ts-active[data-status="sold"]{background:#eceff1;border-color:#607d8b;color:#455a64;font-weight:800}
+.dc-shadow{font-size:9px;color:#666}
+.ts-shadow{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+.ts-shadow-check{accent-color:#e08a3c;cursor:pointer}
+.ts-hint{display:inline-block;width:14px;height:14px;line-height:14px;text-align:center;background:#eee;color:#888;border-radius:50%;font-size:10px;font-weight:700;cursor:help;margin:0 2px;vertical-align:middle}
+.ts-progress-badge{font-size:9px;color:#999}
+.ts-progress{color:#b3541e;font-weight:800}
+.ts-winrate{font-size:9px;color:#2e7d32;font-weight:700}
+/* KNOWLEDGE SYNC 手动导出说明 */
+.knowledge-note{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:4px 7px;margin:6px 0 2px;line-height:1.5}
 /* 移动端紧凑排版:默认全展开(每只股8区决策卡无须点击直接可见),压缩间距降低页面总高 */
 @media (max-width:768px){
   .dc-head{cursor:default;padding:7px 9px;gap:4px}
@@ -2187,7 +2212,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="">
     <td class="tp-name">A 回踩低吸</td>
@@ -2211,11 +2238,12 @@
     <td class="tp-num">63.91</td>
     <td class="tp-num stop">62.95</td>
     <td class="tp-num">64.87</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn">⚠ 现价直接买入盈亏比 0.03(<1.5),不合格 —— 等待回踩至 63.91 再执行,当前仅观察。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.03(<1.5),不合格 —— 等待回踩至 63.91 再执行,当前仅观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破61.99无条件止损 · 到达63.97无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -2225,10 +2253,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材18/20 + 关键位6/15 + 盈亏比0/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="600487" data-name="亨通光电" data-price="63.91" data-entry="63.91" data-stop="61.9927" data-target="63.97"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="600487" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="600487" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="600487" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="600487" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -2280,7 +2310,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="">
     <td class="tp-name">A 回踩低吸</td>
@@ -2304,11 +2336,12 @@
     <td class="tp-num">21.85</td>
     <td class="tp-num stop">21.52</td>
     <td class="tp-num">22.18</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn">⚠ 现价直接买入盈亏比 0.09(<1.5),不合格 —— 等待回踩至 21.85 再执行,当前仅观察。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.09(<1.5),不合格 —— 等待回踩至 21.85 再执行,当前仅观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破21.19无条件止损 · 到达21.91无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -2318,10 +2351,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比0/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="600392" data-name="盛和资源" data-price="21.85" data-entry="21.85" data-stop="21.1945" data-target="21.91"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="600392" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="600392" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="600392" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="600392" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="300285"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -2373,7 +2408,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="">
     <td class="tp-name">A 回踩低吸</td>
@@ -2397,11 +2434,12 @@
     <td class="tp-num">60.35</td>
     <td class="tp-num stop">59.44</td>
     <td class="tp-num">61.26</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn">⚠ 现价直接买入盈亏比 0.22(<1.5),不合格 —— 等待回踩至 60.35 再执行,当前仅观察。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.22(<1.5),不合格 —— 等待回踩至 60.35 再执行,当前仅观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破58.54无条件止损 · 到达60.74无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -2411,10 +2449,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比0/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="300285" data-name="国瓷材料" data-price="60.35" data-entry="60.35" data-stop="58.539500000000004" data-target="60.74"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300285" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300285" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300285" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300285" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="300308"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -2466,7 +2506,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="tp-notrig">
     <td class="tp-name">A 回踩低吸</td>
@@ -2490,11 +2532,12 @@
     <td class="tp-num">890.10</td>
     <td class="tp-num stop">876.75</td>
     <td class="tp-num">903.45</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn tp-ok">现价盈亏比 1.62,可执行计划。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn tp-ok">现价盈亏比 1.62,可执行计划。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破859.65无条件止损 · 到达939.53无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -2504,10 +2547,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势12/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比7/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="300308" data-name="中际旭创" data-price="890.1" data-entry="886.35" data-stop="859.647" data-target="939.5310000000001"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300308" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300308" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300308" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300308" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="603538"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -2559,7 +2604,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="">
     <td class="tp-name">A 回踩低吸</td>
@@ -2583,11 +2630,12 @@
     <td class="tp-num">26.46</td>
     <td class="tp-num stop">26.06</td>
     <td class="tp-num">26.86</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn">⚠ 现价直接买入盈亏比 1.06(<1.5),不合格 —— 等待回踩至 26.46 再执行,当前仅观察。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 1.06(<1.5),不合格 —— 等待回踩至 26.46 再执行,当前仅观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破25.67无条件止损 · 到达27.30无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -2597,10 +2645,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比4/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="603538" data-name="美诺华" data-price="26.46" data-entry="26.46" data-stop="25.6662" data-target="27.3"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="603538" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="603538" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="603538" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="603538" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="300342"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -2652,7 +2702,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="">
     <td class="tp-name">A 回踩低吸</td>
@@ -2678,9 +2730,10 @@
     <td class="tp-num">32.48</td>
     <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn">⚠ 现价直接买入盈亏比 0.31(<1.5),不合格 —— 等待回踩至 32.00 再执行,当前仅观察。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.31(<1.5),不合格 —— 等待回踩至 32.00 再执行,当前仅观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破31.04无条件止损 · 到达32.30无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -2690,10 +2743,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比0/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="300342" data-name="天银机电" data-price="32" data-entry="32" data-stop="31.04" data-target="32.3"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300342" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300342" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300342" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300342" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="300607"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -2745,7 +2800,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="">
     <td class="tp-name">A 回踩低吸</td>
@@ -2769,11 +2826,12 @@
     <td class="tp-num">35.09</td>
     <td class="tp-num stop">34.56</td>
     <td class="tp-num">35.62</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn tp-ok">现价盈亏比 1.61,可执行计划。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn tp-ok">现价盈亏比 1.61,可执行计划。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破34.04无条件止损 · 到达36.78无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -2783,10 +2841,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势30/30 + 资金12/25 + 题材18/20 + 关键位6/15 + 盈亏比7/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="300607" data-name="拓斯达" data-price="35.09" data-entry="35.09" data-stop="34.0373" data-target="36.78"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300607" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300607" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300607" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300607" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="002385"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -2838,7 +2898,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="tp-notrig">
     <td class="tp-name">A 回踩低吸</td>
@@ -2862,11 +2924,12 @@
     <td class="tp-num">3.43</td>
     <td class="tp-num stop">3.38</td>
     <td class="tp-num">3.48</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn">⚠ 现价直接买入盈亏比 0.47(<1.5),不合格 —— 等待回踩至 3.34 再执行,当前仅观察。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.47(<1.5),不合格 —— 等待回踩至 3.34 再执行,当前仅观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破3.24无条件止损 · 到达3.52无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -2876,10 +2939,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势30/30 + 资金12/25 + 题材18/20 + 关键位6/15 + 盈亏比7/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="002385" data-name="大北农" data-price="3.43" data-entry="3.34" data-stop="3.2371" data-target="3.52"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="002385" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="002385" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="002385" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="002385" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="300459"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -2931,7 +2996,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="tp-notrig">
     <td class="tp-name">A 回踩低吸</td>
@@ -2955,11 +3022,12 @@
     <td class="tp-num">3.69</td>
     <td class="tp-num stop">3.63</td>
     <td class="tp-num">3.75</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn">⚠ 现价直接买入盈亏比 0.35(<1.5),不合格 —— 等待回踩至 3.63 再执行,当前仅观察。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.35(<1.5),不合格 —— 等待回踩至 3.63 再执行,当前仅观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破3.52无条件止损 · 到达3.75无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -2969,10 +3037,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势30/30 + 资金12/25 + 题材18/20 + 关键位6/15 + 盈亏比4/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="300459" data-name="汤姆猫" data-price="3.69" data-entry="3.63" data-stop="3.5193" data-target="3.75"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300459" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300459" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300459" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300459" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="600737"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -3024,7 +3094,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="tp-notrig">
     <td class="tp-name">A 回踩低吸</td>
@@ -3048,11 +3120,12 @@
     <td class="tp-num">17.82</td>
     <td class="tp-num stop">17.55</td>
     <td class="tp-num">18.09</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn">⚠ 现价直接买入盈亏比 -0.09(<1.5),不合格 —— 等待回踩至 15.55 再执行,当前仅观察。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 -0.09(<1.5),不合格 —— 等待回踩至 15.55 再执行,当前仅观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.4% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破15.02无条件止损 · 到达17.58无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -3062,10 +3135,12 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势30/30 + 资金15/25 + 题材18/20 + 关键位6/15 + 盈亏比10/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="600737" data-name="中粮糖业" data-price="17.82" data-entry="15.55" data-stop="15.015400000000001" data-target="17.58"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="600737" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="600737" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="600737" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="600737" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="600108"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -3117,7 +3192,9 @@
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
       <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div><table class="tp-table">
+    <div class="dc-block dc-plan ">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▾</span></div>
+      <div class="dc-plan-body"><table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="tp-notrig">
     <td class="tp-name">A 回踩低吸</td>
@@ -3141,11 +3218,12 @@
     <td class="tp-num">5.25</td>
     <td class="tp-num stop">5.17</td>
     <td class="tp-num">5.33</td>
-    <td class="tp-rr rr-warn">1.00</td>
+    <td class="tp-rr rr-bad">1.00</td>
   </tr>
-  </table><div class="tp-warn">⚠ 现价直接买入盈亏比 -0.11(<1.5),不合格 —— 等待回踩至 3.92 再执行,当前仅观察。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 -0.11(<1.5),不合格 —— 等待回踩至 3.92 再执行,当前仅观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损4% → 建议仓位 <b>12%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破3.76无条件止损 · 到达5.08无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       
@@ -3155,12 +3233,14 @@
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势30/30 + 资金15/25 + 题材18/20 + 关键位6/15 + 盈亏比10/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="600108" data-name="亚盛集团" data-price="5.25" data-entry="3.92" data-stop="3.7624999999999997" data-target="5.08"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       <div class="dc-line">资金验证：主力净流入当日--亿，符合做多预期</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="600108" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="600108" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="600108" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="600108" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
-  </div></div></div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><pre id="knowledge-md" class="knowledge-md">---
+  </div></div></div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><div class="knowledge-note">ℹ 手动导出模式：点击下方按钮下载/复制 .md，再粘贴进 Obsidian 即可，全程本地操作、无网络依赖、不会卡顿或报错。</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报
 tags: [ATDS, 交易复盘]
 ---
@@ -3867,22 +3947,25 @@ function buildDecisionCardHtml(s){
   var tStop=price-Math.max(0.5*atrC,price*0.01);
   var tTgt=price+Math.max(0.5*atrC,price*0.01);
   var tRR=(price>tStop)?((tTgt-price)/(price-tStop)):1;
+  var tRRBad=tRR<1.5;
   var trigA=price<=p.entry, trigB=price>=planBEntry, trigC=price>0;
-  function planRow(name,trig,entryV,stopV,tgtV,rrVal,triggered,tone){return '<tr class="'+(triggered?'':'tp-notrig')+'"><td class="tp-name">'+name+'</td><td class="tp-trig">'+escHtmlF(trig)+'</td><td class="tp-num">'+f2(entryV)+'</td><td class="tp-num stop">'+f2(stopV)+'</td><td class="tp-num">'+f2(tgtV)+'</td><td class="tp-rr '+(triggered?'rr-'+tone:'tp-rr-muted')+'">'+(triggered?rrVal.toFixed(2):'未触发')+'</td></tr>';}
+  function planRow(name,trig,entryV,stopV,tgtV,rrVal,triggered,tone,bad){return '<tr class="'+(triggered?'':'tp-notrig')+'"><td class="tp-name">'+name+'</td><td class="tp-trig">'+escHtmlF(trig)+'</td><td class="tp-num">'+f2(entryV)+'</td><td class="tp-num stop">'+f2(stopV)+'</td><td class="tp-num">'+f2(tgtV)+'</td><td class="tp-rr '+(!triggered?'tp-rr-muted':(bad?'rr-bad':'rr-'+tone))+'">'+(triggered?rrVal.toFixed(2):'未触发')+'</td></tr>';}
   var planTable='<table class="tp-table"><tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>'+
     planRow('A 回踩低吸','回踩'+f2(p.entry)+'企稳',p.entry,p.stop,p.target,p.rr,trigA,rrTone(p.rr))+
     planRow('B 突破确认','放量突破'+f2(planBEntry),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
-    planRow('C 日内做T','现价'+f2(price)+'·ATR'+f2(atrC)+'动态止损',price,tStop,tTgt,tRR,trigC,rrTone(tRR))+
+    planRow('C 日内做T','现价'+f2(price)+'·ATR'+f2(atrC)+'动态止损',price,tStop,tTgt,tRR,trigC,rrTone(tRR),tRRBad)+
     '</table>';
   var nowWarn=p.rrNow<1.5
     ?'<div class="tp-warn">⚠ 现价直接买入盈亏比 '+p.rrNow.toFixed(2)+'(<1.5),不合格 —— 等待回踩至 '+f2(p.entry)+' 再执行,当前仅观察。</div>'
     :'<div class="tp-warn tp-ok">现价盈亏比 '+p.rrNow.toFixed(2)+',可执行计划。</div>';
+  var tRRBadWarn=tRRBad?'<div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div>':'';
   // 复盘
   var keyVerify='最高'+f2(s.high)+' '+((pre&&s.high>=pre.price)?('触及压力'+f2(pre.price)):'未触及压力')+' · 最低'+f2(s.low)+' '+((sup&&s.low<=sup.price)?('触及支撑'+f2(sup.price)):'未触及支撑');
   var fundVerify='主力净流入当日'+sign(ff.d1)+(ff.d1!=null?ff.d1.toFixed(2):'--')+'亿，'+(((ff.d1||0)>=0)?'符合做多预期':'与做多预期背离，需复核');
 
   // 情绪总纲建议:情绪冰点+趋势空头+主力流出 → 高难度逆势标的
-  var summaryHtml=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0)?'<div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>':'';
+  var isHardTrade=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0);
+  var summaryHtml=isHardTrade?'<div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>':'';
 
   return '<div class="dc-head">'+
     '<span class="dc-pri">'+priority+'</span>'+
@@ -3908,9 +3991,12 @@ function buildDecisionCardHtml(s){
       '<div class="dc-line">开盘预期 '+escHtmlF(openExpect)+'</div>'+
     '</div>'+
     '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div><div class="dc-line dc-src-note">'+evNote+'</div></div>'+
-    '<div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>'+planTable+nowWarn+
+    '<div class="dc-block dc-plan '+(isHardTrade?'dc-plan-collapsed':'')+'">'+
+      '<div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">'+(isHardTrade?'▸':'▾')+'</span>'+(isHardTrade?'<span class="dc-plan-lock">⛔ 已折叠·强烈建议不参与</span>':'')+'</div>'+
+      '<div class="dc-plan-body">'+planTable+tRRBadWarn+nowWarn+
       '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>'+(pos.capped?'（受单股上限压制，实际最高仓位15%）':'（单股≤15%、单题材≤30%）')+'</div>'+
       '<div class="dc-line dc-disc">执行纪律：跌破'+f2(p.stop)+'无条件止损 · 到达'+f2(p.target)+'无条件止盈 · 日内做T当日必须平T不隔夜</div>'+
+      '</div>'+
     '</div>'+
     '<div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>'+
       (riskSignals.length?'<div class="dc-line dc-risk">'+riskSignals.map(function(r){return '<span class="risk-alert">⚠ '+escHtmlF(r)+(/跌破MA5|跌破MA20/.test(r)?'<i class="risk-guide">空仓者观望，持仓者减仓/清仓</i>':'')+'</span>';}).join('')+'</div>':'')+
@@ -3920,10 +4006,16 @@ function buildDecisionCardHtml(s){
       '<div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤'+mr.capPct+'%（'+escHtmlF(mr.label)+'市）· 单笔风险0.5%-1%</div>'+
       '<div class="dc-line">置信度构成：趋势'+trendScore+'/30 + 资金'+fundScore+'/25 + 题材'+themeScore+'/20 + 关键位'+keyScore+'/15 + 盈亏比'+rrScore+'/10</div>'+
     '</div>'+
-    '<div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
+    '<div class="dc-block dc-review" data-review-code="'+escHtmlF(s.code)+'" data-name="'+escHtmlF(s.name)+'" data-price="'+price+'" data-entry="'+p.entry+'" data-stop="'+p.stop+'" data-target="'+p.target+'"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
       '<div class="dc-line">关键位验证：'+keyVerify+'</div>'+
       '<div class="dc-line">资金验证：'+fundVerify+'</div>'+
-      '<div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>'+
+      '<div class="dc-line dc-trade-status">交易状态：'+
+        '<button class="ts-btn" data-code="'+escHtmlF(s.code)+'" data-status="bought" onclick="setTradeStatus(this,\'bought\')">已买入</button>'+
+        '<button class="ts-btn" data-code="'+escHtmlF(s.code)+'" data-status="not_bought" onclick="setTradeStatus(this,\'not_bought\')">未买入</button>'+
+        '<button class="ts-btn" data-code="'+escHtmlF(s.code)+'" data-status="sold" onclick="setTradeStatus(this,\'sold\')">已卖出</button>'+
+      '</div>'+
+      '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
+      '<div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
     '</div>';
 }
 function buildWatchlistDetailHtml(data){ return buildDecisionCardHtml(data); }
@@ -4681,7 +4773,7 @@ async function fetchStockFundFlowF(code){
 async function fetchMinuteTrendF(code,klt){
   try{
     var num=String(code).replace(/^(sh|sz|bj)/,'');
-    var full=String(num).charAt(0)==='6'?('sh'+num):('sz'+num);
+    var full=/^(4|8|92)/.test(num)?('bj'+num):(num.charAt(0)==='6'||num.charAt(0)==='9'?('sh'+num):('sz'+num));
     var url='https://ifzq.gtimg.cn/appstock/app/kline/mkline?param='+full+','+klt+',,30';
     var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://gu.qq.com/'}});
     var j=await res.json();
@@ -5102,6 +5194,123 @@ function renderJournalStats(){
   j.forEach(function(x){if((x.pnl||0)<0){consec++;maxConsec=Math.max(maxConsec,consec);}else consec=0;});
   el.innerHTML='复盘统计:胜率 '+winRate+' · 平均盈 '+avgWin+'% · 平均亏 '+avgLoss+'% · 连续亏损 '+maxConsec+' 次 · 共'+j.length+'笔';
 }
+/* ===== 盘后复盘:交易状态 + 系统模拟跟踪(Shadow Tracking) + 胜率进度 ===== */
+function getTradeStatusMap(){ try{return JSON.parse(localStorage.getItem('atds_trade_status')||'{}');}catch(e){return {};} }
+function setTradeStatusMap(m){ try{localStorage.setItem('atds_trade_status',JSON.stringify(m));}catch(e){} }
+function getShadowMap(){ try{return JSON.parse(localStorage.getItem('atds_shadow')||'{}');}catch(e){return {};} }
+function setShadowMap(m){ try{localStorage.setItem('atds_shadow',JSON.stringify(m));}catch(e){} }
+
+function togglePlanBlock(h){
+  var block=h.closest('.dc-plan');
+  if(!block)return;
+  var collapsed=block.classList.toggle('dc-plan-collapsed');
+  var caret=block.querySelector('.dc-plan-caret');
+  if(caret)caret.textContent=collapsed?'▸':'▾';
+}
+
+function setTradeStatus(btn,status){
+  var code=btn.getAttribute('data-code');
+  var block=btn.closest('.dc-review');
+  var m=getTradeStatusMap();
+  var rec=m[code]||{};
+  rec.status=status;
+  rec.name=rec.name||(block?block.getAttribute('data-name'):'')||code;
+  if(status==='bought'&&block){
+    rec.entry=parseFloat(block.getAttribute('data-entry'))||null;
+    rec.stop=parseFloat(block.getAttribute('data-stop'))||null;
+    rec.target=parseFloat(block.getAttribute('data-target'))||null;
+    rec.date=new Date().toISOString().slice(0,10);
+    rec.settled=false;
+  }
+  if(status==='sold'&&block&&rec.entry&&!rec.settled){
+    var price=parseFloat(block.getAttribute('data-price'))||0;
+    var pnl=price?Math.round((price-rec.entry)/rec.entry*10000)/100:null;
+    addJournalEntry({code:code,name:rec.name,date:new Date().toISOString().slice(0,10),entry:rec.entry,stop:rec.stop,target:rec.target,close:price,pnl:pnl,shadow:false,result:pnl!=null?(pnl>=0?'win':'loss'):null});
+    rec.settled=true;
+  }
+  m[code]=rec;
+  setTradeStatusMap(m);
+  if(block){
+    var btns=block.querySelectorAll('.ts-btn');
+    for(var i=0;i<btns.length;i++)btns[i].classList.remove('ts-active');
+    btn.classList.add('ts-active');
+  }
+  updateReviewProgress();
+  try{renderJournalStats();}catch(e){}
+}
+
+function toggleShadowTrack(cb){
+  var code=cb.getAttribute('data-code');
+  var block=cb.closest('.dc-review');
+  var m=getShadowMap();
+  if(cb.checked&&block){
+    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:parseFloat(block.getAttribute('data-entry'))||null,stop:parseFloat(block.getAttribute('data-stop'))||null,target:parseFloat(block.getAttribute('data-target'))||null,openedDate:new Date().toISOString().slice(0,10),settled:false};
+  }else if(m[code]){
+    delete m[code];
+  }
+  setShadowMap(m);
+  updateReviewProgress();
+}
+
+function settleShadowTrade(code){
+  var sm=getShadowMap();
+  var rec=sm[code];
+  if(!rec||!rec.enabled||rec.settled)return;
+  var block=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+  if(!block)return;
+  var price=parseFloat(block.getAttribute('data-price'));
+  var entry=rec.entry,stop=rec.stop,target=rec.target;
+  if(isNaN(price)||!entry||!stop||!target)return;
+  var result=null,pnl=null;
+  if(price>=target){result='win';pnl=Math.round((target-entry)/entry*10000)/100;}
+  else if(price<=stop){result='loss';pnl=Math.round((stop-entry)/entry*10000)/100;}
+  if(result){
+    rec.settled=true;rec.result=result;rec.pnl=pnl;
+    setShadowMap(sm);
+    addJournalEntry({code:code,name:rec.name||code,date:new Date().toISOString().slice(0,10),entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result});
+  }
+}
+
+function settleAllShadowTrades(){
+  var sm=getShadowMap();
+  for(var code in sm){ if(sm[code]&&sm[code].enabled&&!sm[code].settled)settleShadowTrade(code); }
+  updateReviewProgress();
+}
+
+function updateReviewProgress(){
+  var j=getJournal();
+  var total=j.length;
+  var wins=0;
+  for(var i=0;i<j.length;i++){ if((j[i].pnl||0)>0)wins++; }
+  var els=document.querySelectorAll('.ts-progress');
+  for(var k=0;k<els.length;k++)els[k].textContent=total+'/10';
+  var statEls=document.querySelectorAll('.ts-winrate');
+  var txt=total>=10?(' · 已积累 '+total+' 笔，模拟/真实胜率 '+Math.round(wins/total*100)+'%'):'';
+  for(var m2=0;m2<statEls.length;m2++)statEls[m2].textContent=txt;
+}
+
+function initReviewState(){
+  var sm=getTradeStatusMap();
+  var sh=getShadowMap();
+  var blocks=document.querySelectorAll('.dc-review');
+  for(var i=0;i<blocks.length;i++){
+    var block=blocks[i];
+    var code=block.getAttribute('data-review-code');
+    if(!code)continue;
+    var rec=sm[code];
+    if(rec&&rec.status){
+      var btns=block.querySelectorAll('.ts-btn');
+      for(var j=0;j<btns.length;j++){ if(btns[j].getAttribute('data-status')===rec.status)btns[j].classList.add('ts-active'); }
+    }
+    var cb=block.querySelector('.ts-shadow-check');
+    if(cb&&sh[code]&&sh[code].enabled)cb.checked=true;
+  }
+  settleAllShadowTrades();
+}
+window.setTradeStatus=setTradeStatus;
+window.toggleShadowTrack=toggleShadowTrack;
+window.togglePlanBlock=togglePlanBlock;
+if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initReviewState,500);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initReviewState,500);});}
 /* 移动端:点击决策卡头部折叠/展开详情 */
 function bindMobileCollapse(){
   if(window.innerWidth>768)return;

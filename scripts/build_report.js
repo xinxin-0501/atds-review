@@ -1461,28 +1461,32 @@ function buildStockRow(s, i, report) {
   const tStop = price - Math.max(0.5 * atrC, price * 0.01);
   const tTgt = price + Math.max(0.5 * atrC, price * 0.01);
   const tRR = (price > tStop) ? ((tTgt - price) / (price - tStop)) : 1;
+  // 做T对称止损止盈 → 盈亏比恒为1.00,判定为不合格并标红
+  const tRRBad = tRR < 1.5;
   // 触发判定:现价是否已到达触发条件(A回踩到位/B突破到位/C围绕现价始终可做)
   const trigA = price <= p.entry;
   const trigB = price >= planBEntry;
   const trigC = price > 0;
-  const planRow = (name, trig, entry, stop, tgt, rr, triggered, tone) => `<tr class="${triggered ? '' : 'tp-notrig'}">
+  const planRow = (name, trig, entry, stop, tgt, rr, triggered, tone, bad) => `<tr class="${triggered ? '' : 'tp-notrig'}">
     <td class="tp-name">${name}</td>
     <td class="tp-trig">${esc(trig)}</td>
     <td class="tp-num">${f2(entry)}</td>
     <td class="tp-num stop">${f2(stop)}</td>
     <td class="tp-num">${f2(tgt)}</td>
-    <td class="tp-rr ${triggered ? 'rr-' + tone : 'tp-rr-muted'}">${triggered ? rr.toFixed(2) : '未触发'}</td>
+    <td class="tp-rr ${!triggered ? 'tp-rr-muted' : (bad ? 'rr-bad' : 'rr-' + tone)}">${triggered ? rr.toFixed(2) : '未触发'}</td>
   </tr>`;
   const planTable = `<table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     ${planRow('A 回踩低吸', '回踩' + f2(p.entry) + '企稳', p.entry, p.stop, p.target, p.rr, trigA, _rrTone(p.rr))}
     ${planRow('B 突破确认', '放量突破' + f2(planBEntry), planBEntry, planBStop, planBTarget, planBRR, trigB, _rrTone(planBRR))}
-    ${planRow('C 日内做T', '现价' + f2(price) + '·ATR' + f2(atrC) + '动态止损', price, tStop, tTgt, tRR, trigC, _rrTone(tRR))}
+    ${planRow('C 日内做T', '现价' + f2(price) + '·ATR' + f2(atrC) + '动态止损', price, tStop, tTgt, tRR, trigC, _rrTone(tRR), tRRBad)}
   </table>`;
   // 现价追入校验
   const nowWarn = p.rrNow < 1.5
     ? '<div class="tp-warn">⚠ 现价直接买入盈亏比 ' + p.rrNow.toFixed(2) + '(<1.5),不合格 —— 等待回踩至 ' + f2(p.entry) + ' 再执行,当前仅观察。</div>'
     : '<div class="tp-warn tp-ok">现价盈亏比 ' + p.rrNow.toFixed(2) + ',可执行计划。</div>';
+  // 做T盈亏比不合格警告
+  const tRRBadWarn = tRRBad ? '<div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div>' : '';
 
   // 情绪总纲建议:情绪冰点+趋势空头+主力流出 → 高难度逆势标的,强烈建议不参与
   const emotionCycle = _emotionCycle(s);
@@ -1517,9 +1521,12 @@ function buildStockRow(s, i, report) {
       <div class="dc-line dc-events">${evHtml}</div>
       <div class="dc-line dc-src-note">${evNote}</div>
     </div>
-    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>${planTable}${nowWarn}
+    <div class="dc-block dc-plan ${isHardTrade ? 'dc-plan-collapsed' : ''}">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">${isHardTrade ? '▸' : '▾'}</span>${isHardTrade ? '<span class="dc-plan-lock">⛔ 已折叠·强烈建议不参与</span>' : ''}</div>
+      <div class="dc-plan-body">${planTable}${tRRBadWarn}${nowWarn}
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>${pos.capped ? '（受单股上限压制，实际最高仓位15%）' : '（单股≤15%、单题材≤30%）'}</div>
       <div class="dc-line dc-disc">执行纪律：跌破${f2(p.stop)}无条件止损 · 到达${f2(p.target)}无条件止盈 · 日内做T当日必须平T不隔夜</div>
+      </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       ${(s.riskSignals && s.riskSignals.length) ? '<div class="dc-line dc-risk">' + s.riskSignals.map(r => '<span class="risk-alert">⚠ ' + esc(r) + (/跌破MA5|跌破MA20/.test(r) ? '<i class="risk-guide">空仓者观望，持仓者减仓/清仓</i>' : '') + '</span>').join('') + '</div>' : ''}
@@ -1529,10 +1536,12 @@ function buildStockRow(s, i, report) {
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤${s.marketRegime ? s.marketRegime.capPct : 50}%（${s.marketRegime ? esc(s.marketRegime.label) : '震荡'}市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势${conf.trendScore}/30 + 资金${conf.fundScore}/25 + 题材${conf.themeScore}/20 + 关键位${conf.keyScore}/15 + 盈亏比${conf.rrScore}/10</div>
     </div>
-    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="${esc(code)}" data-name="${esc(s.name)}" data-price="${price}" data-entry="${p.entry}" data-stop="${p.stop}" data-target="${p.target}"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高${f2(s.high)} ${(preStrong && s.high >= preStrong.price) ? '触及压力' + f2(preStrong.price) : '未触及压力'} · 最低${f2(s.low)} ${(supStrong && s.low <= supStrong.price) ? '触及支撑' + f2(supStrong.price) : '未触及支撑'}</div>
       <div class="dc-line">资金验证：主力净流入当日${sign(ff.d1)}${ff.d1 != null ? ff.d1.toFixed(2) : '--'}亿，${(ff.d1 || 0) >= 0 ? '符合做多预期' : '与做多预期背离，需复核'}</div>
-      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="${esc(code)}" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="${esc(code)}" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
     </div>
   </div>`;
   return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;
@@ -1582,6 +1591,7 @@ function renderWatchlist(report) {
     '<div class="knowledge-title">KNOWLEDGE SYNC</div>' +
     '<div class="knowledge-h">沉淀到 Obsidian</div>' +
     '<div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div>' +
+    '<div class="knowledge-note">ℹ 手动导出模式：点击下方按钮下载/复制 .md，再粘贴进 Obsidian 即可，全程本地操作、无网络依赖、不会卡顿或报错。</div>' +
     '<pre id="knowledge-md" class="knowledge-md">---' + '\n' +
     'title: ATDS Pro V4.0 ' + esc((report.meta && report.meta.typeLabel) || '') + '\n' +
     'tags: [ATDS, 交易复盘]' + '\n' +
