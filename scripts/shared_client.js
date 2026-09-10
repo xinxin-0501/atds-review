@@ -73,6 +73,17 @@ async function addFetchedToWatchlist(code){
     var ff2 = await fetchStockFundFlowF(code);
     if (ff2) data.fundFlow = ff2;
   } catch (e) {}
+  // 分钟趋势 + 封单 + 龙虎榜 + 事件(真实,并发拉取,失败不阻塞)
+  try {
+    var ext = await Promise.all([
+      fetchMinuteTrendF(code, 'm60'), fetchMinuteTrendF(code, 'm15'),
+      fetchLimitUpSealF(code), fetchLhbDetailF(code), fetchEventsF(code)
+    ]);
+    if (ext[0] || ext[1]) data.minTrend = { m60: ext[0], m15: ext[1] };
+    if (ext[2]) data.seal = ext[2];
+    if (ext[3]) data.lhb = ext[3];
+    if (ext[4]) data.events = ext[4];
+  } catch (e) {}
   addToWatchlistUI(data);
   saveWatchlist();
   // 添加后立即强制刷新一次,确保显示最新实时行情(不等待 60s 定时)
@@ -428,6 +439,33 @@ function buildDecisionCardHtml(s){
     '<span>换手 <b>'+escHtmlF(s.turnover||'--')+'%</b></span>'+
     '<span>振幅 <b>'+(Number(s.amplitude)?Number(s.amplitude).toFixed(2)+'%':'--')+'</b></span>'+
     '<span>分歧 <b>'+escHtmlF(divergence)+'</b></span>';
+  // 竞价(真实:高开/低开幅度 + 开盘后承接/抛压)
+  var auctionHtml=(function(){
+    if(!s.prevClose||!s.open)return '竞价 --';
+    var gp=(s.open-s.prevClose)/s.prevClose*100;
+    var gptxt=gp>=2?'高开'+gp.toFixed(1)+'%':gp<=-2?'低开'+gp.toFixed(1)+'%':'平开'+(gp>=0?'+':'')+gp.toFixed(1)+'%';
+    var after=price>s.open?'承接强':price<s.open?'抛压重':'平走';
+    return '竞价 '+gptxt+' · 开盘后'+after;
+  })();
+  // 封单(真实:涨停池匹配)
+  var seal=s.seal||null;
+  var sealHtml=seal
+    ?'<span>封单 <b class="up">'+(seal.sealFund/1e8).toFixed(2)+'亿</b></span><span>连板 <b class="up">'+seal.lbc+'板</b></span><span>炸板 <b>'+seal.zbc+'次</b></span>'
+    :'<span>封单 <b>非涨停</b></span>';
+  // 龙虎榜(真实:机构/游资/北向净买)
+  var lhb=s.lhb||null;
+  var lhbHtml=lhb
+    ?'龙虎榜('+escHtmlF(lhb.date)+')：机构 <b class="'+((lhb.inst||0)>=0?'up':'down')+'">'+((lhb.inst||0)>=0?'+':'')+((lhb.inst!=null?lhb.inst:0).toFixed(2))+'亿</b> · 游资 <b class="'+((lhb.youzi||0)>=0?'up':'down')+'">'+((lhb.youzi||0)>=0?'+':'')+((lhb.youzi!=null?lhb.youzi:0).toFixed(2))+'亿</b> · 北向 <b class="'+((lhb.north||0)>=0?'up':'down')+'">'+((lhb.north||0)>=0?'+':'')+((lhb.north!=null?lhb.north:0).toFixed(2))+'亿</b><br>'+escHtmlF(lhb.explain)
+    :'龙虎榜：近期未上榜';
+  // 60/15分钟趋势(真实)
+  var m60=(s.minTrend&&s.minTrend.m60)||null;
+  var m15=(s.minTrend&&s.minTrend.m15)||null;
+  var minTxt='60分 '+((m60?(m60.trend==='up'?'多头':m60.trend==='down'?'空头':'震荡'):'--'))+' · 15分 '+((m15?(m15.trend==='up'?'多头':m15.trend==='down'?'空头':'震荡'):'--'));
+  // 事件风险(真实:财报/业绩预告/解禁)
+  var evs=s.events||null;
+  var evHtml=(evs&&evs.length)
+    ?evs.slice(0,4).map(function(e){return '<span class="ev ev-'+(e.level==='高'?'h':e.level==='中'?'m':'l')+' '+(e.dir==='利好'?'ev-good':e.dir==='利空'?'ev-bad':'')+'" title="'+escHtmlF(e.detail||e.date||'')+'">'+escHtmlF(e.type)+(e.name?'·'+escHtmlF(e.name):'')+(e.left>0?' T-'+e.left+'天':'')+(e.dir!=='中性'?'·'+escHtmlF(e.dir):'')+'</span>';}).join('')
+    :'<span class="ev">近期无财报/解禁/业绩预告事件</span>';
   // 交易计划表(方案A/B/C)
   var planBEntry=pre?pre.price:(price*1.05);
   var planBStop=planBEntry*0.97, planBTarget=planBEntry*1.08;
@@ -456,12 +494,20 @@ function buildDecisionCardHtml(s){
     '</div>'+
     '<div class="dc-tags">'+(s.category?'<span class="dc-tag">'+escHtmlF(s.category)+'</span>':'')+tagsArr.map(function(x){return '<span class="dc-tag">'+escHtmlF(x)+'</span>';}).join('')+'<span class="dc-tag">催化:'+escHtmlF(catalyst)+'</span><span class="dc-tag">阶段:'+escHtmlF(ferment)+'</span><span class="dc-tag">地位:'+escHtmlF(boardStatus)+'</span></div>'+
     (s.logic?'<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">'+escHtmlF(s.logic)+'</div></div>':'')+
-    '<div class="dc-block"><div class="dc-h">💰 资金与量能</div><div class="dc-grid2"><div class="dc-line">'+fundHtml+'</div><div class="dc-line">'+volHtml+'</div></div></div>'+
+    '<div class="dc-block"><div class="dc-h">💰 资金与量能</div>'+
+      '<div class="dc-line">'+fundHtml+'</div>'+
+      '<div class="dc-line">'+volHtml+'</div>'+
+      '<div class="dc-line">'+auctionHtml+'</div>'+
+      '<div class="dc-line">'+sealHtml+'</div>'+
+      '<div class="dc-line">'+lhbHtml+'</div>'+
+    '</div>'+
     '<div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>'+
       '<div class="dc-line">支撑 '+supHtml+'</div>'+
       '<div class="dc-line">压力 '+preHtml+'</div>'+
-      '<div class="dc-line">缺口 '+escHtmlF(gapHtml)+' · ATR '+f2(t.atr14)+' · '+escHtmlF(trendLabel)+' · '+escHtmlF(weeklyLabel)+' · 开盘 '+escHtmlF(openExpect)+'</div>'+
+      '<div class="dc-line">缺口 '+escHtmlF(gapHtml)+' · ATR '+f2(t.atr14)+' · '+escHtmlF(trendLabel)+' · '+escHtmlF(weeklyLabel)+' · '+minTxt+'</div>'+
+      '<div class="dc-line">开盘预期 '+escHtmlF(openExpect)+'</div>'+
     '</div>'+
+    '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div></div>'+
     '<div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>'+planTable+nowWarn+
       '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>（单股≤15%、单题材≤30%）</div>'+
     '</div>'+
@@ -1191,6 +1237,112 @@ async function fetchStockFundFlowF(code){
     function yi(v){return Math.round(v/1e6)/100;}
     return {d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
   }catch(e){return null;}
+}
+/* 分钟级趋势(腾讯 mkline):60/15分钟 多空;失败返回 null */
+async function fetchMinuteTrendF(code,klt){
+  try{
+    var num=String(code).replace(/^(sh|sz|bj)/,'');
+    var full=String(num).charAt(0)==='6'?('sh'+num):('sz'+num);
+    var url='https://ifzq.gtimg.cn/appstock/app/kline/mkline?param='+full+','+klt+',,30';
+    var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://gu.qq.com/'}});
+    var j=await res.json();
+    var d=(j&&j.data&&j.data[full])||{};
+    var arr=d[klt]||[];
+    if(!Array.isArray(arr)||arr.length<5)return null;
+    var closes=arr.map(function(k){return parseFloat(k[2]);}).filter(function(x){return !isNaN(x);});
+    if(closes.length<5)return null;
+    var last=closes[closes.length-1];
+    var ma5=closes.slice(-5).reduce(function(a,b){return a+b;},0)/5;
+    var ma10=closes.length>=10?closes.slice(-10).reduce(function(a,b){return a+b;},0)/10:null;
+    var trend=(ma10!=null)?(last>ma10*1.005?'up':last<ma10*0.995?'down':'flat'):(last>ma5?'up':'down');
+    return {trend:trend,ma5:Math.round(ma5*100)/100,ma10:ma10!=null?Math.round(ma10*100)/100:null};
+  }catch(e){return null;}
+}
+/* 涨停封单(东财涨停池):匹配单只,非涨停返回 null */
+async function fetchLimitUpSealF(code){
+  try{
+    var num=String(code).replace(/^(sh|sz|bj)/,'');
+    var bj=new Date(Date.now()+8*3600*1000);
+    var dateStr=bj.toISOString().slice(0,10).replace(/-/g,'');
+    var url='https://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=320&sort=fbt%3Aasc&date='+dateStr;
+    var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
+    var j=await res.json();
+    var pool=(j&&j.data&&j.data.pool)||[];
+    for(var i=0;i<pool.length;i++){
+      if(String(pool[i].c)===num){
+        var s=pool[i];
+        return {sealFund:s.fund||0,zbc:s.zbc||0,lbc:s.lbc||1,fbt:s.fbt||0,lbt:s.lbt||0,days:(s.zttj&&s.zttj.days)||1};
+      }
+    }
+    return null;
+  }catch(e){return null;}
+}
+/* 龙虎榜(东财):聚合机构/游资/北向净买,未上榜返回 null */
+async function fetchLhbDetailF(code){
+  try{
+    var num=String(code).replace(/^(sh|sz|bj)/,'');
+    var flt='(SECURITY_CODE%3D%22'+num+'%22)';
+    var base='https://datacenter-web.eastmoney.com/api/data/v1/get';
+    var hdr={'User-Agent':'Mozilla/5.0','Referer':'https://data.eastmoney.com/'};
+    var rb=await fetch(base+'?reportName=RPT_BILLBOARD_DAILYDETAILSBUY&columns=ALL&filter='+flt+'&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1',{headers:hdr});
+    var rs=await fetch(base+'?reportName=RPT_BILLBOARD_DAILYDETAILSSELL&columns=ALL&filter='+flt+'&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1',{headers:hdr});
+    var jb=await rb.json(),js=await rs.json();
+    var rows=[].concat(((jb&&jb.result&&jb.result.data)||[]),((js&&js.result&&js.result.data)||[]));
+    if(!rows.length)return null;
+    var latest=rows.map(function(r){return r.TRADE_DATE;}).filter(Boolean).sort().slice(-1)[0]||'';
+    var dayRows=rows.filter(function(r){return r.TRADE_DATE===latest;});
+    var inst=0,north=0,youzi=0;
+    for(var i=0;i<dayRows.length;i++){
+      var net=dayRows[i].NET||0;
+      var nm=dayRows[i].OPERATEDEPT_NAME||'';
+      if(nm.indexOf('机构')>=0)inst+=net;
+      else if(nm.indexOf('沪股通')>=0||nm.indexOf('深股通')>=0)north+=net;
+      else youzi+=net;
+    }
+    function yi(v){return Math.round(v/1e4)/100;}
+    return {date:latest.slice(0,10),explain:(dayRows[0]&&dayRows[0].EXPLANATION)||'',changeRate:(dayRows[0]&&dayRows[0].CHANGE_RATE)||0,inst:yi(inst),north:yi(north),youzi:yi(youzi)};
+  }catch(e){return null;}
+}
+/* 事件日历(东财):财报预约+业绩预告+解禁;无则返回 null */
+async function fetchEventsF(code){
+  var num=String(code).replace(/^(sh|sz|bj)/,'');
+  var base='https://datacenter-web.eastmoney.com/api/data/v1/get';
+  var hdr={'User-Agent':'Mozilla/5.0','Referer':'https://data.eastmoney.com/'};
+  var bj=new Date(Date.now()+8*3600*1000);
+  var today=bj.toISOString().slice(0,10);
+  var events=[];
+  function daysLeft(d){return Math.round((new Date(d)-new Date(today))/86400000);}
+  async function fjson(reportName,filter,pageSize,sortColumns,sortTypes){
+    try{
+      var res=await fetch(base+'?reportName='+reportName+'&columns=ALL&filter='+filter+'&pageSize='+pageSize+'&sortColumns='+sortColumns+'&sortTypes='+sortTypes,{headers:hdr});
+      var j=await res.json();
+      return (j&&j.result&&j.result.data)||[];
+    }catch(e){return [];}
+  }
+  var flt='(SECURITY_CODE%3D%22'+num+'%22)';
+  try{
+    var appt=await fjson('RPT_PUBLIC_BS_APPOIN',flt,3,'FIRST_APPOINT_DATE',-1);
+    for(var i=0;i<appt.length;i++){
+      var a=appt[i];var d=(a.FIRST_APPOINT_DATE||'').slice(0,10);
+      if(!d||d<today)continue;
+      var left=daysLeft(d);
+      events.push({type:'财报披露',name:a.REPORT_TYPE_NAME||(a.REPORT_YEAR+'财报'),date:d,left:left,dir:'中性',level:left<=3?'高':left<=7?'中':'低'});
+    }
+    var pred=await fjson('RPT_PUBLIC_OP_NEWPREDICT',flt,1,'NOTICE_DATE',-1);
+    for(var j2=0;j2<pred.length;j2++){
+      var p=pred[j2];var amp=(p.ADD_AMP_LOWER||0);
+      events.push({type:'业绩预告',name:'',date:(p.NOTICE_DATE||'').slice(0,10),left:0,dir:amp>0?'利好':'利空',level:'中',detail:(p.PREDICT_CONTENT||'').slice(0,48)});
+    }
+    var lift=await fjson('RPT_LIFT_STAGE',flt+'(FREE_DATE%3E%3D%27'+today+'%27)',3,'FREE_DATE',1);
+    for(var k=0;k<lift.length;k++){
+      var l=lift[k];var d2=(l.FREE_DATE||'').slice(0,10);
+      if(!d2)continue;
+      var left2=daysLeft(d2);
+      var cap=(l.LIFT_MARKET_CAP||0);
+      events.push({type:'解禁',name:l.FREE_SHARES_TYPE||'限售解禁',date:d2,left:left2,dir:'利空',level:cap>50000?'高':cap>10000?'中':'低',detail:'解禁市值约'+Math.round(cap/10000*100)/100+'亿'});
+    }
+  }catch(e){}
+  return events.length?events:null;
 }
 function techPosText(t){
   if (!t) return 'K线数据不足';

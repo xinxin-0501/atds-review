@@ -900,7 +900,146 @@ async function fetchStockFundFlow(code) {
   } catch (e) { return null; }
 }
 
+// 分钟级趋势(腾讯 mkline):60/15分钟收盘价 vs MA10 判断多空,真实计算
+async function fetchMinuteTrend(code, klt) {
+  try {
+    const num = String(code).replace(/^(sh|sz|bj)/, '');
+    const full = String(num).charAt(0) === '6' ? ('sh' + num) : ('sz' + num);
+    const url = `https://ifzq.gtimg.cn/appstock/app/kline/mkline?param=${full},${klt},,30`;
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 8000);
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://gu.qq.com/' }, signal: ac.signal }).finally(() => clearTimeout(timer));
+    const j = await res.json();
+    const d = (j && j.data && j.data[full]) || {};
+    const arr = d[klt] || [];
+    if (!Array.isArray(arr) || arr.length < 5) return null;
+    const closes = arr.map(k => parseFloat(k[2])).filter(x => !isNaN(x));
+    if (closes.length < 5) return null;
+    const last = closes[closes.length - 1];
+    const ma5 = closes.slice(-5).reduce((a, b) => a + b, 0) / 5;
+    const ma10 = closes.length >= 10 ? closes.slice(-10).reduce((a, b) => a + b, 0) / 10 : null;
+    const trend = (ma10 != null) ? (last > ma10 * 1.005 ? 'up' : last < ma10 * 0.995 ? 'down' : 'flat') : (last > ma5 ? 'up' : 'down');
+    return { trend, ma5: Math.round(ma5 * 100) / 100, ma10: ma10 != null ? Math.round(ma10 * 100) / 100 : null };
+  } catch (e) { return null; }
+}
+
+// 全市场涨停池(东财):一次性拉取,返回 Map<code, 封单信息>,观察池内存匹配
+async function fetchLimitUpPool() {
+  try {
+    const bj = new Date(Date.now() + 8 * 3600 * 1000);
+    const dateStr = bj.toISOString().slice(0, 10).replace(/-/g, '');
+    const url = `https://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=320&sort=fbt%3Aasc&date=${dateStr}`;
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 8000);
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, signal: ac.signal }).finally(() => clearTimeout(timer));
+    const j = await res.json();
+    const pool = (j && j.data && j.data.pool) || [];
+    const map = {};
+    for (const s of pool) {
+      map[String(s.c)] = {
+        sealFund: s.fund || 0,             // 封单资金(元)
+        zbc: s.zbc || 0,                   // 炸板次数
+        lbc: s.lbc || 1,                   // 连板数
+        fbt: s.fbt || 0,                   // 首次封板时间(HHMMSS)
+        lbt: s.lbt || 0,                   // 最后封板时间
+        days: (s.zttj && s.zttj.days) || 1 // 连续涨停天数
+      };
+    }
+    return map;
+  } catch (e) { return {}; }
+}
+
+// 龙虎榜明细(东财):聚合 机构/游资/北向 净买入,返回最近上榜信息(真实,未上榜返回 null)
+async function fetchLhbDetail(code) {
+  try {
+    const num = String(code).replace(/^(sh|sz|bj)/, '');
+    const flt = `(SECURITY_CODE%3D%22${num}%22)`;
+    const base = 'https://datacenter-web.eastmoney.com/api/data/v1/get';
+    const hdr = { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://data.eastmoney.com/' };
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 9000);
+    const [rb, rs] = await Promise.all([
+      fetch(`${base}?reportName=RPT_BILLBOARD_DAILYDETAILSBUY&columns=ALL&filter=${flt}&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1`, { headers: hdr, signal: ac.signal }),
+      fetch(`${base}?reportName=RPT_BILLBOARD_DAILYDETAILSSELL&columns=ALL&filter=${flt}&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1`, { headers: hdr, signal: ac.signal })
+    ]);
+    clearTimeout(timer);
+    const jb = await rb.json(), js = await rs.json();
+    const rows = [
+      ...((jb && jb.result && jb.result.data) || []),
+      ...((js && js.result && js.result.data) || [])
+    ];
+    if (!rows.length) return null;
+    const latest = rows.map(r => r.TRADE_DATE).filter(Boolean).sort().slice(-1)[0] || '';
+    const dayRows = rows.filter(r => r.TRADE_DATE === latest);
+    let inst = 0, north = 0, youzi = 0;
+    for (const r of dayRows) {
+      const net = (r.NET || 0);
+      const name = r.OPERATEDEPT_NAME || '';
+      if (name.indexOf('机构') >= 0) inst += net;
+      else if (name.indexOf('沪股通') >= 0 || name.indexOf('深股通') >= 0) north += net;
+      else youzi += net;
+    }
+    const yi = v => Math.round(v / 1e4) / 100; // 元 → 亿元(2位)
+    return {
+      date: latest.slice(0, 10),
+      explain: (dayRows[0] && dayRows[0].EXPLANATION) || '',
+      changeRate: (dayRows[0] && dayRows[0].CHANGE_RATE) || 0,
+      inst: yi(inst), north: yi(north), youzi: yi(youzi)
+    };
+  } catch (e) { return null; }
+}
+
+// 事件日历(东财):财报预约 + 业绩预告 + 解禁,倒计时与影响方向(真实,无则返回 null)
+async function fetchEvents(code) {
+  const num = String(code).replace(/^(sh|sz|bj)/, '');
+  const hdr = { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://data.eastmoney.com/' };
+  const base = 'https://datacenter-web.eastmoney.com/api/data/v1/get';
+  const bj = new Date(Date.now() + 8 * 3600 * 1000);
+  const today = bj.toISOString().slice(0, 10);
+  const daysLeft = (d) => Math.round((new Date(d) - new Date(today)) / 86400000);
+  const events = [];
+  const fjson = async (reportName, filter, pageSize, sortColumns, sortTypes) => {
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), 8000);
+    try {
+      const res = await fetch(`${base}?reportName=${reportName}&columns=ALL&filter=${filter}&pageSize=${pageSize}&sortColumns=${sortColumns}&sortTypes=${sortTypes}`, { headers: hdr, signal: ac.signal });
+      clearTimeout(t);
+      const j = await res.json();
+      return (j && j.result && j.result.data) || [];
+    } catch (e) { clearTimeout(t); return []; }
+  };
+  const flt = `(SECURITY_CODE%3D%22${num}%22)`;
+
+  // 财报披露(未来预约)
+  const appt = await fjson('RPT_PUBLIC_BS_APPOIN', flt, 3, 'FIRST_APPOINT_DATE', -1);
+  for (const a of appt) {
+    const d = (a.FIRST_APPOINT_DATE || '').slice(0, 10);
+    if (!d || d < today) continue;
+    const left = daysLeft(d);
+    events.push({ type: '财报披露', name: a.REPORT_TYPE_NAME || (a.REPORT_YEAR + '财报'), date: d, left, dir: '中性', level: left <= 3 ? '高' : left <= 7 ? '中' : '低' });
+  }
+  // 业绩预告(近期已披露,判断利好/利空方向)
+  const pred = await fjson('RPT_PUBLIC_OP_NEWPREDICT', flt, 1, 'NOTICE_DATE', -1);
+  for (const p of pred) {
+    const amp = (p.ADD_AMP_LOWER || 0);
+    events.push({ type: '业绩预告', name: '', date: (p.NOTICE_DATE || '').slice(0, 10), left: 0, dir: amp > 0 ? '利好' : '利空', level: '中', detail: (p.PREDICT_CONTENT || '').slice(0, 48) });
+  }
+  // 解禁(未来)
+  const lift = await fjson('RPT_LIFT_STAGE', flt + `(FREE_DATE%3E%3D%27${today}%27)`, 3, 'FREE_DATE', 1);
+  for (const l of lift) {
+    const d = (l.FREE_DATE || '').slice(0, 10);
+    if (!d) continue;
+    const left = daysLeft(d);
+    const cap = (l.LIFT_MARKET_CAP || 0); // 万元
+    events.push({ type: '解禁', name: l.FREE_SHARES_TYPE || '限售解禁', date: d, left, dir: '利空', level: cap > 50000 ? '高' : cap > 10000 ? '中' : '低', detail: '解禁市值约' + Math.round(cap / 10000 * 100) / 100 + '亿' });
+  }
+  return events.length ? events : null;
+}
+
 async function enrichWatchlistTech(list) {
+  // 涨停池一次性拉取(全市场),内存匹配观察池
+  let sealMap = {};
+  try { sealMap = await fetchLimitUpPool(); } catch (e) { /* 封单缺失降级 */ }
   const arr = await Promise.all((list || []).map(async (s) => {
     if (!s || !s.code) return s;
     try {
@@ -913,6 +1052,23 @@ async function enrichWatchlistTech(list) {
       const ff = await fetchStockFundFlow(s.code);
       if (ff) s.fundFlow = ff;
     } catch (e) { /* 资金流缺失不阻塞 */ }
+    // 封单/连板(非涨停显示 null → 渲染层"非涨停")
+    if (sealMap[s.code]) s.seal = sealMap[s.code];
+    // 60/15分钟趋势
+    try {
+      const [m60, m15] = await Promise.all([fetchMinuteTrend(s.code, 'm60'), fetchMinuteTrend(s.code, 'm15')]);
+      if (m60 || m15) s.minTrend = { m60, m15 };
+    } catch (e) { /* 分钟趋势缺失不阻塞 */ }
+    // 龙虎榜(未上榜返回 null)
+    try {
+      const lhb = await fetchLhbDetail(s.code);
+      if (lhb) s.lhb = lhb;
+    } catch (e) { /* 龙虎榜缺失不阻塞 */ }
+    // 事件日历
+    try {
+      const ev = await fetchEvents(s.code);
+      if (ev) s.events = ev;
+    } catch (e) { /* 事件缺失不阻塞 */ }
     return s;
   }));
   return arr;

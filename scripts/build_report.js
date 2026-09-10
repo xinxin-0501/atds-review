@@ -1303,6 +1303,7 @@ function _divergence(s) {
 }
 function _trendLabel(t) { return t === 'up' ? '多头' : t === 'repair' ? '修复' : t === 'down' ? '空头' : '震荡'; }
 function _weeklyLabel(t) { return t === 'up' ? '周线向上' : t === 'down' ? '周线向下' : '周线走平'; }
+function _minLabel(m) { return m ? (m.trend === 'up' ? '多头' : m.trend === 'down' ? '空头' : '震荡') : '--'; }
 
 function buildStockRow(s, i, report) {
   const cls = upDownClass(s.pct);
@@ -1364,6 +1365,33 @@ function buildStockRow(s, i, report) {
     <span>换手 <b>${esc(s.turnover || '--')}%</b></span>
     <span>振幅 <b>${Number(s.amplitude) ? s.amplitude.toFixed(2) + '%' : '--'}</b></span>
     <span>分歧 <b>${esc(_divergence(s))}</b></span>`;
+  // 竞价(真实:高开/低开幅度 + 开盘后承接/抛压,基于开盘价与现价关系)
+  const auctionHtml = (() => {
+    if (!s.prevClose || !s.open) return '竞价 --';
+    const gp = (s.open - s.prevClose) / s.prevClose * 100;
+    const gptxt = gp >= 2 ? '高开' + gp.toFixed(1) + '%' : gp <= -2 ? '低开' + gp.toFixed(1) + '%' : '平开' + (gp >= 0 ? '+' : '') + gp.toFixed(1) + '%';
+    const after = price > s.open ? '承接强' : price < s.open ? '抛压重' : '平走';
+    return `竞价 ${gptxt} · 开盘后${after}`;
+  })();
+  // 封单(真实:涨停池匹配,非涨停显示"非涨停")
+  const seal = s.seal || null;
+  const sealHtml = seal
+    ? `<span>封单 <b class="up">${(seal.sealFund / 1e8).toFixed(2)}亿</b></span><span>连板 <b class="up">${seal.lbc}板</b></span><span>炸板 <b>${seal.zbc}次</b></span>`
+    : '<span>封单 <b>非涨停</b></span>';
+  // 龙虎榜(真实:机构/游资/北向净买聚合,未上榜显示"近期未上榜")
+  const lhb = s.lhb || null;
+  const lhbHtml = lhb
+    ? `龙虎榜(${esc(lhb.date)})：机构 <b class="${lhb.inst >= 0 ? 'up' : 'down'}">${lhb.inst >= 0 ? '+' : ''}${lhb.inst.toFixed(2)}亿</b> · 游资 <b class="${lhb.youzi >= 0 ? 'up' : 'down'}">${lhb.youzi >= 0 ? '+' : ''}${lhb.youzi.toFixed(2)}亿</b> · 北向 <b class="${lhb.north >= 0 ? 'up' : 'down'}">${lhb.north >= 0 ? '+' : ''}${lhb.north.toFixed(2)}亿</b><br>${esc(lhb.explain)}`
+    : '龙虎榜：近期未上榜';
+  // 60/15分钟趋势(真实)
+  const m60 = (s.minTrend && s.minTrend.m60) || null;
+  const m15 = (s.minTrend && s.minTrend.m15) || null;
+  const minTxt = `60分 ${_minLabel(m60)} · 15分 ${_minLabel(m15)}`;
+  // 事件风险(真实:财报/业绩预告/解禁,无则"暂无")
+  const evs = s.events || null;
+  const evHtml = (evs && evs.length)
+    ? evs.slice(0, 4).map(e => `<span class="ev ev-${e.level === '高' ? 'h' : e.level === '中' ? 'm' : 'l'} ${e.dir === '利好' ? 'ev-good' : e.dir === '利空' ? 'ev-bad' : ''}" title="${esc(e.detail || e.date || '')}">${esc(e.type)}${e.name ? '·' + esc(e.name) : ''}${e.left > 0 ? ' T-' + e.left + '天' : ''}${e.dir !== '中性' ? '·' + esc(e.dir) : ''}</span>`).join('')
+    : '<span class="ev">近期无财报/解禁/业绩预告事件</span>';
 
   // 交易计划表 (方案A/B/C,真实价位 + 盈亏比 + 仓位)
   const planBEntry = preStrong ? preStrong.price : (price * 1.05);
@@ -1400,15 +1428,20 @@ function buildStockRow(s, i, report) {
     <div class="dc-tags">${s.category ? '<span class="dc-tag">' + esc(s.category) + '</span>' : ''}${(s.tags || []).map(t => '<span class="dc-tag">' + esc(t) + '</span>').join('')}<span class="dc-tag">催化:${esc(_catalyst(s))}</span><span class="dc-tag">阶段:${esc(_ferment(s))}</span><span class="dc-tag">地位:${esc(_boardStatus(s))}</span></div>
     ${s.logic ? '<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">' + esc(s.logic) + '</div></div>' : ''}
     <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
-      <div class="dc-grid2">
-        <div class="dc-line">${fundHtml}</div>
-        <div class="dc-line">${volHtml}</div>
-      </div>
+      <div class="dc-line">${fundHtml}</div>
+      <div class="dc-line">${volHtml}</div>
+      <div class="dc-line">${auctionHtml}</div>
+      <div class="dc-line">${sealHtml}</div>
+      <div class="dc-line">${lhbHtml}</div>
     </div>
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
       <div class="dc-line">支撑 ${supHtml}</div>
       <div class="dc-line">压力 ${preHtml}</div>
-      <div class="dc-line">缺口 ${esc(gapHtml)} · ATR ${f2(t.atr14)} · ${esc(_trendLabel(t.trend))} · ${esc(_weeklyLabel(t.weeklyTrend))} · 开盘 ${esc(openExpect)}</div>
+      <div class="dc-line">缺口 ${esc(gapHtml)} · ATR ${f2(t.atr14)} · ${esc(_trendLabel(t.trend))} · ${esc(_weeklyLabel(t.weeklyTrend))} · ${minTxt}</div>
+      <div class="dc-line">开盘预期 ${esc(openExpect)}</div>
+    </div>
+    <div class="dc-block"><div class="dc-h">📅 事件风险</div>
+      <div class="dc-line dc-events">${evHtml}</div>
     </div>
     <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>${planTable}${nowWarn}
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>（单股≤15%、单题材≤30%）</div>
