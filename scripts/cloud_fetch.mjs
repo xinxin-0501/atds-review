@@ -528,16 +528,21 @@ async function fetchBoardChangeMap() {
 const SECTOR_ALIAS = {
   '光通信': ['光通信模块', '光模块', '通信设备', '通信'],
   '机器人': ['机器人执行器', '减速器', '机器人', '自动化设备'],
-  '农业主线': ['农牧饲渔', '农业种植', '种植业', '农产品加工', '养殖业'],
+  '农业主线': ['农牧饲渔', '农业种植', '种植业', '农产品加工', '养殖业', '农林牧渔', '种植业与林业'],
+  '种业': ['种业', '转基因', '种子', '农业种植'],
   '传媒/IP': ['文化传媒', '游戏', '影视院线', '出版', '传媒'],
   '传媒': ['文化传媒', '游戏', '影视院线', '出版'],
   '稀土': ['稀土永磁', '小金属'],
   '小金属': ['小金属', '稀土永磁'],
   '军工': ['航天航空', '国防军工', '军工电子'],
   '算力': ['算力', 'AI算力', 'CPO', '东数西算'],
-  '金融': ['银行', '证券', '保险', '多元金融']
+  '金融': ['银行', '证券', '保险', '多元金融'],
+  '燃气': ['燃气', '天然气', '油服工程', '公用事业', '油气开采'],
+  '天然气': ['燃气', '天然气', '油气开采', '油服工程'],
+  '房地产': ['房地产开发', '房地产服务', '物业管理', '地产'],
+  '地产链': ['房地产开发', '房地产服务', '物业管理', '建材', '家居', '地产']
 };
-function matchSectorChange(category, boardMap) {
+function matchSectorChange(category, boardMap, logic) {
   if (!category || !boardMap) return null;
   const cat = String(category).trim();
   if (!cat) return null;
@@ -549,10 +554,11 @@ function matchSectorChange(category, boardMap) {
       if (name === a || name.indexOf(a) >= 0) return { boardName: name, changePct: boardMap[name].changePct };
     }
   }
-  // 2) 关键词兜底(长词优先,剔除歧义短词)
-  const keys = ['光通信', '通信', '机器人', '算力', 'AI', '半导体', '芯片', '农牧', '农业', '种植', '养殖', '传媒', '游戏', '影视', '稀土', '小金属', '有色', '军工', '证券', '银行', '保险', '医药', '创新药', '新能源', '光伏', '储能', '汽车', '零部件', '煤炭', '钢铁', '化工', '地产', '食品', '白酒'];
+  // 2) 关键词兜底(长词优先,剔除歧义短词);把 logic 文本纳入,捕捉"种业/天然气/地产链"等概念
+  const text = cat + ' ' + (logic || '');
+  const keys = ['光通信', '通信', '机器人', '算力', 'AI', '半导体', '芯片', '农牧', '农业', '农林牧渔', '种植', '养殖', '种业', '种子', '粮食', '糖', '传媒', '游戏', '影视', '稀土', '小金属', '有色', '军工', '证券', '银行', '保险', '医药', '创新药', '新能源', '光伏', '储能', '汽车', '零部件', '煤炭', '钢铁', '化工', '地产', '房地产', '物业', '建材', '家居', '燃气', '天然气', '油服', '油气', '公用事业', '食品', '白酒'];
   for (const k of keys) {
-    if (cat.indexOf(k) >= 0) {
+    if (text.indexOf(k) >= 0) {
       for (const name in boardMap) {
         if (name.indexOf(k) >= 0) return { boardName: name, changePct: boardMap[name].changePct };
       }
@@ -1490,7 +1496,7 @@ async function enrichWatchlistTech(list) {
     }
     // 所属板块当日涨跌幅(复盘资金归因对比)
     try {
-      const secChg = matchSectorChange(s.category, boardChangeMap);
+      const secChg = matchSectorChange(s.category, boardChangeMap, s.logic);
       if (secChg) s.sectorChange = secChg;
     } catch (e) { /* 板块涨跌缺失不阻塞 */ }
     // 龙虎榜(未上榜返回 null)

@@ -1215,30 +1215,30 @@ function wlTechAdviceText(pct, tech) {
   return '信号尚不充分,建议先观望,等待趋势进一步明朗后再决定是否纳入跟踪';
 }
 // ===== 观察池交易决策卡:辅助计算(全部基于真实行情/K线/资金流,不造假) =====
-function _filterLvls(arr, price) {
-  const seen = {};
-  const out = [];
-  (Array.isArray(arr) ? arr : []).forEach(x => {
-    if (!x || x.price == null || isNaN(x.price)) return;
-    const k = x.price.toFixed(2);
-    if (seen[k]) return;
-    seen[k] = 1;
-    if (price > 0 && Math.abs(x.price - price) / price > 0.20) return;
-    out.push(x);
-  });
-  return out;
-}
-function _supStrong(s) {
+// 关键位动态转换:现价<均线→压力,现价>均线→支撑(修复"跌破均线仍显示支撑"Bug);去重 + ±20% 过滤
+function _splitLvls(s) {
   const t = s.tech || {};
   const price = Number(s.price) || 0;
-  const a = _filterLvls(t.supports, price).sort((a, b) => b.price - a.price);
+  const all = (Array.isArray(t.supports) ? t.supports : []).concat(Array.isArray(t.pressures) ? t.pressures : []);
+  const seen = {}, sup = [], pre = [];
+  for (const x of all) {
+    if (!x || x.price == null || isNaN(x.price)) continue;
+    const k = x.price.toFixed(2);
+    if (seen[k]) continue; seen[k] = 1;
+    if (price > 0 && Math.abs(x.price - price) / price > 0.20) continue;
+    if (x.price < price) sup.push(x); else if (x.price > price) pre.push(x);
+  }
+  sup.sort((a, b) => b.price - a.price);
+  pre.sort((a, b) => a.price - b.price);
+  return { sup, pre };
+}
+function _supStrong(s) {
+  const a = _splitLvls(s).sup;
   if (a.length) return a.find(x => x.weight === 'strong') || a[0];
   return null;
 }
 function _preStrong(s) {
-  const t = s.tech || {};
-  const price = Number(s.price) || 0;
-  const a = _filterLvls(t.pressures, price).sort((a, b) => a.price - b.price);
+  const a = _splitLvls(s).pre;
   if (a.length) return a.find(x => x.weight === 'strong') || a[0];
   return null;
 }
@@ -1290,19 +1290,27 @@ function _positionPct(p) {
 }
 function _boardStatus(s) {
   const tags = (s.tags || []).join('');
-  if (tags.includes('首选')) return '龙头/主攻';
+  if (tags.includes('首选')) return '板块龙头';
   if (tags.includes('稳健')) return '中军';
-  if (tags.includes('补涨')) return '补涨';
-  return '独立观察';
+  return '跟风';
 }
-function _catalyst(s) {
-  const txt = (s.logic || '') + (s.category || '');
-  if (/政策|产业|规划|国产|自主|国家/.test(txt)) return '政策/产业';
-  if (/招标|订单|中标|业绩|预增|扭亏|扭亏为盈/.test(txt)) return '事件/业绩';
-  if (/景气|主升|主线|需求|涨价|周期|复苏/.test(txt)) return '行业景气';
-  if (/资金|流入|抢筹|吸筹/.test(txt)) return '资金驱动';
-  return '题材';
+// 核心概念具体化(种业/天然气/地产链等),从 category+logic+tags+名称 提取,避免笼统"题材"
+function _concept(s) {
+  const txt = ((s.category || '') + ' ' + (s.logic || '') + ' ' + (s.name || '') + ' ' + (s.tags || []).join(' '));
+  const m = [
+    ['种业', /转基因|种子|种业/], ['种植/土地', /种植|土地流转|耕地/],
+    ['天然气', /燃气|天然气|LNG|油气管网/], ['地产链', /地产|房地产|物业|城中村|基建/],
+    ['光模块', /光模块|海缆|光通信|旭创|新易盛/], ['算力', /算力|CPO|AI算力|数据中心/],
+    ['机器人', /机器人|减速器|人形/], ['传媒/IP', /传媒|IP|游戏|影视|出版/],
+    ['稀土', /稀土|永磁|盛和|北方稀土/], ['小金属', /小金属/],
+    ['军工', /军工|航天|国防|天银/], ['半导体材料', /半导体|芯片|集成电路|国瓷|电子陶瓷|MLCC/],
+    ['新能源', /光伏|储能|锂电|新能源/], ['农业', /农业|农牧|养殖|粮食|生猪/],
+    ['医药', /美诺华|医药|创新药|医疗|制药/], ['证券', /证券|券商/], ['银行', /银行/], ['保险', /保险/]
+  ];
+  for (const [name, re] of m) if (re.test(txt)) return name;
+  return s.category || '题材';
 }
+function _catalyst(s) { return _concept(s); }
 function _ferment(s) {
   const v = Number(s.pct) || 0;
   const t = (s.tech || {}).trend;
@@ -1386,9 +1394,13 @@ function buildStockRow(s, i, report) {
   const priority = conf.total >= 75 && p.rr >= 2 ? '★★★' : conf.total >= 60 ? '★★' : '★';
   const f2 = (x) => (x == null || isNaN(x) ? '--' : Number(x).toFixed(2));
   const sign = (x) => (x == null ? '' : x > 0 ? '+' : '');
-  // 开盘预期(基于昨收/今开/均价)
+  // 开盘预期(基于昨收/今开/均价);分歧=一致加速时强制修正
   const gapPct = (s.prevClose > 0 && s.open > 0) ? ((s.open - s.prevClose) / s.prevClose * 100) : null;
-  const openExpect = gapPct == null ? '--' : (gapPct >= 2 ? '高开' + gapPct.toFixed(1) + '%·防冲高回落' : gapPct <= -2 ? '低开' + gapPct.toFixed(1) + '%·看承接' : '平开±2%·看方向');
+  const divergence = _divergence(s);
+  const accelOpenPct = Math.max(1, (Number(s.pct) || 0) * 0.5);
+  const openExpect = divergence === '一致加速'
+    ? '一致加速：高开需达' + accelOpenPct.toFixed(1) + '%以上才符合预期（基于昨日涨幅推算），若大幅低开则警惕情绪反转'
+    : (gapPct == null ? '--' : (gapPct >= 2 ? '高开' + gapPct.toFixed(1) + '%·防冲高回落' : gapPct <= -2 ? '低开' + gapPct.toFixed(1) + '%·看承接' : '平开±2%·看方向'));
   // 证伪条件(真实,基于关键位)
   const falsify = p.sup ? ('跌破' + f2(p.sup.price) + '(' + (p.sup.label || '强支撑') + ')且无法收回 → 逻辑失效') : '跌破近期低点且无法收回 → 逻辑失效';
   const conflicts = _conflictSignals(s);
@@ -1418,8 +1430,9 @@ function buildStockRow(s, i, report) {
 
   // 关键位 + 多周期 (真实)
   const supStrong = _supStrong(s), preStrong = _preStrong(s);
-  const supList = _filterLvls(t.supports, price).sort((a, b) => b.price - a.price);
-  const preList = _filterLvls(t.pressures, price).sort((a, b) => a.price - b.price);
+  const _lv = _splitLvls(s);
+  const supList = _lv.sup;
+  const preList = _lv.pre;
   const supHtml = supList.slice(0, 3).map(x => `<span class="lv lv-s ${x.weight === 'strong' ? 'lv-strong' : ''}">${f2(x.price)}<i>${esc(x.label)}</i></span>`).join('') || '<span class="lv">--</span>';
   const preHtml = preList.slice(0, 3).map(x => `<span class="lv lv-p ${x.weight === 'strong' ? 'lv-strong' : ''}">${f2(x.price)}<i>${esc(x.label)}</i></span>`).join('') || '<span class="lv">--</span>';
   const gapHtml = t.gapUp ? ('向上缺口 ' + f2(t.gapUp.level) + (t.gapUp.filled ? '·已回补' : '·未回补')) : (t.gapDown ? ('向下缺口 ' + f2(t.gapDown.level) + (t.gapDown.filled ? '·已回补' : '·未回补')) : '无近期缺口');
@@ -1509,6 +1522,10 @@ function buildStockRow(s, i, report) {
   else if (riskDowngrade) { effStatusLabel = '高风险观察'; effConfTone = 'down'; }
   else if (rrNowBad || abUnTriggered) { effStatusLabel = '等待触发'; effConfTone = 'down'; }
   else { effStatusLabel = statusLabel; effConfTone = confTone; }
+  // 盈亏比状态绑定:未触发/非"可交易" → 置灰 + "预案盈亏比"提示;仅"可交易"显示绿色
+  const rrActionable = (effStatusLabel === '可交易');
+  const rrHeadCls = rrActionable ? ('rr-' + rrTone) : 'rr-muted';
+  const rrHeadTitle = rrActionable ? '' : ' title="为预案盈亏比，需回踩触发后生效，现价买入无效"';
   // 折叠交易计划表:硬逆势 或 方案A/B均未触发(未达入场条件) → 折叠留提醒
   const shouldCollapsePlan = isHardTrade || abUnTriggered;
   const collapseLabel = isHardTrade ? '⛔ 破位·严禁现价抄底' : '⛔ 等待触发·未达入场条件';
@@ -1586,7 +1603,7 @@ function buildStockRow(s, i, report) {
       <span class="dc-name">${esc(s.name)} <i>${esc(code)}</i></span>
       <span class="dc-status ${effConfTone === 'good' ? 'up' : effConfTone === 'ok' ? '' : 'down'}">${effStatusLabel}</span>
       <span class="dc-conf">置信度 ${conf.total}</span>
-      <span class="dc-rr rr-${rrTone}">盈亏比 ${p.rr.toFixed(2)}</span>
+      <span class="dc-rr ${rrHeadCls}"${rrHeadTitle}>盈亏比 ${p.rr.toFixed(2)}</span>
       <span class="dc-time">${esc(report.meta && report.meta.generatedAt || '')}</span>
     </div>${summaryHtml}
     <div class="dc-tags">${s.category ? '<span class="dc-tag">' + esc(s.category) + '</span>' : ''}${(s.tags || []).map(t => '<span class="dc-tag">' + esc(t) + '</span>').join('')}<span class="dc-tag">催化:${esc(_catalyst(s))}</span><span class="dc-tag">时效:${esc(_catalystTime(s))}</span><span class="dc-tag">阶段:${esc(_ferment(s))}</span><span class="dc-tag">情绪:${esc(emotionCycle)}</span><span class="dc-tag">地位:${esc(_boardStatus(s))}</span><span class="dc-tag">${esc(_tolerance(s))}</span></div>
