@@ -1721,12 +1721,12 @@ async function main() {
   const qdateRaw = String(zt.qdate || '');
   const qdate = qdateRaw.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
   // 数据接口正常且明确为非交易日时才跳过;接口失败(qdate 为空)时降级继续,保证 workflow 不中断
-  if (!isPre && qdate && qdate !== date) {
+  if (qdate && qdate !== date) {
     console.log(`目标(${date})非交易日（最新行情数据日期 ${qdate}），跳过生成`);
     process.exit(0);
   }
-  const zbCount = isPre ? 0 : await fetchZB(todayCompact);
-  const breadth = isPre ? { up: 0, down: 0, flat: 0 } : await fetchBreadth();
+  const zbCount = await fetchZB(todayCompact);
+  const breadth = await fetchBreadth();
 
   // 擒龙池（今日 + 昨日对比）
   const dragonPool = await fetchDragonPool(todayCompact, yesterdayCompact);
@@ -1942,7 +1942,7 @@ async function main() {
     console.log('板块候选股注入:', Object.values(sectorPicks).filter(v => v.picks.length).length + '/' + Object.keys(sectorPicks).length, '个板块有候选');
   }
 
-  const dataAsOfDate = isPre ? qdate : date;
+  const dataAsOfDate = date;
   // 波背离选股(仅午盘):全A扫描剔除ST,优先排序TOP30
   let waveDivergence = null;
   // 超短核心选股(仅午盘):全A扫描剔除ST,优先排序TOP30
@@ -1970,7 +1970,7 @@ async function main() {
       date, time, type, typeLabel: typeConf.label, generatedAt, market: 'A股',
       dataSource: '腾讯行情 + 东方财富公开接口',
       dataAsOfDate,
-      dataAsOfLabel: isPre ? '昨日收盘' : '今日盘中/收盘'
+      dataAsOfLabel: isPre ? '今日盘前实时' : '今日盘中/收盘'
     },
     indices,
     marketStats: {
@@ -1995,7 +1995,7 @@ async function main() {
     closeEmotion,
     techAnalysis,
     playbook,
-    notes: isPre ? `盘前简报（${typeConf.time}），数据基于 ${dataAsOfDate} 收盘。今日市场 9:30 开盘后才会有实时数据。` : '数据来源：腾讯行情 + 东方财富公开接口（云端自动采集）。仅做行情展示，不构成投资建议。'
+    notes: isPre ? `盘前简报（${typeConf.time}），数据采集于开盘后实时行情（${dataAsOfDate}）。` : '数据来源：腾讯行情 + 东方财富公开接口（云端自动采集）。仅做行情展示，不构成投资建议。'
   };
 
   // 打板五佳股 Top5 + 历史回测查取(仅 midday/close)

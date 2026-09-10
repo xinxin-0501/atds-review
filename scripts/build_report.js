@@ -63,7 +63,7 @@ function renderHero(report) {
   const ce = report && report.closeEmotion || {};
   const tempTag = ce.stage ? '<span class="hero-temp-tag">' + (ce.stage || '') + ' · ' + (ce.tempScore || '') + '°</span>' : '';
   const desc = m.type === 'premarket'
-    ? '基于上一交易日数据 · 今日开盘前参考 · 非买卖建议'
+    ? '开盘后实时数据 · 今日盘前参考 · 非买卖建议'
     : m.type === 'midday'
       ? '实时盘中数据 · 每 60 秒自动刷新'
       : '收盘静态快照 · 数据截至 ' + ((config.reportTypes.close && config.reportTypes.close.time) || '15:20');

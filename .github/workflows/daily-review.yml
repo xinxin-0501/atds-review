@@ -53,7 +53,7 @@ jobs:
           else
             HOUR=$(TZ='Asia/Shanghai' date +%H%M)
             HOUR=$((10#$HOUR))   # 去掉前导零,避免 bash 八进制解析错误
-            if [ "$HOUR" -lt 900 ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
+            if [ "$HOUR" -lt 955 ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
             elif [ "$HOUR" -lt 1300 ]; then echo "type=midday" >> "$GITHUB_OUTPUT";
             else echo "type=close" >> "$GITHUB_OUTPUT"; fi
           fi
@@ -73,7 +73,7 @@ jobs:
           TYPE="${{ steps.type.outputs.type }}"
           OK=0
           case "$TYPE" in
-            premarket) [ "$HOUR" -ge 820 ] && [ "$HOUR" -le 859 ] && OK=1 ;;
+            premarket) [ "$HOUR" -ge 940 ] && [ "$HOUR" -le 954 ] && OK=1 ;;
             midday)
               # 午盘仅 10:00 / 11:30 / 14:30 三个触发点(对齐本地 automation),其他时间不更新
               { [ "$HOUR" -ge 955 ] && [ "$HOUR" -le 1005 ]; } || { [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1140 ]; } || { [ "$HOUR" -ge 1425 ] && [ "$HOUR" -le 1440 ]; } && OK=1 ;;
@@ -97,7 +97,7 @@ jobs:
           fi
           TODAY=$(TZ='Asia/Shanghai' date +%Y-%m-%d)
           case "${{ steps.type.outputs.type }}" in
-            premarket) FT="09:40";;
+            premarket) FT="09:45";;
             midday)
               # 午盘盘中更新:10:00/11:30/13:30/14:40 四次刷新,不跳过(覆盖最新数据)
               echo "午盘盘中更新,不跳过(每次刷新最新数据)"
@@ -105,7 +105,7 @@ jobs:
               exit 0
               ;;
             close) FT="16:20";;
-            *) FT="09:40";;
+            *) FT="09:45";;
           esac
           FN="${TODAY}_${FT//:/-}.json"
           if [ -f "data/reviews/${FN}" ]; then
