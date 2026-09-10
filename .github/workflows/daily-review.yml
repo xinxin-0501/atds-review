@@ -54,7 +54,7 @@ jobs:
             HOUR=$(TZ='Asia/Shanghai' date +%H%M)
             HOUR=$((10#$HOUR))   # 去掉前导零,避免 bash 八进制解析错误
             if [ "$HOUR" -lt 955 ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
-            elif [ "$HOUR" -lt 1300 ]; then echo "type=midday" >> "$GITHUB_OUTPUT";
+            elif [ "$HOUR" -lt 1500 ]; then echo "type=midday" >> "$GITHUB_OUTPUT";
             else echo "type=close" >> "$GITHUB_OUTPUT"; fi
           fi
           echo "Type: input=[$INPUT_TYPE] -> ${{ steps.type.outputs.type }}"
@@ -75,8 +75,8 @@ jobs:
           case "$TYPE" in
             premarket) [ "$HOUR" -ge 940 ] && [ "$HOUR" -le 954 ] && OK=1 ;;
             midday)
-              # 午盘仅 10:00 / 11:30 / 14:30 三个触发点(对齐本地 automation),其他时间不更新
-              { [ "$HOUR" -ge 955 ] && [ "$HOUR" -le 1005 ]; } || { [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1140 ]; } || { [ "$HOUR" -ge 1425 ] && [ "$HOUR" -le 1440 ]; } && OK=1 ;;
+              # 盘中 10:00 / 11:30 / 13:30 / 14:40 四个触发点,其他时间不更新
+              { [ "$HOUR" -ge 955 ] && [ "$HOUR" -le 1005 ]; } || { [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1140 ]; } || { [ "$HOUR" -ge 1325 ] && [ "$HOUR" -le 1340 ]; } || { [ "$HOUR" -ge 1425 ] && [ "$HOUR" -le 1440 ]; } && OK=1 ;;
             close) [ "$HOUR" -ge 1610 ] && [ "$HOUR" -le 1730 ] && OK=1 ;;
           esac
           if [ "$OK" = "1" ]; then
@@ -127,7 +127,20 @@ jobs:
 
       - name: Fetch market data
         if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && github.event_name != 'push'
-        run: node --dns-result-order=ipv4first scripts/cloud_fetch.mjs ${{ steps.type.outputs.type }}
+        run: |
+          TYPE="${{ steps.type.outputs.type }}"
+          if [ "$TYPE" = "midday" ]; then
+            HOUR=$(TZ='Asia/Shanghai' date +%H%M)
+            HOUR=$((10#$HOUR))
+            if [ "$HOUR" -le 1005 ]; then SLOT="10:00";
+            elif [ "$HOUR" -le 1140 ]; then SLOT="11:30";
+            elif [ "$HOUR" -le 1340 ]; then SLOT="13:30";
+            else SLOT="14:40"; fi
+            echo "盘中时点: $SLOT"
+            node --dns-result-order=ipv4first scripts/cloud_fetch.mjs "$SLOT"
+          else
+            node --dns-result-order=ipv4first scripts/cloud_fetch.mjs "$TYPE"
+          fi
 
       - name: Build report HTML
         if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true'
