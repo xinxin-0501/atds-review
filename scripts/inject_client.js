@@ -58,12 +58,31 @@ for (const rel of files) {
     }
   }
 
-  // Ensure modal CSS exists (inject into first </style> if missing)
-  if (!c.includes('.modal-mask{display:none')) {
+  // Ensure modal CSS exists (强制每次重新注入,旧 CSS 已能造成折叠/缺样式故障)
+  // 先移除旧 modal_css(.modal-mask 到最后一个 }) 之间的内容,再注入新 modal_css
+  try {
+    const oldCssRe = /\/\*\s*[（(].*?[）)]\s*\*\/\s*\.modal-mask\{[\s\S]*?\}\s*(?=\/\*|$)/g;
+    let removed = false;
+    c = c.replace(oldCssRe, (m) => { removed = true; return ''; });
+    // 兜底:用 sentinel 定位注入点(.modal-mask{...} 起始锚)
+    if (!removed && c.includes('.modal-mask{display:none')) {
+      const idx = c.indexOf('.modal-mask{display:none');
+      const endIdx = c.indexOf('}', idx);
+      if (idx > 0 && endIdx > idx) {
+        // 找到该注入块的完整结束 </style>
+        const styleEnd = c.indexOf('</style>', endIdx);
+        if (styleEnd > endIdx) {
+          c = c.slice(0, idx) + c.slice(styleEnd);
+          removed = true;
+        }
+      }
+    }
     if (c.includes('</style>')) {
       c = c.replace('</style>', modalCss + '\n</style>', 1);
-      console.log('  +modal CSS:', rel);
+      console.log('  +modal CSS (force):', rel);
     }
+  } catch (e) {
+    console.warn('  modal_css reinject error:', e.message);
   }
   // Ensure dragon pool CSS exists
   if (!c.includes('.dragon-pool{')) {

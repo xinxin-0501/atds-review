@@ -533,15 +533,13 @@
 .dc-disc{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:3px 6px}
 /* 移动端摘要折叠:默认隐藏详情区块,点击头部展开 */
 @media (max-width:768px){
-  .wl-detail .dc-block{display:none}
-  .wl-detail .dc-tags{display:none}
-  .wl-detail .dc-tag-editor{display:none}
-  .wl-detail.open .dc-block{display:block}
-  .wl-detail.open .dc-tags{display:flex}
-  .wl-detail.open .dc-tag-editor{display:flex}
-  .wl-detail .dc-head{cursor:pointer;position:relative;padding-right:16px}
-  .wl-detail .dc-head::after{content:'▾';position:absolute;right:2px;top:50%;transform:translateY(-50%);color:#bbb;font-size:12px}
-  .wl-detail.open .dc-head::after{content:'▴'}
+  .dc-head{cursor:default;padding:7px 9px;gap:4px}
+  .dc-head::after{content:''}
+  .dc-tags{padding:4px 9px;gap:3px}
+  .dc-block{padding:6px 9px;border-top:1px solid #f5f5f5}
+  .dc-h{font-size:10px;margin-bottom:4px}
+  .dc-line{font-size:10px;line-height:1.6;margin-top:2px}
+  .wl-detail{font-size:10px}
 }
 /* 事件风险数据源受限提示 */
 .dc-src-note{font-size:8px;color:#b0b0b0;line-height:1.4;margin-top:2px}
