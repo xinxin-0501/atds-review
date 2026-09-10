@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-page-node-id="uHL12qYRaIleKmRF3ELzuA">
-<head data-page-node-id="Np3AqxnsBcLwoRQ7HxA80G">
-<meta charset="UTF-8" data-page-node-id="Pl0WqWdiaAMo7KNbgHIsiW">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" data-page-node-id="sg7uJKyOEuGgY72ugheZjY">
-<meta http-equiv="Pragma" content="no-cache" data-page-node-id="60ErsHrrI4AtgpKK7q7lrR">
-<meta http-equiv="Expires" content="0" data-page-node-id="6Xi47kuXIrVatY3ltnm4He">
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="M44YjRwDs5gY0U13e02572">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ATDS PRO · 复盘报告</title>
 <style>.modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0}
 .modal-mask.show{display:flex}
@@ -533,9 +533,17 @@
 .dc-risk{display:flex;flex-wrap:wrap;gap:4px}
 .risk-alert{display:inline-block;font-size:9px;font-weight:700;color:#c62828;background:#fff0f0;border:1px solid #f0b0b0;border-radius:4px;padding:2px 6px}
 .risk-conflict{color:#e65100;background:#fff8e1;border-color:#ffe0b2}
+/* 风控告警动作指引(跌破MA5/MA20的减仓/清仓建议) */
+.risk-guide{font-style:normal;font-weight:400;color:#b71c1c;background:#fff;border-radius:3px;padding:0 4px;margin-left:4px;font-size:8px;white-space:nowrap}
+/* 未触发方案:整行淡化 + 盈亏比置灰显示"未触发" */
+.tp-notrig{opacity:.62}
+.tp-notrig .tp-num,.tp-notrig .tp-trig,.tp-notrig .tp-name{color:#999}
+.tp-rr-muted{color:#aaa;background:#f2f2f2;border-radius:3px;padding:1px 4px;font-weight:700;font-size:8px}
+/* 情绪总纲建议(高难度逆势标的提示条) */
+.dc-summary{background:linear-gradient(90deg,#fff0f0,#fff5f5);border:1px solid #f0b0b0;border-bottom:1px dashed #f0b0b0;color:#b71c1c;font-size:10px;font-weight:700;padding:6px 10px;line-height:1.5}
 /* 执行纪律 */
 .dc-disc{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:3px 6px}
-/* 移动端紧凑排版:默认全展开 */
+/* 移动端紧凑排版:默认全展开(每只股8区决策卡无须点击直接可见),压缩间距降低页面总高 */
 @media (max-width:768px){
   .dc-head{cursor:default;padding:7px 9px;gap:4px}
   .dc-head::after{content:''}
@@ -2117,273 +2125,273 @@
 }
 </style>
 </head>
-<body data-page-node-id="KpE3JwCKF0Z4t2kGV5PahK">
-<div class="phone" data-page-node-id="Yk1WMJPAzAgvC7M040cdY5">
-<div class="header" data-page-node-id="ZatGgHEcpwOgJDPVGDCWAw">
-    <div class="brand" data-page-node-id="5T5vK7IKcy8aCjkFZpcLLC">
-      <div class="logo" data-page-node-id="7Cl2tZLlOCPFhNZ1ylCZz2">A</div>
-      <div class="brand-text" data-page-node-id="u7txIlDAjXjJeCSdy0PIK9">
-        <div class="brand-name" data-page-node-id="WfLCqbGHxpsykUW17xJnAT">ATDS <span class="pro-badge" data-page-node-id="xd4taNjRzWZswBxwgrNMEk">PRO</span> 复盘</div>
-        <div class="brand-sub" data-page-node-id="wHgzusy0ihIJF2poOmt6b0">GLOBAL LINKAGE V4.0 · 2026-09-10 16:20</div>
+<body>
+<div class="phone">
+<div class="header">
+    <div class="brand">
+      <div class="logo">A</div>
+      <div class="brand-text">
+        <div class="brand-name">ATDS <span class="pro-badge">PRO</span> 复盘</div>
+        <div class="brand-sub">GLOBAL LINKAGE V4.0 · 2026-09-10 16:20</div>
       </div>
     </div>
-    <div class="time-nav" data-page-node-id="rvNzKMblwyPfcVPATJPvW3">
-      <a href="index.html" data-page-node-id="Nf46MtyLcbcnlu4OXDUI0r">盘前</a><a href="2026-09-10_11-35.html" data-page-node-id="t13cTXMYPq8ynbgBn1UPjC">盘中</a><a href="2026-09-10_16-20.html" class="active" data-page-node-id="b2ck2gGDS9aatc5Le0bmRT">收盘</a><a href="2026-09-10_16-20.html" data-page-node-id="rRgdSGMpeQQB1ZsfozhU1r">复盘</a>
+    <div class="time-nav">
+      <a href="index.html">盘前</a><a href="2026-09-10_11-35.html">盘中</a><a href="2026-09-10_16-20.html" class="active">收盘</a><a href="2026-09-10_16-20.html">复盘</a>
     </div>
   </div>
-<div class="hero" data-page-node-id="T2jRBNEkcqpEHEGLKkG6x3"><div class="hero-eyebrow" data-page-node-id="3wj37m9x7kxcIF3Pv4c47Z">A 股每日复盘 · 收盘复盘</div><h1 class="hero-title" data-page-node-id="pm61o1XaO6Mg47wPGrvkbj">2026-09-10 · <span class="hero-time" data-page-node-id="DS7b7A3u1q80lKInMUcqfC">16:20</span></h1><div class="hero-sub" data-page-node-id="mHi1jJaN1M0Z221CxAZqHv">收盘静态快照 · 数据截至 16:20</div><div class="hero-refresh" data-page-node-id="2aB2yBdzLj43BWyfrBhCua"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()" data-page-node-id="obdgIF1KYslw3mypCffjQr">🔄 一键刷新最新数据</button></div><div class="hero-tags" data-page-node-id="ip1dBtgQo1B4byIRsWNwpP"><span class="hero-temp-tag" data-page-node-id="MBm27Qr5VtD11W0sctxhXY">高温区 · 60°</span></div></div>
-<div class="section" data-page-node-id="PjZ2lMDOX13Zx6GRgnkiiZ">
-<div class="close-emotion" data-page-node-id="UPZeTIoZaSPbcJA2oDcXER"><div class="ce-eyebrow" data-page-node-id="zarHLpOCdBm6nxbGd2nApn">A 股收盘 · 主线与情绪复盘</div><div class="ce-title" data-page-node-id="1RdIAtqdvVv8egMgGHUb8c">2026-09-10 收盘复盘 · 数据截至 16:20</div><div class="ce-top-panel" data-page-node-id="0kuYv6DU8j0y6ygM2FOisk"><div class="ce-top-left" data-page-node-id="mgTGxFHbAX4Crlc4xMc9h4"><div class="ce-temp" data-page-node-id="jMZDCaKIuwsEEqcBUDBeMc">60°</div><div class="ce-stage" data-page-node-id="HwQFlXZWrEg4Ly4M0dUHNu">高温区 · 情绪高涨</div><div class="ce-fact" data-page-node-id="hKQMVUGcMogTwZpkbqFq3w">主特征: 情绪高涨,接力效应强</div></div><div class="ce-top-right" data-page-node-id="iubLoZq45VFAUxAbKVFTur"><div class="ce-top-stat" data-page-node-id="GzHfygVbTXRcdbuINTBYEJ"><span class="ce-stat-icon" data-page-node-id="33TpV0ivei63x4KEGgbbhW">🔴</span><span class="ce-stat-label" data-page-node-id="KF3Im0aHOrrDgWauDhnZZy">红盘</span><span class="ce-stat-val" data-page-node-id="DAcxpE2jeLh4JmloZOWuKO">17%</span></div><div class="ce-top-stat" data-page-node-id="mfObrCXrz2gXtmquiHjs3O"><span class="ce-stat-icon" data-page-node-id="LICoPeA50Dnlt5AagTkyu0">🔥</span><span class="ce-stat-label" data-page-node-id="7NtxcqdPaAd40udTxdaKig">涨停</span><span class="ce-stat-val" data-page-node-id="bScMRfjouvG9P8aGs9PFzC">35</span></div><div class="ce-top-stat" data-page-node-id="kXIomuvr1WlXaPJjeTxrDB"><span class="ce-stat-icon" data-page-node-id="qsSCdGqz18HevQEituhTHF">🟢</span><span class="ce-stat-label" data-page-node-id="zxwHxAS53B4LEwn5UKsMfX">跌停</span><span class="ce-stat-val" data-page-node-id="G0BU3XoSBQVHn98c3TieZK">0</span></div><div class="ce-top-desc" data-page-node-id="OBO7nwzi7BOmVRv9Y8uszZ">广度与接力双强,非诱多</div></div></div><div class="card" data-page-node-id="gtjFYNaG291YyjAlJC6mSt"><div class="card-title" data-page-node-id="0l8sPctlVvbl48hC1CtmFf">01 情绪指标</div><div class="ce-emotion-grid" data-page-node-id="YrSf59BAZraUfUkoe9CPVT"><div class="ce-emotion-card" data-page-node-id="5QZC4RHP8UVEfgBvZpE66P"><div class="ce-emo-num" data-page-node-id="VUirpzIm2whqDuDYNEQAaN">35</div><div class="ce-emo-label" data-page-node-id="zj0BKENNEWFDA39Bv6UBFH">涨停</div></div><div class="ce-emotion-card" data-page-node-id="Uh9xMoCXnosULvLYVAEFRc"><div class="ce-emo-num" data-page-node-id="YyOE3RKvMtI64bwfmNVHL8">≈61%</div><div class="ce-emo-label" data-page-node-id="TeYtxKeJWxftO7fd4yxOEo">封板率</div></div><div class="ce-emotion-card" data-page-node-id="xRCFgOxHEwo1NdmKJmsv0L"><div class="ce-emo-num" data-page-node-id="s7C8I26A7NzqB20qqUnxAS">4板</div><div class="ce-emo-label" data-page-node-id="3WbFN8JpVWEzch9RZV7Lxf">最高度</div></div><div class="ce-emotion-card" data-page-node-id="zuO7kGRgTPrrDWYgtBK87H"><div class="ce-emo-num" data-page-node-id="KaQ0q2ThAfwrofrWbhPTCI">26%</div><div class="ce-emo-label" data-page-node-id="oMUWhpBafwb292713oZQKh">连板晋级率</div></div></div></div><div class="card" data-page-node-id="QL0VdMmTsxGA5UOLKYuvKz"><div class="card-title" data-page-node-id="YbGKv1zzqEVb1uRsWbQQpd">02 市场广度与指数结构</div><div class="ce-broad-grid" data-page-node-id="4adF0E6LMjsB5Ug31AHEYh"><div class="ce-broad-left" data-page-node-id="q0sWGbewHObbNYpKVZPp4f"><div class="ce-breadth-row" data-page-node-id="Gzr4js8cFZ3OtLVFmBMYSz"><div class="ce-breadth-stat up" data-page-node-id="6YOpR5PKzZslF6LgKsnzFn"><div class="ce-bs-label" data-page-node-id="y17tvZtTCr98nAb8IErktS">上涨</div><div class="ce-bs-num" data-page-node-id="b97ID7t95mFCbC64ojScpL">1163</div></div><div class="ce-breadth-stat down" data-page-node-id="YRRWuTCzoEyTCbMF8woe1I"><div class="ce-bs-label" data-page-node-id="QRgwzxDM7iU15wRtTDNbYu">下跌</div><div class="ce-bs-num" data-page-node-id="8aCkv2npvzGrTUDMslk4vx">5423</div></div><div class="ce-breadth-stat flat" data-page-node-id="SYQEGdAH9Jjeg8sa4Sp9Yp"><div class="ce-bs-label" data-page-node-id="RN4BWgivbgUGvWdOzOTVWK">平盘</div><div class="ce-bs-num" data-page-node-id="Y1tzxCDj7vhnL2nHQwCvPr">102</div></div></div><div class="ce-breadth-bar" data-page-node-id="2d30vADj3UHQcODgr6jnf6"><div class="ce-bar-up" style="flex:1163" data-page-node-id="QHzALzWtp1mbM4iG4kjMDq"></div><div class="ce-bar-flat" style="flex:102" data-page-node-id="HNdUBMmgLbCixzwToZdJBz"></div><div class="ce-bar-down" style="flex:5423" data-page-node-id="j33z7JxRrhuXmjhET2JFrK"></div></div><div class="ce-breadth-meta" data-page-node-id="UqSRgNgwhGaKaFcMdUi4OP"><span data-page-node-id="H9sLaB23mUZmefTZfR81WA">红盘率 <b data-page-node-id="hjKZnI6dk7vpiI6rr6WsXL">17%</b></span><span data-page-node-id="bzRxHHqHbHa5BcBcpXJRNH">成交额 <b data-page-node-id="hQ1h94JC6JxrK26QfXx5GW">16471亿</b> (沪深合计)</span></div></div><div class="ce-broad-right" data-page-node-id="N6yBVtRUx7xZN4HkwJe8s1"><div class="ce-index-block" data-page-node-id="QWAbFgQGO3uQQnyF9wTON3"><div class="ce-block-h" data-page-node-id="M6e09cHTfPO00HImZtdcrH">指数表现</div><div class="ce-idx-row" data-page-node-id="giNmcPDeGLfkdr6VxylVaX"><span class="ce-idx-name" data-page-node-id="GJjW1CpCEFVypsc18opXZ9">上证指数</span><span class="ce-idx-val down" data-page-node-id="fX2z8BTknm58GTrWBAdv4n">-0.43%</span><div class="ce-idx-bar" data-page-node-id="84y1VM4SF0354ukRJIoTcF"><div class="ce-idx-bar-fill down" style="width:12.9%" data-page-node-id="sg3rGCy0ROC6nvsC0w59LB"></div></div></div><div class="ce-idx-row" data-page-node-id="1YuM0GjT08a41g1edsBBKy"><span class="ce-idx-name" data-page-node-id="OCxvauS4kAgrdChkATc3eA">深证成指</span><span class="ce-idx-val down" data-page-node-id="3s59BNyuvaKWLeTDxSjcep">-0.77%</span><div class="ce-idx-bar" data-page-node-id="5uKzf0nBiX9dY42DLbC8nz"><div class="ce-idx-bar-fill down" style="width:23.1%" data-page-node-id="owbT6rDBX0xfUnd9K6NzlN"></div></div></div><div class="ce-idx-row" data-page-node-id="ADS1dhSYKB2s6BazwDki8b"><span class="ce-idx-name" data-page-node-id="QuYa5MI6LJZB34ZTU2AUJ7">创业板指</span><span class="ce-idx-val down" data-page-node-id="FgvRPGXPJxRmBQEeA5k8jc">-0.49%</span><div class="ce-idx-bar" data-page-node-id="KP4aOgrdKjnfiQaKNGAdQB"><div class="ce-idx-bar-fill down" style="width:14.7%" data-page-node-id="SX0pewXUv4kITOZ7HopHmD"></div></div></div><div class="ce-block-hint" data-page-node-id="xm7xXEaINMsPGCF5BJEa8g">量能 1.65 万亿 (16471 亿)</div></div></div></div></div><div class="card" data-page-node-id="aS034V22FLEkJkjbNARJnH"><div class="card-title" data-page-node-id="91TVjFgVMTYgRynHsUuNxu">03 主线强度与资金流向</div><div class="ce-flow-grid" data-page-node-id="ssSuWCn5saBo63G0yOFPUE"><div class="ce-flow-item" data-page-node-id="GH5yvmdPTlfKHg1Dla7wH5"><div class="ce-ml-block" data-page-node-id="zjXPEk9pArGKrFhLD1BGVy"><div class="ce-block-h" data-page-node-id="XDbW9dWI3EoBVmCOHQMAOF">主线强度</div><div class="ce-ml-row" data-page-node-id="hQlg5j77CuXT9JwFcJAirS"><span class="ce-ml-name" data-page-node-id="qXYr1TgzVMO6GrNdBr3bOg">电力</span><span class="ce-ml-val up" data-page-node-id="MlNuTIT2VFRuCXw4cjBXpO">+9.1%</span></div><div class="ce-ml-row" data-page-node-id="0ZVeXCGB1vGzX4wHyhe6bX"><span class="ce-ml-name" data-page-node-id="XLCsrS1o0YsKdamr9EPHfq">多元金融</span><span class="ce-ml-val up" data-page-node-id="4otO8rmu0K60YxfKXuJFuT">+3.8%</span></div><div class="ce-ml-row" data-page-node-id="R0qqkoSgBbF3g8SIid8FOC"><span class="ce-ml-name" data-page-node-id="JMBcWazEfBHuBARgdDScHC">玻璃玻纤</span><span class="ce-ml-val up" data-page-node-id="LOstdFqlDLItGPcwzooei8">+3.8%</span></div></div></div><div class="ce-flow-item" data-page-node-id="wenUBgcpTZRk6QCu6r03ik"><div class="ce-mi-block" data-page-node-id="IqiRIYWBfnIlcaRNgAzx0P"><div class="ce-block-h" data-page-node-id="LuBYSDYHcScAcMMqpPlDuc">主力净流入(亿元)</div><div class="ce-mi-row" data-page-node-id="06Pzbyi9I0BtqRPweiCfqB"><span class="ce-mi-name" data-page-node-id="pT3KG6umFOfC2lfmNxjoTh">电力</span><span class="ce-mi-val up" data-page-node-id="DrRiNBeFEuBgHPtkCY97CV">+9.1亿</span></div><div class="ce-mi-row" data-page-node-id="FZjU8xIj2LLBm1dGeDBm9H"><span class="ce-mi-name" data-page-node-id="4pmXsPAtCIRr9vg9fpvcxN">多元金融</span><span class="ce-mi-val up" data-page-node-id="Ti76U3S4nHsw3eHbCGwtYH">+3.8亿</span></div><div class="ce-mi-row" data-page-node-id="is2XnEmQrwShiaLnegw97D"><span class="ce-mi-name" data-page-node-id="PYUHnQcsvIn4YwGKRzIzHA">玻璃玻纤</span><span class="ce-mi-val up" data-page-node-id="jPJqE4MAEuUYu8r5uOZEmR">+3.8亿</span></div><div class="ce-mi-row" data-page-node-id="oRog5bINrs66lisZ4pdTXi"><span class="ce-mi-name" data-page-node-id="HmhL7fhwMTpDSO4MsbouvA">燃气Ⅱ</span><span class="ce-mi-val up" data-page-node-id="4FZJsuX7otmPAFzSghhSge">+3.8亿</span></div></div></div><div class="ce-flow-item" data-page-node-id="Mhk65bGbuThpKXVmXG7V2R"><div class="ce-block-h" data-page-node-id="ZzGclO47msGb7uRmUNZ1YB">📌 结论</div><div class="ce-flow-conclusion" data-page-node-id="H3Y2w5a6ID7PdMTK7u9MZg">宽度 × 高度 × 资金<br data-page-node-id="SalutqF7POXy3in9qjFhyJ">三维共振,确认主线。</div></div></div></div><div class="card" data-page-node-id="RWQKl8tvJvhvBXxBA1Di6z"><div class="card-title" data-page-node-id="SrYDknFkLt0dQpAosGQRMi">04 情绪高度(连板梯队)</div><div class="ce-ladder" data-page-node-id="jxVYd85DGgfS6FtYUuy5d9"><span class="ce-ladder-pill" data-page-node-id="sS6Sz04FMB4B4duXHf42tE">4板 · 桂林旅游</span><span class="ce-ladder-pill" data-page-node-id="8JuUNKmUKebVIC0u3PRrXF">3板 · 瑞尔特</span><span class="ce-ladder-pill" data-page-node-id="TynFLnVvNjpUusPPS48xC8">2板 · 新农开发</span></div></div><div class="card" data-page-node-id="DheXu7XgpD0sLhScYCHrku"><div class="card-title" data-page-node-id="ikbqRAUOapsIy4sddlxck7">05 明日观察锚点</div><div class="ce-anchor-grid" data-page-node-id="B7OLp1FNZVR3Cg9nNNV3e3"><div class="ce-anchor-card" data-page-node-id="oZ51zJe1NPJuiA2WvaZ7bf"><div class="ce-anchor-h" data-page-node-id="QTvvefs16YQseEM6I4jtdZ">🎯 主线持续性</div><div class="ce-anchor-desc" data-page-node-id="DNMY7MS7Mn6EQFG8WD4iFg">观察 电力 龙头 闽东电力 能否继续表态</div></div><div class="ce-anchor-card" data-page-node-id="NKvYu7Zm07xO8UR5jmaNno"><div class="ce-anchor-h" data-page-node-id="1phiH7NQPOnaAyu35xVjQ5">⚠️ 情绪退潮阈值</div><div class="ce-anchor-desc" data-page-node-id="goEOOqHHmEMyaMnbZcL9uD">今日炸板 22 家 · 晋级率 26%,炸板率 &gt; 40% 或晋级率 &lt; 50% 需警惕</div></div><div class="ce-anchor-card" data-page-node-id="uiqQnGGyNwjh1gjMl9AlsE"><div class="ce-anchor-h" data-page-node-id="vRDJ5F0xlXRUIkvxtm7m10">📊 量能验证</div><div class="ce-anchor-desc" data-page-node-id="6hG7TgYgb8wJo2OQ5iPMa4">成交额 16471亿 基础上能否重拾放量</div></div><div class="ce-anchor-card" data-page-node-id="RVerS7GHNby0peRjXq46W7"><div class="ce-anchor-h" data-page-node-id="VWZT5v6UTG4oKT0x7tEES9">🛡️ 高位风险</div><div class="ce-anchor-desc" data-page-node-id="6bl9dVKb1TAbdWBBxGUdKR">桂林旅游 4 板,关注与所属板块是否背离</div></div></div></div><div class="card tw-card-outer" data-page-node-id="DRGofoKUnlTNb3UunFIhSq"><div class="card-title" data-page-node-id="bSBkD9S8e3PjhwRqZ9uAbQ"><span class="tw-eyebrow" data-page-node-id="GFU4T2cEA7PdMKMeAW86Qa">06</span> 明日看什么</div><div class="tw-tabs" data-page-node-id="A5s2ZQwuBn5H1asymqep0f"><div class="tw-tab active" data-tw-idx="0" onclick="toggleTwCard(0)" data-page-node-id="ut7cKB5K9r9ZPFrzlcEG1e"><span class="tw-tab-rank" data-page-node-id="8caRafFeiNCY0XCsop26HI">1</span><span class="tw-tab-name" data-page-node-id="C8UNP1B8zZbhYQvQAORYFU">电力</span><span class="tw-tab-cat tw-cat-buy" data-page-node-id="gVIHPtV3kFORQmtGL2SnSN">可买入</span></div><div class="tw-tab" data-tw-idx="1" onclick="toggleTwCard(1)" data-page-node-id="KVpneJKWy9TGuBBo8FpACG"><span class="tw-tab-rank" data-page-node-id="jXg9cgQq73ltbYNmoGWD8H">2</span><span class="tw-tab-name" data-page-node-id="UaAGBLQSiBWtLE8DEFL008">多元金融</span><span class="tw-tab-cat tw-cat-buy" data-page-node-id="SwExMj2dacYsJCpvfL8pkr">可买入</span></div><div class="tw-tab" data-tw-idx="2" onclick="toggleTwCard(2)" data-page-node-id="mfowMB6mwKMl4ObTVqEhpz"><span class="tw-tab-rank" data-page-node-id="4iCdHIhyPaRy7DADlUu0Dg">3</span><span class="tw-tab-name" data-page-node-id="An0Nz6RP6ONdXgCPEOQzGE">家居用品</span><span class="tw-tab-cat tw-cat-watch" data-page-node-id="FCGcHQWU54wkjKfBPR1cS0">可观察</span></div><div class="tw-tab" data-tw-idx="3" onclick="toggleTwCard(3)" data-page-node-id="Z9mnZxM2yXWKRvQKkNVlWV"><span class="tw-tab-rank" data-page-node-id="rZbADO1SzDfKAe9HSbl4iK">4</span><span class="tw-tab-name" data-page-node-id="5JlCkfrexLHMVRmWeEA0P9">焦炭Ⅱ</span><span class="tw-tab-cat tw-cat-watch" data-page-node-id="x4UbZ1V6xS22FrYAvNKI32">可观察</span></div><div class="tw-tab" data-tw-idx="4" onclick="toggleTwCard(4)" data-page-node-id="zBta2GNmaDtmjSipnTzqOH"><span class="tw-tab-rank" data-page-node-id="GDbrAXKTuLJxPBDxMLl1CX">5</span><span class="tw-tab-name" data-page-node-id="ZglOjlCHUq0650T4EyzDuK">旅游及景</span><span class="tw-tab-cat tw-cat-wait" data-page-node-id="Un0yqHJdBGwI8VpZt5OSD7">等回调</span></div></div><div class="tw-details" data-page-node-id="XJO77EyAgnq9SHe35imQKC"><div class="tw-detail active" data-tw-detail="0" data-page-node-id="P8h2sJpMa1ghbDzKlF52c9"><div class="tw-d-picks" data-page-node-id="orHOq9bRKfGXhoE0ikgqLC"><span class="tw-d-pick" data-page-node-id="oyCdhaGlCGraEg2YvZjEVi">九洲集团</span><span class="tw-d-pick" data-page-node-id="J4yXoHlCTyPnzvCD5fEiHF">明星电力</span><span class="tw-d-pick" data-page-node-id="uM2JgbZrhlfq8YyOGEoQXf">西昌电力</span></div><div class="tw-d-reason" data-page-node-id="YqddQOtcVXNxt2GRoDw1GB">电力 主线确认、5家涨停·最高2板、净流入4.5亿;明日只做龙头不追高,看量能能否延续</div></div><div class="tw-detail" data-tw-detail="1" data-page-node-id="9YxH1y7PI2bTIc3Aikye7L"><div class="tw-d-picks" data-page-node-id="VOGF61huuNsD3M0wRGpaaV"><span class="tw-d-pick" data-page-node-id="KpnDFfEbxIj4zTx09Q9XUT">新力金融</span></div><div class="tw-d-reason" data-page-node-id="iuSQa1lrm5toZVhvjt5nJK">多元金融 主线确认、2家涨停、净流入0.7亿;明日只做龙头不追高,看量能能否延续</div></div><div class="tw-detail" data-tw-detail="2" data-page-node-id="WhhXxo8DC95QEb8NQxW4Cr"><div class="tw-d-picks" data-page-node-id="3hzHHRg1KIUYfgeqmrAqUH"><span class="tw-d-pick" data-page-node-id="62Gpvq8Idr8B7FYb9xFEkP">梦天家居</span><span class="tw-d-pick" data-page-node-id="6IgzwMv5eXyiOTPeEidNzX">蒙娜丽莎</span><span class="tw-d-pick" data-page-node-id="3VtmyAib92wDAYJirqm9yR">亚振家居</span></div><div class="tw-d-reason" data-page-node-id="HFd7GphUcIoPuWzwGfkwvc">家居用品 主线确认、1家涨停·最高3板、净流入3.7亿;明日看能否晋级主线,先观察资金是否真实回流</div></div><div class="tw-detail" data-tw-detail="3" data-page-node-id="H0BkX5ZaBnrTiCWdKqusyb"><div class="tw-d-picks" data-page-node-id="hYGSNjASHuV0Fj4mToUu9A"><span class="tw-d-pick" data-page-node-id="OdszHdp8eKevMFA3aL04go">美锦能源</span><span class="tw-d-pick" data-page-node-id="lHtWTB20GvIuYL7ZgUWB3j">宝泰隆</span><span class="tw-d-pick" data-page-node-id="aRJbhtGSNAWh0XTiAl4OaP">安泰集团</span></div><div class="tw-d-reason" data-page-node-id="FSDKeQoHhtJo4EzX08JDo7">焦炭Ⅱ 主线确认、1家涨停·最高3板、净流入0.3亿;明日看能否晋级主线,先观察资金是否真实回流</div></div><div class="tw-detail" data-tw-detail="4" data-page-node-id="eLGYFK3CJSPDBAxELWMswC"><div class="tw-d-picks" data-page-node-id="FfERvdUoqQRshAAEpGpZq8"><span class="tw-d-pick" data-page-node-id="DtjDBpSIm9sCw2lyAMFq4K">云南旅游</span><span class="tw-d-pick" data-page-node-id="m5OiLyd8HiE6tVkc81fTQv">张家界</span><span class="tw-d-pick" data-page-node-id="takMqljEGnZXtEbnnIBogN">西域旅游</span></div><div class="tw-d-reason" data-page-node-id="GYmVrDzZ7NSaI99GoWmvYY">旅游及景 主线确认、1家涨停·最高4板、净流入0.7亿;短期过热,等回调企稳再择机</div></div></div><div class="tw-caution" data-page-node-id="bEyykJoYWZOEnncmYDETft"><span class="tw-caution-tag" data-page-node-id="nNWhJGPXO26cyJVgwrCsVH">03 谨慎方向</span>电力高位加速谨防兑现、电力主线一致高开勿追高、无量不追,放量才跟。</div></div><div class="ce-banner" data-page-node-id="B1QEbPdwCWrdSaVDi7bFUm">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
-    <div class="card top5-card" id="card-top5" data-page-node-id="xOkTthuXDq8Bx1JoELwVz7"><div class="top5-header" data-page-node-id="7vfEDeuuGH47wQfaKgJ4oB"><div class="top5-title" data-page-node-id="jfawIrHxvCYtczyC6tpx0v">🎯 打板五佳股日报<span class="top5-sub" data-page-node-id="B1cCDbnetJ4Y4afa93ChXC">2026-09-10 收盘复盘</span></div><div class="top5-desc" data-page-node-id="d56lMN9nHngRp27HBBisUz">本报告通过 AI 模型搜集当日强势的连续涨停力,并用 8 维加权评估个股 <b data-page-node-id="sO6mZmDrpNrhGPdrjE9OjZ">抓板方向</b>,每只均带 5 个属性标签 + 涨停原因 + 多股叠加雷达对照。</div></div><div class="top5-stats" data-page-node-id="qvyoxU91NWi0yZAjPggZN2">风险高度统计: 打板 <b data-page-node-id="Rx7ho2H2q51zxNGYwVZvR9">35</b> 只,情绪错冷 排除 <b data-page-node-id="os6Fs4EFgbN2i9dEDXQb4A">30</b> 只 · 涨停数据 2026-09-10 · <div class="top5-stats-grid" data-page-node-id="QHrXVQxFEp2Q4NCxE2MX0n"><div data-page-node-id="xAOfFF2aaMxsc7SkAYFb7h"><span class="ts-num" data-page-node-id="I8QdnGy0KyEz9JxFZ1znBq">35</span><span class="ts-lbl" data-page-node-id="jMarE860bhGD9Hr5QG38lx">涨停总数</span></div><div data-page-node-id="BWeaDAv4jlKpoUsDQ5cFIN"><span class="ts-num" data-page-node-id="0uasryMnGJ0XYdyTwYVdVS">15</span><span class="ts-lbl" data-page-node-id="svpC39LQt5fSnFTM2dVxIF">涨停股票数</span></div><div data-page-node-id="MDL9yvG0FbDxKFO89gYM0p"><span class="ts-num" data-page-node-id="1HzPmAzS9EG6per36s9629">22/57</span><span class="ts-lbl" data-page-node-id="WOEgd1ejj2FWqvWi8iUIlZ">炸板率(非中率)</span></div><div data-page-node-id="0S5Vm4Z8Jp6bPubExAF7Yp"><span class="ts-num" data-page-node-id="fSkeQuRt6J31EH10N1zQgE">2 板</span><span class="ts-lbl" data-page-node-id="nx060JpUFzfd6kwK8HucT6">一字定流</span></div><div data-page-node-id="h8E5HHVN87NIavzMHdHPDP"><span class="ts-num" data-page-node-id="UXZxrx8CcACmUvKY6ELu5o">电力</span><span class="ts-lbl" data-page-node-id="u8rSHItzEa8N1zpb3J5Hhj">今日主线</span></div></div></div><div class="top5-section-h" data-page-node-id="eN7K8nEAGax2fLHNn523O9">今日候选 · Top5<b data-page-node-id="bzTLPtL9vTU94yfAh2L1qG">（基于 AI 模型推荐,每只含 5 属性 + 涨停原因 + 8 维雷达）</b></div><div class="tb-scroll" data-page-node-id="FNcflYOLbzet10P0s6w1p6"><div class="tb-cards" data-page-node-id="2QWhv8QPWpYlJVUpd7mapD"><div class="tb-card" data-page-node-id="mU4bQ4Jq92AAQ5hRj4NcBF"><div class="tb-rank" data-page-node-id="0V84l1iAfeGlqkDgUrQx6h">#1 TOP</div><div class="tb-code" data-page-node-id="CbPpTnSWpchxajc1lH7WFt">sz000993</div><div class="tb-name" data-page-node-id="A9R2gUU9uJTzbYqcSUJetx">闽东电力</div><div class="tb-quote" data-page-node-id="cK3joCJkmxzQRTzzDFoFZ4"><span class="tb-quote-lbl" data-page-node-id="qV96zBJ17IEyLe9daMcfcN">现价</span><b data-page-node-id="52LjbAb2jZ1OfcMmxJKVhH">12.62</b> <span class="tb-quote-unit" data-page-node-id="iBagmB8WtJDoAccy3jn2ft">元</span></div><div class="tb-quote" data-page-node-id="eNU8ed8lFt7RHhQ4R8Vzgp"><span class="tb-quote-lbl" data-page-node-id="V0BywGpe6p2rkYJv0Ly0H7">流通市值</span><b data-page-node-id="qfuHCPphepjxOeIybTJtEb">98.2</b> <span class="tb-quote-unit" data-page-node-id="jh2P7yvjuXNhS9sYEnHXcH">亿</span></div><div class="tb-total-big" data-page-node-id="idfOVbWXKWAzOd0gWUd01z">84<span class="tb-total-sub" data-page-node-id="LVdJgEmeOKz5fWjcgiTT58">/100</span></div><div class="tb-total-h" data-page-node-id="aYiiG2Zzmrx7iSN7Md1uOO">综合评分</div><div class="tb-chips" data-page-node-id="GzuWDXcJeaONZGB18YH5DI"><span class="tb-chip tb-chip-sec" data-page-node-id="uxuZfD0QF4bTuCbskJX1bW"><b data-page-node-id="bTubMLJPLPDJiai4jrHyAY">板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board" data-page-node-id="B3Y5YcSNAns636anupuyf6"><b data-page-node-id="7h1tk1VPLvuuIOPxXlNAPw">板型·</b>2板</span><span class="tb-chip tb-chip-shape" data-page-node-id="3i6rnCYT92nHJ9mrWaD5Yy"><b data-page-node-id="j1BfQVGoz2ssiYGJlasIRz">形态·</b>炸板回封</span><span class="tb-chip tb-chip-turn" data-page-node-id="VEwCFVTct9WPNya7WDLe8Z"><b data-page-node-id="mgWAeRdZjnJdPFDt7g0QTn">换手·</b>12.12%</span><span class="tb-chip tb-chip-theme" data-page-node-id="2g6a1Cc0k5CwPRD8YPdchH"><b data-page-node-id="PF2lEE3SWAiEX4Q2ofxQFX">题材·</b>电力(联动5)·2板</span></div><div class="tb-reason" data-page-node-id="8QODtG59cmeIZrlDJeuodb"><b data-page-node-id="9ZjOjN6y9I3wxzLxJmTQcI">涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 93:35 · 炸板 1 次</div></div><div class="tb-card" data-page-node-id="noLwlTkzpIEblEw70xFdiS"><div class="tb-rank" data-page-node-id="8GvgtasF3hvgYFSkiIjKV6">#2 TOP</div><div class="tb-code" data-page-node-id="AmUCH6O9f7KfDuQBmDBKrW">sh600744</div><div class="tb-name" data-page-node-id="qvswTvUb2PlLeIKCE3FRhK">华银电力</div><div class="tb-quote" data-page-node-id="ZjHWgD1hIrbhq3XhzwpYWm"><span class="tb-quote-lbl" data-page-node-id="4E3Vp01NZPPiI979GSClMp">现价</span><b data-page-node-id="ZMtTsUVqrtDzUInHEa6WBl">7.00</b> <span class="tb-quote-unit" data-page-node-id="h2HMNue5Ln1LaY8P66jwt8">元</span></div><div class="tb-quote" data-page-node-id="glLYrYFTZodxZBLsrnn2Hg"><span class="tb-quote-lbl" data-page-node-id="DheXpGUPUhrqeVUNoVh5y5">流通市值</span><b data-page-node-id="mPW7OhwqH0r7Uojv5xtuB3">137.6</b> <span class="tb-quote-unit" data-page-node-id="yjvKhTJSJ7hoHXwcCWpe1a">亿</span></div><div class="tb-total-big" data-page-node-id="lf5BImUUh4G86djfCER3jP">87<span class="tb-total-sub" data-page-node-id="75H15pD7r9ZuLCeg8ZyNON">/100</span></div><div class="tb-total-h" data-page-node-id="wnGJsk2J2tTd0UsagmxUaq">综合评分</div><div class="tb-chips" data-page-node-id="UWAY4APnyuwOZpCGPcaeHC"><span class="tb-chip tb-chip-sec" data-page-node-id="A7Bc5v3VNpa58vDPnVu9iI"><b data-page-node-id="PU7kyZE2sIo9wWfyMrNvOR">板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board" data-page-node-id="d58laUMun6B32ueU4lHFJW"><b data-page-node-id="ISOWlqgbXoCXNAaWoRZtf5">板型·</b>首板</span><span class="tb-chip tb-chip-shape" data-page-node-id="MZ7ZOIFBE6bv59I9Hk1pt1"><b data-page-node-id="xLzEb8kb7Nqy1eqV5jkAEq">形态·</b>盘中拉板</span><span class="tb-chip tb-chip-turn" data-page-node-id="e4vXED8uOkGfJMlDSBtfxB"><b data-page-node-id="v5KzCkqIQGdtHpiFCGLAsn">换手·</b>9.69%</span><span class="tb-chip tb-chip-theme" data-page-node-id="8kVD1khd65mrtqX4kCweTk"><b data-page-node-id="ibJpGgJsdnZATULxIYPDyA">题材·</b>电力(联动5)·1板</span></div><div class="tb-reason" data-page-node-id="f8sBIgAwedxJcblXm5YbwX"><b data-page-node-id="ZfIJbX30Qn3qAHjFlLCV02">涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 10:09</div></div><div class="tb-card" data-page-node-id="osBzwZyJmtEZg0FC04IWP1"><div class="tb-rank" data-page-node-id="gBPcyK2Bmq7imhuGotmTFY">#3 TOP</div><div class="tb-code" data-page-node-id="IWv90QIHTyyGlLpQsH4VPh">sz000722</div><div class="tb-name" data-page-node-id="aCFSD8AOFCRNataggJ5l5Z">湖南发展</div><div class="tb-quote" data-page-node-id="8T9RUvoOUpYO20SCh9NiLD"><span class="tb-quote-lbl" data-page-node-id="q9nxIjHHPpepLc2Cl3Rtu2">现价</span><b data-page-node-id="qJh8BBppNFFFwaDWKP0XAO">14.74</b> <span class="tb-quote-unit" data-page-node-id="vGudhbRubqVaO1wikDc3M8">元</span></div><div class="tb-quote" data-page-node-id="WCIDJhVxPbhXzn2Ln7fGnn"><span class="tb-quote-lbl" data-page-node-id="RfctiGTScPsFGWdM8widWu">流通市值</span><b data-page-node-id="wxjTfHxtBAdnOlJHumRuVh">25.5</b> <span class="tb-quote-unit" data-page-node-id="9WfHCM3l0J6u84xwbg3XIX">亿</span></div><div class="tb-total-big" data-page-node-id="uBh82Qq1MqaqALQfQqLZwi">83<span class="tb-total-sub" data-page-node-id="hlSgFmAgb9Fzre4qv5etZX">/100</span></div><div class="tb-total-h" data-page-node-id="3uNTms2WuRWvQvM5jfZHeI">综合评分</div><div class="tb-chips" data-page-node-id="tumRYdEUE6vGwVuuGfXKPE"><span class="tb-chip tb-chip-sec" data-page-node-id="OYcZOZB4fpnW7WXNAwd5d4"><b data-page-node-id="rblDqVFmqxDH2PyssGqOkS">板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board" data-page-node-id="H1UieARhE7BQLxoFLmgQpX"><b data-page-node-id="w0Pc72CYMYkMht333XluJ0">板型·</b>首板</span><span class="tb-chip tb-chip-shape" data-page-node-id="SwKiywSamrPLf0XUrOIaUm"><b data-page-node-id="wTWhh3eNG1MF6XroBZaxB3">形态·</b>炸板回封</span><span class="tb-chip tb-chip-turn" data-page-node-id="s8HfIl5CZ1IDebfkSBGL1J"><b data-page-node-id="AwsBDLqHF79CbIVz9AYWiv">换手·</b>6.88%</span><span class="tb-chip tb-chip-theme" data-page-node-id="kfQSEEqtUbd8oina5xMm9V"><b data-page-node-id="EnlpBq5FyWsJGRijNQTCNQ">题材·</b>电力(联动5)·1板</span></div><div class="tb-reason" data-page-node-id="P1AfHtFY6ob4AJ1vFDhLgE"><b data-page-node-id="J7Vi5C2Ninwpk7arhQsy6o">涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 95:04 · 炸板 1 次</div></div><div class="tb-card" data-page-node-id="joj5epB1NSYxpyJgKkELwP"><div class="tb-rank" data-page-node-id="FuplTLfAFLVGwLuFUowtzc">#4 TOP</div><div class="tb-code" data-page-node-id="MpIfHNOmXEBWKLa6YGsw8p">sh600644</div><div class="tb-name" data-page-node-id="w0n3Ny73uKXjjBwzXb5BEi">乐山电力</div><div class="tb-quote" data-page-node-id="Uqa1hyDnodaSCqdTThJuHA"><span class="tb-quote-lbl" data-page-node-id="jxcwVd0TrODiTUjFx8BHJp">现价</span><b data-page-node-id="InlD7HoMuPbdAXx0AW8LIp">10.12</b> <span class="tb-quote-unit" data-page-node-id="Wuo3OshLcV3ThTTXXxocPT">元</span></div><div class="tb-quote" data-page-node-id="4mYGuSWqRRbDBSmu336LY3"><span class="tb-quote-lbl" data-page-node-id="TAzSMx0Jk7azVuhJsJvrWO">流通市值</span><b data-page-node-id="oxAFHZfLN0g5aB2tScej9I">424.2</b> <span class="tb-quote-unit" data-page-node-id="dwXKnhE8GxgNgQATVqPPQU">亿</span></div><div class="tb-total-big" data-page-node-id="a7l3B3w7MEvfl338TD8KJP">83<span class="tb-total-sub" data-page-node-id="10SFiHoe3Ns8QLLgWXKhZH">/100</span></div><div class="tb-total-h" data-page-node-id="TCIVkclNoQFXLSY7QSSUce">综合评分</div><div class="tb-chips" data-page-node-id="ezUVTWBGKUibbHLGn68X0r"><span class="tb-chip tb-chip-sec" data-page-node-id="0C9tFImbAzncLNdysv03lV"><b data-page-node-id="P4zfQ36ESIl1QYi7I6xMKF">板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board" data-page-node-id="QlEyXeXfHdSNabrWjVWFVX"><b data-page-node-id="JaHf0wKIwTSEpb2HcIuqBl">板型·</b>首板</span><span class="tb-chip tb-chip-shape" data-page-node-id="08YnCU05K4mMEFGCeZmWvG"><b data-page-node-id="aByobi1ygs2Eky6NAQUyE0">形态·</b>午后封板</span><span class="tb-chip tb-chip-turn" data-page-node-id="UUPxke377B5687UkUdqclU"><b data-page-node-id="YydQi7db8cQUjK0PjqiLS1">换手·</b>13.56%</span><span class="tb-chip tb-chip-theme" data-page-node-id="1wLhGqby7y1zTqrYQsFCBJ"><b data-page-node-id="YvBoAbd5Osj2RYUo4Fwo7x">题材·</b>电力(联动5)·1板</span></div><div class="tb-reason" data-page-node-id="VP7MxI49fggnYSnx7xSp1J"><b data-page-node-id="DKjmzGintM7tRElMVeskN2">涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 13:17</div></div><div class="tb-card" data-page-node-id="7KDJIDkAN4CSC7ESvXsmFo"><div class="tb-rank" data-page-node-id="teX3aGTVYIBhaoT3jR3cz6">#5 TOP</div><div class="tb-code" data-page-node-id="hHt51dWH4FZqL6Y5IO5xUq">sh603105</div><div class="tb-name" data-page-node-id="gXmQmdFEeonv2BakqA2HI5">芯能科技</div><div class="tb-quote" data-page-node-id="vTEHKzKEfQYIBA2PGdubus"><span class="tb-quote-lbl" data-page-node-id="2e7OZ50ZRmfUS26GWITMLI">现价</span><b data-page-node-id="57MeERNtccAV8uLYU5S52n">8.38</b> <span class="tb-quote-unit" data-page-node-id="BDYUOf2jxtYji8TFThNDAS">元</span></div><div class="tb-quote" data-page-node-id="mV8w54KaeRfhBNI14wmWvO"><span class="tb-quote-lbl" data-page-node-id="hPDTIDVPujXW12bfgYBS7N">流通市值</span><b data-page-node-id="PUUP8U3gkXRP5HxRrA1JDj">86.8</b> <span class="tb-quote-unit" data-page-node-id="zECORr34FgIhXakhoQRhMj">亿</span></div><div class="tb-total-big" data-page-node-id="m56Uqwyk4g2deZH8JVR7dn">81<span class="tb-total-sub" data-page-node-id="k8Zv2xfRhdDGx0Dd3ApYL1">/100</span></div><div class="tb-total-h" data-page-node-id="E9K4oyTB3SNsRxJBISCBZG">综合评分</div><div class="tb-chips" data-page-node-id="kSkqUKYM20j2Z43R8srSqZ"><span class="tb-chip tb-chip-sec" data-page-node-id="iqpGannuDpMojjAlzpUPoy"><b data-page-node-id="6kexK3kD5TiddFZ0OXFR2f">板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board" data-page-node-id="eLplBpT43vaMmSwqJEWYfm"><b data-page-node-id="lIIYQcXIqkbAwI3dPJGoGE">板型·</b>首板</span><span class="tb-chip tb-chip-shape" data-page-node-id="AME2Ay4CH5v3Wg6r29R17n"><b data-page-node-id="uhZBGHKKyzqemESEjQv05m">形态·</b>炸板回封</span><span class="tb-chip tb-chip-turn" data-page-node-id="OM7FMawcHixxUBlMzUUHsS"><b data-page-node-id="wPEdQeYU84Wb93O5ksgG8L">换手·</b>6.19%</span><span class="tb-chip tb-chip-theme" data-page-node-id="9cFrC7F00GhWzA38hQyHo3"><b data-page-node-id="1TagTydvntHRx2uukLOEVG">题材·</b>电力(联动5)·1板</span></div><div class="tb-reason" data-page-node-id="0CN12FUyTu7GnhhAcyabNv"><b data-page-node-id="0pCXN1W2D3rOzk0q2yMicn">涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 94:81 · 炸板 2 次</div></div></div></div><div class="radar-wrap" data-page-node-id="cYDA77FBIEGAvY2Jme9m6H"><svg id="tb-radar-20260910" viewBox="0 0 220 240" width="220" height="240" data-page-node-id="lFVPtkIZBirfszvFbkTGHu"><polygon points="110.00,94.00 121.31,98.69 126.00,110.00 121.31,121.31 110.00,126.00 98.69,121.31 94.00,110.00 98.69,98.69" fill="none" stroke="#e2e8f0" stroke-width="0.6" data-page-node-id="fDo5A8kJBvNRKO5kPPn4CO" /><polygon points="110.00,78.00 132.63,87.37 142.00,110.00 132.63,132.63 110.00,142.00 87.37,132.63 78.00,110.00 87.37,87.37" fill="none" stroke="#e2e8f0" stroke-width="0.6" data-page-node-id="XH96cXXAYF4G1YKr3FbJVj" /><polygon points="110.00,62.00 143.94,76.06 158.00,110.00 143.94,143.94 110.00,158.00 76.06,143.94 62.00,110.00 76.06,76.06" fill="none" stroke="#e2e8f0" stroke-width="0.6" data-page-node-id="RrFANVIArzfJEgEWBtrq6Q" /><polygon points="110.00,46.00 155.25,64.75 174.00,110.00 155.25,155.25 110.00,174.00 64.75,155.25 46.00,110.00 64.75,64.75" fill="none" stroke="#e2e8f0" stroke-width="0.6" data-page-node-id="pETciF6QCJ6sOLBd6XeKOT" /><polygon points="110.00,30.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,190.00 53.43,166.57 30.00,110.00 53.43,53.43" fill="none" stroke="#e2e8f0" stroke-width="0.6" data-page-node-id="oAdDxKfeSAzLkb0HtFwfPa" /><line x1="110" y1="110" x2="110.00" y2="30.00" stroke="#cbd5e1" stroke-width="0.5" data-page-node-id="hAFUnwJVAKAJkeU8PXH2te" /><text x="110.00" y="16.00" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle" data-page-node-id="2tXFzWHxQKyqQtpCMMRAzS">股价表现</text><line x1="110" y1="110" x2="166.57" y2="53.43" stroke="#cbd5e1" stroke-width="0.5" data-page-node-id="Tkv0jfBwIaxPA3zaxLhnFh" /><text x="176.47" y="43.53" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle" data-page-node-id="tkRabzGV00XR1E8HkOHQRC">板块类型</text><line x1="110" y1="110" x2="190.00" y2="110.00" stroke="#cbd5e1" stroke-width="0.5" data-page-node-id="YGTdhkZuUnkiCnoypREXgp" /><text x="204.00" y="110.00" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle" data-page-node-id="KDRcwfOyjblbFFeskxGooZ">板块强势</text><line x1="110" y1="110" x2="166.57" y2="166.57" stroke="#cbd5e1" stroke-width="0.5" data-page-node-id="hrFEeAVICptu0w26yn3UiY" /><text x="176.47" y="176.47" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle" data-page-node-id="V6kOATFUpFQhi17bCPJC2S">放量缩量</text><line x1="110" y1="110" x2="110.00" y2="190.00" stroke="#cbd5e1" stroke-width="0.5" data-page-node-id="yjeStWb7Z80Gliqj9yHu6I" /><text x="110.00" y="204.00" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle" data-page-node-id="RD177b0gfxtcpaWMCCBfGO">横盘放量</text><line x1="110" y1="110" x2="53.43" y2="166.57" stroke="#cbd5e1" stroke-width="0.5" data-page-node-id="immCUBNTi4VXoeGFzpcX0Q" /><text x="43.53" y="176.47" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle" data-page-node-id="0KNoImGzwgmqElOwuCnVmg">半年涨势</text><line x1="110" y1="110" x2="30.00" y2="110.00" stroke="#cbd5e1" stroke-width="0.5" data-page-node-id="9Bxo7MDv8ExyfgCxj5zzsG" /><text x="16.00" y="110.00" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle" data-page-node-id="tneZzy6T0EodWdzSwF9XeT">模块效益</text><line x1="110" y1="110" x2="53.43" y2="53.43" stroke="#cbd5e1" stroke-width="0.5" data-page-node-id="FDNxjPHi0WkUda3rGpgq0X" /><text x="43.53" y="43.53" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle" data-page-node-id="brBeABR6lbiBIJJqUEw3Nk">盈亏评价</text><polygon points="110.00,38.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,154.00 81.72,138.28 42.80,110.00 61.35,61.35" fill="#e11d48" fill-opacity="0.16" stroke="#e11d48" stroke-width="1.3" stroke-opacity="0.8" data-page-node-id="OnKSzQSFljRaSxwHK024aP" /><circle cx="110.00" cy="38.00" r="1.4" fill="#e11d48" data-page-node-id="ekyPAEpLiJOjjImB8nzdQo" /><circle cx="166.57" cy="53.43" r="1.4" fill="#e11d48" data-page-node-id="t2AMDBxfOS2NYrv4labthc" /><circle cx="190.00" cy="110.00" r="1.4" fill="#e11d48" data-page-node-id="eE0imSWqafcM0Am7pgj71d" /><circle cx="166.57" cy="166.57" r="1.4" fill="#e11d48" data-page-node-id="bFkigRvTk59y8SwAYAi6MC" /><circle cx="110.00" cy="154.00" r="1.4" fill="#e11d48" data-page-node-id="HYG2wfZvdMU578XRKWwGiN" /><circle cx="81.72" cy="138.28" r="1.4" fill="#e11d48" data-page-node-id="kzGa2lkH60z2XAnAKItoBi" /><circle cx="42.80" cy="110.00" r="1.4" fill="#e11d48" data-page-node-id="ob6qTuCLJqA7piJVGuo7Rm" /><circle cx="61.35" cy="61.35" r="1.4" fill="#e11d48" data-page-node-id="MZ2JdfaocyUzQ8X89MfBKT" /><polygon points="110.00,42.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,154.00 81.72,138.28 40.40,110.00 59.09,59.09" fill="#0284c7" fill-opacity="0.14" stroke="#0284c7" stroke-width="1.3" stroke-opacity="0.75" data-page-node-id="NiBfvDXhK0kyLqLHtp4268" /><circle cx="110.00" cy="42.00" r="1.4" fill="#0284c7" data-page-node-id="RwnXTuTEeCXdVhIqa79jY7" /><circle cx="166.57" cy="53.43" r="1.4" fill="#0284c7" data-page-node-id="4GV6W1MgmVaYiQUAHfF1V2" /><circle cx="190.00" cy="110.00" r="1.4" fill="#0284c7" data-page-node-id="HoBMbWbAOQbk7EkCsn5sAp" /><circle cx="166.57" cy="166.57" r="1.4" fill="#0284c7" data-page-node-id="EmGCvxFCot8ThZDXP2FSKo" /><circle cx="110.00" cy="154.00" r="1.4" fill="#0284c7" data-page-node-id="KE9uuFZ9AU5EJQaKiLFFBn" /><circle cx="81.72" cy="138.28" r="1.4" fill="#0284c7" data-page-node-id="Fm0ypNnR5Ds86W1D8U6TXu" /><circle cx="40.40" cy="110.00" r="1.4" fill="#0284c7" data-page-node-id="PWZvnuvvLmkX7indKUUiUT" /><circle cx="59.09" cy="59.09" r="1.4" fill="#0284c7" data-page-node-id="yFc6F2eDZN3rCcYvVnWTUC" /><polygon points="110.00,42.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,154.00 81.72,138.28 43.60,110.00 62.48,62.48" fill="#16a34a" fill-opacity="0.12" stroke="#16a34a" stroke-width="1.3" stroke-opacity="0.7000000000000001" data-page-node-id="kkazqCK1vgpBErHCQT8b37" /><circle cx="110.00" cy="42.00" r="1.4" fill="#16a34a" data-page-node-id="p62YemEyJV7oPhFetkFti4" /><circle cx="166.57" cy="53.43" r="1.4" fill="#16a34a" data-page-node-id="GLzERMhdDBPBECeNXmxMGK" /><circle cx="190.00" cy="110.00" r="1.4" fill="#16a34a" data-page-node-id="NdCNWG2jl0SrwFYKU8DlcO" /><circle cx="166.57" cy="166.57" r="1.4" fill="#16a34a" data-page-node-id="6EJQjC8tFRPwf9KhQw0fd5" /><circle cx="110.00" cy="154.00" r="1.4" fill="#16a34a" data-page-node-id="E2IiipXGsN5nV7JyK0Xuay" /><circle cx="81.72" cy="138.28" r="1.4" fill="#16a34a" data-page-node-id="AjhmkFfu2B7y0umKNKYwvy" /><circle cx="43.60" cy="110.00" r="1.4" fill="#16a34a" data-page-node-id="01iCGWOHkNxamcKrwDPnac" /><circle cx="62.48" cy="62.48" r="1.4" fill="#16a34a" data-page-node-id="FD56vh3cn7WVkuNKpDZ88y" /><polygon points="110.00,42.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,154.00 81.72,138.28 43.60,110.00 58.52,58.52" fill="#a855f7" fill-opacity="0.1" stroke="#a855f7" stroke-width="1.3" stroke-opacity="0.65" data-page-node-id="e0Zd73zDOdqvJH2bqethsH" /><circle cx="110.00" cy="42.00" r="1.4" fill="#a855f7" data-page-node-id="FMPRBCDKEck2VgpR4RU4iE" /><circle cx="166.57" cy="53.43" r="1.4" fill="#a855f7" data-page-node-id="KVodAR2W78HvFrmQJyInXq" /><circle cx="190.00" cy="110.00" r="1.4" fill="#a855f7" data-page-node-id="K9NuGiAOJwdUn4g3jcvLY0" /><circle cx="166.57" cy="166.57" r="1.4" fill="#a855f7" data-page-node-id="ANUBktnZKlo9n5Wi34Ufbn" /><circle cx="110.00" cy="154.00" r="1.4" fill="#a855f7" data-page-node-id="sDOO8tE2vzJ1PL9kCThe8Z" /><circle cx="81.72" cy="138.28" r="1.4" fill="#a855f7" data-page-node-id="oaDzVFFppC9BZGnEcSgZ2U" /><circle cx="43.60" cy="110.00" r="1.4" fill="#a855f7" data-page-node-id="OTOQxNJ2o7e4vWXekQjCss" /><circle cx="58.52" cy="58.52" r="1.4" fill="#a855f7" data-page-node-id="Hn2g1HRp8uFLqEq8K8h2Xd" /><polygon points="110.00,42.00 166.57,53.43 190.00,110.00 166.00,166.00 110.00,154.00 81.72,138.28 45.20,110.00 63.05,63.05" fill="#f59e0b" fill-opacity="0.08" stroke="#f59e0b" stroke-width="1.3" stroke-opacity="0.6000000000000001" data-page-node-id="ab3L6U1dXGJu3sQKs5sv28" /><circle cx="110.00" cy="42.00" r="1.4" fill="#f59e0b" data-page-node-id="aQwKkfQqHRdj5HhLQbiajl" /><circle cx="166.57" cy="53.43" r="1.4" fill="#f59e0b" data-page-node-id="YJp97t1CTbGqIznCwAjVEi" /><circle cx="190.00" cy="110.00" r="1.4" fill="#f59e0b" data-page-node-id="etxECDNRH7000FUJRpjCOO" /><circle cx="166.00" cy="166.00" r="1.4" fill="#f59e0b" data-page-node-id="JWOHNsSAdyJAQHQrPFcV8a" /><circle cx="110.00" cy="154.00" r="1.4" fill="#f59e0b" data-page-node-id="hPOuvwJXAoOLH7ZFbz1b9u" /><circle cx="81.72" cy="138.28" r="1.4" fill="#f59e0b" data-page-node-id="dZyVU0UQtFEiNpDbWcFhPZ" /><circle cx="45.20" cy="110.00" r="1.4" fill="#f59e0b" data-page-node-id="zBYzqEpZFFPka3QkuLe0n7" /><circle cx="63.05" cy="63.05" r="1.4" fill="#f59e0b" data-page-node-id="UnLmUsGFGEqrRBA4p38poI" /><circle cx="110" cy="110" r="2" fill="#0f172a" data-page-node-id="mp6hg4w3EQbZEi8vBKzekX" /></svg><div class="radar-legend" data-page-node-id="FBttJGFtlG1aPosg7NzfMC"><span class="radar-leg" data-page-node-id="eZOhDAxa3f461woldPORyf"><i style="background:#e11d48" data-page-node-id="DX4TAEV2hB7ifxzx1n9mXG"></i>#1 闽东电力 · 综合 84</span><span class="radar-leg" data-page-node-id="U2UrW5EvKqQWfFw9LX7OjY"><i style="background:#0284c7" data-page-node-id="DjJUr88Fy3yBcVzwAyO8Ia"></i>#2 华银电力 · 综合 87</span><span class="radar-leg" data-page-node-id="XGCalfDKpruS2yOw0NXW9F"><i style="background:#16a34a" data-page-node-id="N6C2N8lH8C8zc0Zo0Hku7p"></i>#3 湖南发展 · 综合 83</span><span class="radar-leg" data-page-node-id="emeJ8zA4oyDE2W2eHFMWau"><i style="background:#a855f7" data-page-node-id="vPaB68mbeeALnWFLpgsFsE"></i>#4 乐山电力 · 综合 83</span><span class="radar-leg" data-page-node-id="C38Ga0Yh3SZR36t9EAW4xp"><i style="background:#f59e0b" data-page-node-id="Cadnf2ecqrbe8dyHhCa362"></i>#5 芯能科技 · 综合 81</span></div></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘</div><h1 class="hero-title">2026-09-10 · <span class="hero-time">16:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 60°</span></div></div>
+<div class="section">
+<div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-09-10 收盘复盘 · 数据截至 16:20</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">60°</div><div class="ce-stage">高温区 · 情绪高涨</div><div class="ce-fact">主特征: 情绪高涨,接力效应强</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">17%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">35</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">35</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈61%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">4板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">26%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">1163</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">5423</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">102</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:1163"></div><div class="ce-bar-flat" style="flex:102"></div><div class="ce-bar-down" style="flex:5423"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>17%</b></span><span>成交额 <b>16471亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val down">-0.43%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:12.9%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val down">-0.77%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:23.1%"></div></div></div><div class="ce-idx-row"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-0.49%</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:14.7%"></div></div></div><div class="ce-block-hint">量能 1.65 万亿 (16471 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">电力</span><span class="ce-ml-val up">+9.1%</span></div><div class="ce-ml-row"><span class="ce-ml-name">多元金融</span><span class="ce-ml-val up">+3.8%</span></div><div class="ce-ml-row"><span class="ce-ml-name">玻璃玻纤</span><span class="ce-ml-val up">+3.8%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">电力</span><span class="ce-mi-val up">+9.1亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">多元金融</span><span class="ce-mi-val up">+3.8亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">玻璃玻纤</span><span class="ce-mi-val up">+3.8亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">燃气Ⅱ</span><span class="ce-mi-val up">+3.8亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title">04 情绪高度(连板梯队)</div><div class="ce-ladder"><span class="ce-ladder-pill">4板 · 桂林旅游</span><span class="ce-ladder-pill">3板 · 瑞尔特</span><span class="ce-ladder-pill">2板 · 新农开发</span></div></div><div class="card"><div class="card-title">05 明日观察锚点</div><div class="ce-anchor-grid"><div class="ce-anchor-card"><div class="ce-anchor-h">🎯 主线持续性</div><div class="ce-anchor-desc">观察 电力 龙头 闽东电力 能否继续表态</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">⚠️ 情绪退潮阈值</div><div class="ce-anchor-desc">今日炸板 22 家 · 晋级率 26%,炸板率 &gt; 40% 或晋级率 &lt; 50% 需警惕</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">📊 量能验证</div><div class="ce-anchor-desc">成交额 16471亿 基础上能否重拾放量</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">🛡️ 高位风险</div><div class="ce-anchor-desc">桂林旅游 4 板,关注与所属板块是否背离</div></div></div></div><div class="card tw-card-outer"><div class="card-title"><span class="tw-eyebrow">06</span> 明日看什么</div><div class="tw-tabs"><div class="tw-tab active" data-tw-idx="0" onclick="toggleTwCard(0)"><span class="tw-tab-rank">1</span><span class="tw-tab-name">电力</span><span class="tw-tab-cat tw-cat-buy">可买入</span></div><div class="tw-tab" data-tw-idx="1" onclick="toggleTwCard(1)"><span class="tw-tab-rank">2</span><span class="tw-tab-name">多元金融</span><span class="tw-tab-cat tw-cat-buy">可买入</span></div><div class="tw-tab" data-tw-idx="2" onclick="toggleTwCard(2)"><span class="tw-tab-rank">3</span><span class="tw-tab-name">家居用品</span><span class="tw-tab-cat tw-cat-watch">可观察</span></div><div class="tw-tab" data-tw-idx="3" onclick="toggleTwCard(3)"><span class="tw-tab-rank">4</span><span class="tw-tab-name">焦炭Ⅱ</span><span class="tw-tab-cat tw-cat-watch">可观察</span></div><div class="tw-tab" data-tw-idx="4" onclick="toggleTwCard(4)"><span class="tw-tab-rank">5</span><span class="tw-tab-name">旅游及景</span><span class="tw-tab-cat tw-cat-wait">等回调</span></div></div><div class="tw-details"><div class="tw-detail active" data-tw-detail="0"><div class="tw-d-picks"><span class="tw-d-pick">九洲集团</span><span class="tw-d-pick">明星电力</span><span class="tw-d-pick">西昌电力</span></div><div class="tw-d-reason">电力 主线确认、5家涨停·最高2板、净流入4.5亿;明日只做龙头不追高,看量能能否延续</div></div><div class="tw-detail" data-tw-detail="1"><div class="tw-d-picks"><span class="tw-d-pick">新力金融</span></div><div class="tw-d-reason">多元金融 主线确认、2家涨停、净流入0.7亿;明日只做龙头不追高,看量能能否延续</div></div><div class="tw-detail" data-tw-detail="2"><div class="tw-d-picks"><span class="tw-d-pick">梦天家居</span><span class="tw-d-pick">蒙娜丽莎</span><span class="tw-d-pick">亚振家居</span></div><div class="tw-d-reason">家居用品 主线确认、1家涨停·最高3板、净流入3.7亿;明日看能否晋级主线,先观察资金是否真实回流</div></div><div class="tw-detail" data-tw-detail="3"><div class="tw-d-picks"><span class="tw-d-pick">美锦能源</span><span class="tw-d-pick">宝泰隆</span><span class="tw-d-pick">安泰集团</span></div><div class="tw-d-reason">焦炭Ⅱ 主线确认、1家涨停·最高3板、净流入0.3亿;明日看能否晋级主线,先观察资金是否真实回流</div></div><div class="tw-detail" data-tw-detail="4"><div class="tw-d-picks"><span class="tw-d-pick">云南旅游</span><span class="tw-d-pick">张家界</span><span class="tw-d-pick">西域旅游</span></div><div class="tw-d-reason">旅游及景 主线确认、1家涨停·最高4板、净流入0.7亿;短期过热,等回调企稳再择机</div></div></div><div class="tw-caution"><span class="tw-caution-tag">03 谨慎方向</span>电力高位加速谨防兑现、电力主线一致高开勿追高、无量不追,放量才跟。</div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
+    <div class="card top5-card" id="card-top5"><div class="top5-header"><div class="top5-title">🎯 打板五佳股日报<span class="top5-sub">2026-09-10 收盘复盘</span></div><div class="top5-desc">本报告通过 AI 模型搜集当日强势的连续涨停力,并用 8 维加权评估个股 <b>抓板方向</b>,每只均带 5 个属性标签 + 涨停原因 + 多股叠加雷达对照。</div></div><div class="top5-stats">风险高度统计: 打板 <b>35</b> 只,情绪错冷 排除 <b>30</b> 只 · 涨停数据 2026-09-10 · <div class="top5-stats-grid"><div><span class="ts-num">35</span><span class="ts-lbl">涨停总数</span></div><div><span class="ts-num">15</span><span class="ts-lbl">涨停股票数</span></div><div><span class="ts-num">22/57</span><span class="ts-lbl">炸板率(非中率)</span></div><div><span class="ts-num">2 板</span><span class="ts-lbl">一字定流</span></div><div><span class="ts-num">电力</span><span class="ts-lbl">今日主线</span></div></div></div><div class="top5-section-h">今日候选 · Top5<b>（基于 AI 模型推荐,每只含 5 属性 + 涨停原因 + 8 维雷达）</b></div><div class="tb-scroll"><div class="tb-cards"><div class="tb-card"><div class="tb-rank">#1 TOP</div><div class="tb-code">sz000993</div><div class="tb-name">闽东电力</div><div class="tb-quote"><span class="tb-quote-lbl">现价</span><b>12.62</b> <span class="tb-quote-unit">元</span></div><div class="tb-quote"><span class="tb-quote-lbl">流通市值</span><b>98.2</b> <span class="tb-quote-unit">亿</span></div><div class="tb-total-big">84<span class="tb-total-sub">/100</span></div><div class="tb-total-h">综合评分</div><div class="tb-chips"><span class="tb-chip tb-chip-sec"><b>板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board"><b>板型·</b>2板</span><span class="tb-chip tb-chip-shape"><b>形态·</b>炸板回封</span><span class="tb-chip tb-chip-turn"><b>换手·</b>12.12%</span><span class="tb-chip tb-chip-theme"><b>题材·</b>电力(联动5)·2板</span></div><div class="tb-reason"><b>涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 93:35 · 炸板 1 次</div></div><div class="tb-card"><div class="tb-rank">#2 TOP</div><div class="tb-code">sh600744</div><div class="tb-name">华银电力</div><div class="tb-quote"><span class="tb-quote-lbl">现价</span><b>7.00</b> <span class="tb-quote-unit">元</span></div><div class="tb-quote"><span class="tb-quote-lbl">流通市值</span><b>137.6</b> <span class="tb-quote-unit">亿</span></div><div class="tb-total-big">87<span class="tb-total-sub">/100</span></div><div class="tb-total-h">综合评分</div><div class="tb-chips"><span class="tb-chip tb-chip-sec"><b>板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board"><b>板型·</b>首板</span><span class="tb-chip tb-chip-shape"><b>形态·</b>盘中拉板</span><span class="tb-chip tb-chip-turn"><b>换手·</b>9.69%</span><span class="tb-chip tb-chip-theme"><b>题材·</b>电力(联动5)·1板</span></div><div class="tb-reason"><b>涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 10:09</div></div><div class="tb-card"><div class="tb-rank">#3 TOP</div><div class="tb-code">sz000722</div><div class="tb-name">湖南发展</div><div class="tb-quote"><span class="tb-quote-lbl">现价</span><b>14.74</b> <span class="tb-quote-unit">元</span></div><div class="tb-quote"><span class="tb-quote-lbl">流通市值</span><b>25.5</b> <span class="tb-quote-unit">亿</span></div><div class="tb-total-big">83<span class="tb-total-sub">/100</span></div><div class="tb-total-h">综合评分</div><div class="tb-chips"><span class="tb-chip tb-chip-sec"><b>板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board"><b>板型·</b>首板</span><span class="tb-chip tb-chip-shape"><b>形态·</b>炸板回封</span><span class="tb-chip tb-chip-turn"><b>换手·</b>6.88%</span><span class="tb-chip tb-chip-theme"><b>题材·</b>电力(联动5)·1板</span></div><div class="tb-reason"><b>涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 95:04 · 炸板 1 次</div></div><div class="tb-card"><div class="tb-rank">#4 TOP</div><div class="tb-code">sh600644</div><div class="tb-name">乐山电力</div><div class="tb-quote"><span class="tb-quote-lbl">现价</span><b>10.12</b> <span class="tb-quote-unit">元</span></div><div class="tb-quote"><span class="tb-quote-lbl">流通市值</span><b>424.2</b> <span class="tb-quote-unit">亿</span></div><div class="tb-total-big">83<span class="tb-total-sub">/100</span></div><div class="tb-total-h">综合评分</div><div class="tb-chips"><span class="tb-chip tb-chip-sec"><b>板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board"><b>板型·</b>首板</span><span class="tb-chip tb-chip-shape"><b>形态·</b>午后封板</span><span class="tb-chip tb-chip-turn"><b>换手·</b>13.56%</span><span class="tb-chip tb-chip-theme"><b>题材·</b>电力(联动5)·1板</span></div><div class="tb-reason"><b>涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 13:17</div></div><div class="tb-card"><div class="tb-rank">#5 TOP</div><div class="tb-code">sh603105</div><div class="tb-name">芯能科技</div><div class="tb-quote"><span class="tb-quote-lbl">现价</span><b>8.38</b> <span class="tb-quote-unit">元</span></div><div class="tb-quote"><span class="tb-quote-lbl">流通市值</span><b>86.8</b> <span class="tb-quote-unit">亿</span></div><div class="tb-total-big">81<span class="tb-total-sub">/100</span></div><div class="tb-total-h">综合评分</div><div class="tb-chips"><span class="tb-chip tb-chip-sec"><b>板块·</b>电力(联动5)</span><span class="tb-chip tb-chip-board"><b>板型·</b>首板</span><span class="tb-chip tb-chip-shape"><b>形态·</b>炸板回封</span><span class="tb-chip tb-chip-turn"><b>换手·</b>6.19%</span><span class="tb-chip tb-chip-theme"><b>题材·</b>电力(联动5)·1板</span></div><div class="tb-reason"><b>涨停原因</b>·电力纯情 · 缩炸作(同板块涨停 5 只) · 首封 94:81 · 炸板 2 次</div></div></div></div><div class="radar-wrap"><svg id="tb-radar-20260910" viewBox="0 0 220 240" width="220" height="240"><polygon points="110.00,94.00 121.31,98.69 126.00,110.00 121.31,121.31 110.00,126.00 98.69,121.31 94.00,110.00 98.69,98.69" fill="none" stroke="#e2e8f0" stroke-width="0.6" /><polygon points="110.00,78.00 132.63,87.37 142.00,110.00 132.63,132.63 110.00,142.00 87.37,132.63 78.00,110.00 87.37,87.37" fill="none" stroke="#e2e8f0" stroke-width="0.6" /><polygon points="110.00,62.00 143.94,76.06 158.00,110.00 143.94,143.94 110.00,158.00 76.06,143.94 62.00,110.00 76.06,76.06" fill="none" stroke="#e2e8f0" stroke-width="0.6" /><polygon points="110.00,46.00 155.25,64.75 174.00,110.00 155.25,155.25 110.00,174.00 64.75,155.25 46.00,110.00 64.75,64.75" fill="none" stroke="#e2e8f0" stroke-width="0.6" /><polygon points="110.00,30.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,190.00 53.43,166.57 30.00,110.00 53.43,53.43" fill="none" stroke="#e2e8f0" stroke-width="0.6" /><line x1="110" y1="110" x2="110.00" y2="30.00" stroke="#cbd5e1" stroke-width="0.5" /><text x="110.00" y="16.00" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle">股价表现</text><line x1="110" y1="110" x2="166.57" y2="53.43" stroke="#cbd5e1" stroke-width="0.5" /><text x="176.47" y="43.53" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle">板块类型</text><line x1="110" y1="110" x2="190.00" y2="110.00" stroke="#cbd5e1" stroke-width="0.5" /><text x="204.00" y="110.00" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle">板块强势</text><line x1="110" y1="110" x2="166.57" y2="166.57" stroke="#cbd5e1" stroke-width="0.5" /><text x="176.47" y="176.47" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle">放量缩量</text><line x1="110" y1="110" x2="110.00" y2="190.00" stroke="#cbd5e1" stroke-width="0.5" /><text x="110.00" y="204.00" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle">横盘放量</text><line x1="110" y1="110" x2="53.43" y2="166.57" stroke="#cbd5e1" stroke-width="0.5" /><text x="43.53" y="176.47" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle">半年涨势</text><line x1="110" y1="110" x2="30.00" y2="110.00" stroke="#cbd5e1" stroke-width="0.5" /><text x="16.00" y="110.00" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle">模块效益</text><line x1="110" y1="110" x2="53.43" y2="53.43" stroke="#cbd5e1" stroke-width="0.5" /><text x="43.53" y="43.53" font-size="8" fill="#475569" text-anchor="middle" dominant-baseline="middle">盈亏评价</text><polygon points="110.00,38.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,154.00 81.72,138.28 42.80,110.00 61.35,61.35" fill="#e11d48" fill-opacity="0.16" stroke="#e11d48" stroke-width="1.3" stroke-opacity="0.8" /><circle cx="110.00" cy="38.00" r="1.4" fill="#e11d48" /><circle cx="166.57" cy="53.43" r="1.4" fill="#e11d48" /><circle cx="190.00" cy="110.00" r="1.4" fill="#e11d48" /><circle cx="166.57" cy="166.57" r="1.4" fill="#e11d48" /><circle cx="110.00" cy="154.00" r="1.4" fill="#e11d48" /><circle cx="81.72" cy="138.28" r="1.4" fill="#e11d48" /><circle cx="42.80" cy="110.00" r="1.4" fill="#e11d48" /><circle cx="61.35" cy="61.35" r="1.4" fill="#e11d48" /><polygon points="110.00,42.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,154.00 81.72,138.28 40.40,110.00 59.09,59.09" fill="#0284c7" fill-opacity="0.14" stroke="#0284c7" stroke-width="1.3" stroke-opacity="0.75" /><circle cx="110.00" cy="42.00" r="1.4" fill="#0284c7" /><circle cx="166.57" cy="53.43" r="1.4" fill="#0284c7" /><circle cx="190.00" cy="110.00" r="1.4" fill="#0284c7" /><circle cx="166.57" cy="166.57" r="1.4" fill="#0284c7" /><circle cx="110.00" cy="154.00" r="1.4" fill="#0284c7" /><circle cx="81.72" cy="138.28" r="1.4" fill="#0284c7" /><circle cx="40.40" cy="110.00" r="1.4" fill="#0284c7" /><circle cx="59.09" cy="59.09" r="1.4" fill="#0284c7" /><polygon points="110.00,42.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,154.00 81.72,138.28 43.60,110.00 62.48,62.48" fill="#16a34a" fill-opacity="0.12" stroke="#16a34a" stroke-width="1.3" stroke-opacity="0.7000000000000001" /><circle cx="110.00" cy="42.00" r="1.4" fill="#16a34a" /><circle cx="166.57" cy="53.43" r="1.4" fill="#16a34a" /><circle cx="190.00" cy="110.00" r="1.4" fill="#16a34a" /><circle cx="166.57" cy="166.57" r="1.4" fill="#16a34a" /><circle cx="110.00" cy="154.00" r="1.4" fill="#16a34a" /><circle cx="81.72" cy="138.28" r="1.4" fill="#16a34a" /><circle cx="43.60" cy="110.00" r="1.4" fill="#16a34a" /><circle cx="62.48" cy="62.48" r="1.4" fill="#16a34a" /><polygon points="110.00,42.00 166.57,53.43 190.00,110.00 166.57,166.57 110.00,154.00 81.72,138.28 43.60,110.00 58.52,58.52" fill="#a855f7" fill-opacity="0.1" stroke="#a855f7" stroke-width="1.3" stroke-opacity="0.65" /><circle cx="110.00" cy="42.00" r="1.4" fill="#a855f7" /><circle cx="166.57" cy="53.43" r="1.4" fill="#a855f7" /><circle cx="190.00" cy="110.00" r="1.4" fill="#a855f7" /><circle cx="166.57" cy="166.57" r="1.4" fill="#a855f7" /><circle cx="110.00" cy="154.00" r="1.4" fill="#a855f7" /><circle cx="81.72" cy="138.28" r="1.4" fill="#a855f7" /><circle cx="43.60" cy="110.00" r="1.4" fill="#a855f7" /><circle cx="58.52" cy="58.52" r="1.4" fill="#a855f7" /><polygon points="110.00,42.00 166.57,53.43 190.00,110.00 166.00,166.00 110.00,154.00 81.72,138.28 45.20,110.00 63.05,63.05" fill="#f59e0b" fill-opacity="0.08" stroke="#f59e0b" stroke-width="1.3" stroke-opacity="0.6000000000000001" /><circle cx="110.00" cy="42.00" r="1.4" fill="#f59e0b" /><circle cx="166.57" cy="53.43" r="1.4" fill="#f59e0b" /><circle cx="190.00" cy="110.00" r="1.4" fill="#f59e0b" /><circle cx="166.00" cy="166.00" r="1.4" fill="#f59e0b" /><circle cx="110.00" cy="154.00" r="1.4" fill="#f59e0b" /><circle cx="81.72" cy="138.28" r="1.4" fill="#f59e0b" /><circle cx="45.20" cy="110.00" r="1.4" fill="#f59e0b" /><circle cx="63.05" cy="63.05" r="1.4" fill="#f59e0b" /><circle cx="110" cy="110" r="2" fill="#0f172a" /></svg><div class="radar-legend"><span class="radar-leg"><i style="background:#e11d48"></i>#1 闽东电力 · 综合 84</span><span class="radar-leg"><i style="background:#0284c7"></i>#2 华银电力 · 综合 87</span><span class="radar-leg"><i style="background:#16a34a"></i>#3 湖南发展 · 综合 83</span><span class="radar-leg"><i style="background:#a855f7"></i>#4 乐山电力 · 综合 83</span><span class="radar-leg"><i style="background:#f59e0b"></i>#5 芯能科技 · 综合 81</span></div></div></div>
     
   
   
   
   
-  <div class="card da-card" data-page-node-id="vWoAMbZf94tpURsCdVPq0P">
-    <div class="card-title" data-page-node-id="IJCz4lTMs0CM60zjo9ygeg">AI 数据分析 · 八步复盘</div>
-    <div class="da-note" data-page-node-id="L98SZqSFDpZRmrtXov5wKx">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
-    <div class="da-block" data-page-node-id="FjVeK2g2pnsjG0q1q2m7Dj">
-    <div class="da-h" data-page-node-id="I4tNaSDxycia8awhWfPupe">第一步 · 市场定调</div>
-    <div class="da-line" data-page-node-id="TURf41C18tdXIF2u6BXlnq">指数：上证指数 -0.43% / 深证成指 -0.77% / 创业板指 -0.49%</div>
-    <div class="da-line" data-page-node-id="Xa28UfxN80IWHVid2rtGkP">涨跌家数：涨 1163 / 跌 5423 / 平 102（红盘率 17%）</div>
-    <div class="da-line" data-page-node-id="zSrH83Cic6nB9egVgpn0PU">涨停 35 家 · 炸板 22 家 · 最高连板 4 板（桂林旅游）</div>
-    <div class="da-src" data-page-node-id="nyGiCgOpnL4UwEBAkJtGda">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score" data-page-node-id="SqaQ9gBHU6qxMIlGojPDPJ">准确性 9/10</span></div>
-  </div><div class="da-block" data-page-node-id="XTIzWg4iebVtFEENf4F3vw">
-    <div class="da-h" data-page-node-id="IsVT8Y9sJAWktSmlByB887">第二步 · 情绪周期</div>
-    <div class="da-line" data-page-node-id="Q6tUPevVIav6gIM1Cp5D0u">情绪温度 60° → 阶段判定：<b class="da-cycle" data-page-node-id="URfYICXh0GvajOi7vQZlZ1">加速</b></div>
-    <div class="da-line" data-page-node-id="lOa0qWBjUR5zdsA6TpRO0I">操作基调：顺势参与，关注晋级与主线</div>
-    <div class="da-src" data-page-node-id="7kVwummXSZbdqCH4dt6J1S">数据源：由东财涨停/炸板/连板数据推导<span class="da-score" data-page-node-id="pRmhQEPbvffVntzWKcp0Nl">准确性 7/10（逻辑推演）</span></div>
-  </div><div class="da-block" data-page-node-id="kv3SeqSRY5wZTjlEYPp6Xz">
-    <div class="da-h" data-page-node-id="NmG3GJVK28SPYDFr5D9bSA">第三步 · 主线识别</div>
-    <div class="da-sub" data-page-node-id="gVH95GWlRXHTuy9OEDcJIw">涨停题材分布</div>
-    <div class="da-line" data-page-node-id="L1iJPIA96lT5XO0NAtuDUQ">• 电力：涨停 5 家 / 最高 2 板，领涨 <a class="da-stock" data-code="000993" onclick="openStockResearch(this.dataset.code)" data-page-node-id="tuHdGxVt693yHMLICkDvWZ">闽东电力</a></div><div class="da-line" data-page-node-id="tXKBhrXiRkSqeDl2HSzNs4">• 多元金融：涨停 2 家 / 最高 1 板，领涨 <a class="da-stock" data-code="600318" onclick="openStockResearch(this.dataset.code)" data-page-node-id="KvkA4Z0MoT3RbCDEHBf5pr">新力金融</a></div><div class="da-line" data-page-node-id="EZLmT8cJhdlJ1RVJBbFKFj">• 玻璃玻纤：涨停 2 家 / 最高 1 板，领涨 <a class="da-stock" data-code="002201" onclick="openStockResearch(this.dataset.code)" data-page-node-id="hcQO1OtPG93V2YRSQoRVPl">九鼎新材</a></div><div class="da-line" data-page-node-id="v7MTFqn6JhPoF2iemZMq2w">• 燃气Ⅱ：涨停 2 家 / 最高 1 板，领涨 <a class="da-stock" data-code="603318" onclick="openStockResearch(this.dataset.code)" data-page-node-id="mYTDBWX5DbJ6hoOCJqolnL">水发燃气</a></div>
-    <div class="da-line" data-page-node-id="r1Wnze5iRgECbdzC8hkHAA">连续 2-3 天上榜方向：桂林旅游（4板）、瑞尔特（3板）、云煤能源（3板）</div>
-    <div class="da-line" data-page-node-id="iK4sNfoBci1NtrpDXwTexu">结构判断：龙头带队，有明确领涨梯队</div>
-    <div class="da-line" data-page-node-id="t8P4AHimh8A9EFiJvrYf6W">明日最可能机会方向（1-2个）：电力、多元金融</div>
-    <div class="da-src" data-page-node-id="cajoj9yCWtZCpQoOobBLt4">数据源：东方财富涨停池分类聚合<span class="da-score" data-page-node-id="IHomFDjBhpabOnWiFbFNHC">准确性 8/10</span></div>
-  </div><div class="da-block" data-page-node-id="AXhMG8QgI9FGC9cuhSmi7G">
-    <div class="da-h" data-page-node-id="n2dLELfj53sHRsAftnpe0Z">第四步 · 核心个股拆解（Top5 涨停）</div>
-    <div class="da-line" data-page-node-id="1yJRi0g3puYQEGshA3shIi"><b data-page-node-id="KFSxm8TrtqqpdQthKLNV3n"><a class="da-stock" data-code="000978" onclick="openStockResearch(this.dataset.code)" data-page-node-id="8YG97T9IWNrGMlCU2zDCra">桂林旅游</a>（000978）4板</b>：首板放量启动，随后连续晋级；高位连板(4板)，换手充分，筹码快速交换；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line" data-page-node-id="nviqyITezR6Vb1UugT2EZF"><b data-page-node-id="5xHzvAwlMGWrrCWnrJjMRG"><a class="da-stock" data-code="002790" onclick="openStockResearch(this.dataset.code)" data-page-node-id="0valChfJ3fwZFsDbaJrUzv">瑞尔特</a>（002790）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line" data-page-node-id="4zRU7rgYLR4HKRc5Whvu46"><b data-page-node-id="eE07QPILmZLa9duFZKft6i"><a class="da-stock" data-code="600318" onclick="openStockResearch(this.dataset.code)" data-page-node-id="zLHg0L5ksOKHfbJwT8vo2O">新力金融</a>（600318）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line" data-page-node-id="ict1eEjkMIzTJ0cwSH9vTO"><b data-page-node-id="nzl3NLaHdiAC9qoOOFeh5g"><a class="da-stock" data-code="600359" onclick="openStockResearch(this.dataset.code)" data-page-node-id="OthQclX9lT58lcdmma28HC">新农开发</a>（600359）2板</b>：首板放量启动，随后连续晋级；连板 2 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line" data-page-node-id="s5sqschHJep5jTHWtDsELE"><b data-page-node-id="bLRvZtVkMuJa3cdZaoA2kr"><a class="da-stock" data-code="600488" onclick="openStockResearch(this.dataset.code)" data-page-node-id="MOHMzn3KWqJrqvhQrxCDWV">津药药业</a>（600488）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>
-    <div class="da-src" data-page-node-id="397uxTT80z2pTorR9vo4ty">数据源：东财涨停池 + 逻辑推演（启动/加速/分歧为推断，需结合K线人工验证）<span class="da-score" data-page-node-id="gE2wBGLf5Z1WIHvUL94TvX">准确性 6/10</span></div>
-  </div><div class="da-block da-trade" data-page-node-id="dRFD6eoiie2QQZ77aCRKx5">
-    <div class="da-h" data-page-node-id="BnJVDILWd9wm9LrA1BM4Jf">第五步 · 交易复盘</div>
-    <div class="da-line" data-page-node-id="XTIlFpgWUkBOmWwlJnuyLT">待提供今日逐笔交易记录（股票、买点K线位置、买入理由、是否符合系统、卖出原因）后自动生成分析。</div>
-    <div class="da-src" data-page-node-id="5EuY0RPbz8455vQJGYXwtX">数据源：用户提供<span class="da-score" data-page-node-id="uhyGaMZbXDydt2qIZEaOiV">提交后 10/10</span></div>
-  </div><div class="da-block da-trade" data-page-node-id="3aUs456RJn2Ly5fiNtOct8">
-    <div class="da-h" data-page-node-id="cdiY0DubDbfF5MKmIGrcGT">第六步 · 交易行为复盘</div>
-    <div class="da-line" data-page-node-id="fmEtYOIwvV1HNMDIF500ct">待提供每笔交易数据后，分析追高/杀跌/持仓周期/情绪化交易等行为偏差与优化规则。</div>
-    <div class="da-src" data-page-node-id="6yXMdj9RVPh2djQFhySZPm">数据源：用户提供<span class="da-score" data-page-node-id="1kHuYIfRn5Mqy1sPTDDDjn">提交后 10/10</span></div>
-  </div><div class="da-block" data-page-node-id="Ymg4QQwI1rVNnXZ8xVA8N9">
-    <div class="da-h" data-page-node-id="K42z9TZKEwyfxjin9BSghY">第七步 · 强势股共性模板</div>
-    <div class="da-line" data-page-node-id="rc9JLbWvDAFYqmHNbg88E1">当前市场最高连板 4 板。强势股共性：底部放量首板 → 缩量/换手连板加速 → 首次分歧不破位 → 承接有力再上攻。</div>
-    <div class="da-line" data-page-node-id="ZI2ak7HAVzggspPjwBYHzK">模板要点：① 首板看量能 ② 连板看换手 ③ 分歧看承接 ④ 只有承接验证通过的方向才值得次日跟进。</div>
-    <div class="da-src" data-page-node-id="YpxA6EXVBkL2xrXmrUW1sV">数据源：逻辑推演（基于连板梯队）<span class="da-score" data-page-node-id="lzU3agURgMbrSE3c511xb9">准确性 6/10</span></div>
-  </div><div class="da-block" data-page-node-id="t620F9FSyY30u71l1NeYuK">
-    <div class="da-h" data-page-node-id="M5mccD7HQmtWVma0MyK2lQ">第八步 · 主线资金复盘</div>
-    <div class="da-line" data-page-node-id="oaG4qWIC92tXVuKtNJTmji">今日涨停题材分布：电力(5家)、多元金融(2家)、玻璃玻纤(2家)、燃气Ⅱ(2家)、元件(2家)、旅游及景(1家)</div>
-    <div class="da-line" data-page-node-id="boRuAYCvSQAwt78kzDtCy1">重复上榜（连续2-3天）方向：桂林旅游（4板）、瑞尔特（3板）、云煤能源（3板）</div>
-    <div class="da-line" data-page-node-id="qKFYt3qrKJAmByUno0PGfm">结构：龙头带队，处于高位加速</div>
-    <div class="da-line" data-page-node-id="E2ylr1pbuznNhfFzDpyQfp">明日最可能机会方向：电力、多元金融</div>
-    <div class="da-line" data-page-node-id="LnKZi3QsKhgzLArxh1oBSN">明日基调：<b class="da-stance" data-page-node-id="Ce7Mymn5PbqFyEH0K6QBth">进攻（控仓）</b></div>
-    <div class="da-src" data-page-node-id="OpvmK0j3n00sUQnDhGnQ7I">数据源：东方财富涨停池 + 板块统计<span class="da-score" data-page-node-id="9kaSqJzrVj01kwFQMQeHk3">准确性 8/10</span></div>
+  <div class="card da-card">
+    <div class="card-title">AI 数据分析 · 八步复盘</div>
+    <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
+    <div class="da-block">
+    <div class="da-h">第一步 · 市场定调</div>
+    <div class="da-line">指数：上证指数 -0.43% / 深证成指 -0.77% / 创业板指 -0.49%</div>
+    <div class="da-line">涨跌家数：涨 1163 / 跌 5423 / 平 102（红盘率 17%）</div>
+    <div class="da-line">涨停 35 家 · 炸板 22 家 · 最高连板 4 板（桂林旅游）</div>
+    <div class="da-src">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score">准确性 9/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第二步 · 情绪周期</div>
+    <div class="da-line">情绪温度 60° → 阶段判定：<b class="da-cycle">加速</b></div>
+    <div class="da-line">操作基调：顺势参与，关注晋级与主线</div>
+    <div class="da-src">数据源：由东财涨停/炸板/连板数据推导<span class="da-score">准确性 7/10（逻辑推演）</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第三步 · 主线识别</div>
+    <div class="da-sub">涨停题材分布</div>
+    <div class="da-line">• 电力：涨停 5 家 / 最高 2 板，领涨 <a class="da-stock" data-code="000993" onclick="openStockResearch(this.dataset.code)">闽东电力</a></div><div class="da-line">• 多元金融：涨停 2 家 / 最高 1 板，领涨 <a class="da-stock" data-code="600318" onclick="openStockResearch(this.dataset.code)">新力金融</a></div><div class="da-line">• 玻璃玻纤：涨停 2 家 / 最高 1 板，领涨 <a class="da-stock" data-code="002201" onclick="openStockResearch(this.dataset.code)">九鼎新材</a></div><div class="da-line">• 燃气Ⅱ：涨停 2 家 / 最高 1 板，领涨 <a class="da-stock" data-code="603318" onclick="openStockResearch(this.dataset.code)">水发燃气</a></div>
+    <div class="da-line">连续 2-3 天上榜方向：桂林旅游（4板）、瑞尔特（3板）、云煤能源（3板）</div>
+    <div class="da-line">结构判断：龙头带队，有明确领涨梯队</div>
+    <div class="da-line">明日最可能机会方向（1-2个）：电力、多元金融</div>
+    <div class="da-src">数据源：东方财富涨停池分类聚合<span class="da-score">准确性 8/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第四步 · 核心个股拆解（Top5 涨停）</div>
+    <div class="da-line"><b><a class="da-stock" data-code="000978" onclick="openStockResearch(this.dataset.code)">桂林旅游</a>（000978）4板</b>：首板放量启动，随后连续晋级；高位连板(4板)，换手充分，筹码快速交换；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b><a class="da-stock" data-code="002790" onclick="openStockResearch(this.dataset.code)">瑞尔特</a>（002790）3板</b>：首板放量启动，随后连续晋级；连板 3 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b><a class="da-stock" data-code="600318" onclick="openStockResearch(this.dataset.code)">新力金融</a>（600318）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b><a class="da-stock" data-code="600359" onclick="openStockResearch(this.dataset.code)">新农开发</a>（600359）2板</b>：首板放量启动，随后连续晋级；连板 2 天，缩量加速为主；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div><div class="da-line"><b><a class="da-stock" data-code="600488" onclick="openStockResearch(this.dataset.code)">津药药业</a>（600488）1板</b>：今日首板放量启动，观察次日承接；首板放量，加速待验证；分歧点关注首次放量滞涨/炸板；承接看大跌后能否快速收回</div>
+    <div class="da-src">数据源：东财涨停池 + 逻辑推演（启动/加速/分歧为推断，需结合K线人工验证）<span class="da-score">准确性 6/10</span></div>
+  </div><div class="da-block da-trade">
+    <div class="da-h">第五步 · 交易复盘</div>
+    <div class="da-line">待提供今日逐笔交易记录（股票、买点K线位置、买入理由、是否符合系统、卖出原因）后自动生成分析。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div><div class="da-block da-trade">
+    <div class="da-h">第六步 · 交易行为复盘</div>
+    <div class="da-line">待提供每笔交易数据后，分析追高/杀跌/持仓周期/情绪化交易等行为偏差与优化规则。</div>
+    <div class="da-src">数据源：用户提供<span class="da-score">提交后 10/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第七步 · 强势股共性模板</div>
+    <div class="da-line">当前市场最高连板 4 板。强势股共性：底部放量首板 → 缩量/换手连板加速 → 首次分歧不破位 → 承接有力再上攻。</div>
+    <div class="da-line">模板要点：① 首板看量能 ② 连板看换手 ③ 分歧看承接 ④ 只有承接验证通过的方向才值得次日跟进。</div>
+    <div class="da-src">数据源：逻辑推演（基于连板梯队）<span class="da-score">准确性 6/10</span></div>
+  </div><div class="da-block">
+    <div class="da-h">第八步 · 主线资金复盘</div>
+    <div class="da-line">今日涨停题材分布：电力(5家)、多元金融(2家)、玻璃玻纤(2家)、燃气Ⅱ(2家)、元件(2家)、旅游及景(1家)</div>
+    <div class="da-line">重复上榜（连续2-3天）方向：桂林旅游（4板）、瑞尔特（3板）、云煤能源（3板）</div>
+    <div class="da-line">结构：龙头带队，处于高位加速</div>
+    <div class="da-line">明日最可能机会方向：电力、多元金融</div>
+    <div class="da-line">明日基调：<b class="da-stance">进攻（控仓）</b></div>
+    <div class="da-src">数据源：东方财富涨停池 + 板块统计<span class="da-score">准确性 8/10</span></div>
   </div>
   </div>
   
   
-  <div class="card" data-page-node-id="D5fLkfhiJrLWmhX8xxqUpQ">
-    <div class="card-title" data-page-node-id="MTXTgzHOTMdPclCDqxQL3H">核心指数</div>
-    <div class="index-row" data-page-node-id="2s4rA5sncgC9Dyy7QIyjH9"><div class="index-item" data-code="000001" data-prefix="sh" data-page-node-id="Abk1ImhKSyTFMOMUxFQWKP">
-      <div class="index-name" data-page-node-id="apUQGdXr7JrxazJX3q9yyD">上证指数</div>
-      <div class="index-value down" data-page-node-id="KqdCtH4xIFet4cID31pWIY">3,934.40</div>
-      <div class="index-change down" data-page-node-id="gffrFRT7Hs4y4inRtcAKL5">-0.43%</div>
-    </div><div class="index-item" data-code="399001" data-prefix="sz" data-page-node-id="nKxW1JBFPl8brxvGVGVEEp">
-      <div class="index-name" data-page-node-id="GzZHrMxYil6apIATKLNN8a">深证成指</div>
-      <div class="index-value down" data-page-node-id="7RdILgomy5MegrvHCumeTK">13,617.67</div>
-      <div class="index-change down" data-page-node-id="90TqK9a9G7xW8j0bxuEaCD">-0.77%</div>
-    </div><div class="index-item" data-code="399006" data-prefix="sz" data-page-node-id="cI5N0YM2YsmDbZjPVhDn5d">
-      <div class="index-name" data-page-node-id="WovJEDjhk4YuVFRxx7raVx">创业板指</div>
-      <div class="index-value down" data-page-node-id="lKjJhtqSqFStjY1W6y6zgW">3,338.42</div>
-      <div class="index-change down" data-page-node-id="osoBFkQHHhJnbC8Ak4z7ls">-0.49%</div>
+  <div class="card">
+    <div class="card-title">核心指数</div>
+    <div class="index-row"><div class="index-item" data-code="000001" data-prefix="sh">
+      <div class="index-name">上证指数</div>
+      <div class="index-value down">3,934.40</div>
+      <div class="index-change down">-0.43%</div>
+    </div><div class="index-item" data-code="399001" data-prefix="sz">
+      <div class="index-name">深证成指</div>
+      <div class="index-value down">13,617.67</div>
+      <div class="index-change down">-0.77%</div>
+    </div><div class="index-item" data-code="399006" data-prefix="sz">
+      <div class="index-name">创业板指</div>
+      <div class="index-value down">3,338.42</div>
+      <div class="index-change down">-0.49%</div>
     </div></div>
-    <div class="status-row" data-page-node-id="G3YxKYUUDDFZcxJ9aLhA2Z">
-      <div class="status-item" data-page-node-id="zzXco6gG1IEQlG8wDPmiEX">生成时间<strong data-page-node-id="xganl7wcVh09QGxO2g7IhU">2026-09-10 23:28:12</strong></div>
-      <div class="status-item" data-page-node-id="5irMIEhkrWwgZrMjErSNqt">数据源<strong data-page-node-id="Y5yTdH9UCewxPtJowJOEID">通达信实时</strong></div>
-      <div class="status-item" data-page-node-id="33ysSENDDGkrR7QzfFbgeF">类型<strong data-page-node-id="qljmBLXozg4mQ9ZtCfR58d">收盘复盘</strong></div>
+    <div class="status-row">
+      <div class="status-item">生成时间<strong>2026-09-10 23:28:12</strong></div>
+      <div class="status-item">数据源<strong>通达信实时</strong></div>
+      <div class="status-item">类型<strong>收盘复盘</strong></div>
     </div>
   </div>
-  <div class="status-row" data-page-node-id="W55a480II5UiHJOgAwSx1d">
-    <div class="status-item" data-page-node-id="3EeiUtw3e183a3Mb1nLqUj">上涨<strong data-page-node-id="wTGSwx2hVbePLyReWPRq2w">1163</strong></div>
-    <div class="status-item" data-page-node-id="KP9UzEnRUBWrK640DcDlh7">下跌<strong data-page-node-id="kVYqddAon87OoTYhkUkIhs">5423</strong></div>
-    <div class="status-item" data-page-node-id="APMFg1riHTYLjGsM8FfFu3">平盘<strong data-page-node-id="rbushc4ym7FZJdX3iPfphC">102</strong></div>
-    <div class="status-item" data-page-node-id="lMv0j0s7WBiFWdMEGYh0Ce">涨停<strong data-page-node-id="7TUQh0G8aETtsrvNw5lgjT">35</strong></div>
-    <div class="status-item" data-page-node-id="oLYGm6vkdpmeFMAq57CDGJ">跌停<strong data-page-node-id="KJqM248Z2cIKby1RsyKJXX">0</strong></div>
-    <div class="status-item" data-page-node-id="L6FvzYzqLeGfdJrBecGcYl">炸板<strong data-page-node-id="TaOFBWtgGZGRAQz0tRlItY">22</strong></div>
+  <div class="status-row">
+    <div class="status-item">上涨<strong>1163</strong></div>
+    <div class="status-item">下跌<strong>5423</strong></div>
+    <div class="status-item">平盘<strong>102</strong></div>
+    <div class="status-item">涨停<strong>35</strong></div>
+    <div class="status-item">跌停<strong>0</strong></div>
+    <div class="status-item">炸板<strong>22</strong></div>
   </div>
-  <div class="card" data-page-node-id="cu47FR8rpqaic2OtLLBRe6">
-    <div class="card-title" data-page-node-id="8YtwvQ6E3DAUq41CfGO4KW">市场概览</div>
-    <div class="stat-grid" data-page-node-id="vYpRyohFwzwRxnjrgY5TRC">
-      <div class="stat-card" data-page-node-id="m6xKeTy7IjOmZHUw6yXnw4"><div class="stat-num up" data-page-node-id="fOM2md7rxdsJcPXHlvq4tc">1163</div><div class="stat-label" data-page-node-id="cWHURHWP0hftWgp6jHYCdi">上涨家数</div></div>
-      <div class="stat-card" data-page-node-id="yBVu70lrqXWRdHkuvMQEBg"><div class="stat-num down" data-page-node-id="FWfFQ4EPpYUn4rCughBK69">5423</div><div class="stat-label" data-page-node-id="SGRce13Al3Mqqtugzj1Jp4">下跌家数</div></div>
-      <div class="stat-card" data-page-node-id="1Uspe549XRF13LMwkevkyk"><div class="stat-num" data-page-node-id="OWanS8AyfczhAmyVQae2pJ">35</div><div class="stat-label" data-page-node-id="CpsYQA3IaOhM4EPiLEIr4s">涨停家数</div></div>
-      <div class="stat-card" data-page-node-id="odb7hBUSwVXNKphPcDe8bw"><div class="stat-num down" data-page-node-id="qoEhbjFmnWEHVxAUoHjp1d">0</div><div class="stat-label" data-page-node-id="lj9iFULoTH6UDQwgDl1kMe">跌停家数</div></div>
-      <div class="stat-card" data-page-node-id="Xwdzaj6ocTb2VyFHJGno7w"><div class="stat-num" data-page-node-id="WNhNS6nnCsF5W9Lk6rATYY">22</div><div class="stat-label" data-page-node-id="jNCfZWvOtSbSCQ8WYTfULa">炸板家数</div></div>
-      <div class="stat-card" data-page-node-id="PUsXA6nFwxEPceRPRr8Mih"><div class="stat-num" data-page-node-id="WWqTSScGBEfz96RG2ksxYl">4</div><div class="stat-label" data-page-node-id="tvz9BMjiEg0MA5UWYsqCTf">最高连板</div></div>
+  <div class="card">
+    <div class="card-title">市场概览</div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num up">1163</div><div class="stat-label">上涨家数</div></div>
+      <div class="stat-card"><div class="stat-num down">5423</div><div class="stat-label">下跌家数</div></div>
+      <div class="stat-card"><div class="stat-num">35</div><div class="stat-label">涨停家数</div></div>
+      <div class="stat-card"><div class="stat-num down">0</div><div class="stat-label">跌停家数</div></div>
+      <div class="stat-card"><div class="stat-num">22</div><div class="stat-label">炸板家数</div></div>
+      <div class="stat-card"><div class="stat-num">4</div><div class="stat-label">最高连板</div></div>
     </div>
-    <div class="status-row" data-page-node-id="nghw80IIbtqWHM3iNnx8G3">
-      <div class="status-item" data-page-node-id="ugTH1NqLUIDgBiUJK8Q7R3">最高连板<strong data-page-node-id="bLvRxATClhnt8oDAd7Ny3H">桂林旅游</strong></div>
-      <div class="status-item" data-page-node-id="3rzAsTa4QXkgRA7IoUsg2k">成交额<strong data-page-node-id="T60toOJ5Z3OQfVaZiDbUk9">16471亿</strong></div>
+    <div class="status-row">
+      <div class="status-item">最高连板<strong>桂林旅游</strong></div>
+      <div class="status-item">成交额<strong>16471亿</strong></div>
     </div>
   </div>
-  <div class="card" data-page-node-id="snNCwbMalGhSNqT4tRrCZD">
-    <div class="card-title" data-page-node-id="opecq1eZavYGFTBiZ2EUtJ">板块热点</div>
-    <table class="table" data-page-node-id="cWGEG1Ume97IKCbn619KSq"><thead data-page-node-id="4tXUTmDRZ5HcWCv9r8Lc7n"><tr data-page-node-id="z6jhCksgUg8WaU1KATYSCG"><th data-page-node-id="EzN7QYVzCIHWdutWOBVLEL">#</th><th data-page-node-id="cgYk7VqMpewaSeRU8xVqld">板块</th><th data-page-node-id="w1ATzqCbmvDHHugTB4QhML">涨幅</th><th data-page-node-id="8sH5wA7JR3TbFstkBd4nnS">涨停</th><th data-page-node-id="kbwOJBcfJRsBLU8GQNTBo4">领涨</th></tr></thead><tbody data-page-node-id="gwGSABhO3gEEae75hHCpqy"><tr data-page-node-id="DFH8hYNCvzf3MZUIpYq8Kj">
-      <td data-page-node-id="eU7GLCPGghbMn6eDlvzY0a">1</td>
-      <td data-page-node-id="H5yM9bzO47L47TwFvhW7uC">电力</td>
-      <td class="up" data-page-node-id="mGWD8wDfbf4kt7uJ9rCV8I">+10.01%</td>
-      <td data-page-node-id="8VhbGqqHwUeNs2j7k2EUVG">5</td>
-      <td data-page-node-id="Yc13B4jN01szaB9ff39g3e">闽东电力</td>
-    </tr><tr data-page-node-id="0ljgeRBPXd6g4wkAMZCbFj">
-      <td data-page-node-id="h5S6mBp51u1WlVG0ahx9uy">2</td>
-      <td data-page-node-id="h84vHTyxHjYVw8HdRDDWxl">多元金融</td>
-      <td class="up" data-page-node-id="mg4QaIt14GzDxULD3bRh6b">+10.04%</td>
-      <td data-page-node-id="sQhMHYLfpBFNRHAiAyIsDd">2</td>
-      <td data-page-node-id="7d2TtIEueV0RQ2hwW71WR4">新力金融</td>
-    </tr><tr data-page-node-id="l9xxExxeQGk00QECPUUWXM">
-      <td data-page-node-id="ZKj9Y4MZA1NCKBXRQAVYGY">3</td>
-      <td data-page-node-id="Abnn2zYPEOgmFEKFvQ9cRh">玻璃玻纤</td>
-      <td class="up" data-page-node-id="YeIACM64V6FPEnq1FpFJoF">+10.02%</td>
-      <td data-page-node-id="MPxVJdFhPNkL6NSG7V0NTf">2</td>
-      <td data-page-node-id="MxIqT0cc3sjGNVPFLbVT5T">九鼎新材</td>
-    </tr><tr data-page-node-id="jTqSFaymoKAwmhvNnBjND5">
-      <td data-page-node-id="W1TbgqKYQFrCbKeCLg00xf">4</td>
-      <td data-page-node-id="seA6gkDiQPSeE9R2Fd0NpZ">燃气Ⅱ</td>
-      <td class="up" data-page-node-id="Th35VAgGzRBrPmheyVefmn">+10.02%</td>
-      <td data-page-node-id="kZGMdo36WqxGgUtXNS3mNk">2</td>
-      <td data-page-node-id="lF43F2hxmptICFvqnMdr7n">水发燃气</td>
-    </tr><tr data-page-node-id="c721gDDlx2exMA2XwlzhTi">
-      <td data-page-node-id="Fr6kXrRa5qc1UfwWWti6B6">5</td>
-      <td data-page-node-id="mKEBuH5UOM7vCnw8x84jkg">元件</td>
-      <td class="up" data-page-node-id="Ws7Sc7J1YuIVDZCEXOCyin">+10.00%</td>
-      <td data-page-node-id="aRk4I0zal8nkOHPK8PY9bM">2</td>
-      <td data-page-node-id="F1lmS5NZsBQ1byUGGilExl">金安国纪</td>
-    </tr><tr data-page-node-id="OIpeS1oderhO8wvA7reBdP">
-      <td data-page-node-id="vyol102wIROD0ljc1XHQ2l">6</td>
-      <td data-page-node-id="TIAaumvzqERP6BeGbIqu0t">旅游及景</td>
-      <td class="up" data-page-node-id="muZlY8rafZgUzyVTOsPDzI">+9.99%</td>
-      <td data-page-node-id="CWKZilrjSvEVVsBzbOHIsQ">1</td>
-      <td data-page-node-id="qnmG0BmG4kRBAty5zkjAtW">桂林旅游</td>
+  <div class="card">
+    <div class="card-title">板块热点</div>
+    <table class="table"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>涨停</th><th>领涨</th></tr></thead><tbody><tr>
+      <td>1</td>
+      <td>电力</td>
+      <td class="up">+10.01%</td>
+      <td>5</td>
+      <td>闽东电力</td>
+    </tr><tr>
+      <td>2</td>
+      <td>多元金融</td>
+      <td class="up">+10.04%</td>
+      <td>2</td>
+      <td>新力金融</td>
+    </tr><tr>
+      <td>3</td>
+      <td>玻璃玻纤</td>
+      <td class="up">+10.02%</td>
+      <td>2</td>
+      <td>九鼎新材</td>
+    </tr><tr>
+      <td>4</td>
+      <td>燃气Ⅱ</td>
+      <td class="up">+10.02%</td>
+      <td>2</td>
+      <td>水发燃气</td>
+    </tr><tr>
+      <td>5</td>
+      <td>元件</td>
+      <td class="up">+10.00%</td>
+      <td>2</td>
+      <td>金安国纪</td>
+    </tr><tr>
+      <td>6</td>
+      <td>旅游及景</td>
+      <td class="up">+9.99%</td>
+      <td>1</td>
+      <td>桂林旅游</td>
     </tr></tbody></table>
   </div>
-  <div class="card" data-page-node-id="7IsZ45IgxW927mTpGxJ7Y8">
-    <div class="card-title" data-page-node-id="fnQ7blRgh0uGOJBwNgoDve">涨停梯队 · 15 只</div>
-    <div class="stock-row" data-page-node-id="N48DRtvGZz4GDc7QgqD8Cf">
-      <div class="stock-info" data-page-node-id="PicoGzS1sZzkm1XGdjEE41"><div class="stock-name" data-page-node-id="LI73CU9BkowZsINFVJ7qjG">1. 桂林旅游 <span class="rank-tag" data-page-node-id="ZLdIsXQxboYwDEYAU3tyvM">4天4板</span></div>
-        <div class="stock-code" data-page-node-id="8C9TaownBuDuk1Caq4Xleg">000978 · 旅游及景</div>
-        <div class="stock-code" data-page-node-id="5qLH1fZMLqX7V774UmlG6x">封单 0.70 亿 · 开板 1 次</div>
+  <div class="card">
+    <div class="card-title">涨停梯队 · 15 只</div>
+    <div class="stock-row">
+      <div class="stock-info"><div class="stock-name">1. 桂林旅游 <span class="rank-tag">4天4板</span></div>
+        <div class="stock-code">000978 · 旅游及景</div>
+        <div class="stock-code">封单 0.70 亿 · 开板 1 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="XUwOkEDyjSvVQFIMPRZEIB"><div class="price up" data-page-node-id="CWNbBHPOVJxmGcwuq6CwRn">9.69</div><div class="pct up" data-page-node-id="OiBHco9ZaZzlUvm67ahFj7">+9.99%</div></div>
-    </div><div class="stock-row" data-page-node-id="UmwHQF1xsgdHQ7g04nK7AU">
-      <div class="stock-info" data-page-node-id="kHBcfazP7aP8x0ByIPG1jW"><div class="stock-name" data-page-node-id="RtXgZgH0Ixp9wmneCNBsXn">2. 瑞尔特 <span class="rank-tag" data-page-node-id="vv3HA2gIpiED96fsDFV9vF">3天3板</span></div>
-        <div class="stock-code" data-page-node-id="gjJgEVbC0jv3trQaT9WgFp">002790 · 家居用品</div>
-        <div class="stock-code" data-page-node-id="XGGnfgD0Kf6YRpjfR7hV03">封单 3.73 亿 · 开板 0 次</div>
+      <div class="stock-price"><div class="price up">9.69</div><div class="pct up">+9.99%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">2. 瑞尔特 <span class="rank-tag">3天3板</span></div>
+        <div class="stock-code">002790 · 家居用品</div>
+        <div class="stock-code">封单 3.73 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="OjyrTdgUOEmui9EAQj0tZF"><div class="price up" data-page-node-id="mOhWN3sACEpCMtHxIfppAU">8.46</div><div class="pct up" data-page-node-id="8by3RgHknMU6vnFfNnzUF5">+10.01%</div></div>
-    </div><div class="stock-row" data-page-node-id="eRmtDeZ5jHpl8TH7RnqJPK">
-      <div class="stock-info" data-page-node-id="UtNnq0JXAXH4AEjvCiK3gc"><div class="stock-name" data-page-node-id="CMLkA2Z37XOzXfWRHJnhiE">3. 新力金融 <span class="rank-tag" data-page-node-id="8zrI9LZCUNxfkxBsOSGT8a">1天1板</span></div>
-        <div class="stock-code" data-page-node-id="cJGBq7HDWjJQLgUEcMnmdu">600318 · 多元金融</div>
-        <div class="stock-code" data-page-node-id="nibEsfd1sKJn02iqnrVPsK">封单 0.44 亿 · 开板 6 次</div>
+      <div class="stock-price"><div class="price up">8.46</div><div class="pct up">+10.01%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">3. 新力金融 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">600318 · 多元金融</div>
+        <div class="stock-code">封单 0.44 亿 · 开板 6 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="gzxQUh9TJska7z4yKYS5hn"><div class="price up" data-page-node-id="EqnWWbz6GijyiBfIZMWXA7">8.09</div><div class="pct up" data-page-node-id="iPF30ftxSd9Jspd1OlyksW">+10.07%</div></div>
-    </div><div class="stock-row" data-page-node-id="m6qppxFNZ8A2dKUZMxrgqv">
-      <div class="stock-info" data-page-node-id="SvPAw3d1WHuuLDZ6Su6asg"><div class="stock-name" data-page-node-id="Ps4yV4uL1085xExwQRryF6">4. 新农开发 <span class="rank-tag" data-page-node-id="rlRYdcXQc4yV2ja2uto0Gc">2天2板</span></div>
-        <div class="stock-code" data-page-node-id="zxZ3yBj9ZpbIpu9WClAiUP">600359 · 种植业</div>
-        <div class="stock-code" data-page-node-id="ruGOBeYJ2kCgtHAM2AQGSS">封单 0.43 亿 · 开板 1 次</div>
+      <div class="stock-price"><div class="price up">8.09</div><div class="pct up">+10.07%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">4. 新农开发 <span class="rank-tag">2天2板</span></div>
+        <div class="stock-code">600359 · 种植业</div>
+        <div class="stock-code">封单 0.43 亿 · 开板 1 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="vXTXjRmXE6xwa0xMxE4ZCR"><div class="price up" data-page-node-id="BzzjldFWtrSkm4duoFMAbt">9.64</div><div class="pct up" data-page-node-id="VaFHCJaKB5COEEcJe2KLkE">+10.05%</div></div>
-    </div><div class="stock-row" data-page-node-id="amCZDYlBJqsnJHTSMvFDaO">
-      <div class="stock-info" data-page-node-id="6Qq8A8mrX2eGdh5lNmBzxV"><div class="stock-name" data-page-node-id="PYEnyXrpxCQtlZKhLXQlQg">5. 津药药业 <span class="rank-tag" data-page-node-id="bCvu3qEFLgiqxcCqQKfnBT">1天1板</span></div>
-        <div class="stock-code" data-page-node-id="fGS2gdxvmkkxZ2ckxjQRIz">600488 · 化学制药</div>
-        <div class="stock-code" data-page-node-id="yhmB8jmV1l5cZelKIGJK3k">封单 0.40 亿 · 开板 7 次</div>
+      <div class="stock-price"><div class="price up">9.64</div><div class="pct up">+10.05%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">5. 津药药业 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">600488 · 化学制药</div>
+        <div class="stock-code">封单 0.40 亿 · 开板 7 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="3ZX2GApOsHMXNiSCVy7AFu"><div class="price up" data-page-node-id="E0MMBpwUiGnOpliHDNRJmH">5.90</div><div class="pct up" data-page-node-id="BSr6uQ535lGjFJgMe5tLkF">+10.07%</div></div>
-    </div><div class="stock-row" data-page-node-id="RC8GQSHJOiVyj27zzRrFKF">
-      <div class="stock-info" data-page-node-id="VRDomICW9uLDy6JcCrMt0d"><div class="stock-name" data-page-node-id="1i61STYOAdXOGceP2MDyxc">6. 国创高新 <span class="rank-tag" data-page-node-id="G6mv6kruku0vTt5pj4U8He">2天2板</span></div>
-        <div class="stock-code" data-page-node-id="KADnQFGBtiudel80194ESP">002377 · 炼化及贸</div>
-        <div class="stock-code" data-page-node-id="BxDo26TixzvQjwLlLqytMC">封单 1.04 亿 · 开板 0 次</div>
+      <div class="stock-price"><div class="price up">5.90</div><div class="pct up">+10.07%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">6. 国创高新 <span class="rank-tag">2天2板</span></div>
+        <div class="stock-code">002377 · 炼化及贸</div>
+        <div class="stock-code">封单 1.04 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="jLPZlPdKv19PpyYemOcASN"><div class="price up" data-page-node-id="R8JCP3C8AiRdt1cAw3XSnn">3.47</div><div class="pct up" data-page-node-id="Lt3d6gGoPyDfGp6Gn5A47m">+10.16%</div></div>
-    </div><div class="stock-row" data-page-node-id="2Bh2FTjL8aldaCBr6RgUom">
-      <div class="stock-info" data-page-node-id="XrXPtOnpmhSKDSqFVtjyrh"><div class="stock-name" data-page-node-id="YYTXe5QB1MTi4vxUiq4MJA">7. 云煤能源 <span class="rank-tag" data-page-node-id="ZV6nYVXJie25pIYGTfwKW6">8天4板</span></div>
-        <div class="stock-code" data-page-node-id="CVVF7TPtBTLHuBSKwsHwGU">600792 · 焦炭Ⅱ</div>
-        <div class="stock-code" data-page-node-id="nM8YQXrXjB2FDc5vTLRA0d">封单 0.33 亿 · 开板 1 次</div>
+      <div class="stock-price"><div class="price up">3.47</div><div class="pct up">+10.16%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">7. 云煤能源 <span class="rank-tag">8天4板</span></div>
+        <div class="stock-code">600792 · 焦炭Ⅱ</div>
+        <div class="stock-code">封单 0.33 亿 · 开板 1 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="sHDSqEJ9jURhJME4vY9LlA"><div class="price up" data-page-node-id="yQG2uJGldg5Tzdrxjg9CvY">5.41</div><div class="pct up" data-page-node-id="wTsfFvGMRRUe6hDKIV0SYA">+9.96%</div></div>
-    </div><div class="stock-row" data-page-node-id="wUh0UErgZGOA10VrykZM2q">
-      <div class="stock-info" data-page-node-id="Zuay9DJPsAjXiiD0YXIPJQ"><div class="stock-name" data-page-node-id="t884lRYf5XHwQtpXIw5mLz">8. 长城电工 <span class="rank-tag" data-page-node-id="xtLDNuWWqqPZXhXE1OVNwl">2天2板</span></div>
-        <div class="stock-code" data-page-node-id="5wd1QN1xiZcGpbucMwF4xw">600192 · 电网设备</div>
-        <div class="stock-code" data-page-node-id="i1iycd1h6DbVJ1SjU3LAyy">封单 0.39 亿 · 开板 3 次</div>
+      <div class="stock-price"><div class="price up">5.41</div><div class="pct up">+9.96%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">8. 长城电工 <span class="rank-tag">2天2板</span></div>
+        <div class="stock-code">600192 · 电网设备</div>
+        <div class="stock-code">封单 0.39 亿 · 开板 3 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="IiNEfjPUCAjCRbHBoEzqS0"><div class="price up" data-page-node-id="HzOVOLMlkXdGHRGTEa7CHA">8.68</div><div class="pct up" data-page-node-id="xJtQeK7ZepJ0shVzABjKej">+10.01%</div></div>
-    </div><div class="stock-row" data-page-node-id="QarxXgX4TcbquqK759PCYe">
-      <div class="stock-info" data-page-node-id="34SYHIqdEraJxEzbjNxKH1"><div class="stock-name" data-page-node-id="XF0TGPiJqXEBwNWjPHwJYE">9. 闽东电力 <span class="rank-tag" data-page-node-id="0xWRyzgtFbbKOhcKQZQgEQ">2天2板</span></div>
-        <div class="stock-code" data-page-node-id="hjdyHTBx6OEr2vdlLFcbL3">000993 · 电力</div>
-        <div class="stock-code" data-page-node-id="CBr8cxIYxcYQDw2H60MWh6">封单 1.22 亿 · 开板 1 次</div>
+      <div class="stock-price"><div class="price up">8.68</div><div class="pct up">+10.01%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">9. 闽东电力 <span class="rank-tag">2天2板</span></div>
+        <div class="stock-code">000993 · 电力</div>
+        <div class="stock-code">封单 1.22 亿 · 开板 1 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="fdSYsLG8ElmvJeXTyDAX9N"><div class="price up" data-page-node-id="F7iGTix0AqoNELy1wcPHF4">12.62</div><div class="pct up" data-page-node-id="kiV0aQCnYxEbVQl5nFbSNj">+10.03%</div></div>
-    </div><div class="stock-row" data-page-node-id="gwPVqWQ9K57ZVVMneAK2i6">
-      <div class="stock-info" data-page-node-id="WPjty2dd6w2M4xOKlbuQxH"><div class="stock-name" data-page-node-id="4ueDhLqgJARhsJPyiHkcCu">10. 中新赛克 <span class="rank-tag" data-page-node-id="FGDRHaIiKr4xOpmxeC8KNu">1天1板</span></div>
-        <div class="stock-code" data-page-node-id="8XnbUEO5ZABYkqDRbvkysB">002912 · 计算机设</div>
-        <div class="stock-code" data-page-node-id="D4E3HpSofsS0p6NgNv9QAi">封单 0.10 亿 · 开板 4 次</div>
+      <div class="stock-price"><div class="price up">12.62</div><div class="pct up">+10.03%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">10. 中新赛克 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">002912 · 计算机设</div>
+        <div class="stock-code">封单 0.10 亿 · 开板 4 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="54YJjx2Ht4sfEpdTDbmpX6"><div class="price up" data-page-node-id="zk21nKQaMREcW3EpxX9QeL">21.37</div><div class="pct up" data-page-node-id="RL7Jw4sHAlJXAStH7oBvfY">+9.98%</div></div>
-    </div><div class="stock-row" data-page-node-id="JJEq7lCYaEpBYPnRPLVCEZ">
-      <div class="stock-info" data-page-node-id="egPuavIUIMFWUJe5jSwhdz"><div class="stock-name" data-page-node-id="0KTOC0ejhGiYpf8ZHDH4CA">11. 太极实业 <span class="rank-tag" data-page-node-id="WrNDNshrNEgIuB6vZSrCf5">1天1板</span></div>
-        <div class="stock-code" data-page-node-id="VGlyAteGLYo9D4jJBTCfuW">600667 · 工程咨询</div>
-        <div class="stock-code" data-page-node-id="RXGHY85PoXIFLZ9BraASWk">封单 5.42 亿 · 开板 0 次</div>
+      <div class="stock-price"><div class="price up">21.37</div><div class="pct up">+9.98%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">11. 太极实业 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">600667 · 工程咨询</div>
+        <div class="stock-code">封单 5.42 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="5fFmdQPBeXSjMtnGHIWcDN"><div class="price up" data-page-node-id="KHSqJC7tZoQedP1VKv9pbt">19.98</div><div class="pct up" data-page-node-id="O7LbtbvJHKGVbD3WXTY0sW">+10.02%</div></div>
-    </div><div class="stock-row" data-page-node-id="Gl0FLQ2cvzfyBiVLXlgAdL">
-      <div class="stock-info" data-page-node-id="GP04tJA8HMdqVXZpxQKhok"><div class="stock-name" data-page-node-id="nrBuDeIcBJFkJgJtyVIGN7">12. 九鼎新材 <span class="rank-tag" data-page-node-id="JHivSlX126zB6cBagOKhXU">1天1板</span></div>
-        <div class="stock-code" data-page-node-id="EIF31WMvPKEiJiEbViHQbM">002201 · 玻璃玻纤</div>
-        <div class="stock-code" data-page-node-id="3QqUAvU5Hky4tQR7skZw92">封单 0.74 亿 · 开板 2 次</div>
+      <div class="stock-price"><div class="price up">19.98</div><div class="pct up">+10.02%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">12. 九鼎新材 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">002201 · 玻璃玻纤</div>
+        <div class="stock-code">封单 0.74 亿 · 开板 2 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="A4qE2J9gDEyg3Qct70X9uq"><div class="price up" data-page-node-id="CSZhWicl1MvEigFoe5gVLr">10.08</div><div class="pct up" data-page-node-id="FzmF0E9Wdbp96CgKRlk7vX">+10.04%</div></div>
-    </div><div class="stock-row" data-page-node-id="mqQpnYPWidib2XvucsFYXr">
-      <div class="stock-info" data-page-node-id="n3ygevJHPPK0lPOVLJ5H4g"><div class="stock-name" data-page-node-id="kPfE4PnYDNJ5z1yX51J3SK">13. 水发燃气 <span class="rank-tag" data-page-node-id="vyf8mHzPS9Gql9rjrLQBFg">1天1板</span></div>
-        <div class="stock-code" data-page-node-id="aqT5hc89EoZnXnMKcOgoNV">603318 · 燃气Ⅱ</div>
-        <div class="stock-code" data-page-node-id="xYXFKtdanHjdebsAUtmDS2">封单 0.43 亿 · 开板 2 次</div>
+      <div class="stock-price"><div class="price up">10.08</div><div class="pct up">+10.04%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">13. 水发燃气 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">603318 · 燃气Ⅱ</div>
+        <div class="stock-code">封单 0.43 亿 · 开板 2 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="SyuNl1ulMPH0iBLgpiip7Z"><div class="price up" data-page-node-id="YsNuGmgmNRWNCg63htIylI">10.35</div><div class="pct up" data-page-node-id="omvxamM4xFGPpmlRzPdQ9m">+9.99%</div></div>
-    </div><div class="stock-row" data-page-node-id="zoLa4hDlZEa3dsgMgEM8PH">
-      <div class="stock-info" data-page-node-id="g9cEmhbjYZH5aSYeZlPttY"><div class="stock-name" data-page-node-id="3Y1aGiENE39qJP1iFbKjrA">14. 克明食品 <span class="rank-tag" data-page-node-id="VVAHSIRKCnw25SfUs6KFZP">1天1板</span></div>
-        <div class="stock-code" data-page-node-id="yRlDG7zGd9NpZWCJXzGZxo">002661 · 食品加工</div>
-        <div class="stock-code" data-page-node-id="PpghwEmmr2nWszGSe1DdYq">封单 0.22 亿 · 开板 4 次</div>
+      <div class="stock-price"><div class="price up">10.35</div><div class="pct up">+9.99%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">14. 克明食品 <span class="rank-tag">1天1板</span></div>
+        <div class="stock-code">002661 · 食品加工</div>
+        <div class="stock-code">封单 0.22 亿 · 开板 4 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="sm3j6FahZfPfakkILa1Jgy"><div class="price up" data-page-node-id="zlnkOCEXwrDm7UinoZVx9i">9.60</div><div class="pct up" data-page-node-id="PAMURNoO2rmdpKNuUKC3Rg">+9.97%</div></div>
-    </div><div class="stock-row" data-page-node-id="A3UgLQbOGHj1zOd2pBcBVv">
-      <div class="stock-info" data-page-node-id="i9LC62LFBUyZpt7QsTheAs"><div class="stock-name" data-page-node-id="u7SPCrva82DnDDGpgsFKzA">15. 鼎信通讯 <span class="rank-tag" data-page-node-id="NQNCj0P02yHSpH2rvbHe1Y">2天2板</span></div>
-        <div class="stock-code" data-page-node-id="VrOfOKZX8bqQI0uAY8dOFN">603421 · 通信设备</div>
-        <div class="stock-code" data-page-node-id="hM9vzmyTbXAaWJKLZDqpUi">封单 0.65 亿 · 开板 0 次</div>
+      <div class="stock-price"><div class="price up">9.60</div><div class="pct up">+9.97%</div></div>
+    </div><div class="stock-row">
+      <div class="stock-info"><div class="stock-name">15. 鼎信通讯 <span class="rank-tag">2天2板</span></div>
+        <div class="stock-code">603421 · 通信设备</div>
+        <div class="stock-code">封单 0.65 亿 · 开板 0 次</div>
       </div>
-      <div class="stock-price" data-page-node-id="ti4gYwa5ReGfgR4bzioUQE"><div class="price up" data-page-node-id="8D7E3j08tYb7Y17vBVxBSR">7.29</div><div class="pct up" data-page-node-id="UIlnQlSwlWJ1yaBmOkkAtq">+9.95%</div></div>
+      <div class="stock-price"><div class="price up">7.29</div><div class="pct up">+9.95%</div></div>
     </div>
   </div>
   
-  <div class="playbook-card" data-page-node-id="Dk5FSL4jKrEsOKDwZzumdz"><div class="pb-header" data-page-node-id="0VXdSP3QMJ22F9Lax3uZNA"><span class="pb-eyebrow" data-page-node-id="PdmynSMWD8lEcTxDLwbhLn">PLAYBOOK · 风险判断及重点关注方向</span><span class="pb-title" data-page-node-id="q6whwCRLaKNXEIVL72TsPO">🎯 风险判断及重点关注方向</span></div><div class="pb-grid" data-page-node-id="LOA7FZT5CBRd49FwZ4FKXA"><div class="pb-sec pb-offense" data-page-node-id="qxheISGTrkfZoiDotWAFHM"><div class="pb-sec-h" data-page-node-id="l6KFO1vjDGwsdTnrVjYFa5">⚔️ 进攻方向(2-3 个)</div><div class="pb-item" data-page-node-id="OakE8AEvu0pB95ylPUHSDX"><div class="pb-name" data-page-node-id="bc8aHB4avP5ud5DH1TFigs">电力<span class="pb-count" data-page-node-id="RMdH0fa9cKBzNGZcQ65kxB">5家 / 2板</span><span class="pb-lead" data-page-node-id="5pWACg0MlL7OW3NEInSFcT">龙头 闽东电力</span></div><div class="pb-logic" data-page-node-id="yKykWQfj9Yt6PuSh4vCNt3"></div><div class="pb-scenario" data-page-node-id="mZaI0XVLkADWEOA4CBHSj8">适用场景:</div><div class="str-picks" data-page-node-id="RrMJN5XAKUMTNIbqq3d6D8"><span class="str-picks-tag" data-page-node-id="dMvYnXdK5oRyNYVvfczQ8u">排除涨停 · 优先可观察</span><span class="str-pick" data-page-node-id="TfiDULdiO2Y7w96ilAc7td"><b data-page-node-id="AVwvqZ5rHZ5aIAutHfm0pP">九洲集团</b><span class="up" data-page-node-id="z2GWo3CLNtrHpi94htC3Hh">+8.08%</span></span><span class="str-pick" data-page-node-id="EJ90I96CBILBUPUAEFOVvz"><b data-page-node-id="68cJwcYlaUAdy4GIHDg6rq">明星电力</b><span class="up" data-page-node-id="KTB0h5blAi8cEb8FwNyzXP">+6.79%</span></span><span class="str-pick" data-page-node-id="TxA7PVaS90plZTCX1q0wfo"><b data-page-node-id="ZjWUqJSLjcOlB2FzGK4zjL">西昌电力</b><span class="up" data-page-node-id="dusVRNiOSnpbdwVK2x1wZI">+5.86%</span></span></div></div></div><div class="pb-sec pb-defense" data-page-node-id="HIkWNGne7JGHxTpKPLKFxz"><div class="pb-sec-h" data-page-node-id="lKI8I9ZCE6QRvrASRSwcic">🛡️ 防御方向(2-3 个)</div><div class="pb-item" data-page-node-id="k1BdmUxsOr3HXgvbqTO6Ey"><div class="pb-name" data-page-node-id="cU21EET1EiBq7YnDmdlKXd">高股息红利</div><div class="pb-logic" data-page-node-id="E1feYMPS0iOFhIy7oXi0jf">低波动+稳定分红</div><div class="pb-scenario" data-page-node-id="JOKNp9dppkrTjsndCQCeMp">适用场景:若市场风险偏好下行或风格切换</div></div><div class="pb-item" data-page-node-id="DbQ9EtPdY00MKRO3ZGeGRL"><div class="pb-name" data-page-node-id="222U8qgHiK0exYxKHKUgbr">公用事业</div><div class="pb-logic" data-page-node-id="jPlSUXMyVY6vbUqhx45w8S">现金流稳定+刚性需求</div><div class="pb-scenario" data-page-node-id="TdBnQUHW0zLTp2WLNpMIfw">适用场景:外盘走弱+量能萎缩</div></div><div class="pb-item" data-page-node-id="9XCvlBf3yNsMZNtiHi9CFz"><div class="pb-name" data-page-node-id="6VHiuwaDvc0HfR6tTBUnha">银行(大行)</div><div class="pb-logic" data-page-node-id="RsFza743RxkX2PrJLYc9oG">高股息+低估值</div><div class="pb-scenario" data-page-node-id="HGrSzI668gEiY7WGn8Rwvr">适用场景:高位板块兑现+避险情绪升温</div></div></div><div class="pb-sec pb-themes" data-page-node-id="BtPXUTFMGDAFG0jStGqwvf"><div class="pb-sec-h" data-page-node-id="QSFg6Qw7hBWiMbtFO5pdAj">🎯 主题方向</div><div class="pb-item" data-page-node-id="GdacmJXuneDcyRr44YeaCJ"><div class="pb-name" data-page-node-id="eGPVKHNsvxiLuHM4HxTpzK">半导体</div><div class="pb-logic" data-page-node-id="Z3oqUb4D9ccOm1kYNzEN4B">映射标的:诚邦股份</div><div class="str-picks" data-page-node-id="R3Bqvd1dH6SJCc29XwKi3C"><span class="str-picks-tag" data-page-node-id="US22OLIjZHot6Cz1AWT1uS">排除涨停 · 优先可观察</span><span class="str-pick" data-page-node-id="Wc0U9OdAY1r4mFHRUDuwiV"><b data-page-node-id="qOjbVJ0nTRaSFVbgYa6yL0">富乐德</b><span class="up" data-page-node-id="v5UqjsFzjdqGtW2ukuxA9m">+8.97%</span></span><span class="str-pick" data-page-node-id="3tawKKu2vp4fdYZyioOJDX"><b data-page-node-id="BXZ1GYPQWQtWmgYVepx2eN">气派科技</b><span class="up" data-page-node-id="mV7KYimJ37s0Ali5JwTF8t">+6.16%</span></span><span class="str-pick" data-page-node-id="tcRV3vnjzDIIFeCK87DNdw"><b data-page-node-id="c8afWp5zOeZFnnDPVulaL1">利扬芯片</b><span class="up" data-page-node-id="lP89zAQGyRPfBuBG0wDqyp">+5.64%</span></span></div></div></div><div class="pb-sec pb-pitfall" data-page-node-id="hA3C8MVhGNpmYuyskx0TeQ"><div class="pb-sec-h" data-page-node-id="gvthLCHZgzVr9WCAOn9B5M">⚠️ 避坑方向(2-3 个)</div><div class="pb-item" data-page-node-id="Q4O6sH36Ozb0ID0uSA17zA"><div class="pb-name" data-page-node-id="wcfjvRNq0HwNBC7pWID8ta">高位连板股(连板≥4)</div><div class="pb-logic" data-page-node-id="9JxTRhKiBe4tzwkjXkRs6I">当前连板≥4 共 1 只,承接强度需复核</div><div class="pb-scenario" data-page-node-id="XgcYJfvHGF90AFFjDzCvnv">适用场景:若 11:30 后炸板率上升</div></div><div class="pb-item" data-page-node-id="6Hs4PeiGdoeExsa6RsvTXT"><div class="pb-name" data-page-node-id="CWuHGlkKT7TdXiWItRF08C">当日炸板股</div><div class="pb-logic" data-page-node-id="U8WWYKU9k0fq669a2uVnxV">近 0 只炸板,分歧加大</div><div class="pb-scenario" data-page-node-id="qtBJtmiUPGPk8sjaLKx02C">适用场景:缩量回踩阶段避免追高</div></div><div class="pb-item" data-page-node-id="BupeMX0VoDnUbhIScVMuIt"><div class="pb-name" data-page-node-id="pFjkKYrvZwBqIN3iwKK82a">北证/微盘股</div><div class="pb-logic" data-page-node-id="0iciQdr555bNwOVGuXlMu9">波动放大+流动性敏感</div><div class="pb-scenario" data-page-node-id="cSsgjaRZUBhGYzvfC4vhCu">适用场景:外盘系统性风险时易补跌</div></div></div></div><div class="card" data-page-node-id="7byZnjrVH9hMJeJoUSYpbK"><div class="card-title" data-page-node-id="GPWt7GWJRAmhMZEF1mlvFz">操作节奏</div><div class="rhythm-item" data-page-node-id="xB9IxYMAfhDGSSt0HQwzpe"><span class="rhythm-time" data-page-node-id="9hMpyt9FLUFWO75dYT5zsJ">早盘 9:30-10:30</span><span class="rhythm-rule" data-page-node-id="qkSkBu2ff9N6dGugqLHoZH">"高开不追、低开看承接":基于外盘+开盘竞价,若高开 ≥0.5% 谨防冲高回落;若低开 ≤-0.5% 关注早盘 30 分钟承接力度</span></div><div class="rhythm-item" data-page-node-id="0TYyMkURUx0G8yzRcoZqBO"><span class="rhythm-time" data-page-node-id="Y3jEcVwMzprRATtaH6dY2y">午盘 10:30-14:00</span><span class="rhythm-rule" data-page-node-id="MAJKlyAn5oerA9QrFPrmIE">基于上午量能+板块轮动:若上午成交已达 5 日均量 50% 以上 + 板块轮动有序,可继续持有;若上午缩量+龙头炸板,逢高减仓</span></div><div class="rhythm-item" data-page-node-id="juehobtiqDuhlmGZwjdmxj"><span class="rhythm-time" data-page-node-id="RRvLetUut6c83ybcw7FeTZ">尾盘 14:00-15:00</span><span class="rhythm-rule" data-page-node-id="GkMkhrS4M9Ke7e1v6p8xGd">基于全天走势定型:定型向上则持有或加仓主线,定型向下则规避高位股+减仓至建议仓位</span></div><div class="rhythm-pos" data-page-node-id="ghUk8LIHjm4Z9bnograrae"><b data-page-node-id="G6AZqCaVDELBv5ERFjFH9D">仓位管理建议</b>:当前市场环境下建议仓位区间 <b data-page-node-id="u7npPUh5frIxVVQWffPCEV">40%-60%</b>,加减仓触发条件:放量突破 MA60 + 板块带动 ≥3 板 → 加仓至 60%;缩量回踩 MA20 + 龙头炸板 → 减仓至 40%</div></div></div>
-  <div class="verdict-card" data-page-node-id="ETUP89nJhnQdfRIryWgOER"><div class="vd-header" data-page-node-id="KRUK1LLVuOL6RTFNBMuCRo"><span class="vd-eyebrow" data-page-node-id="u5KavGFp2EvYFLUDuUWUxr">VERDICT · 综合研判输出</span><span class="vd-title" data-page-node-id="B9NeE9hYr1H87VSSogVOt4">📋 综合研判输出</span></div><div class="card vd-card vd-offense" data-page-node-id="nMzFRXDmn8LHOZlbM4AkWt"><div class="vd-h" data-page-node-id="mcHbKkWOkny5qw8pLMPsIo">⚔️ 进攻线</div><div class="vd-body" data-page-node-id="lLX105gg6YIewOaDsTLen0">关注 <b data-page-node-id="3xWjanfrxEI70Gm1UUYUx6">电力</b> 的持续性与龙头承接,概率倾向:板块带动效应延续的可能性较高</div></div><div class="card vd-card vd-defense" data-page-node-id="843ZDbTFZwWL9kj80GhCgB"><div class="vd-h" data-page-node-id="RYC7dq0EEQEFF6YZiEqVze">🛡️ 防守线</div><div class="vd-body" data-page-node-id="a5osKLs1DLwq9oZBuIorWu">若市场风险偏好下行,配置可考虑 <b data-page-node-id="PQqx6EmYlBEisJvr1r3pgu">高股息红利 / 公用事业</b>,此类标的波动较低、分红稳定</div></div><div class="card vd-card vd-pitfall" data-page-node-id="QLn0OePWEcpVVkWa39V7c1"><div class="vd-h" data-page-node-id="BYPVJplYJhF1ORIL48y7LJ">⚠️ 避坑线</div><div class="vd-body" data-page-node-id="Ipdk2SN69iNhCwRPu8rncW">回避 <b data-page-node-id="bUQcbdRtIaCLGbfv6k7XBf">高位连板股(连板≥4) / 当日炸板股</b>,尤其在外盘走弱或高位板块炸板时风险上升</div></div><div class="card" data-page-node-id="GvHFn1sMkI91NWN5665uL2"><div class="card-title" data-page-node-id="sTR2DO1aN25RKJETB0b5yG">关键变量提醒(今日待落地)</div><div class="var-item" data-page-node-id="PoyDaj2YPryZYHzgXrYmX7">🇺🇸 <b data-page-node-id="6exXl8zidLZUNaRNKR7sbm">美国 CPI / 美联储讲话</b> → 关注通胀与利率路径,影响北向资金与全球风险偏好</div><div class="var-item" data-page-node-id="w7mfumFWEvN5Li5BNnC3DE">🇨🇳 <b data-page-node-id="gOa1dEqWfMrEFgKWyT8WkV">国内经济数据 / 央行公开市场操作</b> → 关注社融、PMI、利率决议,影响流动性预期</div><div class="var-item" data-page-node-id="zQF0ZFfAhGIBcVksyxRHo9">🌐 <b data-page-node-id="1RoWzcs57gVB7oSjzu4B5d">外盘重要事件</b> → 欧股开盘、美股期货走势、地缘冲突</div><div class="hint" data-page-node-id="FR8drRIfiOXeWpmrw0Milw">具体发布时间需联网实时确认(由 ATDS 11:35 automation 联网补充)</div></div><div class="card" data-page-node-id="Gpn7mDaNYjJorllIHuRvd8"><div class="card-title" data-page-node-id="qGsEBGZlDu1Zo37POEG4MM">风险提示(综合)</div><div class="vd-risk" data-page-node-id="QDaKlGGo4UN9vgdVAhcbjR">高位连板股(连板≥4)——当前连板≥4 共 1 只,承接强度需复核</div><div class="vd-risk" data-page-node-id="9HuJIyxysmFgtf8qlCVoqZ">当日炸板股——近 0 只炸板,分歧加大</div></div><div class="vd-disclaimer" data-page-node-id="Gu69tzxPgqox58jfBoMiFq">约束条件:所有数据来自联网实时检索;所有判断为概率倾向,不使用绝对化表述;技术位是概率参考而非确定买卖点;若某类别无重大变化,输出"本类暂无重大变化",不编造;A 股真正走势由内资承接力度、国内政策催化、板块轮动节奏决定</div></div>
-  <div class="card trade-review-entry" data-page-node-id="qUfoBFZ0B2U3f47TZV0Ak7">
-    <div class="trade-review-title" data-page-node-id="csT0WlKGHN39ncO1lsTjAS">📒 第五步 · 交易复盘</div>
-    <div class="trade-review-sub" data-page-node-id="XduvaAx9fAwwbDZnXgkS1e">输入个股代码，自动分析买点K线位置、买入理由、是否符合系统、卖出原因</div>
-    <button class="wl-btn wl-btn-primary" onclick="openTradeReview()" style="margin-top:8px;" data-page-node-id="iwhim873W479CcUspZHDXM">✍️ 开始交易复盘</button>
+  <div class="playbook-card"><div class="pb-header"><span class="pb-eyebrow">PLAYBOOK · 风险判断及重点关注方向</span><span class="pb-title">🎯 风险判断及重点关注方向</span></div><div class="pb-grid"><div class="pb-sec pb-offense"><div class="pb-sec-h">⚔️ 进攻方向(2-3 个)</div><div class="pb-item"><div class="pb-name">电力<span class="pb-count">5家 / 2板</span><span class="pb-lead">龙头 闽东电力</span></div><div class="pb-logic"></div><div class="pb-scenario">适用场景:</div><div class="str-picks"><span class="str-picks-tag">排除涨停 · 优先可观察</span><span class="str-pick"><b>九洲集团</b><span class="up">+8.08%</span></span><span class="str-pick"><b>明星电力</b><span class="up">+6.79%</span></span><span class="str-pick"><b>西昌电力</b><span class="up">+5.86%</span></span></div></div></div><div class="pb-sec pb-defense"><div class="pb-sec-h">🛡️ 防御方向(2-3 个)</div><div class="pb-item"><div class="pb-name">高股息红利</div><div class="pb-logic">低波动+稳定分红</div><div class="pb-scenario">适用场景:若市场风险偏好下行或风格切换</div></div><div class="pb-item"><div class="pb-name">公用事业</div><div class="pb-logic">现金流稳定+刚性需求</div><div class="pb-scenario">适用场景:外盘走弱+量能萎缩</div></div><div class="pb-item"><div class="pb-name">银行(大行)</div><div class="pb-logic">高股息+低估值</div><div class="pb-scenario">适用场景:高位板块兑现+避险情绪升温</div></div></div><div class="pb-sec pb-themes"><div class="pb-sec-h">🎯 主题方向</div><div class="pb-item"><div class="pb-name">半导体</div><div class="pb-logic">映射标的:诚邦股份</div><div class="str-picks"><span class="str-picks-tag">排除涨停 · 优先可观察</span><span class="str-pick"><b>富乐德</b><span class="up">+8.97%</span></span><span class="str-pick"><b>气派科技</b><span class="up">+6.16%</span></span><span class="str-pick"><b>利扬芯片</b><span class="up">+5.64%</span></span></div></div></div><div class="pb-sec pb-pitfall"><div class="pb-sec-h">⚠️ 避坑方向(2-3 个)</div><div class="pb-item"><div class="pb-name">高位连板股(连板≥4)</div><div class="pb-logic">当前连板≥4 共 1 只,承接强度需复核</div><div class="pb-scenario">适用场景:若 11:30 后炸板率上升</div></div><div class="pb-item"><div class="pb-name">当日炸板股</div><div class="pb-logic">近 0 只炸板,分歧加大</div><div class="pb-scenario">适用场景:缩量回踩阶段避免追高</div></div><div class="pb-item"><div class="pb-name">北证/微盘股</div><div class="pb-logic">波动放大+流动性敏感</div><div class="pb-scenario">适用场景:外盘系统性风险时易补跌</div></div></div></div><div class="card"><div class="card-title">操作节奏</div><div class="rhythm-item"><span class="rhythm-time">早盘 9:30-10:30</span><span class="rhythm-rule">"高开不追、低开看承接":基于外盘+开盘竞价,若高开 ≥0.5% 谨防冲高回落;若低开 ≤-0.5% 关注早盘 30 分钟承接力度</span></div><div class="rhythm-item"><span class="rhythm-time">午盘 10:30-14:00</span><span class="rhythm-rule">基于上午量能+板块轮动:若上午成交已达 5 日均量 50% 以上 + 板块轮动有序,可继续持有;若上午缩量+龙头炸板,逢高减仓</span></div><div class="rhythm-item"><span class="rhythm-time">尾盘 14:00-15:00</span><span class="rhythm-rule">基于全天走势定型:定型向上则持有或加仓主线,定型向下则规避高位股+减仓至建议仓位</span></div><div class="rhythm-pos"><b>仓位管理建议</b>:当前市场环境下建议仓位区间 <b>40%-60%</b>,加减仓触发条件:放量突破 MA60 + 板块带动 ≥3 板 → 加仓至 60%;缩量回踩 MA20 + 龙头炸板 → 减仓至 40%</div></div></div>
+  <div class="verdict-card"><div class="vd-header"><span class="vd-eyebrow">VERDICT · 综合研判输出</span><span class="vd-title">📋 综合研判输出</span></div><div class="card vd-card vd-offense"><div class="vd-h">⚔️ 进攻线</div><div class="vd-body">关注 <b>电力</b> 的持续性与龙头承接,概率倾向:板块带动效应延续的可能性较高</div></div><div class="card vd-card vd-defense"><div class="vd-h">🛡️ 防守线</div><div class="vd-body">若市场风险偏好下行,配置可考虑 <b>高股息红利 / 公用事业</b>,此类标的波动较低、分红稳定</div></div><div class="card vd-card vd-pitfall"><div class="vd-h">⚠️ 避坑线</div><div class="vd-body">回避 <b>高位连板股(连板≥4) / 当日炸板股</b>,尤其在外盘走弱或高位板块炸板时风险上升</div></div><div class="card"><div class="card-title">关键变量提醒(今日待落地)</div><div class="var-item">🇺🇸 <b>美国 CPI / 美联储讲话</b> → 关注通胀与利率路径,影响北向资金与全球风险偏好</div><div class="var-item">🇨🇳 <b>国内经济数据 / 央行公开市场操作</b> → 关注社融、PMI、利率决议,影响流动性预期</div><div class="var-item">🌐 <b>外盘重要事件</b> → 欧股开盘、美股期货走势、地缘冲突</div><div class="hint">具体发布时间需联网实时确认(由 ATDS 11:35 automation 联网补充)</div></div><div class="card"><div class="card-title">风险提示(综合)</div><div class="vd-risk">高位连板股(连板≥4)——当前连板≥4 共 1 只,承接强度需复核</div><div class="vd-risk">当日炸板股——近 0 只炸板,分歧加大</div></div><div class="vd-disclaimer">约束条件:所有数据来自联网实时检索;所有判断为概率倾向,不使用绝对化表述;技术位是概率参考而非确定买卖点;若某类别无重大变化,输出"本类暂无重大变化",不编造;A 股真正走势由内资承接力度、国内政策催化、板块轮动节奏决定</div></div>
+  <div class="card trade-review-entry">
+    <div class="trade-review-title">📒 第五步 · 交易复盘</div>
+    <div class="trade-review-sub">输入个股代码，自动分析买点K线位置、买入理由、是否符合系统、卖出原因</div>
+    <button class="wl-btn wl-btn-primary" onclick="openTradeReview()" style="margin-top:8px;">✍️ 开始交易复盘</button>
   </div>
-  <div class="card trade-review-entry" data-page-node-id="NOgIm9WmfHjoO3NRDZtXEe">
-    <div class="trade-review-title" data-page-node-id="O4go8BALAPpTGNznIX77C2">📊 第六步 · 交易行为复盘</div>
-    <div class="trade-review-sub" data-page-node-id="PA04OeCaqNTrfOEaDe956t">输入个股与成本价，分析追高、杀跌、持仓周期、情绪化交易等行为偏差与优化规则</div>
-    <button class="wl-btn wl-btn-primary" onclick="openBehaviorReview()" style="margin-top:8px;" data-page-node-id="C4H5Cu7MGUdVmfB29qFBI2">🧭 开始行为复盘</button>
+  <div class="card trade-review-entry">
+    <div class="trade-review-title">📊 第六步 · 交易行为复盘</div>
+    <div class="trade-review-sub">输入个股与成本价，分析追高、杀跌、持仓周期、情绪化交易等行为偏差与优化规则</div>
+    <button class="wl-btn wl-btn-primary" onclick="openBehaviorReview()" style="margin-top:8px;">🧭 开始行为复盘</button>
   </div>
 </div>
-<div class="footer" data-page-node-id="jx0NvQGGQVsb0t2NrOzEJ6">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
+<div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
 </div>
 <script>
 function getBaseUrl(){var h=location.href.split("#")[0];if(/index\.html/i.test(h)){return h.replace(/index\.html.*$/i,"");}if(h.slice(-1)==="/"){return h;}var i=h.lastIndexOf("/");return h.slice(0,i+1);}
@@ -2794,9 +2802,11 @@ function buildDecisionCardHtml(s){
   keyScore=Math.min(15,keyScore);
   var rrScore=p.rr>=2?10:p.rr>=1.5?7:p.rr>=1?4:0;
   var confTotal=Math.round(trendScore+fundScore+themeScore+keyScore+rrScore);
-  // 仓位计算器:单笔风险0.5%-1% ÷ 止损幅度
+  // 仓位计算器:单笔风险0.5%-1% ÷ 止损幅度,单股15%硬顶
   var stopPctMax=Math.max(p.stopPct,1);
-  var pos={low:Math.round(0.5/stopPctMax*100),high:Math.round(1/stopPctMax*100),stopPct:Math.round(stopPctMax*10)/10};
+  var rawLow=0.5/stopPctMax*100, rawHigh=1/stopPctMax*100;
+  var posCapped=rawHigh>15;
+  var pos={low:Math.min(Math.round(rawLow),15),high:Math.min(Math.round(rawHigh),15),capped:posCapped,stopPct:Math.round(stopPctMax*10)/10};
   var confTone=confTotal>=75?'good':confTotal>=60?'ok':'warn';
   var statusLabel=confTotal>=75?'可交易':confTotal>=60?'轻仓试错':'观察';
   var priority=confTotal>=75&&p.rr>=2?'★★★':confTotal>=60?'★★':'★';
@@ -2867,10 +2877,11 @@ function buildDecisionCardHtml(s){
   var lhbHtml=lhb
     ?'龙虎榜('+escHtmlF(lhb.date)+')：机构 <b class="'+((lhb.inst||0)>=0?'up':'down')+'">'+((lhb.inst||0)>=0?'+':'')+((lhb.inst!=null?lhb.inst:0).toFixed(2))+'亿</b> · 游资 <b class="'+((lhb.youzi||0)>=0?'up':'down')+'">'+((lhb.youzi||0)>=0?'+':'')+((lhb.youzi!=null?lhb.youzi:0).toFixed(2))+'亿</b> · 北向 <b class="'+((lhb.north||0)>=0?'up':'down')+'">'+((lhb.north||0)>=0?'+':'')+((lhb.north!=null?lhb.north:0).toFixed(2))+'亿</b>'+(lhb.fundAttr?' · 属性 <b>'+escHtmlF(lhb.fundAttr)+'</b>':'')+(lhb.famousSeats&&lhb.famousSeats.length?'<br>知名席位：'+escHtmlF(lhb.famousSeats.slice(0,2).join('、')):'')+'<br>'+escHtmlF(lhb.explain)
     :'龙虎榜：近期未上榜';
-  // 60/15分钟趋势(真实)
+  // 60/15分钟趋势(真实,含MA10/MA5具体价位)
   var m60=(s.minTrend&&s.minTrend.m60)||null;
   var m15=(s.minTrend&&s.minTrend.m15)||null;
-  var minTxt='60分 '+((m60?(m60.trend==='up'?'多头':m60.trend==='down'?'空头':'震荡'):'--'))+' · 15分 '+((m15?(m15.trend==='up'?'多头':m15.trend==='down'?'空头':'震荡'):'--'));
+  function minLabel(m){if(!m)return '--';var dir=m.trend==='up'?'多头':m.trend==='down'?'空头':'震荡';var ma=m.ma10!=null?('MA10 '+m.ma10):(m.ma5!=null?('MA5 '+m.ma5):'');return ma?(dir+'('+ma+')'):dir;}
+  var minTxt='60分 '+minLabel(m60)+' · 15分 '+minLabel(m15);
   // 事件风险(真实:东财财报/解禁 + 巨潮减持/增发/回购/股东大会/监管问询;3天内高影响标红)
   var evs=s.events||null;
   var evStatus=s.eventsStatus||{};
@@ -2879,16 +2890,20 @@ function buildDecisionCardHtml(s){
     ?evs.slice(0,5).map(function(e){var red=(e.level==='高'&&e.left>=-3&&e.left<=3)?' ev-red-alert':'';var cnt=e.left>0?(' T-'+e.left+'天'):(e.left<0?(' '+Math.abs(e.left)+'天前'):' 今日');var short=(e.name&&e.name.length>14)?(e.name.slice(0,14)+'…'):(e.name||'');return '<span class="ev ev-'+(e.level==='高'?'h':e.level==='中'?'m':'l')+' '+(e.dir==='利好'?'ev-good':e.dir==='利空'?'ev-bad':'')+red+'" title="'+escHtmlF(e.detail||e.date||'')+'">'+escHtmlF(e.type)+(short?'·'+escHtmlF(short):'')+cnt+(e.dir!=='中性'?'·'+escHtmlF(e.dir):'')+(e.source?'〔'+escHtmlF(e.source)+'〕':'')+'</span>';}).join('')
     :evEmpty;
   var evNote=(evStatus.cninfo==='fail')?'⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财':'来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)';
-  // 交易计划表(方案A/B/C)
+  // 交易计划表(方案A/B/C;未触发方案盈亏比置灰+未触发标签;做T用ATR动态止损)
   var planBEntry=pre?pre.price:(price*1.05);
   var planBStop=planBEntry*0.97, planBTarget=planBEntry*1.08;
   var planBRR=(planBTarget-planBEntry)/(planBEntry-planBStop);
-  function planRow(name,trig,entryV,stopV,tgtV,rrVal,tone){return '<tr><td class="tp-name">'+name+'</td><td class="tp-trig">'+escHtmlF(trig)+'</td><td class="tp-num">'+f2(entryV)+'</td><td class="tp-num stop">'+f2(stopV)+'</td><td class="tp-num">'+f2(tgtV)+'</td><td class="tp-rr rr-'+tone+'">'+rrVal.toFixed(2)+'</td></tr>';}
-  var cRR=(s.low&&s.high)?((s.high-price)/Math.max(price-s.low,0.01)):p.rr;
+  var atrC=p.atr||(price*0.03);
+  var tStop=price-Math.max(0.5*atrC,price*0.01);
+  var tTgt=price+Math.max(0.5*atrC,price*0.01);
+  var tRR=(price>tStop)?((tTgt-price)/(price-tStop)):1;
+  var trigA=price<=p.entry, trigB=price>=planBEntry, trigC=price>0;
+  function planRow(name,trig,entryV,stopV,tgtV,rrVal,triggered,tone){return '<tr class="'+(triggered?'':'tp-notrig')+'"><td class="tp-name">'+name+'</td><td class="tp-trig">'+escHtmlF(trig)+'</td><td class="tp-num">'+f2(entryV)+'</td><td class="tp-num stop">'+f2(stopV)+'</td><td class="tp-num">'+f2(tgtV)+'</td><td class="tp-rr '+(triggered?'rr-'+tone:'tp-rr-muted')+'">'+(triggered?rrVal.toFixed(2):'未触发')+'</td></tr>';}
   var planTable='<table class="tp-table"><tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>'+
-    planRow('A 回踩低吸','回踩'+f2(p.entry)+'企稳',p.entry,p.stop,p.target,p.rr,rrTone(p.rr))+
-    planRow('B 突破确认','放量突破'+f2(planBEntry),planBEntry,planBStop,planBTarget,planBRR,rrTone(planBRR))+
-    planRow('C 日内做T','区间['+f2(s.low)+','+f2(s.high)+']',price,f2(s.low||p.stop),f2(s.high||planBTarget),cRR,rrTone(cRR))+
+    planRow('A 回踩低吸','回踩'+f2(p.entry)+'企稳',p.entry,p.stop,p.target,p.rr,trigA,rrTone(p.rr))+
+    planRow('B 突破确认','放量突破'+f2(planBEntry),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
+    planRow('C 日内做T','现价'+f2(price)+'·ATR'+f2(atrC)+'动态止损',price,tStop,tTgt,tRR,trigC,rrTone(tRR))+
     '</table>';
   var nowWarn=p.rrNow<1.5
     ?'<div class="tp-warn">⚠ 现价直接买入盈亏比 '+p.rrNow.toFixed(2)+'(<1.5),不合格 —— 等待回踩至 '+f2(p.entry)+' 再执行,当前仅观察。</div>'
@@ -2897,6 +2912,9 @@ function buildDecisionCardHtml(s){
   var keyVerify='最高'+f2(s.high)+' '+((pre&&s.high>=pre.price)?('触及压力'+f2(pre.price)):'未触及压力')+' · 最低'+f2(s.low)+' '+((sup&&s.low<=sup.price)?('触及支撑'+f2(sup.price)):'未触及支撑');
   var fundVerify='主力净流入当日'+sign(ff.d1)+(ff.d1!=null?ff.d1.toFixed(2):'--')+'亿，'+(((ff.d1||0)>=0)?'符合做多预期':'与做多预期背离，需复核');
 
+  // 情绪总纲建议:情绪冰点+趋势空头+主力流出 → 高难度逆势标的
+  var summaryHtml=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0)?'<div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>':'';
+
   return '<div class="dc-head">'+
     '<span class="dc-pri">'+priority+'</span>'+
     '<span class="dc-name">'+escHtmlF(s.name)+' <i>'+escHtmlF(s.code)+'</i></span>'+
@@ -2904,7 +2922,7 @@ function buildDecisionCardHtml(s){
     '<span class="dc-conf">置信度 '+confTotal+'</span>'+
     '<span class="dc-rr rr-'+rrToneVal+'">盈亏比 '+p.rr.toFixed(2)+'</span>'+
     '<span class="dc-time">'+new Date().toLocaleString('zh-CN',{hour12:false})+'</span>'+
-    '</div>'+
+    '</div>'+summaryHtml+
     '<div class="dc-tags">'+(s.category?'<span class="dc-tag">'+escHtmlF(s.category)+'</span>':'')+tagsArr.map(function(x){return '<span class="dc-tag">'+escHtmlF(x)+'</span>';}).join('')+'<span class="dc-tag">催化:'+escHtmlF(catalyst)+'</span><span class="dc-tag">时效:'+escHtmlF(catalystTime)+'</span><span class="dc-tag">阶段:'+escHtmlF(ferment)+'</span><span class="dc-tag">情绪:'+escHtmlF(emotionCycle)+'</span><span class="dc-tag">地位:'+escHtmlF(boardStatus)+'</span><span class="dc-tag">'+escHtmlF(tolerance)+'</span></div>'+
     (s.logic?'<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">'+escHtmlF(s.logic)+'</div></div>':'')+
     '<div class="dc-block"><div class="dc-h">💰 资金与量能</div>'+
@@ -2922,11 +2940,11 @@ function buildDecisionCardHtml(s){
     '</div>'+
     '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div><div class="dc-line dc-src-note">'+evNote+'</div></div>'+
     '<div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>'+planTable+nowWarn+
-      '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>（单股≤15%、单题材≤30%）</div>'+
+      '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>'+(pos.capped?'（受单股上限压制，实际最高仓位15%）':'（单股≤15%、单题材≤30%）')+'</div>'+
       '<div class="dc-line dc-disc">执行纪律：跌破'+f2(p.stop)+'无条件止损 · 到达'+f2(p.target)+'无条件止盈 · 日内做T当日必须平T不隔夜</div>'+
     '</div>'+
     '<div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>'+
-      (riskSignals.length?'<div class="dc-line dc-risk">'+riskSignals.map(function(r){return '<span class="risk-alert">⚠ '+escHtmlF(r)+'</span>';}).join('')+'</div>':'')+
+      (riskSignals.length?'<div class="dc-line dc-risk">'+riskSignals.map(function(r){return '<span class="risk-alert">⚠ '+escHtmlF(r)+(/跌破MA5|跌破MA20/.test(r)?'<i class="risk-guide">空仓者观望，持仓者减仓/清仓</i>':'')+'</span>';}).join('')+'</div>':'')+
       (conflicts.length?'<div class="dc-line dc-risk">'+conflicts.map(function(r){return '<span class="risk-alert risk-conflict">⚡ '+escHtmlF(r)+'</span>';}).join('')+'</div>':'')+
       '<div class="dc-line">证伪条件：'+escHtmlF(falsify)+'</div>'+
       '<div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>'+
@@ -3664,18 +3682,30 @@ function calcDecisionTech(klines){
 }
 /* 个股主力资金流(东财 fflow/kline):主力净流入 当日/3日/5日,单位亿元;失败返回 null 不阻塞 */
 async function fetchStockFundFlowF(code){
+  var num=String(code).replace(/^(sh|sz|bj)/,'');
+  var mkt=String(code).charAt(0)==='6'?'1':'0';
+  function yi(v){return Math.round(v/1e6)/100;}
+  // 主源:历史资金流(120天),正确聚合 d1/d3/d5
   try{
-    var num=String(code).replace(/^(sh|sz|bj)/,'');
-    var mkt=String(code).charAt(0)==='6'?'1':'0';
-    var url='https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5';
+    var url='https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63';
     var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
     var j=await res.json();
     var kl=(j&&j.data&&j.data.klines)||[];
-    if(!kl.length)return null;
-    var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
-    function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
-    function yi(v){return Math.round(v/1e6)/100;}
-    return {d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
+    if(kl.length>=3){
+      var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
+      function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
+      return {d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
+    }
+  }catch(e){/* 降级 */}
+  // 降级:实时接口(仅当日),d3/d5 置 null 避免重复
+  try{
+    var url2='https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5';
+    var res2=await fetch(url2,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
+    var j2=await res2.json();
+    var kl2=(j2&&j2.data&&j2.data.klines)||[];
+    if(!kl2.length)return null;
+    var d1=yi(parseFloat((kl2[kl2.length-1].split(',')[1])||0)||0);
+    return {d1:d1,d3:null,d5:null};
   }catch(e){return null;}
 }
 /* 分钟级趋势(腾讯 mkline):60/15分钟 多空;失败返回 null */

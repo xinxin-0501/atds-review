@@ -907,11 +907,30 @@ function calcTechFromKline(arr) {
     range60: Math.round(range60), pct5: Math.round(pct5 * 100) / 100
   };
 }
-// 个股主力资金流(东财 fflow/kline):主力净流入 当日/3日/5日,单位亿元
+// 个股主力资金流(东财历史资金流 daykline):主力净流入 当日/3日/5日,单位亿元
+// 注:旧接口 fflow/kline?klt=101&lmt=5 只返回当天1根K线,导致 d1=d3=d5 重复;
+//     改用 push2his daykline?lmt=0 取全量历史(120天),正确聚合多日资金。
+//     主源失败时降级到 push2 实时接口(仅当日),d3/d5 置 null(显示 --)绝不重复 d1。
 async function fetchStockFundFlow(code) {
+  const yi = (v) => Math.round(v / 1e6) / 100;  // 元 → 亿元(2位)
+  const num = String(code).replace(/^(sh|sz|bj)/, '');
+  const mkt = String(code).charAt(0) === '6' ? '1' : '0';
+  // 主源:历史资金流(120天)
   try {
-    const num = String(code).replace(/^(sh|sz|bj)/, '');
-    const mkt = String(code).charAt(0) === '6' ? '1' : '0';
+    const url = `https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid=${mkt}.${num}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63`;
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 8000);
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, signal: ac.signal }).finally(() => clearTimeout(timer));
+    const j = await res.json();
+    const kl = (j && j.data && j.data.klines) || [];
+    if (kl.length >= 3) {
+      const vals = kl.map(line => parseFloat((line.split(',')[1]) || 0) || 0);  // f52 主力净流入(元)
+      const sum = k => vals.slice(-k).reduce((a, b) => a + b, 0);
+      return { d1: yi(sum(1)), d3: yi(sum(3)), d5: yi(sum(5)) };
+    }
+  } catch (e) { /* 降级 */ }
+  // 降级:实时接口(仅当日1根K线),d3/d5 置 null 避免重复
+  try {
     const url = `https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid=${mkt}.${num}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5`;
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), 8000);
@@ -919,10 +938,8 @@ async function fetchStockFundFlow(code) {
     const j = await res.json();
     const kl = (j && j.data && j.data.klines) || [];
     if (!kl.length) return null;
-    const vals = kl.map(line => parseFloat((line.split(',')[1]) || 0) || 0);  // f52 主力净流入(元)
-    const sum = k => vals.slice(-k).reduce((a, b) => a + b, 0);
-    const yi = (v) => Math.round(v / 1e6) / 100;  // 元 → 亿元(2位)
-    return { d1: yi(sum(1)), d3: yi(sum(3)), d5: yi(sum(5)) };
+    const d1 = yi(parseFloat((kl[kl.length - 1].split(',')[1]) || 0) || 0);
+    return { d1, d3: null, d5: null };
   } catch (e) { return null; }
 }
 

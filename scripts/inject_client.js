@@ -22,6 +22,8 @@ const heroCss = fs.readFileSync(path.join(ROOT, 'hero_mobile.css'), 'utf8').trim
 const wlStrategyCss = fs.readFileSync(path.join(ROOT, 'watchlist_strategy.css'), 'utf8').trim();
 
 // 自动扫描 site 下所有 HTML(含 reviews/ 子目录),云端新日期自动纳入
+// 排除遗留独立页(自包含,不应被重复注入共享 JS/CSS,否则污染 diff 并可能破坏其自有结构)
+const SKIP_FILES = new Set(['watchlist-mobile.html', 'watchlist-v5.html']);
 function scanFiles() {
   const out = [];
   const walk = (dir) => {
@@ -33,7 +35,7 @@ function scanFiles() {
       const st = fs.statSync(full);
       if (st.isDirectory()) {
         walk(rel);
-      } else if (name.endsWith('.html')) {
+      } else if (name.endsWith('.html') && !SKIP_FILES.has(name)) {
         out.push(rel);
       }
     }
@@ -58,31 +60,12 @@ for (const rel of files) {
     }
   }
 
-  // Ensure modal CSS exists (强制每次重新注入,旧 CSS 已能造成折叠/缺样式故障)
-  // 先移除旧 modal_css(.modal-mask 到最后一个 }) 之间的内容,再注入新 modal_css
-  try {
-    const oldCssRe = /\/\*\s*[（(].*?[）)]\s*\*\/\s*\.modal-mask\{[\s\S]*?\}\s*(?=\/\*|$)/g;
-    let removed = false;
-    c = c.replace(oldCssRe, (m) => { removed = true; return ''; });
-    // 兜底:用 sentinel 定位注入点(.modal-mask{...} 起始锚)
-    if (!removed && c.includes('.modal-mask{display:none')) {
-      const idx = c.indexOf('.modal-mask{display:none');
-      const endIdx = c.indexOf('}', idx);
-      if (idx > 0 && endIdx > idx) {
-        // 找到该注入块的完整结束 </style>
-        const styleEnd = c.indexOf('</style>', endIdx);
-        if (styleEnd > endIdx) {
-          c = c.slice(0, idx) + c.slice(styleEnd);
-          removed = true;
-        }
-      }
-    }
+  // Ensure modal CSS exists (inject into first </style> if missing)
+  if (!c.includes('.modal-mask{display:none')) {
     if (c.includes('</style>')) {
       c = c.replace('</style>', modalCss + '\n</style>', 1);
-      console.log('  +modal CSS (force):', rel);
+      console.log('  +modal CSS:', rel);
     }
-  } catch (e) {
-    console.warn('  modal_css reinject error:', e.message);
   }
   // Ensure dragon pool CSS exists
   if (!c.includes('.dragon-pool{')) {

@@ -523,6 +523,14 @@
 .dc-risk{display:flex;flex-wrap:wrap;gap:4px}
 .risk-alert{display:inline-block;font-size:9px;font-weight:700;color:#c62828;background:#fff0f0;border:1px solid #f0b0b0;border-radius:4px;padding:2px 6px}
 .risk-conflict{color:#e65100;background:#fff8e1;border-color:#ffe0b2}
+/* 风控告警动作指引(跌破MA5/MA20的减仓/清仓建议) */
+.risk-guide{font-style:normal;font-weight:400;color:#b71c1c;background:#fff;border-radius:3px;padding:0 4px;margin-left:4px;font-size:8px;white-space:nowrap}
+/* 未触发方案:整行淡化 + 盈亏比置灰显示"未触发" */
+.tp-notrig{opacity:.62}
+.tp-notrig .tp-num,.tp-notrig .tp-trig,.tp-notrig .tp-name{color:#999}
+.tp-rr-muted{color:#aaa;background:#f2f2f2;border-radius:3px;padding:1px 4px;font-weight:700;font-size:8px}
+/* 情绪总纲建议(高难度逆势标的提示条) */
+.dc-summary{background:linear-gradient(90deg,#fff0f0,#fff5f5);border:1px solid #f0b0b0;border-bottom:1px dashed #f0b0b0;color:#b71c1c;font-size:10px;font-weight:700;padding:6px 10px;line-height:1.5}
 /* 执行纪律 */
 .dc-disc{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:3px 6px}
 /* 移动端紧凑排版:默认全展开(每只股8区决策卡无须点击直接可见),压缩间距降低页面总高 */

@@ -1267,7 +1267,9 @@ function _confidence(s, p) {
 }
 function _positionPct(p) {
   const stopPct = Math.max(p.stopPct, 1);
-  return { low: Math.round(0.5 / stopPct * 100), high: Math.round(1 / stopPct * 100), stopPct: Math.round(stopPct * 10) / 10 };
+  const rawLow = 0.5 / stopPct * 100, rawHigh = 1 / stopPct * 100;
+  const capped = rawHigh > 15;  // 超过单股15%上限,需硬顶
+  return { low: Math.min(Math.round(rawLow), 15), high: Math.min(Math.round(rawHigh), 15), capped, stopPct: Math.round(stopPct * 10) / 10 };
 }
 function _boardStatus(s) {
   const tags = (s.tags || []).join('');
@@ -1303,7 +1305,12 @@ function _divergence(s) {
 }
 function _trendLabel(t) { return t === 'up' ? '多头' : t === 'repair' ? '修复' : t === 'down' ? '空头' : '震荡'; }
 function _weeklyLabel(t) { return t === 'up' ? '周线向上' : t === 'down' ? '周线向下' : '周线走平'; }
-function _minLabel(m) { return m ? (m.trend === 'up' ? '多头' : m.trend === 'down' ? '空头' : '震荡') : '--'; }
+function _minLabel(m) {
+  if (!m) return '--';
+  const dir = m.trend === 'up' ? '多头' : m.trend === 'down' ? '空头' : '震荡';
+  const ma = m.ma10 != null ? ('MA10 ' + m.ma10) : (m.ma5 != null ? ('MA5 ' + m.ma5) : '');
+  return ma ? (dir + '(' + ma + ')') : dir;
+}
 // 资金属性(龙虎榜席位归类;无龙虎榜则空,渲染层隐藏)
 function _fundAttr(s) { return (s.lhb && s.lhb.fundAttr) || ''; }
 // 容错率(板块地位派生:龙头高/中军次之/跟风低)
@@ -1445,28 +1452,42 @@ function buildStockRow(s, i, report) {
     ? '⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财'
     : '来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新';
 
-  // 交易计划表 (方案A/B/C,真实价位 + 盈亏比 + 仓位)
+  // 交易计划表 (方案A/B/C,真实价位 + 盈亏比 + 仓位;未触发方案盈亏比置灰+未触发标签)
   const planBEntry = preStrong ? preStrong.price : (price * 1.05);
   const planBStop = planBEntry * 0.97, planBTarget = planBEntry * 1.08;
   const planBRR = (planBTarget - planBEntry) / (planBEntry - planBStop);
-  const planRow = (name, trig, entry, stop, tgt, rr, tone) => `<tr>
+  // 做T:ATR动态止损(止损空间≥0.5 ATR,防瞬间扫损,不再用当日最低价导致0.08元级别的过窄止损)
+  const atrC = p.atr || (price * 0.03);
+  const tStop = price - Math.max(0.5 * atrC, price * 0.01);
+  const tTgt = price + Math.max(0.5 * atrC, price * 0.01);
+  const tRR = (price > tStop) ? ((tTgt - price) / (price - tStop)) : 1;
+  // 触发判定:现价是否已到达触发条件(A回踩到位/B突破到位/C围绕现价始终可做)
+  const trigA = price <= p.entry;
+  const trigB = price >= planBEntry;
+  const trigC = price > 0;
+  const planRow = (name, trig, entry, stop, tgt, rr, triggered, tone) => `<tr class="${triggered ? '' : 'tp-notrig'}">
     <td class="tp-name">${name}</td>
     <td class="tp-trig">${esc(trig)}</td>
     <td class="tp-num">${f2(entry)}</td>
     <td class="tp-num stop">${f2(stop)}</td>
     <td class="tp-num">${f2(tgt)}</td>
-    <td class="tp-rr rr-${tone}">${rr.toFixed(2)}</td>
+    <td class="tp-rr ${triggered ? 'rr-' + tone : 'tp-rr-muted'}">${triggered ? rr.toFixed(2) : '未触发'}</td>
   </tr>`;
   const planTable = `<table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
-    ${planRow('A 回踩低吸', '回踩' + f2(p.entry) + '企稳', p.entry, p.stop, p.target, p.rr, _rrTone(p.rr))}
-    ${planRow('B 突破确认', '放量突破' + f2(planBEntry), planBEntry, planBStop, planBTarget, planBRR, _rrTone(planBRR))}
-    ${planRow('C 日内做T', '区间[' + f2(s.low) + ',' + f2(s.high) + ']', price, f2(s.low || p.stop), f2(s.high || planBTarget), (s.low && s.high ? ((s.high - price) / (price - s.low)) : p.rr), _rrTone(s.low && s.high ? ((s.high - price) / Math.max(price - s.low, 0.01)) : p.rr))}
+    ${planRow('A 回踩低吸', '回踩' + f2(p.entry) + '企稳', p.entry, p.stop, p.target, p.rr, trigA, _rrTone(p.rr))}
+    ${planRow('B 突破确认', '放量突破' + f2(planBEntry), planBEntry, planBStop, planBTarget, planBRR, trigB, _rrTone(planBRR))}
+    ${planRow('C 日内做T', '现价' + f2(price) + '·ATR' + f2(atrC) + '动态止损', price, tStop, tTgt, tRR, trigC, _rrTone(tRR))}
   </table>`;
   // 现价追入校验
   const nowWarn = p.rrNow < 1.5
     ? '<div class="tp-warn">⚠ 现价直接买入盈亏比 ' + p.rrNow.toFixed(2) + '(<1.5),不合格 —— 等待回踩至 ' + f2(p.entry) + ' 再执行,当前仅观察。</div>'
     : '<div class="tp-warn tp-ok">现价盈亏比 ' + p.rrNow.toFixed(2) + ',可执行计划。</div>';
+
+  // 情绪总纲建议:情绪冰点+趋势空头+主力流出 → 高难度逆势标的,强烈建议不参与
+  const emotionCycle = _emotionCycle(s);
+  const isHardTrade = (emotionCycle === '冰点' && t.trend === 'down' && (ff.d1 || 0) < 0);
+  const summaryHtml = isHardTrade ? '<div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>' : '';
 
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
     <div class="dc-head">
@@ -1476,8 +1497,8 @@ function buildStockRow(s, i, report) {
       <span class="dc-conf">置信度 ${conf.total}</span>
       <span class="dc-rr rr-${rrTone}">盈亏比 ${p.rr.toFixed(2)}</span>
       <span class="dc-time">${esc(report.meta && report.meta.generatedAt || '')}</span>
-    </div>
-    <div class="dc-tags">${s.category ? '<span class="dc-tag">' + esc(s.category) + '</span>' : ''}${(s.tags || []).map(t => '<span class="dc-tag">' + esc(t) + '</span>').join('')}<span class="dc-tag">催化:${esc(_catalyst(s))}</span><span class="dc-tag">时效:${esc(_catalystTime(s))}</span><span class="dc-tag">阶段:${esc(_ferment(s))}</span><span class="dc-tag">情绪:${esc(_emotionCycle(s))}</span><span class="dc-tag">地位:${esc(_boardStatus(s))}</span><span class="dc-tag">${esc(_tolerance(s))}</span></div>
+    </div>${summaryHtml}
+    <div class="dc-tags">${s.category ? '<span class="dc-tag">' + esc(s.category) + '</span>' : ''}${(s.tags || []).map(t => '<span class="dc-tag">' + esc(t) + '</span>').join('')}<span class="dc-tag">催化:${esc(_catalyst(s))}</span><span class="dc-tag">时效:${esc(_catalystTime(s))}</span><span class="dc-tag">阶段:${esc(_ferment(s))}</span><span class="dc-tag">情绪:${esc(emotionCycle)}</span><span class="dc-tag">地位:${esc(_boardStatus(s))}</span><span class="dc-tag">${esc(_tolerance(s))}</span></div>
     ${s.logic ? '<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">' + esc(s.logic) + '</div></div>' : ''}
     <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
       <div class="dc-line">${fundHtml}</div>
@@ -1497,11 +1518,11 @@ function buildStockRow(s, i, report) {
       <div class="dc-line dc-src-note">${evNote}</div>
     </div>
     <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>${planTable}${nowWarn}
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>（单股≤15%、单题材≤30%）</div>
+      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>${pos.capped ? '（受单股上限压制，实际最高仓位15%）' : '（单股≤15%、单题材≤30%）'}</div>
       <div class="dc-line dc-disc">执行纪律：跌破${f2(p.stop)}无条件止损 · 到达${f2(p.target)}无条件止盈 · 日内做T当日必须平T不隔夜</div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
-      ${(s.riskSignals && s.riskSignals.length) ? '<div class="dc-line dc-risk">' + s.riskSignals.map(r => '<span class="risk-alert">⚠ ' + esc(r) + '</span>').join('') + '</div>' : ''}
+      ${(s.riskSignals && s.riskSignals.length) ? '<div class="dc-line dc-risk">' + s.riskSignals.map(r => '<span class="risk-alert">⚠ ' + esc(r) + (/跌破MA5|跌破MA20/.test(r) ? '<i class="risk-guide">空仓者观望，持仓者减仓/清仓</i>' : '') + '</span>').join('') + '</div>' : ''}
       ${conflicts.length ? '<div class="dc-line dc-risk">' + conflicts.map(r => '<span class="risk-alert risk-conflict">⚡ ' + esc(r) + '</span>').join('') + '</div>' : ''}
       <div class="dc-line">证伪条件：${esc(falsify)}</div>
       <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
