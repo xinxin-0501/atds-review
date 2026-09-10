@@ -125,6 +125,21 @@ jobs:
           # 全A股票列表在仓库根目录,脚本读取 data/stock_list.json,需同步
           if [ -f "stock_list.json" ]; then cp -f "stock_list.json" "data/stock_list.json"; echo "synced data/stock_list.json"; fi
 
+      # P2 事件数据源(可选主源 AKShare,仅盘前跑一次生成 events_cache.json;失败降级到 cloud_fetch.mjs 内巨潮直连)
+      - name: Setup Python for event source (AKShare)
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && github.event_name != 'push' && steps.type.outputs.type == 'premarket'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Fetch events via AKShare (best-effort, fallback to cninfo direct)
+        if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && github.event_name != 'push' && steps.type.outputs.type == 'premarket'
+        continue-on-error: true
+        run: |
+          pip install -q akshare || echo "[events] akshare install failed, will fallback to cninfo direct"
+          python scripts/fetch_events.py || echo "[events] fetch_events.py failed, will fallback to cninfo direct"
+
       - name: Fetch market data
         if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && github.event_name != 'push'
         run: |

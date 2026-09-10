@@ -483,11 +483,14 @@ function buildDecisionCardHtml(s){
   var m60=(s.minTrend&&s.minTrend.m60)||null;
   var m15=(s.minTrend&&s.minTrend.m15)||null;
   var minTxt='60分 '+((m60?(m60.trend==='up'?'多头':m60.trend==='down'?'空头':'震荡'):'--'))+' · 15分 '+((m15?(m15.trend==='up'?'多头':m15.trend==='down'?'空头':'震荡'):'--'));
-  // 事件风险(真实:财报/业绩预告/解禁)
+  // 事件风险(真实:东财财报/解禁 + 巨潮减持/增发/回购/股东大会/监管问询;3天内高影响标红)
   var evs=s.events||null;
+  var evStatus=s.eventsStatus||{};
+  var evEmpty=(evStatus.cninfo==='fail')?'<span class="ev">数据源暂时不可用，请自行前往巨潮资讯网查询</span>':'<span class="ev">近期无重大事件公告</span>';
   var evHtml=(evs&&evs.length)
-    ?evs.slice(0,4).map(function(e){return '<span class="ev ev-'+(e.level==='高'?'h':e.level==='中'?'m':'l')+' '+(e.dir==='利好'?'ev-good':e.dir==='利空'?'ev-bad':'')+'" title="'+escHtmlF(e.detail||e.date||'')+'">'+escHtmlF(e.type)+(e.name?'·'+escHtmlF(e.name):'')+(e.left>0?' T-'+e.left+'天':'')+(e.dir!=='中性'?'·'+escHtmlF(e.dir):'')+'</span>';}).join('')
-    :'<span class="ev">近期无财报/解禁/业绩预告事件</span>';
+    ?evs.slice(0,5).map(function(e){var red=(e.level==='高'&&e.left>=-3&&e.left<=3)?' ev-red-alert':'';var cnt=e.left>0?(' T-'+e.left+'天'):(e.left<0?(' '+Math.abs(e.left)+'天前'):' 今日');var short=(e.name&&e.name.length>14)?(e.name.slice(0,14)+'…'):(e.name||'');return '<span class="ev ev-'+(e.level==='高'?'h':e.level==='中'?'m':'l')+' '+(e.dir==='利好'?'ev-good':e.dir==='利空'?'ev-bad':'')+red+'" title="'+escHtmlF(e.detail||e.date||'')+'">'+escHtmlF(e.type)+(short?'·'+escHtmlF(short):'')+cnt+(e.dir!=='中性'?'·'+escHtmlF(e.dir):'')+(e.source?'〔'+escHtmlF(e.source)+'〕':'')+'</span>';}).join('')
+    :evEmpty;
+  var evNote=(evStatus.cninfo==='fail')?'⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财':'来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)';
   // 交易计划表(方案A/B/C)
   var planBEntry=pre?pre.price:(price*1.05);
   var planBStop=planBEntry*0.97, planBTarget=planBEntry*1.08;
@@ -529,7 +532,7 @@ function buildDecisionCardHtml(s){
       '<div class="dc-line">缺口 '+escHtmlF(gapHtml)+' · ATR '+f2(t.atr14)+' · '+escHtmlF(trendLabel)+' · '+escHtmlF(weeklyLabel)+' · '+minTxt+'</div>'+
       '<div class="dc-line">开盘预期 '+escHtmlF(openExpect)+'</div>'+
     '</div>'+
-    '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div><div class="dc-line dc-src-note">数据源受限：减持/增发/回购/股东大会/监管问询等免费源不可得，请自行前往巨潮资讯网(cninfo.com.cn)查询</div></div>'+
+    '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div><div class="dc-line dc-src-note">'+evNote+'</div></div>'+
     '<div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>'+planTable+nowWarn+
       '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>（单股≤15%、单题材≤30%）</div>'+
       '<div class="dc-line dc-disc">执行纪律：跌破'+f2(p.stop)+'无条件止损 · 到达'+f2(p.target)+'无条件止盈 · 日内做T当日必须平T不隔夜</div>'+
@@ -1388,12 +1391,14 @@ async function fetchEventsF(code){
       var a=appt[i];var d=(a.FIRST_APPOINT_DATE||'').slice(0,10);
       if(!d||d<today)continue;
       var left=daysLeft(d);
-      events.push({type:'财报披露',name:a.REPORT_TYPE_NAME||(a.REPORT_YEAR+'财报'),date:d,left:left,dir:'中性',level:left<=3?'高':left<=7?'中':'低'});
+      events.push({type:'财报披露',eventType:'财报披露',name:a.REPORT_TYPE_NAME||(a.REPORT_YEAR+'财报'),date:d,eventDate:d,left:left,countdown:'T-'+left+'天',dir:'中性',direction:'中性',level:left<=3?'高':left<=7?'中':'低',impactLevel:left<=3?'高':left<=7?'中':'低',source:'东财'});
     }
     var pred=await fjson('RPT_PUBLIC_OP_NEWPREDICT',flt,1,'NOTICE_DATE',-1);
     for(var j2=0;j2<pred.length;j2++){
       var p=pred[j2];var amp=(p.ADD_AMP_LOWER||0);
-      events.push({type:'业绩预告',name:'',date:(p.NOTICE_DATE||'').slice(0,10),left:0,dir:amp>0?'利好':'利空',level:'中',detail:(p.PREDICT_CONTENT||'').slice(0,48)});
+      var dd=(p.NOTICE_DATE||'').slice(0,10);
+      if(dd&&daysLeft(dd)<-90)continue;
+      events.push({type:'业绩预告',eventType:'业绩预告',name:'',date:dd,eventDate:dd,left:daysLeft(dd||today),countdown:'今日',dir:amp>0?'利好':'利空',direction:amp>0?'利好':'利空',level:'中',impactLevel:'中',detail:(p.PREDICT_CONTENT||'').slice(0,48),source:'东财'});
     }
     var lift=await fjson('RPT_LIFT_STAGE',flt+'(FREE_DATE%3E%3D%27'+today+'%27)',3,'FREE_DATE',1);
     for(var k=0;k<lift.length;k++){
@@ -1401,7 +1406,7 @@ async function fetchEventsF(code){
       if(!d2)continue;
       var left2=daysLeft(d2);
       var cap=(l.LIFT_MARKET_CAP||0);
-      events.push({type:'解禁',name:l.FREE_SHARES_TYPE||'限售解禁',date:d2,left:left2,dir:'利空',level:cap>50000?'高':cap>10000?'中':'低',detail:'解禁市值约'+Math.round(cap/10000*100)/100+'亿'});
+      events.push({type:'解禁',eventType:'解禁',name:l.FREE_SHARES_TYPE||'限售解禁',date:d2,eventDate:d2,left:left2,countdown:'T-'+left2+'天',dir:'利空',direction:'利空',level:cap>50000?'高':cap>10000?'中':'低',impactLevel:cap>50000?'高':cap>10000?'中':'低',detail:'解禁市值约'+Math.round(cap/10000*100)/100+'亿',source:'东财'});
     }
   }catch(e){}
   return events.length?events:null;

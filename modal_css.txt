@@ -501,6 +501,10 @@
 .ev-l{background:#fafafa;border-color:#e0e0e0;color:#757575}
 .ev-good{background:#e8f5e9;border-color:#c8e6c9;color:#2e7d32}
 .ev-bad{color:#c62828}
+/* 3天内高影响事件标红预警(覆盖等级/方向底色)+来源小标 */
+.ev-red-alert{background:#c62828;border-color:#b71c1c;color:#fff;font-weight:700;animation:ev-pulse 1.2s ease-in-out infinite}
+.ev-src{font-style:normal;font-weight:400;opacity:.78;font-size:8px}
+@keyframes ev-pulse{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,.45)}50%{box-shadow:0 0 0 3px rgba(198,40,40,0)}}
 
 /* ==================== 观察池 Pro 交互层样式(第十二轮) ==================== */
 /* 控制条 */

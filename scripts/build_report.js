@@ -1427,11 +1427,23 @@ function buildStockRow(s, i, report) {
   const m60 = (s.minTrend && s.minTrend.m60) || null;
   const m15 = (s.minTrend && s.minTrend.m15) || null;
   const minTxt = `60分 ${_minLabel(m60)} · 15分 ${_minLabel(m15)}`;
-  // 事件风险(真实:财报/业绩预告/解禁,无则"暂无")
+  // 事件风险(真实:东财财报/解禁 + 巨潮减持/增发/回购/股东大会/监管问询;3天内高影响标红)
   const evs = s.events || null;
+  const evStatus = s.eventsStatus || {};
+  const evEmpty = (evStatus.cninfo === 'fail')
+    ? '<span class="ev">数据源暂时不可用，请自行前往巨潮资讯网查询</span>'
+    : '<span class="ev">近期无重大事件公告</span>';
   const evHtml = (evs && evs.length)
-    ? evs.slice(0, 4).map(e => `<span class="ev ev-${e.level === '高' ? 'h' : e.level === '中' ? 'm' : 'l'} ${e.dir === '利好' ? 'ev-good' : e.dir === '利空' ? 'ev-bad' : ''}" title="${esc(e.detail || e.date || '')}">${esc(e.type)}${e.name ? '·' + esc(e.name) : ''}${e.left > 0 ? ' T-' + e.left + '天' : ''}${e.dir !== '中性' ? '·' + esc(e.dir) : ''}</span>`).join('')
-    : '<span class="ev">近期无财报/解禁/业绩预告事件</span>';
+    ? evs.slice(0, 5).map(e => {
+        const red = (e.level === '高' && e.left >= -3 && e.left <= 3) ? ' ev-red-alert' : '';
+        const cnt = e.left > 0 ? ' T-' + e.left + '天' : (e.left < 0 ? ' ' + Math.abs(e.left) + '天前' : ' 今日');
+        const short = (e.name && e.name.length > 14) ? e.name.slice(0, 14) + '…' : (e.name || '');
+        return `<span class="ev ev-${e.level === '高' ? 'h' : e.level === '中' ? 'm' : 'l'} ${e.dir === '利好' ? 'ev-good' : e.dir === '利空' ? 'ev-bad' : ''}${red}" title="${esc(e.detail || e.date || '')}">${esc(e.type)}${short ? '·' + esc(short) : ''}${cnt}${e.dir !== '中性' ? '·' + esc(e.dir) : ''}${e.source ? '〔' + esc(e.source) + '〕' : ''}</span>`;
+      }).join('')
+    : evEmpty;
+  const evNote = (evStatus.cninfo === 'fail')
+    ? '⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财'
+    : '来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新';
 
   // 交易计划表 (方案A/B/C,真实价位 + 盈亏比 + 仓位)
   const planBEntry = preStrong ? preStrong.price : (price * 1.05);
@@ -1482,7 +1494,7 @@ function buildStockRow(s, i, report) {
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events">${evHtml}</div>
-      <div class="dc-line dc-src-note">数据源受限：减持/增发/回购/股东大会/监管问询等免费源不可得，请自行前往巨潮资讯网(cninfo.com.cn)查询</div>
+      <div class="dc-line dc-src-note">${evNote}</div>
     </div>
     <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>${planTable}${nowWarn}
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>（单股≤15%、单题材≤30%）</div>

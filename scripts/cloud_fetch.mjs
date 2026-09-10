@@ -1026,13 +1026,125 @@ async function fetchLhbDetail(code) {
   } catch (e) { return null; }
 }
 
-// 事件日历(东财):财报预约 + 业绩预告 + 解禁,倒计时与影响方向(真实,无则返回 null)
-async function fetchEvents(code) {
+// ============ 事件缓存(巨潮公告类,盘中读缓存避免频繁请求被封 IP) ============
+let _eventsCache = null;
+function loadEventsCache() {
+  if (_eventsCache) return _eventsCache;
+  try {
+    const p = path.join(ROOT, 'data', 'events_cache.json');
+    if (fs.existsSync(p)) {
+      const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+      _eventsCache = { date: j.date || '', byCode: j.byCode || {} };
+    } else {
+      _eventsCache = { date: '', byCode: {} };
+    }
+  } catch (e) { _eventsCache = { date: '', byCode: {} }; }
+  return _eventsCache;
+}
+function saveEventsCache() {
+  try {
+    if (!_eventsCache) return;
+    const p = path.join(ROOT, 'data', 'events_cache.json');
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, JSON.stringify(_eventsCache, null, 2), 'utf8');
+  } catch (e) { console.error('saveEventsCache 失败:', e.message); }
+}
+function bjToday() {
+  return new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+// 巨潮公告(减持/增发/回购/股东大会/监管问询/重组等):真实;5秒超时+3次重试+关键词过滤
+// 返回 null = 源不可用(渲染层显示降级提示);返回 [] = 成功但无匹配事件
+async function fetchCninfoEvents(code, name) {
+  const num = String(code);
+  const c0 = num.charAt(0);
+  if (c0 === '4' || c0 === '8' || c0 === '9') return []; // 北交所巨潮口径不完整,诚实降级跳过
+  const orgId = (c0 === '6' || c0 === '5') ? ('gssh0' + num) : ('gssz0' + num);
+  const today = bjToday();
+  const start = new Date(Date.now() + 8 * 3600 * 1000 - 30 * 86400000).toISOString().slice(0, 10);
+  const daysLeft = (d) => Math.round((new Date(d + 'T00:00:00+08:00') - new Date(today + 'T00:00:00+08:00')) / 86400000);
+
+  // 关键词 → [eventType, direction, impactLevel](顺序即优先级)
+  const KW = [
+    ['减持', '减持', '利空', '高'], ['增持', '增持', '利好', '中'],
+    ['增发', '增发', '中性', '中'], ['非公开发行', '增发', '中性', '中'], ['定增', '增发', '中性', '中'], ['配股', '增发', '中性', '中'],
+    ['回购', '回购', '利好', '中'],
+    ['股东大会', '股东大会', '中性', '低'], ['股东会', '股东大会', '中性', '低'],
+    ['问询', '监管问询', '利空', '高'], ['关注函', '监管问询', '利空', '高'], ['监管函', '监管问询', '利空', '高'], ['警示函', '监管问询', '利空', '高'],
+    ['立案', '监管问询', '利空', '高'], ['处罚', '监管问询', '利空', '高'], ['调查', '监管问询', '利空', '高'],
+    ['解禁', '解禁', '利空', '中'], ['限售', '解禁', '利空', '中'],
+    ['重组', '重组', '中性', '中'], ['并购', '重组', '中性', '中'], ['收购', '重组', '中性', '中'],
+    ['停牌', '停牌', '中性', '中'], ['复牌', '复牌', '中性', '低']
+  ];
+
+  async function postQuery(body) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const ac = new AbortController();
+      const t = setTimeout(() => ac.abort(), 5000);
+      try {
+        const res = await fetch('https://www.cninfo.com.cn/new/hisAnnouncement/query', {
+          method: 'POST',
+          headers: { 'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest', 'Referer': 'https://www.cninfo.com.cn/new/commonUrl/pageOfSearch?url=disclosure/list/search' },
+          body, signal: ac.signal
+        });
+        clearTimeout(t);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+      } catch (e) { clearTimeout(t); if (attempt === 2) throw e; await new Promise(r => setTimeout(r, 1000)); }
+    }
+  }
+
+  const byStock = (stockVal) => 'pageNum=1&pageSize=50&column=szse&tabName=fulltext&plate=&stock=' + encodeURIComponent(stockVal) + '&searchkey=&secid=&category=&trade=&seDate=' + start + '~' + today + '&sortName=&sortType=&isHLtitle=true';
+
+  let anns = [];
+  try {
+    // 主:stock=code,orgId(精确匹配)
+    const j = await postQuery(byStock(num + ',' + orgId));
+    anns = (j && j.announcements) || [];
+    if (!anns.length && name) {
+      // 降级:searchkey=公司名(部分股票 orgId 不可由代码推导时)
+      const j2 = await postQuery('pageNum=1&pageSize=50&column=szse&tabName=fulltext&plate=&stock=&searchkey=' + encodeURIComponent(name) + '&secid=&category=&trade=&seDate=' + start + '~' + today + '&sortName=&sortType=&isHLtitle=true');
+      const all2 = (j2 && j2.announcements) || [];
+      anns = all2.filter(a => String(a.secCode) === num);
+    }
+  } catch (e) {
+    console.error('fetchCninfoEvents(' + code + ') 失败:', e.message);
+    return null;
+  }
+
+  const events = [];
+  for (const a of anns) {
+    const title = String(a.announcementTitle || '').replace(/<[^>]+>/g, '');
+    if (!title) continue;
+    for (const [kw, type, dir, level] of KW) {
+      if (title.indexOf(kw) >= 0) {
+        // 精度修正:"回购注销限制性股票"是中性动作,非市场回购利好,避免方向误导
+        let d2 = dir;
+        if (type === '回购' && /注销/.test(title)) d2 = '中性';
+        const d = a.announcementTime ? new Date(a.announcementTime + 8 * 3600 * 1000).toISOString().slice(0, 10) : today;
+        const left = daysLeft(d);
+        events.push({
+          type, eventType: type,
+          name: title.slice(0, 30), title: title.slice(0, 30),
+          date: d, eventDate: d, left,
+          countdown: left > 0 ? ('T-' + left + '天') : (left < 0 ? Math.abs(left) + '天前' : '今日'),
+          dir: d2, direction: d2, level, impactLevel: level,
+          detail: title.slice(0, 48),
+          source: '巨潮'
+        });
+        break; // 每条公告只归入一个事件类型
+      }
+    }
+  }
+  return events;
+}
+
+// 事件日历:东财(财报/业绩预告/解禁) + 巨潮(减持/增发/回购/股东大会/监管问询),合并排序(真实,无则返回 null)
+async function fetchEvents(code, name) {
   const num = String(code).replace(/^(sh|sz|bj)/, '');
   const hdr = { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://data.eastmoney.com/' };
   const base = 'https://datacenter-web.eastmoney.com/api/data/v1/get';
-  const bj = new Date(Date.now() + 8 * 3600 * 1000);
-  const today = bj.toISOString().slice(0, 10);
+  const today = bjToday();
   const daysLeft = (d) => Math.round((new Date(d) - new Date(today)) / 86400000);
   const events = [];
   const fjson = async (reportName, filter, pageSize, sortColumns, sortTypes) => {
@@ -1047,30 +1159,62 @@ async function fetchEvents(code) {
   };
   const flt = `(SECURITY_CODE%3D%22${num}%22)`;
 
-  // 财报披露(未来预约)
+  // 东财:财报披露(未来预约)
   const appt = await fjson('RPT_PUBLIC_BS_APPOIN', flt, 3, 'FIRST_APPOINT_DATE', -1);
   for (const a of appt) {
     const d = (a.FIRST_APPOINT_DATE || '').slice(0, 10);
     if (!d || d < today) continue;
     const left = daysLeft(d);
-    events.push({ type: '财报披露', name: a.REPORT_TYPE_NAME || (a.REPORT_YEAR + '财报'), date: d, left, dir: '中性', level: left <= 3 ? '高' : left <= 7 ? '中' : '低' });
+    events.push({ type: '财报披露', eventType: '财报披露', name: a.REPORT_TYPE_NAME || (a.REPORT_YEAR + '财报'), date: d, eventDate: d, left, countdown: 'T-' + left + '天', dir: '中性', direction: '中性', level: left <= 3 ? '高' : left <= 7 ? '中' : '低', impactLevel: left <= 3 ? '高' : left <= 7 ? '中' : '低', source: '东财' });
   }
-  // 业绩预告(近期已披露,判断利好/利空方向)
+  // 东财:业绩预告(仅近 90 天,过期的预告不展示,避免误导)
   const pred = await fjson('RPT_PUBLIC_OP_NEWPREDICT', flt, 1, 'NOTICE_DATE', -1);
   for (const p of pred) {
     const amp = (p.ADD_AMP_LOWER || 0);
-    events.push({ type: '业绩预告', name: '', date: (p.NOTICE_DATE || '').slice(0, 10), left: 0, dir: amp > 0 ? '利好' : '利空', level: '中', detail: (p.PREDICT_CONTENT || '').slice(0, 48) });
+    const dd = (p.NOTICE_DATE || '').slice(0, 10);
+    if (dd && daysLeft(dd) < -90) continue; // 超过 90 天的旧预告视为过期
+    events.push({ type: '业绩预告', eventType: '业绩预告', name: '', date: dd, eventDate: dd, left: daysLeft(dd || today), countdown: '今日', dir: amp > 0 ? '利好' : '利空', direction: amp > 0 ? '利好' : '利空', level: '中', impactLevel: '中', detail: (p.PREDICT_CONTENT || '').slice(0, 48), source: '东财' });
   }
-  // 解禁(未来)
+  // 东财:解禁(未来)
   const lift = await fjson('RPT_LIFT_STAGE', flt + `(FREE_DATE%3E%3D%27${today}%27)`, 3, 'FREE_DATE', 1);
   for (const l of lift) {
     const d = (l.FREE_DATE || '').slice(0, 10);
     if (!d) continue;
     const left = daysLeft(d);
     const cap = (l.LIFT_MARKET_CAP || 0); // 万元
-    events.push({ type: '解禁', name: l.FREE_SHARES_TYPE || '限售解禁', date: d, left, dir: '利空', level: cap > 50000 ? '高' : cap > 10000 ? '中' : '低', detail: '解禁市值约' + Math.round(cap / 10000 * 100) / 100 + '亿' });
+    events.push({ type: '解禁', eventType: '解禁', name: l.FREE_SHARES_TYPE || '限售解禁', date: d, eventDate: d, left, countdown: 'T-' + left + '天', dir: '利空', direction: '利空', level: cap > 50000 ? '高' : cap > 10000 ? '中' : '低', impactLevel: cap > 50000 ? '高' : cap > 10000 ? '中' : '低', detail: '解禁市值约' + Math.round(cap / 10000 * 100) / 100 + '亿', source: '东财' });
   }
-  return events.length ? events : null;
+
+  // 巨潮:减持/增发/回购/股东大会/监管问询/重组(有缓存,盘中读缓存)
+  const cache = loadEventsCache();
+  let cninfo = null;
+  let cninfoStatus = 'empty'; // ok=有事件 / empty=成功无事件 / fail=源不可用
+  if (cache.date === today && Object.prototype.hasOwnProperty.call(cache.byCode, num)) {
+    cninfo = cache.byCode[num] || [];
+    cninfoStatus = cninfo.length ? 'ok' : 'empty';
+  } else {
+    try {
+      cninfo = await fetchCninfoEvents(num, name);
+    } catch (e) { cninfo = null; }
+    if (cninfo === null) {
+      cninfoStatus = 'fail';
+    } else {
+      cninfoStatus = cninfo.length ? 'ok' : 'empty';
+      cache.byCode[num] = cninfo; // 仅成功(含空数组)才缓存;fail 不缓存,下次重试
+      cache.date = today;
+    }
+  }
+  if (cninfo && cninfo.length) {
+    for (const ev of cninfo) {
+      const dup = events.some(x => x.type === ev.type && x.date === ev.date);
+      if (!dup) events.push(ev);
+    }
+  }
+
+  // 排序:影响等级 高>中>低,同级按日期升序(最近/最紧迫在前)
+  const lvRank = { '高': 0, '中': 1, '低': 2 };
+  events.sort((a, b) => (lvRank[a.level] ?? 2) - (lvRank[b.level] ?? 2) || (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  return { events: events.length ? events : null, cninfoStatus };
 }
 
 async function enrichWatchlistTech(list) {
@@ -1112,10 +1256,11 @@ async function enrichWatchlistTech(list) {
       const lhb = await fetchLhbDetail(s.code);
       if (lhb) s.lhb = lhb;
     } catch (e) { /* 龙虎榜缺失不阻塞 */ }
-    // 事件日历
+    // 事件日历(东财+巨潮合并)
     try {
-      const ev = await fetchEvents(s.code);
-      if (ev) s.events = ev;
+      const ev = await fetchEvents(s.code, s.name);
+      if (ev && ev.events) s.events = ev.events;
+      if (ev) s.eventsStatus = { cninfo: ev.cninfoStatus };
     } catch (e) { /* 事件缺失不阻塞 */ }
     // 量化风险信号(可观测规则固化,触发则高亮)
     const riskSignals = [];
@@ -2059,6 +2204,8 @@ async function main() {
     watchlist = await enrichWatchlistTech(watchlist);
     console.log('观察池技术画像:', watchlist.filter(s => s.tech).length + '/' + watchlist.length + ' 只 (' + (Date.now() - t0) + 'ms)');
   }
+  // 事件缓存落盘(巨潮公告类,供下次盘中读缓存,随 git 提交持久化)
+  saveEventsCache();
 
   // 国际联动：盘中/盘前外盘快照
   const intlMkt = await fetchIntlMkt();

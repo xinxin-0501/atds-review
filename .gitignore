@@ -46,7 +46,14 @@ push_batch*.json
 /repo14.json
 /sina.json
 /*.txt
+!/requirements.txt
 /run_logs.zip
+
+# Python 缓存与依赖
+__pycache__/
+*.pyc
+.env
+.venv/
 
 # 截图
 /shot*.png
