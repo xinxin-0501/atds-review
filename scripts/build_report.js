@@ -1309,7 +1309,8 @@ function _minLabel(m) {
   if (!m) return '--';
   const dir = m.trend === 'up' ? '多头' : m.trend === 'down' ? '空头' : '震荡';
   const ma = m.ma10 != null ? ('MA10 ' + m.ma10) : (m.ma5 != null ? ('MA5 ' + m.ma5) : '');
-  return ma ? (dir + '(' + ma + ')') : dir;
+  const fb = m.fallback ? '·日线兜底' : '';
+  return ma ? (dir + '(' + ma + ')' + fb) : (dir + fb);
 }
 // 资金属性(龙虎榜席位归类;无龙虎榜则空,渲染层隐藏)
 function _fundAttr(s) { return (s.lhb && s.lhb.fundAttr) || ''; }
@@ -1487,6 +1488,21 @@ function buildStockRow(s, i, report) {
     : '<div class="tp-warn tp-ok">现价盈亏比 ' + p.rrNow.toFixed(2) + ',可执行计划。</div>';
   // 做T盈亏比不合格警告
   const tRRBadWarn = tRRBad ? '<div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div>' : '';
+  // 资金验证归因:个股当日涨跌 vs 所属板块当日涨跌(完整归因)
+  const secChg = s.sectorChange || null;
+  const stockPctN = Number(s.pct) || 0;
+  let fundVerify = '主力净流入当日' + sign(ff.d1) + (ff.d1 != null ? ff.d1.toFixed(2) : '--') + '亿，' + ((ff.d1 || 0) >= 0 ? '符合做多预期' : '与做多预期背离，需复核');
+  if (secChg && secChg.changePct != null && !isNaN(secChg.changePct)) {
+    const diff = stockPctN - secChg.changePct;
+    const cmp = diff <= -0.5 ? '弱于板块，弱势特征明显' : (diff >= 0.5 ? '强于板块，具备相对强度' : '与板块基本同步');
+    fundVerify += '；个股 ' + (stockPctN > 0 ? '+' : '') + stockPctN.toFixed(2) + '% vs ' + esc(secChg.boardName) + '板块 ' + (secChg.changePct > 0 ? '+' : '') + secChg.changePct.toFixed(2) + '%，' + cmp;
+  }
+  // 明日核心观察点(次日操作指引)
+  const nextDayFocus = (t.ma5 && price)
+    ? (price < t.ma5
+      ? '明日观察能否放量收复MA5（' + f2(t.ma5) + '），若不能，继续观望。'
+      : '明日观察能否站稳MA5（' + f2(t.ma5) + '）并放量上攻，若失守则减仓。')
+    : '明日观察量能与MA5得失，方向未明前继续观望。';
 
   // 情绪总纲建议:情绪冰点+趋势空头+主力流出 → 高难度逆势标的,强烈建议不参与
   const emotionCycle = _emotionCycle(s);
@@ -1522,7 +1538,7 @@ function buildStockRow(s, i, report) {
       <div class="dc-line dc-src-note">${evNote}</div>
     </div>
     <div class="dc-block dc-plan ${isHardTrade ? 'dc-plan-collapsed' : ''}">
-      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">${isHardTrade ? '▸' : '▾'}</span>${isHardTrade ? '<span class="dc-plan-lock">⛔ 已折叠·强烈建议不参与</span>' : ''}</div>
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">${isHardTrade ? '▸' : '▾'}</span>${isHardTrade ? '<span class="dc-plan-lock">⛔ 已折叠·强烈建议不参与</span><span class="dc-plan-expand">👆 点击展开</span>' : ''}</div>
       <div class="dc-plan-body">${planTable}${tRRBadWarn}${nowWarn}
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>${pos.capped ? '（受单股上限压制，实际最高仓位15%）' : '（单股≤15%、单题材≤30%）'}</div>
       <div class="dc-line dc-disc">执行纪律：跌破${f2(p.stop)}无条件止损 · 到达${f2(p.target)}无条件止盈 · 日内做T当日必须平T不隔夜</div>
@@ -1538,10 +1554,11 @@ function buildStockRow(s, i, report) {
     </div>
     <div class="dc-block dc-review" data-review-code="${esc(code)}" data-name="${esc(s.name)}" data-price="${price}" data-entry="${p.entry}" data-stop="${p.stop}" data-target="${p.target}"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高${f2(s.high)} ${(preStrong && s.high >= preStrong.price) ? '触及压力' + f2(preStrong.price) : '未触及压力'} · 最低${f2(s.low)} ${(supStrong && s.low <= supStrong.price) ? '触及支撑' + f2(supStrong.price) : '未触及支撑'}</div>
-      <div class="dc-line">资金验证：主力净流入当日${sign(ff.d1)}${ff.d1 != null ? ff.d1.toFixed(2) : '--'}亿，${(ff.d1 || 0) >= 0 ? '符合做多预期' : '与做多预期背离，需复核'}</div>
-      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="${esc(code)}" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button></div>
+      <div class="dc-line">资金验证：${fundVerify}</div>
+      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="${esc(code)}" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="${esc(code)}" onclick="recordTTrade(this)">记做T</button></div>
       <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="${esc(code)}" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
-      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
+      <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤；波段与做T胜率分开展示">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
+      <div class="dc-line dc-next-day">🎯 明日核心观察点：${nextDayFocus}</div>
     </div>
   </div>`;
   return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;

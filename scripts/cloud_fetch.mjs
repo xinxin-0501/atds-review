@@ -445,6 +445,65 @@ async function resolveBoardCode(name) {
     return hit ? { name: hit.Name, code: hit.Code } : { name: boards[0].Name, code: boards[0].Code };
   } catch (e) { return null; }
 }
+// 板块涨跌地图(行业+概念):name → { code, changePct },供复盘资金归因"个股 vs 板块"对比
+// 注意:clist 单页最多 pz=100,且按涨幅降序;需翻页才能覆盖下跌板块(如稀土/军工/算力)
+async function fetchBoardChangeMap() {
+  const map = {};
+  const fsList = ['m:90+t:2', 'm:90+t:3']; // 行业板块 + 概念板块
+  for (const fs of fsList) {
+    for (let pn = 1; pn <= 8; pn++) {
+      try {
+        const url = `https://push2.eastmoney.com/api/qt/clist/get?pn=${pn}&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=${fs}&fields=f12,f14,f3`;
+        const j = await fetchJsonTxt(url, { timeout: 10000 });
+        const diff = (j && j.data && j.data.diff) || [];
+        if (!diff.length) break;
+        for (const it of diff) {
+          if (it.f14 && it.f3 != null && !isNaN(Number(it.f3))) {
+            map[String(it.f14).trim()] = { code: it.f12, changePct: Math.round(Number(it.f3) * 100) / 100 };
+          }
+        }
+        if (diff.length < 100) break; // 最后一页
+      } catch (e) { break; }
+    }
+  }
+  return map;
+}
+// 个股 category(自由文本) → 东财板块名 的别名映射(优先精确别名,再关键词兜底)
+const SECTOR_ALIAS = {
+  '光通信': ['光通信模块', '光模块', '通信设备', '通信'],
+  '机器人': ['机器人执行器', '减速器', '机器人', '自动化设备'],
+  '农业主线': ['农牧饲渔', '农业种植', '种植业', '农产品加工', '养殖业'],
+  '传媒/IP': ['文化传媒', '游戏', '影视院线', '出版', '传媒'],
+  '传媒': ['文化传媒', '游戏', '影视院线', '出版'],
+  '稀土': ['稀土永磁', '小金属'],
+  '小金属': ['小金属', '稀土永磁'],
+  '军工': ['航天航空', '国防军工', '军工电子'],
+  '算力': ['算力', 'AI算力', 'CPO', '东数西算'],
+  '金融': ['银行', '证券', '保险', '多元金融']
+};
+function matchSectorChange(category, boardMap) {
+  if (!category || !boardMap) return null;
+  const cat = String(category).trim();
+  if (!cat) return null;
+  if (boardMap[cat]) return { boardName: cat, changePct: boardMap[cat].changePct };
+  // 1) 别名优先(精确匹配别名词,避免"IP"误中"DRG/DIP"这类短词)
+  const aliases = SECTOR_ALIAS[cat] || [];
+  for (const a of aliases) {
+    for (const name in boardMap) {
+      if (name === a || name.indexOf(a) >= 0) return { boardName: name, changePct: boardMap[name].changePct };
+    }
+  }
+  // 2) 关键词兜底(长词优先,剔除歧义短词)
+  const keys = ['光通信', '通信', '机器人', '算力', 'AI', '半导体', '芯片', '农牧', '农业', '种植', '养殖', '传媒', '游戏', '影视', '稀土', '小金属', '有色', '军工', '证券', '银行', '保险', '医药', '创新药', '新能源', '光伏', '储能', '汽车', '零部件', '煤炭', '钢铁', '化工', '地产', '食品', '白酒'];
+  for (const k of keys) {
+    if (cat.indexOf(k) >= 0) {
+      for (const name in boardMap) {
+        if (name.indexOf(k) >= 0) return { boardName: name, changePct: boardMap[name].changePct };
+      }
+    }
+  }
+  return null;
+}
 // 板块成分实时行情:剔除 涨停/ST/退市/北交所,非涨停按涨幅降序取前 N(含当日涨幅/换手)
 async function fetchBoardPicks(bkCode, ztSet, topN) {
   const tryHosts = ['https://push2.eastmoney.com', 'http://push2.eastmoney.com', 'https://push2delay.eastmoney.com', 'http://push2ex.eastmoney.com'];
@@ -943,12 +1002,21 @@ async function fetchStockFundFlow(code) {
   } catch (e) { return null; }
 }
 
-// 分钟级趋势(腾讯 mkline):60/15分钟收盘价 vs MA10 判断多空,真实计算
+// 分钟级趋势:60/15分钟收盘价 vs MA10 判断多空,真实计算
+// 数据源双链路:腾讯 mkline 优先 → 新浪 getKLineData 兜底(境外 GitHub Actions 可能屏蔽腾讯域名)
+function computeMinTrendFromCloses(closes) {
+  const last = closes[closes.length - 1];
+  const ma5 = closes.slice(-5).reduce((a, b) => a + b, 0) / 5;
+  const ma10 = closes.length >= 10 ? closes.slice(-10).reduce((a, b) => a + b, 0) / 10 : null;
+  const trend = (ma10 != null) ? (last > ma10 * 1.005 ? 'up' : last < ma10 * 0.995 ? 'down' : 'flat') : (last > ma5 ? 'up' : 'down');
+  return { trend, ma5: Math.round(ma5 * 100) / 100, ma10: ma10 != null ? Math.round(ma10 * 100) / 100 : null };
+}
 async function fetchMinuteTrend(code, klt) {
+  const num = String(code).replace(/^(sh|sz|bj)/, '');
+  // 北交所(43/83/87/88/92 开头)需 bj 前缀,否则接口返回空导致 60/15 分钟数据缺失
+  const full = /^(4|8|92)/.test(num) ? ('bj' + num) : (num.charAt(0) === '6' || num.charAt(0) === '9' ? ('sh' + num) : ('sz' + num));
+  // 源1:腾讯 mkline(分钟K线)
   try {
-    const num = String(code).replace(/^(sh|sz|bj)/, '');
-    // 北交所(43/83/87/88/92 开头)需 bj 前缀,否则接口返回空导致 60/15 分钟数据缺失
-    const full = /^(4|8|92)/.test(num) ? ('bj' + num) : (num.charAt(0) === '6' || num.charAt(0) === '9' ? ('sh' + num) : ('sz' + num));
     const url = `https://ifzq.gtimg.cn/appstock/app/kline/mkline?param=${full},${klt},,30`;
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), 8000);
@@ -956,15 +1024,28 @@ async function fetchMinuteTrend(code, klt) {
     const j = await res.json();
     const d = (j && j.data && j.data[full]) || {};
     const arr = d[klt] || [];
-    if (!Array.isArray(arr) || arr.length < 5) return null;
-    const closes = arr.map(k => parseFloat(k[2])).filter(x => !isNaN(x));
-    if (closes.length < 5) return null;
-    const last = closes[closes.length - 1];
-    const ma5 = closes.slice(-5).reduce((a, b) => a + b, 0) / 5;
-    const ma10 = closes.length >= 10 ? closes.slice(-10).reduce((a, b) => a + b, 0) / 10 : null;
-    const trend = (ma10 != null) ? (last > ma10 * 1.005 ? 'up' : last < ma10 * 0.995 ? 'down' : 'flat') : (last > ma5 ? 'up' : 'down');
-    return { trend, ma5: Math.round(ma5 * 100) / 100, ma10: ma10 != null ? Math.round(ma10 * 100) / 100 : null };
-  } catch (e) { return null; }
+    if (Array.isArray(arr) && arr.length >= 5) {
+      const closes = arr.map(k => parseFloat(k[2])).filter(x => !isNaN(x));
+      if (closes.length >= 5) return computeMinTrendFromCloses(closes);
+    }
+  } catch (e) { /* 降级新浪 */ }
+  // 源2:新浪 getKLineData(分钟K线,{day,open,high,low,close,volume})
+  try {
+    const scale = klt === 'm60' ? 60 : 15;
+    const sinaUrl = `https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=${full}&scale=${scale}&ma=no&datalen=30`;
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 8000);
+    const res = await fetch(sinaUrl, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://finance.sina.com.cn/' }, signal: ac.signal }).finally(() => clearTimeout(timer));
+    const txt = await res.text();
+    if (txt && txt.trim().startsWith('[')) {
+      const arr = JSON.parse(txt);
+      if (Array.isArray(arr) && arr.length >= 5) {
+        const closes = arr.map(k => parseFloat(k.close)).filter(x => !isNaN(x));
+        if (closes.length >= 5) return computeMinTrendFromCloses(closes);
+      }
+    }
+  } catch (e) { /* 双源均失败,由调用方日线兜底 */ }
+  return null;
 }
 
 // 全市场涨停池(东财):一次性拉取,返回 Map<code, 封单信息>,观察池内存匹配
@@ -1250,6 +1331,9 @@ async function enrichWatchlistTech(list) {
       else marketRegime = { label: '震荡', capPct: 50 };
     }
   } catch (e) { /* 大盘状态降级为震荡 */ }
+  // 板块涨跌地图(行业+概念,复盘资金归因"个股 vs 板块"用),一次性拉取
+  let boardChangeMap = {};
+  try { boardChangeMap = await fetchBoardChangeMap(); } catch (e) { /* 板块地图缺失降级 */ }
   const arr = await Promise.all((list || []).map(async (s) => {
     if (!s || !s.code) return s;
     try {
@@ -1264,11 +1348,21 @@ async function enrichWatchlistTech(list) {
     } catch (e) { /* 资金流缺失不阻塞 */ }
     // 封单/连板(非涨停显示 null → 渲染层"非涨停")
     if (sealMap[s.code]) s.seal = sealMap[s.code];
-    // 60/15分钟趋势
+    // 60/15分钟趋势(腾讯→新浪双链路;双源失败用日线MA趋势兜底,避免显示 --)
     try {
       const [m60, m15] = await Promise.all([fetchMinuteTrend(s.code, 'm60'), fetchMinuteTrend(s.code, 'm15')]);
-      if (m60 || m15) s.minTrend = { m60, m15 };
+      if (m60 || m15) {
+        s.minTrend = { m60, m15 };
+      } else if (s.tech && s.tech.trend) {
+        const fb = { trend: s.tech.trend, ma5: s.tech.ma5, ma10: s.tech.ma10, fallback: true };
+        s.minTrend = { m60: fb, m15: fb };
+      }
     } catch (e) { /* 分钟趋势缺失不阻塞 */ }
+    // 所属板块当日涨跌幅(复盘资金归因对比)
+    try {
+      const secChg = matchSectorChange(s.category, boardChangeMap);
+      if (secChg) s.sectorChange = secChg;
+    } catch (e) { /* 板块涨跌缺失不阻塞 */ }
     // 龙虎榜(未上榜返回 null)
     try {
       const lhb = await fetchLhbDetail(s.code);

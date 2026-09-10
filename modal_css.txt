@@ -541,6 +541,8 @@
 .dc-plan-toggle:hover{color:#b71c1c}
 .dc-plan-caret{font-size:11px;color:#999}
 .dc-plan-lock{font-size:9px;font-weight:700;color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0;border-radius:4px;padding:1px 6px}
+.dc-plan-expand{font-size:9px;font-weight:700;color:#1565c0;background:#e3f2fd;border:1px solid #90caf9;border-radius:4px;padding:1px 6px;animation:dc-pulse 1.6s ease-in-out infinite}
+@keyframes dc-pulse{0%,100%{opacity:1}50%{opacity:.55}}
 .dc-plan-collapsed .dc-plan-body{display:none}
 /* 盘后复盘:交易状态按钮 + 系统模拟跟踪 + 胜率进度提示 */
 .dc-trade-status{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
@@ -556,6 +558,9 @@
 .ts-progress-badge{font-size:9px;color:#999}
 .ts-progress{color:#b3541e;font-weight:800}
 .ts-winrate{font-size:9px;color:#2e7d32;font-weight:700}
+.ts-t-btn{color:#6a1b9a;border-color:#ce93d8}
+.ts-t-btn:hover{border-color:#8e24aa;color:#6a1b9a}
+.dc-next-day{font-size:9px;color:#1a5c8a;background:#e3f2fd;border:1px solid #bbdefb;border-radius:4px;padding:3px 7px;margin-top:3px;font-weight:600}
 /* KNOWLEDGE SYNC 手动导出说明 */
 .knowledge-note{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:4px 7px;margin:6px 0 2px;line-height:1.5}
 /* 移动端紧凑排版:默认全展开(每只股8区决策卡无须点击直接可见),压缩间距降低页面总高 */
