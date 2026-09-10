@@ -501,3 +501,37 @@
 .ev-l{background:#fafafa;border-color:#e0e0e0;color:#757575}
 .ev-good{background:#e8f5e9;border-color:#c8e6c9;color:#2e7d32}
 .ev-bad{color:#c62828}
+
+/* ==================== 观察池 Pro 交互层样式(第十二轮) ==================== */
+/* 控制条 */
+.wl-pro-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:7px 10px;background:linear-gradient(90deg,#fff7f0,#fff);border-bottom:1px solid #f0e6d8;font-size:11px}
+.wl-pro-title{font-weight:800;color:#b3541e;font-size:12px;margin-right:2px}
+.wl-pro-btn{font-size:10px;font-weight:600;color:#fff;background:#e08a3c;border:none;border-radius:12px;padding:4px 9px;cursor:pointer;line-height:1.2}
+.wl-pro-btn:hover{background:#c9722a}
+.wl-pro-countdown{display:inline-flex;align-items:center;gap:4px;margin-left:auto;font-size:9px;color:#999}
+.wl-refresh-bar{display:inline-block;width:52px;height:5px;background:#4caf50;border-radius:3px;vertical-align:middle;transition:width .1s linear}
+.wl-journal-stats{width:100%;font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:5px;padding:3px 7px;margin-top:3px}
+/* 手动标签编辑器 */
+.dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
+.dc-te-label{color:#999;font-weight:600}
+.dc-te-select{font-size:9px;border:1px solid #ddd;border-radius:4px;padding:2px 3px;color:#555;background:#fff}
+/* 量化风险信号 + 冲突提示 */
+.dc-risk{display:flex;flex-wrap:wrap;gap:4px}
+.risk-alert{display:inline-block;font-size:9px;font-weight:700;color:#c62828;background:#fff0f0;border:1px solid #f0b0b0;border-radius:4px;padding:2px 6px}
+.risk-conflict{color:#e65100;background:#fff8e1;border-color:#ffe0b2}
+/* 执行纪律 */
+.dc-disc{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:3px 6px}
+/* 移动端摘要折叠:默认隐藏详情区块,点击头部展开 */
+@media (max-width:768px){
+  .wl-detail .dc-block{display:none}
+  .wl-detail .dc-tags{display:none}
+  .wl-detail .dc-tag-editor{display:none}
+  .wl-detail.open .dc-block{display:block}
+  .wl-detail.open .dc-tags{display:flex}
+  .wl-detail.open .dc-tag-editor{display:flex}
+  .wl-detail .dc-head{cursor:pointer;position:relative;padding-right:16px}
+  .wl-detail .dc-head::after{content:'▾';position:absolute;right:2px;top:50%;transform:translateY(-50%);color:#bbb;font-size:12px}
+  .wl-detail.open .dc-head::after{content:'▴'}
+}
+/* 事件风险数据源受限提示 */
+.dc-src-note{font-size:8px;color:#b0b0b0;line-height:1.4;margin-top:2px}

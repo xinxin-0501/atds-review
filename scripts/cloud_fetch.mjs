@@ -775,6 +775,19 @@ function deriveTodayWatchList(mainRank, playbook, zt, limitUpList, hotSectors, d
   return { themes, caution };
 }
 /* ============ 观察池技术画像(盘前):MA/量比/KDJ/趋势 → 支撑"建议"五类文案 ============ */
+// A股交易时间进度(0~1):盘中放量缩量按已交易分钟比例折算昨日同期量
+function tradeProgress() {
+  const bj = new Date(Date.now() + 8 * 3600 * 1000);
+  const day = bj.getUTCDay();
+  if (day === 0 || day === 6) return 1;  // 周末按收盘
+  const mins = bj.getUTCHours() * 60 + bj.getUTCMinutes();
+  let traded = 0;
+  if (mins >= 570 && mins <= 690) traded = mins - 570;               // 09:30-11:30
+  else if (mins > 690 && mins < 780) traded = 120;                    // 午休
+  else if (mins >= 780 && mins <= 900) traded = 120 + (mins - 780);   // 13:00-15:00
+  else if (mins > 900) traded = 240;                                  // 收盘后
+  return Math.min(1, Math.max(0, traded / 240));
+}
 function calcTechFromKline(arr) {
   if (!Array.isArray(arr) || arr.length < 30) return null;
   const closes = arr.map(k => parseFloat(k[2])).filter(n => !isNaN(n));
@@ -832,13 +845,25 @@ function calcTechFromKline(arr) {
   const high60 = highs60.length ? Math.max(...highs60) : null;
   const low60 = lows60.length ? Math.min(...lows60) : null;
 
-  // 缺口锚点(今日相对昨日)
+  // 缺口锚点(今日相对昨日):用开盘价判缺口,用最低/最高价判是否回补
   let gapUp = null, gapDown = null;
   if (n >= 2) {
     const prevH = parseFloat(arr[n - 2][3]), prevL = parseFloat(arr[n - 2][4]);
-    const curL = parseFloat(arr[n - 1][4]), curH = parseFloat(arr[n - 1][3]);
-    if (!isNaN(prevH) && !isNaN(curL) && curL > prevH) gapUp = { level: r2(prevH), filled: false };
-    else if (!isNaN(prevL) && !isNaN(curH) && curH < prevL) gapDown = { level: r2(prevL), filled: false };
+    const curO = parseFloat(arr[n - 1][1]), curL = parseFloat(arr[n - 1][4]), curH = parseFloat(arr[n - 1][3]);
+    if (!isNaN(prevH) && !isNaN(curO) && !isNaN(curL) && curO > prevH)
+      gapUp = { level: r2(prevH), filled: curL <= prevH };
+    else if (!isNaN(prevL) && !isNaN(curO) && !isNaN(curH) && curO < prevL)
+      gapDown = { level: r2(prevL), filled: curH >= prevL };
+  }
+
+  // 较昨日放量/缩量%(盘中按交易时间进度折算昨日同期量)
+  const volToday = vols[n - 1] || 0, volYesterday = vols[n - 2] || 0;
+  let volChgPct = null;
+  if (volYesterday > 0) {
+    const prog = tradeProgress();
+    const ratio = volToday / volYesterday;
+    const adj = (prog > 0 && prog < 1) ? ratio / prog : ratio;
+    volChgPct = Math.round((adj - 1) * 1000) / 10;
   }
 
   // 支撑/压力(强弱 + 依据)——均线 + 前高前低 + 整数关口,全部真实计算
@@ -875,6 +900,7 @@ function calcTechFromKline(arr) {
     supports, pressures,
     weeklyTrend,
     volRatio: volRatio != null ? Math.round(volRatio * 100) / 100 : null,
+    volChgPct, volToday, volYesterday,
     kdjGold,
     bias10: ma10 ? Math.round((last / ma10 - 1) * 1000) / 10 : null,
     bias20: ma20 ? Math.round((last / ma20 - 1) * 1000) / 10 : null,
@@ -980,11 +1006,22 @@ async function fetchLhbDetail(code) {
       else youzi += net;
     }
     const yi = v => Math.round(v / 1e4) / 100; // 元 → 亿元(2位)
+    // 资金属性(席位关键词归类):机构/游资/北向/混合
+    const attr = [];
+    if (inst > 0) attr.push('机构');
+    if (north > 0) attr.push('北向');
+    if (youzi > 0) attr.push('游资');
+    const fundAttr = attr.length >= 2 ? '混合资金'
+      : attr.length === 1 ? (attr[0] === '机构' ? '机构主导' : attr[0] === '北向' ? '北向主导' : '游资主导') : null;
+    // 知名席位联动(知名游资关键词匹配,展示真实席位名)
+    const famousKw = ['华鑫', '东方财富', '拉萨', '绍兴', '江苏路', '溧阳路', '益田路', '淮海中路', '佛山', '解放南', '共和新路', '小鳄鱼', '章盟主', '炒股养家', '作手新一', '赵老哥'];
+    const famousSeats = [...new Set(dayRows.map(r => r.OPERATEDEPT_NAME || '').filter(n => famousKw.some(k => n.indexOf(k) >= 0)))];
     return {
       date: latest.slice(0, 10),
       explain: (dayRows[0] && dayRows[0].EXPLANATION) || '',
       changeRate: (dayRows[0] && dayRows[0].CHANGE_RATE) || 0,
-      inst: yi(inst), north: yi(north), youzi: yi(youzi)
+      inst: yi(inst), north: yi(north), youzi: yi(youzi),
+      fundAttr, famousSeats
     };
   } catch (e) { return null; }
 }
@@ -1040,6 +1077,17 @@ async function enrichWatchlistTech(list) {
   // 涨停池一次性拉取(全市场),内存匹配观察池
   let sealMap = {};
   try { sealMap = await fetchLimitUpPool(); } catch (e) { /* 封单缺失降级 */ }
+  // 大盘强弱(总仓位上限依据):上证指数均线状态,全局一份
+  let marketRegime = { label: '震荡', capPct: 50 };
+  try {
+    const idxKl = await fetchKline('sh000001', 120);
+    const idxT = calcTechFromKline(idxKl);
+    if (idxT) {
+      if (idxT.trend === 'up' || (idxT.ma20 && idxT.price > idxT.ma20 && idxT.ma20Slope === 'up')) marketRegime = { label: '强', capPct: 70 };
+      else if (idxT.trend === 'down' || (idxT.ma20 && idxT.price < idxT.ma20)) marketRegime = { label: '弱', capPct: 30 };
+      else marketRegime = { label: '震荡', capPct: 50 };
+    }
+  } catch (e) { /* 大盘状态降级为震荡 */ }
   const arr = await Promise.all((list || []).map(async (s) => {
     if (!s || !s.code) return s;
     try {
@@ -1069,6 +1117,15 @@ async function enrichWatchlistTech(list) {
       const ev = await fetchEvents(s.code);
       if (ev) s.events = ev;
     } catch (e) { /* 事件缺失不阻塞 */ }
+    // 量化风险信号(可观测规则固化,触发则高亮)
+    const riskSignals = [];
+    const tt = s.tech || {};
+    if ((s.pct != null && s.pct <= -7) && (tt.volChgPct > 30 || s.volRatio > 1.5)) riskSignals.push('单日放量下跌超7%');
+    if (s.seal && s.seal.zbc > 0) riskSignals.push('炸板' + s.seal.zbc + '次');
+    if (tt.ma5 && s.price && s.price < tt.ma5) riskSignals.push('现价跌破MA5');
+    if (tt.ma20 && s.price && s.price < tt.ma20 && tt.trend === 'down') riskSignals.push('跌破MA20趋势转弱');
+    if (riskSignals.length) s.riskSignals = riskSignals;
+    s.marketRegime = marketRegime;
     return s;
   }));
   return arr;

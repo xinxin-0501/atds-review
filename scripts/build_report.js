@@ -1304,6 +1304,41 @@ function _divergence(s) {
 function _trendLabel(t) { return t === 'up' ? '多头' : t === 'repair' ? '修复' : t === 'down' ? '空头' : '震荡'; }
 function _weeklyLabel(t) { return t === 'up' ? '周线向上' : t === 'down' ? '周线向下' : '周线走平'; }
 function _minLabel(m) { return m ? (m.trend === 'up' ? '多头' : m.trend === 'down' ? '空头' : '震荡') : '--'; }
+// 资金属性(龙虎榜席位归类;无龙虎榜则空,渲染层隐藏)
+function _fundAttr(s) { return (s.lhb && s.lhb.fundAttr) || ''; }
+// 容错率(板块地位派生:龙头高/中军次之/跟风低)
+function _tolerance(s) {
+  const b = _boardStatus(s);
+  if (b.includes('龙头')) return '容错高';
+  if (b.includes('中军')) return '容错中';
+  return '容错低';
+}
+// 催化时效(手动标签优先,否则按板块地位默认)
+function _catalystTime(s) {
+  if (s.catalystTime) return s.catalystTime;
+  const b = _boardStatus(s);
+  if (b.includes('龙头')) return '波段1-2周';
+  return '短线1-3天';
+}
+// 情绪周期(个股维度,由发酵阶段映射到 冰点/修复/加速/分歧/退潮)
+function _emotionCycle(s) {
+  const f = _ferment(s);
+  if (f === '高潮/加速') return '加速';
+  if (f === '退潮') return '退潮';
+  if (f === '发酵') return '发酵';
+  if (f === '启动') return '修复';
+  return '冰点';
+}
+// 冲突提示(滞涨/跟风不足/龙头走弱,基于真实资金与价格背离)
+function _conflictSignals(s) {
+  const out = [];
+  const ff = s.fundFlow || {};
+  const v = Number(s.pct) || 0;
+  if (ff.d1 != null && ff.d1 > 0 && v <= 0.3) out.push('资金流入但价不涨·滞涨风险');
+  if ((s.category || (s.tags && s.tags.length)) && v < 0) out.push('题材强但个股弱·跟风不足');
+  if (v <= -5) out.push('个股大跌·若为板块龙头需防带崩情绪');
+  return out;
+}
 
 function buildStockRow(s, i, report) {
   const cls = upDownClass(s.pct);
@@ -1325,6 +1360,7 @@ function buildStockRow(s, i, report) {
   const openExpect = gapPct == null ? '--' : (gapPct >= 2 ? '高开' + gapPct.toFixed(1) + '%·防冲高回落' : gapPct <= -2 ? '低开' + gapPct.toFixed(1) + '%·看承接' : '平开±2%·看方向');
   // 证伪条件(真实,基于关键位)
   const falsify = p.sup ? ('跌破' + f2(p.sup.price) + '(' + (p.sup.label || '强支撑') + ')且无法收回 → 逻辑失效') : '跌破近期低点且无法收回 → 逻辑失效';
+  const conflicts = _conflictSignals(s);
 
   // 紧凑表头行(常显)
   const headRow = `<div class="wl-stock-row wl-stock-head">
@@ -1355,14 +1391,18 @@ function buildStockRow(s, i, report) {
   const preList = Array.isArray(t.pressures) ? t.pressures : [];
   const supHtml = supList.slice(0, 3).map(x => `<span class="lv lv-s ${x.weight === 'strong' ? 'lv-strong' : ''}">${f2(x.price)}<i>${esc(x.label)}</i></span>`).join('') || '<span class="lv">--</span>';
   const preHtml = preList.slice(0, 3).map(x => `<span class="lv lv-p ${x.weight === 'strong' ? 'lv-strong' : ''}">${f2(x.price)}<i>${esc(x.label)}</i></span>`).join('') || '<span class="lv">--</span>';
-  const gapHtml = t.gapUp ? ('向上缺口 ' + f2(t.gapUp.level)) : (t.gapDown ? ('向下缺口 ' + f2(t.gapDown.level)) : '无近期缺口');
+  const gapHtml = t.gapUp ? ('向上缺口 ' + f2(t.gapUp.level) + (t.gapUp.filled ? '·已回补' : '·未回补')) : (t.gapDown ? ('向下缺口 ' + f2(t.gapDown.level) + (t.gapDown.filled ? '·已回补' : '·未回补')) : '无近期缺口');
 
   // 资金量能 (真实)
   const fundHtml = `<span>主力净流入 <b class="${(ff.d1 || 0) >= 0 ? 'up' : 'down'}">${sign(ff.d1)}${ff.d1 != null ? ff.d1.toFixed(2) : '--'}亿</b></span>
     <span>3日 <b class="${(ff.d3 || 0) >= 0 ? 'up' : 'down'}">${sign(ff.d3)}${ff.d3 != null ? ff.d3.toFixed(2) : '--'}亿</b></span>
     <span>5日 <b class="${(ff.d5 || 0) >= 0 ? 'up' : 'down'}">${sign(ff.d5)}${ff.d5 != null ? ff.d5.toFixed(2) : '--'}亿</b></span>`;
+  const tvol = t.volChgPct;
+  const volChgTxt = tvol != null ? (tvol >= 0 ? '+' : '') + tvol.toFixed(1) + '%' : '--';
+  const volChgCls = tvol != null ? (tvol >= 0 ? 'up' : 'down') : '';
   const volHtml = `<span>量比 <b>${Number(s.volRatio) || '--'}</b></span>
     <span>换手 <b>${esc(s.turnover || '--')}%</b></span>
+    <span>较昨日量 <b class="${volChgCls}">${volChgTxt}</b></span>
     <span>振幅 <b>${Number(s.amplitude) ? s.amplitude.toFixed(2) + '%' : '--'}</b></span>
     <span>分歧 <b>${esc(_divergence(s))}</b></span>`;
   // 竞价(真实:高开/低开幅度 + 开盘后承接/抛压,基于开盘价与现价关系)
@@ -1381,7 +1421,7 @@ function buildStockRow(s, i, report) {
   // 龙虎榜(真实:机构/游资/北向净买聚合,未上榜显示"近期未上榜")
   const lhb = s.lhb || null;
   const lhbHtml = lhb
-    ? `龙虎榜(${esc(lhb.date)})：机构 <b class="${lhb.inst >= 0 ? 'up' : 'down'}">${lhb.inst >= 0 ? '+' : ''}${lhb.inst.toFixed(2)}亿</b> · 游资 <b class="${lhb.youzi >= 0 ? 'up' : 'down'}">${lhb.youzi >= 0 ? '+' : ''}${lhb.youzi.toFixed(2)}亿</b> · 北向 <b class="${lhb.north >= 0 ? 'up' : 'down'}">${lhb.north >= 0 ? '+' : ''}${lhb.north.toFixed(2)}亿</b><br>${esc(lhb.explain)}`
+    ? `龙虎榜(${esc(lhb.date)})：机构 <b class="${lhb.inst >= 0 ? 'up' : 'down'}">${lhb.inst >= 0 ? '+' : ''}${lhb.inst.toFixed(2)}亿</b> · 游资 <b class="${lhb.youzi >= 0 ? 'up' : 'down'}">${lhb.youzi >= 0 ? '+' : ''}${lhb.youzi.toFixed(2)}亿</b> · 北向 <b class="${lhb.north >= 0 ? 'up' : 'down'}">${lhb.north >= 0 ? '+' : ''}${lhb.north.toFixed(2)}亿</b>${lhb.fundAttr ? ' · 属性 <b>' + esc(lhb.fundAttr) + '</b>' : ''}${lhb.famousSeats && lhb.famousSeats.length ? '<br>知名席位：' + esc(lhb.famousSeats.slice(0, 2).join('、')) : ''}<br>${esc(lhb.explain)}`
     : '龙虎榜：近期未上榜';
   // 60/15分钟趋势(真实)
   const m60 = (s.minTrend && s.minTrend.m60) || null;
@@ -1425,7 +1465,7 @@ function buildStockRow(s, i, report) {
       <span class="dc-rr rr-${rrTone}">盈亏比 ${p.rr.toFixed(2)}</span>
       <span class="dc-time">${esc(report.meta && report.meta.generatedAt || '')}</span>
     </div>
-    <div class="dc-tags">${s.category ? '<span class="dc-tag">' + esc(s.category) + '</span>' : ''}${(s.tags || []).map(t => '<span class="dc-tag">' + esc(t) + '</span>').join('')}<span class="dc-tag">催化:${esc(_catalyst(s))}</span><span class="dc-tag">阶段:${esc(_ferment(s))}</span><span class="dc-tag">地位:${esc(_boardStatus(s))}</span></div>
+    <div class="dc-tags">${s.category ? '<span class="dc-tag">' + esc(s.category) + '</span>' : ''}${(s.tags || []).map(t => '<span class="dc-tag">' + esc(t) + '</span>').join('')}<span class="dc-tag">催化:${esc(_catalyst(s))}</span><span class="dc-tag">时效:${esc(_catalystTime(s))}</span><span class="dc-tag">阶段:${esc(_ferment(s))}</span><span class="dc-tag">情绪:${esc(_emotionCycle(s))}</span><span class="dc-tag">地位:${esc(_boardStatus(s))}</span><span class="dc-tag">${esc(_tolerance(s))}</span></div>
     ${s.logic ? '<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">' + esc(s.logic) + '</div></div>' : ''}
     <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
       <div class="dc-line">${fundHtml}</div>
@@ -1442,13 +1482,18 @@ function buildStockRow(s, i, report) {
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events">${evHtml}</div>
+      <div class="dc-line dc-src-note">数据源受限：减持/增发/回购/股东大会/监管问询等免费源不可得，请自行前往巨潮资讯网(cninfo.com.cn)查询</div>
     </div>
     <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>${planTable}${nowWarn}
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>（单股≤15%、单题材≤30%）</div>
+      <div class="dc-line dc-disc">执行纪律：跌破${f2(p.stop)}无条件止损 · 到达${f2(p.target)}无条件止盈 · 日内做T当日必须平T不隔夜</div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
+      ${(s.riskSignals && s.riskSignals.length) ? '<div class="dc-line dc-risk">' + s.riskSignals.map(r => '<span class="risk-alert">⚠ ' + esc(r) + '</span>').join('') + '</div>' : ''}
+      ${conflicts.length ? '<div class="dc-line dc-risk">' + conflicts.map(r => '<span class="risk-alert risk-conflict">⚡ ' + esc(r) + '</span>').join('') + '</div>' : ''}
       <div class="dc-line">证伪条件：${esc(falsify)}</div>
       <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
+      <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤${s.marketRegime ? s.marketRegime.capPct : 50}%（${s.marketRegime ? esc(s.marketRegime.label) : '震荡'}市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势${conf.trendScore}/30 + 资金${conf.fundScore}/25 + 题材${conf.themeScore}/20 + 关键位${conf.keyScore}/15 + 盈亏比${conf.rrScore}/10</div>
     </div>
     <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>

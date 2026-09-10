@@ -424,19 +424,32 @@ function buildDecisionCardHtml(s){
   var catalyst=/政策|产业|规划|国产|自主|国家/.test(catalystTxt)?'政策/产业':/招标|订单|中标|业绩|预增|扭亏|扭亏为盈/.test(catalystTxt)?'事件/业绩':/景气|主升|主线|需求|涨价|周期|复苏/.test(catalystTxt)?'行业景气':/资金|流入|抢筹|吸筹/.test(catalystTxt)?'资金驱动':'题材';
   var ferment=pct>=7?'高潮/加速':pct>=3?'发酵':(pct>=0&&t.trend==='up')?'启动':pct<-2?'退潮':'混沌';
   var divergence=pct>=5&&vr>=1.3?'一致加速':vr>=1.5?'分歧换手':vr<0.8?'缩量一致':'正常换手';
+  // 时效/情绪周期/容错率(手动标签优先,否则派生)
+  var catalystTime=s.catalystTime||((boardStatus.indexOf('龙头')>=0)?'波段1-2周':'短线1-3天');
+  var emotionCycle=ferment==='高潮/加速'?'加速':ferment==='退潮'?'退潮':ferment==='发酵'?'发酵':ferment==='启动'?'修复':'冰点';
+  var tolerance=boardStatus.indexOf('龙头')>=0?'容错高':boardStatus.indexOf('中军')>=0?'容错中':'容错低';
+  // 冲突提示(滞涨/跟风不足/龙头走弱)
+  var conflicts=[];
+  if(ff.d1!=null&&ff.d1>0&&pct<=0.3)conflicts.push('资金流入但价不涨·滞涨风险');
+  if((s.category||tagsArr.length)&&pct<0)conflicts.push('题材强但个股弱·跟风不足');
+  if(pct<=-5)conflicts.push('个股大跌·若为板块龙头需防带崩情绪');
   var trendLabel=t.trend==='up'?'多头':t.trend==='repair'?'修复':t.trend==='down'?'空头':'震荡';
   var weeklyLabel=t.weeklyTrend==='up'?'周线向上':t.weeklyTrend==='down'?'周线向下':'周线走平';
   var supList=Array.isArray(t.supports)?t.supports:[];
   var preList=Array.isArray(t.pressures)?t.pressures:[];
   var supHtml=supList.slice(0,3).map(function(x){return '<span class="lv lv-s'+(x.weight==='strong'?' lv-strong':'')+'">'+f2(x.price)+'<i>'+escHtmlF(x.label)+'</i></span>';}).join('')||'<span class="lv">--</span>';
   var preHtml=preList.slice(0,3).map(function(x){return '<span class="lv lv-p'+(x.weight==='strong'?' lv-strong':'')+'">'+f2(x.price)+'<i>'+escHtmlF(x.label)+'</i></span>';}).join('')||'<span class="lv">--</span>';
-  var gapHtml=t.gapUp?('向上缺口 '+f2(t.gapUp.level)):(t.gapDown?('向下缺口 '+f2(t.gapDown.level)):'无近期缺口');
+  var gapHtml=t.gapUp?('向上缺口 '+f2(t.gapUp.level)+(t.gapUp.filled?'·已回补':'·未回补')):(t.gapDown?('向下缺口 '+f2(t.gapDown.level)+(t.gapDown.filled?'·已回补':'·未回补')):'无近期缺口');
   // 资金量能
   var fundHtml='<span>主力净流入 <b class="'+((ff.d1||0)>=0?'up':'down')+'">'+sign(ff.d1)+(ff.d1!=null?ff.d1.toFixed(2):'--')+'亿</b></span>'+
     '<span>3日 <b class="'+((ff.d3||0)>=0?'up':'down')+'">'+sign(ff.d3)+(ff.d3!=null?ff.d3.toFixed(2):'--')+'亿</b></span>'+
     '<span>5日 <b class="'+((ff.d5||0)>=0?'up':'down')+'">'+sign(ff.d5)+(ff.d5!=null?ff.d5.toFixed(2):'--')+'亿</b></span>';
+  var tvol=t.volChgPct;
+  var volChgTxt=tvol!=null?(tvol>=0?'+':'')+tvol.toFixed(1)+'%':'--';
+  var volChgCls=tvol!=null?(tvol>=0?'up':'down'):'';
   var volHtml='<span>量比 <b>'+((Number(s.volRatio)||t.volRatio||'--'))+'</b></span>'+
     '<span>换手 <b>'+escHtmlF(s.turnover||'--')+'%</b></span>'+
+    '<span>较昨日量 <b class="'+volChgCls+'">'+volChgTxt+'</b></span>'+
     '<span>振幅 <b>'+(Number(s.amplitude)?Number(s.amplitude).toFixed(2)+'%':'--')+'</b></span>'+
     '<span>分歧 <b>'+escHtmlF(divergence)+'</b></span>';
   // 竞价(真实:高开/低开幅度 + 开盘后承接/抛压)
@@ -452,10 +465,19 @@ function buildDecisionCardHtml(s){
   var sealHtml=seal
     ?'<span>封单 <b class="up">'+(seal.sealFund/1e8).toFixed(2)+'亿</b></span><span>连板 <b class="up">'+seal.lbc+'板</b></span><span>炸板 <b>'+seal.zbc+'次</b></span>'
     :'<span>封单 <b>非涨停</b></span>';
+  // 量化风险信号(可观测规则) + 大盘强弱(总仓位上限)
+  var riskSignals=s.riskSignals||[];
+  if(!riskSignals.length){
+    if(pct<=-7&&(t.volChgPct>30||vr>1.5))riskSignals.push('单日放量下跌超7%');
+    if(seal&&seal.zbc>0)riskSignals.push('炸板'+seal.zbc+'次');
+    if(t.ma5&&price<t.ma5)riskSignals.push('现价跌破MA5');
+    if(t.ma20&&price<t.ma20&&t.trend==='down')riskSignals.push('跌破MA20趋势转弱');
+  }
+  var mr=s.marketRegime||{label:'震荡',capPct:50};
   // 龙虎榜(真实:机构/游资/北向净买)
   var lhb=s.lhb||null;
   var lhbHtml=lhb
-    ?'龙虎榜('+escHtmlF(lhb.date)+')：机构 <b class="'+((lhb.inst||0)>=0?'up':'down')+'">'+((lhb.inst||0)>=0?'+':'')+((lhb.inst!=null?lhb.inst:0).toFixed(2))+'亿</b> · 游资 <b class="'+((lhb.youzi||0)>=0?'up':'down')+'">'+((lhb.youzi||0)>=0?'+':'')+((lhb.youzi!=null?lhb.youzi:0).toFixed(2))+'亿</b> · 北向 <b class="'+((lhb.north||0)>=0?'up':'down')+'">'+((lhb.north||0)>=0?'+':'')+((lhb.north!=null?lhb.north:0).toFixed(2))+'亿</b><br>'+escHtmlF(lhb.explain)
+    ?'龙虎榜('+escHtmlF(lhb.date)+')：机构 <b class="'+((lhb.inst||0)>=0?'up':'down')+'">'+((lhb.inst||0)>=0?'+':'')+((lhb.inst!=null?lhb.inst:0).toFixed(2))+'亿</b> · 游资 <b class="'+((lhb.youzi||0)>=0?'up':'down')+'">'+((lhb.youzi||0)>=0?'+':'')+((lhb.youzi!=null?lhb.youzi:0).toFixed(2))+'亿</b> · 北向 <b class="'+((lhb.north||0)>=0?'up':'down')+'">'+((lhb.north||0)>=0?'+':'')+((lhb.north!=null?lhb.north:0).toFixed(2))+'亿</b>'+(lhb.fundAttr?' · 属性 <b>'+escHtmlF(lhb.fundAttr)+'</b>':'')+(lhb.famousSeats&&lhb.famousSeats.length?'<br>知名席位：'+escHtmlF(lhb.famousSeats.slice(0,2).join('、')):'')+'<br>'+escHtmlF(lhb.explain)
     :'龙虎榜：近期未上榜';
   // 60/15分钟趋势(真实)
   var m60=(s.minTrend&&s.minTrend.m60)||null;
@@ -492,7 +514,7 @@ function buildDecisionCardHtml(s){
     '<span class="dc-rr rr-'+rrToneVal+'">盈亏比 '+p.rr.toFixed(2)+'</span>'+
     '<span class="dc-time">'+new Date().toLocaleString('zh-CN',{hour12:false})+'</span>'+
     '</div>'+
-    '<div class="dc-tags">'+(s.category?'<span class="dc-tag">'+escHtmlF(s.category)+'</span>':'')+tagsArr.map(function(x){return '<span class="dc-tag">'+escHtmlF(x)+'</span>';}).join('')+'<span class="dc-tag">催化:'+escHtmlF(catalyst)+'</span><span class="dc-tag">阶段:'+escHtmlF(ferment)+'</span><span class="dc-tag">地位:'+escHtmlF(boardStatus)+'</span></div>'+
+    '<div class="dc-tags">'+(s.category?'<span class="dc-tag">'+escHtmlF(s.category)+'</span>':'')+tagsArr.map(function(x){return '<span class="dc-tag">'+escHtmlF(x)+'</span>';}).join('')+'<span class="dc-tag">催化:'+escHtmlF(catalyst)+'</span><span class="dc-tag">时效:'+escHtmlF(catalystTime)+'</span><span class="dc-tag">阶段:'+escHtmlF(ferment)+'</span><span class="dc-tag">情绪:'+escHtmlF(emotionCycle)+'</span><span class="dc-tag">地位:'+escHtmlF(boardStatus)+'</span><span class="dc-tag">'+escHtmlF(tolerance)+'</span></div>'+
     (s.logic?'<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">'+escHtmlF(s.logic)+'</div></div>':'')+
     '<div class="dc-block"><div class="dc-h">💰 资金与量能</div>'+
       '<div class="dc-line">'+fundHtml+'</div>'+
@@ -507,13 +529,17 @@ function buildDecisionCardHtml(s){
       '<div class="dc-line">缺口 '+escHtmlF(gapHtml)+' · ATR '+f2(t.atr14)+' · '+escHtmlF(trendLabel)+' · '+escHtmlF(weeklyLabel)+' · '+minTxt+'</div>'+
       '<div class="dc-line">开盘预期 '+escHtmlF(openExpect)+'</div>'+
     '</div>'+
-    '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div></div>'+
+    '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div><div class="dc-line dc-src-note">数据源受限：减持/增发/回购/股东大会/监管问询等免费源不可得，请自行前往巨潮资讯网(cninfo.com.cn)查询</div></div>'+
     '<div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>'+planTable+nowWarn+
       '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>（单股≤15%、单题材≤30%）</div>'+
+      '<div class="dc-line dc-disc">执行纪律：跌破'+f2(p.stop)+'无条件止损 · 到达'+f2(p.target)+'无条件止盈 · 日内做T当日必须平T不隔夜</div>'+
     '</div>'+
     '<div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>'+
+      (riskSignals.length?'<div class="dc-line dc-risk">'+riskSignals.map(function(r){return '<span class="risk-alert">⚠ '+escHtmlF(r)+'</span>';}).join('')+'</div>':'')+
+      (conflicts.length?'<div class="dc-line dc-risk">'+conflicts.map(function(r){return '<span class="risk-alert risk-conflict">⚡ '+escHtmlF(r)+'</span>';}).join('')+'</div>':'')+
       '<div class="dc-line">证伪条件：'+escHtmlF(falsify)+'</div>'+
       '<div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>'+
+      '<div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤'+mr.capPct+'%（'+escHtmlF(mr.label)+'市）· 单笔风险0.5%-1%</div>'+
       '<div class="dc-line">置信度构成：趋势'+trendScore+'/30 + 资金'+fundScore+'/25 + 题材'+themeScore+'/20 + 关键位'+keyScore+'/15 + 盈亏比'+rrScore+'/10</div>'+
     '</div>'+
     '<div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
@@ -1157,6 +1183,19 @@ function computeTechMetrics(klines){
     nearMa20: ma20 ? Math.abs(last - ma20) / ma20 * 100 <= 2 : false
   };
 }
+/* A股交易时间进度(0~1):盘中放量缩量折算 */
+function tradeProgressF(){
+  var bj=new Date(Date.now()+8*3600*1000);
+  var day=bj.getUTCDay();
+  if(day===0||day===6)return 1;
+  var mins=bj.getUTCHours()*60+bj.getUTCMinutes();
+  var traded=0;
+  if(mins>=570&&mins<=690)traded=mins-570;
+  else if(mins>690&&mins<780)traded=120;
+  else if(mins>=780&&mins<=900)traded=120+(mins-780);
+  else if(mins>900)traded=240;
+  return Math.min(1,Math.max(0,traded/240));
+}
 /* 交易决策技术画像:镜像云端 calcTechFromKline(ATR14/支撑压力/缺口/多周期),真实K线计算 */
 function calcDecisionTech(klines){
   if(!Array.isArray(klines)||klines.length<30)return null;
@@ -1192,9 +1231,18 @@ function calcDecisionTech(klines){
   var gapUp=null,gapDown=null;
   if(n>=2){
     var prevH=parseFloat(klines[n-2][3]),prevL=parseFloat(klines[n-2][4]);
-    var curL=parseFloat(klines[n-1][4]),curH=parseFloat(klines[n-1][3]);
-    if(!isNaN(prevH)&&!isNaN(curL)&&curL>prevH)gapUp={level:r2(prevH),filled:false};
-    else if(!isNaN(prevL)&&!isNaN(curH)&&curH<prevL)gapDown={level:r2(prevL),filled:false};
+    var curO=parseFloat(klines[n-1][1]),curL=parseFloat(klines[n-1][4]),curH=parseFloat(klines[n-1][3]);
+    if(!isNaN(prevH)&&!isNaN(curO)&&!isNaN(curL)&&curO>prevH)gapUp={level:r2(prevH),filled:curL<=prevH};
+    else if(!isNaN(prevL)&&!isNaN(curO)&&!isNaN(curH)&&curO<prevL)gapDown={level:r2(prevL),filled:curH>=prevL};
+  }
+  // 较昨日放量/缩量%(盘中按交易时间进度折算)
+  var volToday=vols[n-1]||0,volYesterday=vols[n-2]||0;
+  var volChgPct=null;
+  if(volYesterday>0){
+    var prog=tradeProgressF();
+    var ratio=volToday/volYesterday;
+    var adj=(prog>0&&prog<1)?ratio/prog:ratio;
+    volChgPct=Math.round((adj-1)*1000)/10;
   }
   var supports=[],pressures=[];
   function addLvl(price,label,weight){
@@ -1220,6 +1268,7 @@ function calcDecisionTech(klines){
   return {price:r2(last),ma5:r2(ma5),ma10:r2(ma10),ma20:r2(ma20),ma60:r2(ma60),ma20Slope:ma20Slope,trend:trend,
     atr14:r2(atr14),high60:r2(high60),low60:r2(low60),gapUp:gapUp,gapDown:gapDown,supports:supports,pressures:pressures,
     weeklyTrend:weeklyTrend,volRatio:volRatio!=null?Math.round(volRatio*100)/100:null,
+    volChgPct:volChgPct,volToday:volToday,volYesterday:volYesterday,
     bias20:ma20?Math.round((last/ma20-1)*1000)/10:null};
 }
 /* 个股主力资金流(东财 fflow/kline):主力净流入 当日/3日/5日,单位亿元;失败返回 null 不阻塞 */
@@ -1300,7 +1349,20 @@ async function fetchLhbDetailF(code){
       else youzi+=net;
     }
     function yi(v){return Math.round(v/1e4)/100;}
-    return {date:latest.slice(0,10),explain:(dayRows[0]&&dayRows[0].EXPLANATION)||'',changeRate:(dayRows[0]&&dayRows[0].CHANGE_RATE)||0,inst:yi(inst),north:yi(north),youzi:yi(youzi)};
+    var attr=[];
+    if(inst>0)attr.push('机构');
+    if(north>0)attr.push('北向');
+    if(youzi>0)attr.push('游资');
+    var fundAttr=attr.length>=2?'混合资金':attr.length===1?(attr[0]==='机构'?'机构主导':attr[0]==='北向'?'北向主导':'游资主导'):null;
+    var famousKw=['华鑫','东方财富','拉萨','绍兴','江苏路','溧阳路','益田路','淮海中路','佛山','解放南','共和新路','小鳄鱼','章盟主','炒股养家','作手新一','赵老哥'];
+    var seen={},famousSeats=[];
+    for(var j=0;j<dayRows.length;j++){
+      var nm2=dayRows[j].OPERATEDEPT_NAME||'';
+      for(var k=0;k<famousKw.length;k++){
+        if(nm2.indexOf(famousKw[k])>=0&&!seen[nm2]){seen[nm2]=1;famousSeats.push(nm2);break;}
+      }
+    }
+    return {date:latest.slice(0,10),explain:(dayRows[0]&&dayRows[0].EXPLANATION)||'',changeRate:(dayRows[0]&&dayRows[0].CHANGE_RATE)||0,inst:yi(inst),north:yi(north),youzi:yi(youzi),fundAttr:fundAttr,famousSeats:famousSeats};
   }catch(e){return null;}
 }
 /* 事件日历(东财):财报预约+业绩预告+解禁;无则返回 null */
@@ -1531,3 +1593,158 @@ async function runBehaviorReview(){
   var t = computeTechMetrics(kl);
   res.innerHTML = renderBehaviorResult(data, t, cost);
 }
+
+/* ==================== 观察池 Pro 交互层(第十二轮:手动标签/筛选排序/红绿切换/倒计时/复盘日志/移动端折叠) ==================== */
+/* 手动标签:催化时效/情绪周期/容错率 —— localStorage 持久化,不依赖 API */
+function getManualTags(){ try{return JSON.parse(localStorage.getItem('atds_manual_tags')||'{}');}catch(e){return {};} }
+function setManualTag(code,field,val){
+  try{var t=getManualTags(); if(!t[code])t[code]={}; t[code][field]=val; localStorage.setItem('atds_manual_tags',JSON.stringify(t));}catch(e){}
+}
+/* 红涨绿跌切换(默认国内红涨绿跌;切换为国际绿涨红跌) */
+function toggleColorScheme(){
+  var cur=localStorage.getItem('atds_color_scheme')||'cn';
+  var next=cur==='cn'?'intl':'cn';
+  localStorage.setItem('atds_color_scheme',next);
+  applyColorScheme(next);
+  var btn=document.getElementById('wl-pro-color-btn');
+  if(btn)btn.textContent=next==='cn'?'🎨 红涨绿跌':'🎨 绿涨红跌';
+}
+function applyColorScheme(scheme){
+  var id='atds-color-scheme-style',el=document.getElementById(id);
+  if(!el){el=document.createElement('style');el.id=id;document.head.appendChild(el);}
+  el.textContent=(scheme==='intl')?'.up,.up *{color:#16a34a!important}.down,.down *{color:#e11d48!important}':'';
+}
+/* 按优先级排序(★★★→★★→★) */
+function sortWatchlistByPriority(){
+  var wrap=document.querySelector('.wl-stocks-scroll')||document.querySelector('.wl-stocks');
+  if(!wrap)return;
+  var stocks=Array.prototype.slice.call(wrap.querySelectorAll('.wl-stock'));
+  stocks.sort(function(a,b){
+    function pri(el){var d=el.querySelector('.dc-pri');return d?(d.textContent.replace(/[^★]/g,'').length):0;}
+    return pri(b)-pri(a);
+  });
+  stocks.forEach(function(el){wrap.appendChild(el);});
+}
+/* 手动标签编辑器:为每只股票决策卡注入三个下拉(催化时效/情绪周期/容错率) */
+function showTagEditor(){
+  var cards=document.querySelectorAll('.wl-detail');
+  var tags=getManualTags();
+  var timeOpts=['短线1-3天','波段1-2周','中线逻辑'];
+  var emoOpts=['冰点','修复','加速','分歧','退潮'];
+  var tolOpts=['容错高','容错中','容错低'];
+  function sel(field,opts,cur,label){
+    var o='<select class="dc-te-select" data-field="'+field+'" data-label="'+label+'"><option value="">'+label+'</option>';
+    for(var i=0;i<opts.length;i++){var v=opts[i];o+='<option value="'+v+'"'+(cur===v?' selected':'')+'>'+v+'</option>';}
+    return o+'</select>';
+  }
+  for(var i=0;i<cards.length;i++){
+    var d=cards[i];
+    var code=d.getAttribute('data-detail-code'); if(!code)continue;
+    if(d.querySelector('.dc-tag-editor'))continue;
+    var t=tags[code]||{};
+    var ed=document.createElement('div');
+    ed.className='dc-tag-editor';
+    ed.innerHTML='<span class="dc-te-label">手动标签:</span>'+sel('time',timeOpts,t.time,'催化时效')+sel('emotion',emoOpts,t.emotion,'情绪周期')+sel('tolerance',tolOpts,t.tolerance,'容错率');
+    var tagsRow=d.querySelector('.dc-tags');
+    if(tagsRow)tagsRow.parentNode.insertBefore(ed,tagsRow.nextSibling);
+    else d.appendChild(ed);
+  }
+  var selects=document.querySelectorAll('.dc-te-select');
+  for(var j=0;j<selects.length;j++){
+    selects[j].onchange=function(){
+      var d=this.closest('.wl-detail');
+      var code=d?d.getAttribute('data-detail-code'):null;
+      if(!code)return;
+      setManualTag(code,this.getAttribute('data-field'),this.value);
+      updateManualTagLabel(code);
+    };
+  }
+}
+function updateManualTagLabel(code){
+  var tags=getManualTags();var t=tags[code]||{};
+  var d=document.querySelector('.wl-detail[data-detail-code="'+code+'"]');
+  if(!d)return;
+  var all=d.querySelectorAll('.dc-tags .dc-tag');
+  for(var i=0;i<all.length;i++){
+    var sp=all[i],txt=sp.textContent;
+    if(t.time&&txt.indexOf('时效:')===0)sp.textContent='时效:'+t.time;
+    if(t.emotion&&txt.indexOf('情绪:')===0)sp.textContent='情绪:'+t.emotion;
+    if(t.tolerance&&/^容错[高中低]$/.test(txt))sp.textContent=t.tolerance;
+  }
+}
+/* 刷新倒计时进度条(5秒) */
+var wlCdTimer=null;
+function startRefreshCountdown(){
+  var bar=document.getElementById('wl-refresh-bar'); if(!bar)return;
+  var total=5,left=total;
+  if(wlCdTimer)clearInterval(wlCdTimer);
+  wlCdTimer=setInterval(function(){
+    left-=0.1; if(left<=0)left=total;
+    bar.style.width=Math.round(left/total*52)+'px';
+    var txt=document.getElementById('wl-refresh-time');
+    if(txt)txt.textContent=left.toFixed(1)+'s';
+  },100);
+}
+/* 复盘交易日志(localStorage):统计胜率/平均盈亏/连续亏损 */
+function getJournal(){ try{return JSON.parse(localStorage.getItem('atds_trade_journal')||'[]');}catch(e){return [];} }
+function addJournalEntry(entry){ try{var j=getJournal();j.push(entry);localStorage.setItem('atds_trade_journal',JSON.stringify(j));}catch(e){} }
+function recordTrade(code,name,entry,stop,target){
+  var price=Number(document.querySelector('.wl-stock-row[data-code="'+code+'"] .price')||{})||0;
+  var pnl=null;
+  if(price&&entry&&price!==entry)pnl=Math.round((price-entry)/entry*10000)/100;
+  addJournalEntry({code:code,name:name||code,date:new Date().toISOString().slice(0,10),entry:entry,stop:stop,target:target,close:price,pnl:pnl});
+  renderJournalStats();
+  var pnlTxt=pnl==null?'--':((pnl>0?'+':'')+pnl+'%');
+  alert('已记录交易:'+name+'('+code+') 入场'+entry+' 现价'+price+' 盈亏'+pnlTxt);
+}
+function renderJournalStats(){
+  var el=document.getElementById('wl-journal-stats'); if(!el)return;
+  var j=getJournal();
+  if(!j.length){el.innerHTML='复盘统计:暂无交易记录';return;}
+  var wins=0,losses=0,sumWin=0,sumLoss=0;
+  j.forEach(function(x){if((x.pnl||0)>0){wins++;sumWin+=x.pnl;}else if((x.pnl||0)<0){losses++;sumLoss+=x.pnl;}});
+  var winRate=j.length?Math.round(wins/j.length*100)+'%':'--';
+  var avgWin=wins?Math.round(sumWin/wins*100)/100:'--';
+  var avgLoss=losses?Math.round(sumLoss/losses*100)/100:'--';
+  var consec=0,maxConsec=0;
+  j.forEach(function(x){if((x.pnl||0)<0){consec++;maxConsec=Math.max(maxConsec,consec);}else consec=0;});
+  el.innerHTML='复盘统计:胜率 '+winRate+' · 平均盈 '+avgWin+'% · 平均亏 '+avgLoss+'% · 连续亏损 '+maxConsec+' 次 · 共'+j.length+'笔';
+}
+/* 移动端:点击决策卡头部折叠/展开详情 */
+function bindMobileCollapse(){
+  if(window.innerWidth>768)return;
+  var heads=document.querySelectorAll('.wl-detail .dc-head');
+  for(var i=0;i<heads.length;i++){
+    heads[i].onclick=function(){
+      var d=this.closest('.wl-detail');
+      if(d)d.classList.toggle('open');
+    };
+  }
+}
+/* 初始化观察池 Pro UI(控制条) */
+function initWatchlistProUI(){
+  var card=document.querySelector('.watchlist-card');
+  if(!card)return;
+  if(document.getElementById('wl-pro-bar'))return;
+  var bar=document.createElement('div');
+  bar.className='wl-pro-bar';
+  bar.id='wl-pro-bar';
+  bar.innerHTML='<span class="wl-pro-title">⚡ 交易决策观察池</span>'+
+    '<button id="wl-pro-color-btn" class="wl-pro-btn" onclick="toggleColorScheme()">🎨 红涨绿跌</button>'+
+    '<button class="wl-pro-btn" onclick="showTagEditor()">🏷 手动标签</button>'+
+    '<button class="wl-pro-btn" onclick="sortWatchlistByPriority()">★ 优先级排序</button>'+
+    '<span class="wl-pro-countdown"><span id="wl-refresh-bar" class="wl-refresh-bar"></span><span id="wl-refresh-time">5.0s</span></span>'+
+    '<span id="wl-journal-stats" class="wl-journal-stats"></span>';
+  card.insertBefore(bar,card.firstChild);
+  var scheme=localStorage.getItem('atds_color_scheme')||'cn';
+  applyColorScheme(scheme);
+  var cb=document.getElementById('wl-pro-color-btn');
+  if(cb)cb.textContent=scheme==='cn'?'🎨 红涨绿跌':'🎨 绿涨红跌';
+  startRefreshCountdown();
+  renderJournalStats();
+  bindMobileCollapse();
+}
+window.recordTrade=recordTrade;
+window.getManualTags=getManualTags;
+window.setManualTag=setManualTag;
+if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initWatchlistProUI,700);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initWatchlistProUI,700);});}
