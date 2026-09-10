@@ -196,7 +196,44 @@ async function fetchIntlMkt() {
   return out;
 }
 
-async function fetchKline(code, count = 250) {
+// ============ K线/分钟趋势本地缓存(过去交易日,云端源不可用时兜底,坚决不显示--) ============
+let _klineCache = null;
+function loadKlineCache() {
+  if (_klineCache) return _klineCache;
+  try {
+    const p = path.join(ROOT, 'data', 'kline_cache.json');
+    if (fs.existsSync(p)) _klineCache = JSON.parse(fs.readFileSync(p, 'utf8')) || {};
+  } catch (e) { /* 缓存损坏忽略 */ }
+  if (!_klineCache || typeof _klineCache !== 'object') _klineCache = {};
+  return _klineCache;
+}
+function saveKlineCache() {
+  try {
+    const p = path.join(ROOT, 'data', 'kline_cache.json');
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, JSON.stringify(_klineCache, null, 2), 'utf8');
+  } catch (e) { console.error('saveKlineCache 失败:', e.message); }
+}
+// 分钟趋势缓存(独立文件,保存最近一次真实抓取的 m60/m15 具体价位)
+let _minTrendCache = null;
+function loadMinTrendCache() {
+  if (_minTrendCache) return _minTrendCache;
+  try {
+    const p = path.join(ROOT, 'data', 'min_trend_cache.json');
+    if (fs.existsSync(p)) _minTrendCache = JSON.parse(fs.readFileSync(p, 'utf8')) || {};
+  } catch (e) { /* 忽略 */ }
+  if (!_minTrendCache || typeof _minTrendCache !== 'object') _minTrendCache = {};
+  return _minTrendCache;
+}
+function saveMinTrendCache() {
+  try {
+    const p = path.join(ROOT, 'data', 'min_trend_cache.json');
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, JSON.stringify(_minTrendCache, null, 2), 'utf8');
+  } catch (e) { console.error('saveMinTrendCache 失败:', e.message); }
+}
+
+async function fetchKlineRaw(code, count = 250) {
   const fetchT = (u, h, m) => { const ac = new AbortController(); const t = setTimeout(() => ac.abort(), m || 9000); return fetch(u, { headers: h || { 'User-Agent': 'Mozilla/5.0' }, redirect: 'follow', signal: ac.signal }).finally(() => clearTimeout(t)); };
   // 腾讯优先
   const url = `http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=${code},day,,,${count},qfq`;
@@ -261,6 +298,25 @@ async function fetchKline(code, count = 250) {
       }
     }
   } catch (e) { /* ignore */ }
+  return [];
+}
+
+// fetchKline 包装:成功时缓存日线(过去交易日),全部源失败时读缓存兜底,确保 tech 永不为空
+async function fetchKline(code, count = 250) {
+  const series = await fetchKlineRaw(code, count);
+  if (Array.isArray(series) && series.length >= 30) {
+    try {
+      const c = loadKlineCache();
+      c[code] = { date: bjToday(), series: series.slice(-120) };
+      saveKlineCache();
+    } catch (e) { /* 缓存写入失败不影响主流程 */ }
+    return series;
+  }
+  // 源不可用 → 读本地缓存(过去交易日日线,足以算出 MA 趋势,避免 60/15 分钟与日线双双显示 --)
+  try {
+    const cached = loadKlineCache()[code];
+    if (cached && Array.isArray(cached.series) && cached.series.length >= 30) return cached.series;
+  } catch (e) { /* 缓存缺失忽略 */ }
   return [];
 }
 
@@ -1348,15 +1404,24 @@ async function enrichWatchlistTech(list) {
     } catch (e) { /* 资金流缺失不阻塞 */ }
     // 封单/连板(非涨停显示 null → 渲染层"非涨停")
     if (sealMap[s.code]) s.seal = sealMap[s.code];
-    // 60/15分钟趋势(腾讯→新浪双链路;双源失败用日线MA趋势兜底,避免显示 --)
+    // 60/15分钟趋势:腾讯→新浪→本地缓存→日线MA趋势,四级兜底,坚决不空(显示 --)
     try {
       const [m60, m15] = await Promise.all([fetchMinuteTrend(s.code, 'm60'), fetchMinuteTrend(s.code, 'm15')]);
+      let f60 = m60, f15 = m15;
+      // 仅缓存真实抓取值(兜底值不入缓存,保持缓存为可信历史价位)
       if (m60 || m15) {
-        s.minTrend = { m60, m15 };
-      } else if (s.tech && s.tech.trend) {
-        const fb = { trend: s.tech.trend, ma5: s.tech.ma5, ma10: s.tech.ma10, fallback: true };
-        s.minTrend = { m60: fb, m15: fb };
+        const mc = loadMinTrendCache();
+        mc[s.code] = { date: bjToday(), m60: m60 || null, m15: m15 || null };
+        saveMinTrendCache();
       }
+      // 三级兜底:本地分钟趋势缓存(上次成功抓取的具体价位)
+      const mct = loadMinTrendCache()[s.code];
+      if (!f60 && mct && mct.m60) f60 = { ...mct.m60, cached: true };
+      if (!f15 && mct && mct.m15) f15 = { ...mct.m15, cached: true };
+      // 四级兜底:日线 MA 趋势(过去交易日日线算出的 MA5/MA10)
+      if (!f60 && s.tech && s.tech.trend) f60 = { trend: s.tech.trend, ma5: s.tech.ma5, ma10: s.tech.ma10, fallback: true };
+      if (!f15 && s.tech && s.tech.trend) f15 = { trend: s.tech.trend, ma5: s.tech.ma5, ma10: s.tech.ma10, fallback: true };
+      if (f60 || f15) s.minTrend = { m60: f60, m15: f15 };
     } catch (e) { /* 分钟趋势缺失不阻塞 */ }
     // 所属板块当日涨跌幅(复盘资金归因对比)
     try {
