@@ -1215,14 +1215,31 @@ function wlTechAdviceText(pct, tech) {
   return '信号尚不充分,建议先观望,等待趋势进一步明朗后再决定是否纳入跟踪';
 }
 // ===== 观察池交易决策卡:辅助计算(全部基于真实行情/K线/资金流,不造假) =====
+function _filterLvls(arr, price) {
+  const seen = {};
+  const out = [];
+  (Array.isArray(arr) ? arr : []).forEach(x => {
+    if (!x || x.price == null || isNaN(x.price)) return;
+    const k = x.price.toFixed(2);
+    if (seen[k]) return;
+    seen[k] = 1;
+    if (price > 0 && Math.abs(x.price - price) / price > 0.20) return;
+    out.push(x);
+  });
+  return out;
+}
 function _supStrong(s) {
   const t = s.tech || {};
-  if (Array.isArray(t.supports) && t.supports.length) return t.supports.find(x => x.weight === 'strong') || t.supports[0];
+  const price = Number(s.price) || 0;
+  const a = _filterLvls(t.supports, price).sort((a, b) => b.price - a.price);
+  if (a.length) return a.find(x => x.weight === 'strong') || a[0];
   return null;
 }
 function _preStrong(s) {
   const t = s.tech || {};
-  if (Array.isArray(t.pressures) && t.pressures.length) return t.pressures.find(x => x.weight === 'strong') || t.pressures[0];
+  const price = Number(s.price) || 0;
+  const a = _filterLvls(t.pressures, price).sort((a, b) => a.price - b.price);
+  if (a.length) return a.find(x => x.weight === 'strong') || a[0];
   return null;
 }
 function _plan(s) {
@@ -1312,6 +1329,12 @@ function _minLabel(m) {
   const fb = m.cached ? '·缓存' : (m.approx ? '·日线近似' : '');
   return ma ? (dir + '(' + ma + ')' + fb) : (dir + fb);
 }
+function _minApprox(m) { return !m || m.approx; }
+function _minWrap(m) {
+  const txt = _minLabel(m);
+  if (_minApprox(m)) return `<span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">${txt}<i class="min-approx-ico">ⓘ</i></span>`;
+  return `<span>${txt}</span>`;
+}
 // 资金属性(龙虎榜席位归类;无龙虎榜则空,渲染层隐藏)
 function _fundAttr(s) { return (s.lhb && s.lhb.fundAttr) || ''; }
 // 容错率(板块地位派生:龙头高/中军次之/跟风低)
@@ -1395,8 +1418,8 @@ function buildStockRow(s, i, report) {
 
   // 关键位 + 多周期 (真实)
   const supStrong = _supStrong(s), preStrong = _preStrong(s);
-  const supList = Array.isArray(t.supports) ? t.supports : [];
-  const preList = Array.isArray(t.pressures) ? t.pressures : [];
+  const supList = _filterLvls(t.supports, price).sort((a, b) => b.price - a.price);
+  const preList = _filterLvls(t.pressures, price).sort((a, b) => a.price - b.price);
   const supHtml = supList.slice(0, 3).map(x => `<span class="lv lv-s ${x.weight === 'strong' ? 'lv-strong' : ''}">${f2(x.price)}<i>${esc(x.label)}</i></span>`).join('') || '<span class="lv">--</span>';
   const preHtml = preList.slice(0, 3).map(x => `<span class="lv lv-p ${x.weight === 'strong' ? 'lv-strong' : ''}">${f2(x.price)}<i>${esc(x.label)}</i></span>`).join('') || '<span class="lv">--</span>';
   const gapHtml = t.gapUp ? ('向上缺口 ' + f2(t.gapUp.level) + (t.gapUp.filled ? '·已回补' : '·未回补')) : (t.gapDown ? ('向下缺口 ' + f2(t.gapDown.level) + (t.gapDown.filled ? '·已回补' : '·未回补')) : '无近期缺口');
@@ -1434,7 +1457,7 @@ function buildStockRow(s, i, report) {
   // 60/15分钟趋势(真实)
   const m60 = (s.minTrend && s.minTrend.m60) || null;
   const m15 = (s.minTrend && s.minTrend.m15) || null;
-  const minTxt = `60分 ${_minLabel(m60)} · 15分 ${_minLabel(m15)}`;
+  const minTxt = `60分 ${_minWrap(m60)} · 15分 ${_minWrap(m15)}`;
   // 事件风险(真实:东财财报/解禁 + 巨潮减持/增发/回购/股东大会/监管问询;3天内高影响标红)
   const evs = s.events || null;
   const evStatus = s.eventsStatus || {};
@@ -1474,12 +1497,15 @@ function buildStockRow(s, i, report) {
   // 情绪周期与硬逆势判定(提前到此,供状态覆盖与折叠使用)
   const emotionCycle = _emotionCycle(s);
   const isHardTrade = (emotionCycle === '冰点' && t.trend === 'down' && (ff.d1 || 0) < 0);
+  // 复盘形态:长上影线/大幅冲高回落识别 —— (最高-现价)>3% 且 现价<开盘价(提前到此,供状态降级与形态/资金文案使用)
+  const upperShadow = (s.high > 0 && price > 0 && s.open > 0 && ((s.high - price) / price * 100 > 3) && price < s.open);
   // 状态机强制覆盖(致命防呆):现价盈亏比不合格 或 方案A/B均未触发 → 禁止"可交易/轻仓试错",强制"等待触发/高风险观察"
   const rrNowBad = p.rrNow < 1.5;             // 现价直接买入盈亏比不合格
   const abUnTriggered = !trigA && !trigB;      // 方案A/B均未触发
   const riskDowngrade = tRRBad && (ff.d1 || 0) < 0;  // 做T不合格+主力流出
   let effStatusLabel, effConfTone;
   if (isHardTrade) { effStatusLabel = '不建议参与'; effConfTone = 'down'; }
+  else if (upperShadow) { effStatusLabel = '高风险观察'; effConfTone = 'down'; }
   else if (riskDowngrade) { effStatusLabel = '高风险观察'; effConfTone = 'down'; }
   else if (rrNowBad || abUnTriggered) { effStatusLabel = '等待触发'; effConfTone = 'down'; }
   else { effStatusLabel = statusLabel; effConfTone = confTone; }
@@ -1514,7 +1540,9 @@ function buildStockRow(s, i, report) {
   const isShrinking = (t.volRatio != null && t.volRatio < 0.75);
   const isFlatPrice = Math.abs(stockPctN) <= 0.3;
   let fundVerify;
-  if (isMicroInflow && isShrinking && isFlatPrice) {
+  if (upperShadow && (ff.d1 || 0) > 0) {
+    fundVerify = '主力净流入当日' + sign(ff.d1) + ff.d1.toFixed(2) + '亿，资金逆势流入，存在试盘可能';
+  } else if (isMicroInflow && isShrinking && isFlatPrice) {
     fundVerify = '主力净流入当日' + sign(ff.d1) + ff.d1.toFixed(2) + '亿，微幅流入，买方承接极弱，需警惕滞涨';
   } else {
     fundVerify = '主力净流入当日' + sign(ff.d1) + (ff.d1 != null ? ff.d1.toFixed(2) : '--') + '亿，' + ((ff.d1 || 0) >= 0 ? '符合做多预期' : '与做多预期背离，需复核');
@@ -1524,11 +1552,15 @@ function buildStockRow(s, i, report) {
     const cmp = diff <= -0.5 ? '弱于板块，弱势特征明显' : (diff >= 0.5 ? '强于板块，具备相对强度' : '与板块基本同步');
     fundVerify += '；个股 ' + (stockPctN > 0 ? '+' : '') + stockPctN.toFixed(2) + '% vs ' + esc(secChg.boardName) + '板块 ' + (secChg.changePct > 0 ? '+' : '') + secChg.changePct.toFixed(2) + '%，' + cmp;
   }
-  // 复盘形态判定:长上影线(冲高回落)识别 —— (最高-现价)>3% 且 现价<开盘价 → 上方抛压极重
-  const upperShadow = (s.high > 0 && price > 0 && s.open > 0 && ((s.high - price) / price * 100 > 3) && price < s.open);
-  const patternHtml = upperShadow
-    ? '<div class="dc-line dc-pattern">形态判定：今日大幅冲高回落，收长上影线，上方抛压极重，空头占优。</div>'
-    : '';
+  // 复盘形态判定(资金方向区分):长上影线 + 主力净流入 = 冲高回落但资金逆势流入(试盘);长上影线 + 净流出 = 抛压极重空头占优
+  let patternHtml = '';
+  if (upperShadow) {
+    if ((ff.d1 || 0) > 0) {
+      patternHtml = '<div class="dc-line dc-pattern">形态判定：今日冲高回落收长上影线，但资金逆势流入，存在试盘可能，需警惕次日的低开或补跌。</div>';
+    } else {
+      patternHtml = '<div class="dc-line dc-pattern">形态判定：今日大幅冲高回落，收长上影线，上方抛压极重，空头占优。</div>';
+    }
+  }
   // 明日核心观察点(次日操作指引):现价距离MA5超3% → 不机械写"收复MA5",改支撑位止跌企稳
   let nextDayFocus;
   if (t.ma5 && price) {

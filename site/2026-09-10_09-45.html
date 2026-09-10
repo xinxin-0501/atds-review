@@ -569,6 +569,9 @@
 .dc-next-day{font-size:9px;color:#1a5c8a;background:#e3f2fd;border:1px solid #bbdefb;border-radius:4px;padding:3px 7px;margin-top:3px;font-weight:600}
 /* 复盘形态判定(长上影线/冲高回落等) */
 .dc-pattern{font-size:9px;color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0;border-radius:4px;padding:3px 7px;margin-top:3px;font-weight:700}
+/* 分钟级近似趋势气泡提示 */
+.min-approx{position:relative;display:inline-flex;align-items:center;cursor:help;border-bottom:1px dashed #bbb}
+.min-approx-ico{font-style:normal;font-size:10px;color:#8a6d3b;margin-left:3px}
 /* KNOWLEDGE SYNC 手动导出说明 */
 .knowledge-note{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:4px 7px;margin:6px 0 2px;line-height:1.5}
 /* 移动端紧凑排版:默认全展开(每只股8区决策卡无须点击直接可见),压缩间距降低页面总高 */
@@ -2182,16 +2185,16 @@
     <span class="wl-cell wl-cell-price"><span class="price down">63.91</span></span>
     <span class="wl-cell wl-cell-pct down">-4.07%</span>
     <span class="wl-cell wl-cell-amt">94.5亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-warn">54</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-good">4.66 ✓</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-warn">48</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-warn">1.14</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600487" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="600487" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600487">
     <div class="dc-head">
       <span class="dc-pri">★</span>
       <span class="dc-name">亨通光电 <i>600487</i></span>
       <span class="dc-status down">高风险观察</span>
-      <span class="dc-conf">置信度 54</span>
-      <span class="dc-rr rr-good">盈亏比 4.66</span>
+      <span class="dc-conf">置信度 48</span>
+      <span class="dc-rr rr-warn">盈亏比 1.14</span>
       <span class="dc-time">2026-09-10 23:30:44</span>
     </div>
     <div class="dc-tags"><span class="dc-tag">光通信</span><span class="dc-tag">首选参与</span><span class="dc-tag">催化:事件/业绩</span><span class="dc-tag">时效:波段1-2周</span><span class="dc-tag">阶段:退潮</span><span class="dc-tag">情绪:退潮</span><span class="dc-tag">地位:龙头/主攻</span><span class="dc-tag">容错高</span></div>
@@ -2210,9 +2213,9 @@
       <div class="dc-line">龙虎榜(2026-08-25)：机构 <b class="up">+656.31亿</b> · 游资 <b class="up">+439.09亿</b> · 北向 <b class="up">+754.19亿</b> · 属性 <b>混合资金</b><br>知名席位：东方财富证券股份有限公司拉萨金融城南环路证券营业部、东方财富证券股份有限公司山南香曲东路证券营业部<br>有价格涨跌幅限制的日价格振幅达到15%的前五只证券</div>
     </div>
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv lv-s ">60.00<i>整数关口</i></span><span class="lv lv-s ">50.00<i>整数关口</i></span><span class="lv lv-s lv-strong">45.60<i>近60日前低</i></span></div>
+      <div class="dc-line">支撑 <span class="lv lv-s ">60.00<i>整数关口</i></span></div>
       <div class="dc-line">压力 <span class="lv lv-p ">63.97<i>MA5</i></span><span class="lv lv-p lv-strong">64.66<i>MA20</i></span><span class="lv lv-p ">65.55<i>MA10</i></span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR 4.09 · 空头 · 周线走平 · 60分 空头(MA10 64.97) · 15分 震荡(MA10 64.08)</div>
+      <div class="dc-line">缺口 无近期缺口 · ATR 4.09 · 空头 · 周线走平 · 60分 <span>空头(MA10 64.97)</span> · 15分 <span>震荡(MA10 64.08)</span></div>
       <div class="dc-line">开盘预期 低开-2.4%·看承接</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -2225,9 +2228,9 @@
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="tp-notrig">
     <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩45.60企稳</td>
-    <td class="tp-num">45.60</td>
-    <td class="tp-num stop">41.51</td>
+    <td class="tp-trig">回踩60.00企稳</td>
+    <td class="tp-num">60.00</td>
+    <td class="tp-num stop">55.91</td>
     <td class="tp-num">64.66</td>
     <td class="tp-rr tp-rr-muted">未触发</td>
   </tr>
@@ -2240,20 +2243,20 @@
     <td class="tp-rr tp-rr-muted">未触发</td>
   </tr>
     
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.03(<1.5),不合格 —— 等待回踩至 45.60 再执行,当前仅观察。</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损9% → 建议仓位 <b>6%-11%</b>（单股≤15%、单题材≤30%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破41.51无条件止损 · 到达64.66无条件止盈 · 日内做T当日必须平T不隔夜</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.09(<1.5),不合格 —— 等待回踩至 60.00 再执行,当前仅观察。</div>
+      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损6.8% → 建议仓位 <b>7%-15%</b>（单股≤15%、单题材≤30%）</div>
+      <div class="dc-line dc-disc">执行纪律：跌破55.91无条件止损 · 到达64.66无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       <div class="dc-line dc-risk"><span class="risk-alert">⚠ 现价跌破MA5<i class="risk-guide">空仓者观望，持仓者减仓/清仓</i></span><span class="risk-alert">⚠ 跌破MA20趋势转弱<i class="risk-guide">空仓者观望，持仓者减仓/清仓</i></span></div>
       <div class="dc-line dc-risk"><span class="risk-alert risk-conflict">⚡ 题材强但个股弱·跟风不足</span></div>
-      <div class="dc-line">证伪条件：跌破45.60(近60日前低)且无法收回 → 逻辑失效</div>
+      <div class="dc-line">证伪条件：跌破60.00(整数关口)且无法收回 → 逻辑失效</div>
       <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤30%（弱市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材18/20 + 关键位9/15 + 盈亏比10/10</div>
+      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材18/20 + 关键位9/15 + 盈亏比4/10</div>
     </div>
-    <div class="dc-block dc-review" data-review-code="600487" data-name="亨通光电" data-price="63.91" data-entry="45.6" data-stop="41.510000000000005" data-target="64.66"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="600487" data-name="亨通光电" data-price="63.91" data-entry="60" data-stop="55.91" data-target="64.66"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高65.68 触及压力64.66 · 最低63.80 未触及支撑</div>
       
       <div class="dc-line">资金验证：主力净流入当日-13.66亿，与做多预期背离，需复核</div>
@@ -2305,7 +2308,7 @@
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
       <div class="dc-line">支撑 <span class="lv lv-s ">20.00<i>整数关口</i></span><span class="lv lv-s lv-strong">19.31<i>近60日前低</i></span></div>
       <div class="dc-line">压力 <span class="lv lv-p ">21.91<i>MA5</i></span><span class="lv lv-p ">22.27<i>MA10</i></span><span class="lv lv-p lv-strong">22.63<i>MA20</i></span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR 0.74 · 空头 · 周线向下 · 60分 空头(MA10 21.96) · 15分 震荡(MA10 21.91)</div>
+      <div class="dc-line">缺口 无近期缺口 · ATR 0.74 · 空头 · 周线向下 · 60分 <span>空头(MA10 21.96)</span> · 15分 <span>震荡(MA10 21.91)</span></div>
       <div class="dc-line">开盘预期 平开±2%·看方向</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -2369,7 +2372,7 @@
     <span class="wl-cell wl-cell-pct down">-0.03%</span>
     <span class="wl-cell wl-cell-amt">27.3亿</span>
     <span class="wl-cell wl-cell-atds"><span class="conf conf-warn">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-good">4.49 ✓</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-warn">1.37</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300285" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300285" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300285">
     <div class="dc-head">
@@ -2377,7 +2380,7 @@
       <span class="dc-name">国瓷材料 <i>300285</i></span>
       <span class="dc-status down">不建议参与</span>
       <span class="dc-conf">置信度 41</span>
-      <span class="dc-rr rr-good">盈亏比 4.49</span>
+      <span class="dc-rr rr-warn">盈亏比 1.37</span>
       <span class="dc-time">2026-09-10 23:30:44</span>
     </div><div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>
     <div class="dc-tags"><span class="dc-tag">催化:题材</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:混沌</span><span class="dc-tag">情绪:冰点</span><span class="dc-tag">地位:独立观察</span><span class="dc-tag">容错低</span></div>
@@ -2396,9 +2399,9 @@
       <div class="dc-line">龙虎榜(2026-07-21)：机构 <b class="down">-379.64亿</b> · 游资 <b class="up">+91.98亿</b> · 北向 <b class="down">-259.31亿</b> · 属性 <b>游资主导</b><br>日涨幅达到15%的前5只证券</div>
     </div>
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv lv-s ">60.00<i>整数关口</i></span><span class="lv lv-s ">50.00<i>整数关口</i></span><span class="lv lv-s lv-strong">47.72<i>近60日前低</i></span></div>
+      <div class="dc-line">支撑 <span class="lv lv-s ">60.00<i>整数关口</i></span><span class="lv lv-s ">50.00<i>整数关口</i></span></div>
       <div class="dc-line">压力 <span class="lv lv-p ">60.74<i>MA5</i></span><span class="lv lv-p ">63.29<i>MA10</i></span><span class="lv lv-p lv-strong">65.40<i>MA20</i></span></div>
-      <div class="dc-line">缺口 向下缺口 59.94·已回补 · ATR 3.94 · 空头 · 周线向下 · 60分 震荡(MA10 60.62) · 15分 震荡(MA10 60.27)</div>
+      <div class="dc-line">缺口 向下缺口 59.94·已回补 · ATR 3.94 · 空头 · 周线向下 · 60分 <span>震荡(MA10 60.62)</span> · 15分 <span>震荡(MA10 60.27)</span></div>
       <div class="dc-line">开盘预期 平开±2%·看方向</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -2411,9 +2414,9 @@
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="tp-notrig">
     <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩47.72企稳</td>
-    <td class="tp-num">47.72</td>
-    <td class="tp-num stop">43.78</td>
+    <td class="tp-trig">回踩60.00企稳</td>
+    <td class="tp-num">60.00</td>
+    <td class="tp-num stop">56.06</td>
     <td class="tp-num">65.40</td>
     <td class="tp-rr tp-rr-muted">未触发</td>
   </tr>
@@ -2426,21 +2429,21 @@
     <td class="tp-rr tp-rr-muted">未触发</td>
   </tr>
     
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.30(<1.5),不合格 —— 等待回踩至 47.72 再执行,当前仅观察。</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损8.3% → 建议仓位 <b>6%-12%</b>（单股≤15%、单题材≤30%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破43.78无条件止损 · 到达65.40无条件止盈 · 日内做T当日必须平T不隔夜</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 1.18(<1.5),不合格 —— 等待回踩至 60.00 再执行,当前仅观察。</div>
+      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损6.6% → 建议仓位 <b>8%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
+      <div class="dc-line dc-disc">执行纪律：跌破56.06无条件止损 · 到达65.40无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       <div class="dc-line dc-risk"><span class="risk-alert">⚠ 现价跌破MA5<i class="risk-guide">空仓者观望，持仓者减仓/清仓</i></span><span class="risk-alert">⚠ 跌破MA20趋势转弱<i class="risk-guide">空仓者观望，持仓者减仓/清仓</i></span></div>
       
-      <div class="dc-line">证伪条件：跌破47.72(近60日前低)且无法收回 → 逻辑失效</div>
+      <div class="dc-line">证伪条件：跌破60.00(整数关口)且无法收回 → 逻辑失效</div>
       <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤30%（弱市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比10/10</div>
+      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位12/15 + 盈亏比4/10</div>
     </div>
-    <div class="dc-block dc-review" data-review-code="300285" data-name="国瓷材料" data-price="60.35" data-entry="47.72" data-stop="43.78" data-target="65.4"><div class="dc-h">📊 盘后复盘（当日验证）</div>
-      <div class="dc-line">关键位验证：最高61.60 未触及压力 · 最低59.34 未触及支撑</div>
+    <div class="dc-block dc-review" data-review-code="300285" data-name="国瓷材料" data-price="60.35" data-entry="60" data-stop="56.06" data-target="65.4"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+      <div class="dc-line">关键位验证：最高61.60 未触及压力 · 最低59.34 触及支撑60.00</div>
       
       <div class="dc-line">资金验证：主力净流入当日-1.16亿，与做多预期背离，需复核</div>
       <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300285" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300285" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300285" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="300285" onclick="recordTTrade(this)">记做T</button></div>
@@ -2490,8 +2493,8 @@
     </div>
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
       <div class="dc-line">支撑 <span class="lv lv-s ">890.00<i>整数关口</i></span><span class="lv lv-s lv-strong">886.35<i>MA20</i></span><span class="lv lv-s ">882.77<i>MA5</i></span></div>
-      <div class="dc-line">压力 <span class="lv lv-p ">900.00<i>整数关口</i></span><span class="lv lv-p ">900.00<i>整数关口</i></span><span class="lv lv-p ">900.00<i>整数关口</i></span></div>
-      <div class="dc-line">缺口 向下缺口 901.00·已回补 · ATR 45.29 · 震荡 · 周线向上 · 60分 空头(MA10 904.32) · 15分 震荡(MA10 892.96)</div>
+      <div class="dc-line">压力 <span class="lv lv-p ">900.00<i>整数关口</i></span><span class="lv lv-p ">1000.00<i>整数关口</i></span><span class="lv lv-p lv-strong">1020.06<i>MA60</i></span></div>
+      <div class="dc-line">缺口 向下缺口 901.00·已回补 · ATR 45.29 · 震荡 · 周线向上 · 60分 <span>空头(MA10 904.32)</span> · 15分 <span>震荡(MA10 892.96)</span></div>
       <div class="dc-line">开盘预期 低开-2.1%·看承接</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -2582,9 +2585,9 @@
       <div class="dc-line">龙虎榜(2026-08-21)：机构 <b class="up">+0.00亿</b> · 游资 <b class="down">-24.03亿</b> · 北向 <b class="down">-86.45亿</b><br>知名席位：东方财富证券股份有限公司拉萨金融城南环路证券营业部、东方财富证券股份有限公司山南香曲东路证券营业部<br>有价格涨跌幅限制的日收盘价格跌幅偏离值达到7%的前五只证券</div>
     </div>
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv lv-s lv-strong">22.49<i>近60日前低</i></span><span class="lv lv-s ">20.00<i>整数关口</i></span></div>
+      <div class="dc-line">支撑 <span class="lv lv-s lv-strong">22.49<i>近60日前低</i></span></div>
       <div class="dc-line">压力 <span class="lv lv-p ">27.10<i>MA10</i></span><span class="lv lv-p ">27.30<i>MA5</i></span><span class="lv lv-p lv-strong">27.99<i>MA20</i></span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR 1.59 · 空头 · 周线向下 · 60分 空头(MA10 27.17) · 15分 震荡(MA10 26.43)</div>
+      <div class="dc-line">缺口 无近期缺口 · ATR 1.59 · 空头 · 周线向下 · 60分 <span>空头(MA10 27.17)</span> · 15分 <span>震荡(MA10 26.43)</span></div>
       <div class="dc-line">开盘预期 平开±2%·看方向</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -2677,7 +2680,7 @@
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
       <div class="dc-line">支撑 <span class="lv lv-s ">30.00<i>整数关口</i></span><span class="lv lv-s lv-strong">28.42<i>近60日前低</i></span></div>
       <div class="dc-line">压力 <span class="lv lv-p ">32.30<i>MA5</i></span><span class="lv lv-p ">32.50<i>MA10</i></span><span class="lv lv-p lv-strong">33.13<i>MA20</i></span></div>
-      <div class="dc-line">缺口 向下缺口 32.12·已回补 · ATR 1.18 · 空头 · 周线向下 · 60分 空头(MA10 32.3) · 15分 震荡(MA10 32.15)</div>
+      <div class="dc-line">缺口 向下缺口 32.12·已回补 · ATR 1.18 · 空头 · 周线向下 · 60分 <span>空头(MA10 32.3)</span> · 15分 <span>震荡(MA10 32.15)</span></div>
       <div class="dc-line">开盘预期 平开±2%·看方向</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -2740,16 +2743,16 @@
     <span class="wl-cell wl-cell-price"><span class="price down">35.09</span></span>
     <span class="wl-cell wl-cell-pct down">-8.09%</span>
     <span class="wl-cell wl-cell-amt">25.8亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-good">92</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-good">3.04 ✓</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-good">89</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-ok">1.90 ✓</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300607" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300607" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300607">
     <div class="dc-head">
-      <span class="dc-pri">★★★</span>
+      <span class="dc-pri">★★</span>
       <span class="dc-name">拓斯达 <i>300607</i></span>
-      <span class="dc-status down">等待触发</span>
-      <span class="dc-conf">置信度 92</span>
-      <span class="dc-rr rr-good">盈亏比 3.04</span>
+      <span class="dc-status down">高风险观察</span>
+      <span class="dc-conf">置信度 89</span>
+      <span class="dc-rr rr-ok">盈亏比 1.90</span>
       <span class="dc-time">2026-09-10 23:30:44</span>
     </div>
     <div class="dc-tags"><span class="dc-tag">机器人</span><span class="dc-tag">稳健参与</span><span class="dc-tag">催化:政策/产业</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:退潮</span><span class="dc-tag">情绪:退潮</span><span class="dc-tag">地位:中军</span><span class="dc-tag">容错中</span></div>
@@ -2768,9 +2771,9 @@
       <div class="dc-line">龙虎榜(2026-07-06)：机构 <b class="down">-50.17亿</b> · 游资 <b class="down">-69.56亿</b> · 北向 <b class="down">-86.15亿</b><br>日跌幅达到15%的前5只证券</div>
     </div>
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv lv-s ">30.00<i>整数关口</i></span><span class="lv lv-s lv-strong">26.58<i>近60日前低</i></span></div>
+      <div class="dc-line">支撑 <span class="lv lv-s ">30.00<i>整数关口</i></span></div>
       <div class="dc-line">压力 <span class="lv lv-p lv-strong">35.73<i>MA60</i></span><span class="lv lv-p lv-strong">35.78<i>MA20</i></span><span class="lv lv-p ">36.17<i>MA10</i></span></div>
-      <div class="dc-line">缺口 向上缺口 39.39·已回补 · ATR 3.01 · 多头 · 周线向上 · 60分 空头(MA10 37.27) · 15分 空头(MA10 35.43)</div>
+      <div class="dc-line">缺口 向上缺口 39.39·已回补 · ATR 3.01 · 多头 · 周线向上 · 60分 <span>空头(MA10 37.27)</span> · 15分 <span>空头(MA10 35.43)</span></div>
       <div class="dc-line">开盘预期 高开4.2%·防冲高回落</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -2783,9 +2786,9 @@
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="tp-notrig">
     <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩26.58企稳</td>
-    <td class="tp-num">26.58</td>
-    <td class="tp-num stop">23.57</td>
+    <td class="tp-trig">回踩30.00企稳</td>
+    <td class="tp-num">30.00</td>
+    <td class="tp-num stop">26.99</td>
     <td class="tp-num">35.73</td>
     <td class="tp-rr tp-rr-muted">未触发</td>
   </tr>
@@ -2798,27 +2801,27 @@
     <td class="tp-rr tp-rr-muted">未触发</td>
   </tr>
     
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.06(<1.5),不合格 —— 等待回踩至 26.58 再执行,当前仅观察。</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损11.3% → 建议仓位 <b>4%-9%</b>（单股≤15%、单题材≤30%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破23.57无条件止损 · 到达35.73无条件止盈 · 日内做T当日必须平T不隔夜</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.08(<1.5),不合格 —— 等待回踩至 30.00 再执行,当前仅观察。</div>
+      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损10% → 建议仓位 <b>5%-10%</b>（单股≤15%、单题材≤30%）</div>
+      <div class="dc-line dc-disc">执行纪律：跌破26.99无条件止损 · 到达35.73无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       <div class="dc-line dc-risk"><span class="risk-alert">⚠ 单日放量下跌超7%</span><span class="risk-alert">⚠ 现价跌破MA5<i class="risk-guide">空仓者观望，持仓者减仓/清仓</i></span></div>
       <div class="dc-line dc-risk"><span class="risk-alert risk-conflict">⚡ 资金流入但价不涨·滞涨风险</span><span class="risk-alert risk-conflict">⚡ 题材强但个股弱·跟风不足</span><span class="risk-alert risk-conflict">⚡ 个股大跌·若为板块龙头需防带崩情绪</span></div>
-      <div class="dc-line">证伪条件：跌破26.58(近60日前低)且无法收回 → 逻辑失效</div>
+      <div class="dc-line">证伪条件：跌破30.00(整数关口)且无法收回 → 逻辑失效</div>
       <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤30%（弱市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势30/30 + 资金25/25 + 题材18/20 + 关键位9/15 + 盈亏比10/10</div>
+      <div class="dc-line">置信度构成：趋势30/30 + 资金25/25 + 题材18/20 + 关键位9/15 + 盈亏比7/10</div>
     </div>
-    <div class="dc-block dc-review" data-review-code="300607" data-name="拓斯达" data-price="35.09" data-entry="26.58" data-stop="23.57" data-target="35.73"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="300607" data-name="拓斯达" data-price="35.09" data-entry="30" data-stop="26.990000000000002" data-target="35.73"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高41.94 触及压力35.73 · 最低35.06 未触及支撑</div>
-      <div class="dc-line dc-pattern">形态判定：今日大幅冲高回落，收长上影线，上方抛压极重，空头占优。</div>
-      <div class="dc-line">资金验证：主力净流入当日+0.03亿，符合做多预期</div>
+      <div class="dc-line dc-pattern">形态判定：今日冲高回落收长上影线，但资金逆势流入，存在试盘可能，需警惕次日的低开或补跌。</div>
+      <div class="dc-line">资金验证：主力净流入当日+0.03亿，资金逆势流入，存在试盘可能</div>
       <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300607" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300607" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300607" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="300607" onclick="recordTTrade(this)">记做T</button></div>
       <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300607" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
       <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤；波段与做T胜率分开展示">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
-      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察能否在26.58（支撑位）止跌企稳，否则继续观望。</div>
+      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察能否在30.00（支撑位）止跌企稳，否则继续观望。</div>
     </div>
   </div></div><div class="wl-stock" data-stock-code="002385"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
@@ -2861,9 +2864,9 @@
       <div class="dc-line">龙虎榜(2026-08-18)：机构 <b class="down">-2.01亿</b> · 游资 <b class="up">+31.25亿</b> · 北向 <b class="up">+13.36亿</b> · 属性 <b>混合资金</b><br>日涨幅偏离值达到7%的前5只证券</div>
     </div>
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv lv-s lv-strong">3.34<i>MA20</i></span><span class="lv lv-s lv-strong">3.09<i>MA60</i></span><span class="lv lv-s lv-strong">2.64<i>近60日前低</i></span></div>
+      <div class="dc-line">支撑 <span class="lv lv-s lv-strong">3.34<i>MA20</i></span><span class="lv lv-s lv-strong">3.09<i>MA60</i></span></div>
       <div class="dc-line">压力 <span class="lv lv-p ">3.44<i>MA10</i></span><span class="lv lv-p ">3.52<i>MA5</i></span><span class="lv lv-p lv-strong">3.68<i>近60日前高</i></span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR 0.18 · 多头 · 周线向上 · 60分 空头(MA10 3.54) · 15分 震荡(MA10 3.44)</div>
+      <div class="dc-line">缺口 无近期缺口 · ATR 0.18 · 多头 · 周线向上 · 60分 <span>空头(MA10 3.54)</span> · 15分 <span>震荡(MA10 3.44)</span></div>
       <div class="dc-line">开盘预期 平开±2%·看方向</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -2956,7 +2959,7 @@
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
       <div class="dc-line">支撑 <span class="lv lv-s lv-strong">3.63<i>MA20</i></span><span class="lv lv-s lv-strong">3.58<i>MA60</i></span><span class="lv lv-s lv-strong">3.24<i>近60日前低</i></span></div>
       <div class="dc-line">压力 <span class="lv lv-p ">3.73<i>MA10</i></span><span class="lv lv-p ">3.75<i>MA5</i></span><span class="lv lv-p lv-strong">3.97<i>近60日前高</i></span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR 0.14 · 多头 · 周线向上 · 60分 空头(MA10 3.72) · 15分 震荡(MA10 3.69)</div>
+      <div class="dc-line">缺口 无近期缺口 · ATR 0.14 · 多头 · 周线向上 · 60分 <span>空头(MA10 3.72)</span> · 15分 <span>震荡(MA10 3.69)</span></div>
       <div class="dc-line">开盘预期 平开±2%·看方向</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -3048,8 +3051,8 @@
     </div>
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
       <div class="dc-line">支撑 <span class="lv lv-s ">17.58<i>MA5</i></span><span class="lv lv-s ">16.47<i>MA10</i></span><span class="lv lv-s lv-strong">15.55<i>MA20</i></span></div>
-      <div class="dc-line">压力 <span class="lv lv-p lv-strong">19.89<i>近60日前高</i></span><span class="lv lv-p ">20.00<i>整数关口</i></span><span class="lv lv-p ">50.00<i>整数关口</i></span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR 1.24 · 多头 · 周线向上 · 60分 空头(MA10 18.72) · 15分 空头(MA10 18.03)</div>
+      <div class="dc-line">压力 <span class="lv lv-p lv-strong">19.89<i>近60日前高</i></span><span class="lv lv-p ">20.00<i>整数关口</i></span></div>
+      <div class="dc-line">缺口 无近期缺口 · ATR 1.24 · 多头 · 周线向上 · 60分 <span>空头(MA10 18.72)</span> · 15分 <span>空头(MA10 18.03)</span></div>
       <div class="dc-line">开盘预期 平开±2%·看方向</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -3112,16 +3115,16 @@
     <span class="wl-cell wl-cell-price"><span class="price down">5.25</span></span>
     <span class="wl-cell wl-cell-pct down">-8.06%</span>
     <span class="wl-cell wl-cell-amt">34.1亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-good">79</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-good">4.97 ✓</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-good">76</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-ok">1.92 ✓</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600108" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="600108" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600108">
     <div class="dc-head">
-      <span class="dc-pri">★★★</span>
+      <span class="dc-pri">★★</span>
       <span class="dc-name">亚盛集团 <i>600108</i></span>
       <span class="dc-status down">高风险观察</span>
-      <span class="dc-conf">置信度 79</span>
-      <span class="dc-rr rr-good">盈亏比 4.97</span>
+      <span class="dc-conf">置信度 76</span>
+      <span class="dc-rr rr-ok">盈亏比 1.92</span>
       <span class="dc-time">2026-09-10 23:30:44</span>
     </div>
     <div class="dc-tags"><span class="dc-tag">农业主线</span><span class="dc-tag">补涨参与</span><span class="dc-tag">催化:行业景气</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:退潮</span><span class="dc-tag">情绪:退潮</span><span class="dc-tag">地位:补涨</span><span class="dc-tag">容错低</span></div>
@@ -3140,9 +3143,9 @@
       <div class="dc-line">龙虎榜(2026-09-10)：机构 <b class="up">+0.00亿</b> · 游资 <b class="up">+28.16亿</b> · 北向 <b class="down">-49.26亿</b> · 属性 <b>游资主导</b><br>有价格涨跌幅限制的日价格振幅达到15%的前五只证券</div>
     </div>
     <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv lv-s ">5.08<i>MA5</i></span><span class="lv lv-s ">4.44<i>MA10</i></span><span class="lv lv-s lv-strong">3.92<i>MA20</i></span></div>
-      <div class="dc-line">压力 <span class="lv lv-p lv-strong">5.81<i>近60日前高</i></span><span class="lv lv-p ">10.00<i>整数关口</i></span><span class="lv lv-p ">50.00<i>整数关口</i></span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR 0.38 · 多头 · 周线向上 · 60分 空头(MA10 5.44) · 15分 多头(MA10 5.22)</div>
+      <div class="dc-line">支撑 <span class="lv lv-s ">5.08<i>MA5</i></span><span class="lv lv-s ">4.44<i>MA10</i></span></div>
+      <div class="dc-line">压力 <span class="lv lv-p lv-strong">5.81<i>近60日前高</i></span></div>
+      <div class="dc-line">缺口 无近期缺口 · ATR 0.38 · 多头 · 周线向上 · 60分 <span>空头(MA10 5.44)</span> · 15分 <span>多头(MA10 5.22)</span></div>
       <div class="dc-line">开盘预期 平开±2%·看方向</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
@@ -3155,9 +3158,9 @@
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     <tr class="tp-notrig">
     <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩3.92企稳</td>
-    <td class="tp-num">3.92</td>
-    <td class="tp-num stop">3.54</td>
+    <td class="tp-trig">回踩5.08企稳</td>
+    <td class="tp-num">5.08</td>
+    <td class="tp-num stop">4.70</td>
     <td class="tp-num">5.81</td>
     <td class="tp-rr tp-rr-muted">未触发</td>
   </tr>
@@ -3170,27 +3173,27 @@
     <td class="tp-rr tp-rr-muted">未触发</td>
   </tr>
     
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.33(<1.5),不合格 —— 等待回踩至 3.92 再执行,当前仅观察。</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损9.7% → 建议仓位 <b>5%-10%</b>（单股≤15%、单题材≤30%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破3.54无条件止损 · 到达5.81无条件止盈 · 日内做T当日必须平T不隔夜</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 1.02(<1.5),不合格 —— 等待回踩至 5.08 再执行,当前仅观察。</div>
+      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损7.5% → 建议仓位 <b>7%-13%</b>（单股≤15%、单题材≤30%）</div>
+      <div class="dc-line dc-disc">执行纪律：跌破4.70无条件止损 · 到达5.81无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
     </div>
     <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
       <div class="dc-line dc-risk"><span class="risk-alert">⚠ 单日放量下跌超7%</span></div>
       <div class="dc-line dc-risk"><span class="risk-alert risk-conflict">⚡ 题材强但个股弱·跟风不足</span><span class="risk-alert risk-conflict">⚡ 个股大跌·若为板块龙头需防带崩情绪</span></div>
-      <div class="dc-line">证伪条件：跌破3.92(MA20)且无法收回 → 逻辑失效</div>
+      <div class="dc-line">证伪条件：跌破5.08(MA5)且无法收回 → 逻辑失效</div>
       <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤30%（弱市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势30/30 + 资金15/25 + 题材18/20 + 关键位6/15 + 盈亏比10/10</div>
+      <div class="dc-line">置信度构成：趋势30/30 + 资金15/25 + 题材18/20 + 关键位6/15 + 盈亏比7/10</div>
     </div>
-    <div class="dc-block dc-review" data-review-code="600108" data-name="亚盛集团" data-price="5.25" data-entry="3.92" data-stop="3.54" data-target="5.81"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="600108" data-name="亚盛集团" data-price="5.25" data-entry="5.08" data-stop="4.7" data-target="5.81"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高6.00 触及压力5.81 · 最低5.14 未触及支撑</div>
       <div class="dc-line dc-pattern">形态判定：今日大幅冲高回落，收长上影线，上方抛压极重，空头占优。</div>
       <div class="dc-line">资金验证：主力净流入当日-2.72亿，与做多预期背离，需复核</div>
       <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="600108" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="600108" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="600108" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="600108" onclick="recordTTrade(this)">记做T</button></div>
       <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="600108" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
       <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤；波段与做T胜率分开展示">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
-      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察能否在3.92（支撑位）止跌企稳，否则继续观望。</div>
+      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察能否在5.08（支撑位）止跌企稳，否则继续观望。</div>
     </div>
   </div></div></div></div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><div class="knowledge-note">ℹ 手动导出模式：点击下方按钮下载/复制 .md，再粘贴进 Obsidian 即可，全程本地操作、无网络依赖、不会卡顿或报错。</div><pre id="knowledge-md" class="knowledge-md">---
 title: ATDS Pro V4.0 盘前简报
@@ -3775,8 +3778,10 @@ function buildDecisionCardHtml(s){
   var pct=Number(s.pct)||0;
   function f2(x){return (x==null||isNaN(x))?'--':Number(x).toFixed(2);}
   function sign(x){return (x==null||isNaN(x))?'':(x>0?'+':'');}
-  function supStrong(){var a=Array.isArray(t.supports)?t.supports:[];for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
-  function preStrong(){var a=Array.isArray(t.pressures)?t.pressures:[];for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
+  // 关键位过滤:去重 + 仅保留距现价 ±20% 内(渲染层兜底,剔除远距离整数关口/前高前低噪音)
+  function filterLvls(arr,asc){var seen={},a=Array.isArray(arr)?arr:[],out=[];for(var i=0;i<a.length;i++){var x=a[i];if(!x||x.price==null||isNaN(x.price))continue;var k=x.price.toFixed(2);if(seen[k])continue;seen[k]=1;if(price>0&&Math.abs(x.price-price)/price>0.20)continue;out.push(x);}out.sort(asc?function(a,b){return a.price-b.price;}:function(a,b){return b.price-a.price;});return out;}
+  function supStrong(){var a=filterLvls(t.supports,false);for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
+  function preStrong(){var a=filterLvls(t.pressures,true);for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
   var sup=supStrong(), pre=preStrong();
   var supPrice=sup?sup.price:(t.ma20||price*0.96);
   var prePrice=pre?pre.price:(t.ma5||price*1.05);
@@ -3838,8 +3843,8 @@ function buildDecisionCardHtml(s){
   if(pct<=-5)conflicts.push('个股大跌·若为板块龙头需防带崩情绪');
   var trendLabel=t.trend==='up'?'多头':t.trend==='repair'?'修复':t.trend==='down'?'空头':'震荡';
   var weeklyLabel=t.weeklyTrend==='up'?'周线向上':t.weeklyTrend==='down'?'周线向下':'周线走平';
-  var supList=Array.isArray(t.supports)?t.supports:[];
-  var preList=Array.isArray(t.pressures)?t.pressures:[];
+  var supList=filterLvls(t.supports,false);
+  var preList=filterLvls(t.pressures,true);
   var supHtml=supList.slice(0,3).map(function(x){return '<span class="lv lv-s'+(x.weight==='strong'?' lv-strong':'')+'">'+f2(x.price)+'<i>'+escHtmlF(x.label)+'</i></span>';}).join('')||'<span class="lv">--</span>';
   var preHtml=preList.slice(0,3).map(function(x){return '<span class="lv lv-p'+(x.weight==='strong'?' lv-strong':'')+'">'+f2(x.price)+'<i>'+escHtmlF(x.label)+'</i></span>';}).join('')||'<span class="lv">--</span>';
   var gapHtml=t.gapUp?('向上缺口 '+f2(t.gapUp.level)+(t.gapUp.filled?'·已回补':'·未回补')):(t.gapDown?('向下缺口 '+f2(t.gapDown.level)+(t.gapDown.filled?'·已回补':'·未回补')):'无近期缺口');
@@ -3886,7 +3891,9 @@ function buildDecisionCardHtml(s){
   var m60=(s.minTrend&&s.minTrend.m60)||null;
   var m15=(s.minTrend&&s.minTrend.m15)||null;
   function minLabel(m){if(!m)return '震荡(近似)';var dir=m.trend==='up'?'多头':m.trend==='down'?'空头':'震荡';var ma=m.ma10!=null?('MA10 '+m.ma10):(m.ma5!=null?('MA5 '+m.ma5):'');var fb=m.cached?'·缓存':(m.approx?'·日线近似':'');return ma?(dir+'('+ma+')'+fb):(dir+fb);}
-  var minTxt='60分 '+minLabel(m60)+' · 15分 '+minLabel(m15);
+  function minApprox(m){return !m||m.approx;}
+  function minWrap(m){var txt=minLabel(m);if(minApprox(m))return '<span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">'+txt+'<i class="min-approx-ico">ⓘ</i></span>';return '<span>'+txt+'</span>';}
+  var minTxt='60分 '+minWrap(m60)+' · 15分 '+minWrap(m15);
   // 事件风险(真实:东财财报/解禁 + 巨潮减持/增发/回购/股东大会/监管问询;3天内高影响标红)
   var evs=s.events||null;
   var evStatus=s.eventsStatus||{};
@@ -3910,12 +3917,15 @@ function buildDecisionCardHtml(s){
   var trigA=price<=p.entry, trigB=price>=planBEntry, trigC=price>0;
   // 情绪周期与硬逆势判定(提前到此,供状态覆盖与折叠使用)
   var isHardTrade=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0);
+  // 复盘形态:长上影线/大幅冲高回落识别 —— (最高-现价)>3% 且 现价<开盘价(提前到此,供状态降级与形态/资金文案使用)
+  var upperShadow=(s.high>0&&price>0&&s.open>0&&((s.high-price)/price*100>3)&&price<s.open);
   // 状态机强制覆盖(致命防呆):现价盈亏比不合格 或 方案A/B均未触发 → 禁止"可交易/轻仓试错",强制"等待触发/高风险观察"
   var rrNowBad=p.rrNow<1.5;
   var abUnTriggered=!trigA&&!trigB;
   var riskDowngrade=tRRBad&&(ff.d1||0)<0;
   var effStatusLabel, effConfTone;
   if(isHardTrade){effStatusLabel='不建议参与';effConfTone='down';}
+  else if(upperShadow){effStatusLabel='高风险观察';effConfTone='down';}
   else if(riskDowngrade){effStatusLabel='高风险观察';effConfTone='down';}
   else if(rrNowBad||abUnTriggered){effStatusLabel='等待触发';effConfTone='down';}
   else{effStatusLabel=statusLabel;effConfTone=confTone;}
@@ -3940,7 +3950,9 @@ function buildDecisionCardHtml(s){
   var isShrinking=(t.volRatio!=null&&t.volRatio<0.75);
   var isFlatPrice=Math.abs(stockPctN)<=0.3;
   var fundVerify;
-  if(isMicroInflow&&isShrinking&&isFlatPrice){
+  if(upperShadow&&(ff.d1||0)>0){
+    fundVerify='主力净流入当日'+sign(ff.d1)+ff.d1.toFixed(2)+'亿，资金逆势流入，存在试盘可能';
+  }else if(isMicroInflow&&isShrinking&&isFlatPrice){
     fundVerify='主力净流入当日'+sign(ff.d1)+ff.d1.toFixed(2)+'亿，微幅流入，买方承接极弱，需警惕滞涨';
   }else{
     fundVerify='主力净流入当日'+sign(ff.d1)+(ff.d1!=null?ff.d1.toFixed(2):'--')+'亿，'+(((ff.d1||0)>=0)?'符合做多预期':'与做多预期背离，需复核');
@@ -3964,9 +3976,15 @@ function buildDecisionCardHtml(s){
   }else{
     nextDayFocus='明日观察量能与MA5得失，方向未明前继续观望。';
   }
-  // 复盘形态判定:长上影线(冲高回落)识别 —— (最高-现价)>3% 且 现价<开盘价 → 上方抛压极重
-  var upperShadow=(s.high>0&&price>0&&s.open>0&&((s.high-price)/price*100>3)&&price<s.open);
-  var patternHtml=upperShadow?'<div class="dc-line dc-pattern">形态判定：今日大幅冲高回落，收长上影线，上方抛压极重，空头占优。</div>':'';
+  // 复盘形态判定(资金方向区分):长上影线 + 主力净流入 = 冲高回落但资金逆势流入(试盘);长上影线 + 净流出 = 抛压极重空头占优
+  var patternHtml='';
+  if(upperShadow){
+    if((ff.d1||0)>0){
+      patternHtml='<div class="dc-line dc-pattern">形态判定：今日冲高回落收长上影线，但资金逆势流入，存在试盘可能，需警惕次日的低开或补跌。</div>';
+    }else{
+      patternHtml='<div class="dc-line dc-pattern">形态判定：今日大幅冲高回落，收长上影线，上方抛压极重，空头占优。</div>';
+    }
+  }
 
   // 情绪总纲建议(硬逆势):强烈建议不参与(emotionCycle/isHardTrade 已在上面状态机处计算)
   var summaryHtml=isHardTrade?'<div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>':'';
@@ -4028,8 +4046,8 @@ function buildWatchlistDetailHtml(data){ return buildDecisionCardHtml(data); }
 /* 主行徽章:置信度 + 盈亏比(与决策卡同源计算,供 addToWatchlistUI / refreshWatchlistQuotes 复用) */
 function dcBadges(s){
   var t=s.tech||{}, ff=s.fundFlow||{}, price=Number(s.price)||0;
-  function supStrong(){var a=Array.isArray(t.supports)?t.supports:[];for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
-  function preStrong(){var a=Array.isArray(t.pressures)?t.pressures:[];for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
+  function supStrong(){var seen={},a=Array.isArray(t.supports)?t.supports:[],out=[];for(var i=0;i<a.length;i++){var x=a[i];if(!x||x.price==null||isNaN(x.price))continue;var k=x.price.toFixed(2);if(seen[k])continue;seen[k]=1;if(price>0&&Math.abs(x.price-price)/price>0.20)continue;out.push(x);}out.sort(function(a,b){return b.price-a.price;});for(var j=0;j<out.length;j++){if(out[j].weight==='strong')return out[j];}return out[0]||null;}
+  function preStrong(){var seen={},a=Array.isArray(t.pressures)?t.pressures:[],out=[];for(var i=0;i<a.length;i++){var x=a[i];if(!x||x.price==null||isNaN(x.price))continue;var k=x.price.toFixed(2);if(seen[k])continue;seen[k]=1;if(price>0&&Math.abs(x.price-price)/price>0.20)continue;out.push(x);}out.sort(function(a,b){return a.price-b.price;});for(var j=0;j<out.length;j++){if(out[j].weight==='strong')return out[j];}return out[0]||null;}
   var sup=supStrong(),pre=preStrong();
   var supPrice=sup?sup.price:(t.ma20||price*0.96);
   var prePrice=pre?pre.price:(t.ma5||price*1.05);

@@ -996,8 +996,18 @@ function calcTechFromKline(arr) {
     if (up > last) addLvl(up, '整数关口', 'weak');
     if (down < last && down > 0) addLvl(down, '整数关口', 'weak');
   });
-  supports.sort((a, b) => b.price - a.price);
-  pressures.sort((a, b) => a.price - b.price);
+  // 过滤:去重 + 只保留距现价 ±20% 范围内的关键位,最多 3 支撑/3 压力,剔除远距离整数关口与前高前低噪音
+  const dedupLvls = (arr) => {
+    const seen = new Set();
+    return arr.filter((x) => {
+      if (seen.has(x.price)) return false;
+      seen.add(x.price);
+      return true;
+    });
+  };
+  const withinRange = (x) => x && x.price != null && !isNaN(x.price) && Math.abs(x.price - last) / last <= 0.20;
+  const supportsF = dedupLvls(supports).filter(withinRange).sort((a, b) => b.price - a.price).slice(0, 3);
+  const pressuresF = dedupLvls(pressures).filter(withinRange).sort((a, b) => a.price - b.price).slice(0, 3);
 
   // 多周期趋势:周线(5日聚合)+ 日线
   const weeklyCloses = [];
@@ -1012,7 +1022,7 @@ function calcTechFromKline(arr) {
     atr14: r2(atr14),
     high60: r2(high60), low60: r2(low60),
     gapUp, gapDown,
-    supports, pressures,
+    supports: supportsF, pressures: pressuresF,
     weeklyTrend,
     volRatio: volRatio != null ? Math.round(volRatio * 100) / 100 : null,
     volChgPct, volToday, volYesterday,
