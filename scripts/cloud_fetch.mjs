@@ -1067,6 +1067,72 @@ function computeMinTrendFromCloses(closes) {
   const trend = (ma10 != null) ? (last > ma10 * 1.005 ? 'up' : last < ma10 * 0.995 ? 'down' : 'flat') : (last > ma5 ? 'up' : 'down');
   return { trend, ma5: Math.round(ma5 * 100) / 100, ma10: ma10 != null ? Math.round(ma10 * 100) / 100 : null };
 }
+// 是否盘后(北京时间 15:30 及以后):盘后抓取当日分钟线存缓存,盘前/盘中直接读缓存,不依赖实时请求
+function isAfterClose() {
+  const bj = new Date(Date.now() + 8 * 3600 * 1000);
+  const day = bj.getUTCDay();
+  if (day === 0 || day === 6) return true;  // 周末视为盘后
+  const mins = bj.getUTCHours() * 60 + bj.getUTCMinutes();
+  return mins >= 930;  // 15:30 及以后
+}
+// 日线级别近似趋势:用 MA20 斜率 + 现价相对 MA20 位置 替代分钟线(无法抓取分钟线时的最终兜底,绝不返回空)
+function approxMinFromTech(tech) {
+  const slope = (tech && tech.ma20Slope) || 'flat';
+  const price = tech && tech.price;
+  const ma20 = tech && tech.ma20;
+  let trend = 'flat';
+  if (price != null && ma20 != null) {
+    if (price > ma20 && slope !== 'down') trend = 'up';
+    else if (price < ma20) trend = 'down';
+    else trend = (slope === 'up') ? 'up' : (slope === 'down') ? 'down' : 'flat';
+  } else if (slope !== 'flat') {
+    trend = slope;
+  }
+  return {
+    trend,
+    ma5: (tech && tech.ma5 != null) ? tech.ma5 : null,
+    ma10: (tech && tech.ma10 != null) ? tech.ma10 : null,
+    approx: true
+  };
+}
+// 分钟趋势统一解析:盘后抓取存缓存 → 盘前/盘中优先读缓存 → 实时兜底 → 日线斜率近似(绝不返回空)
+async function resolveMinuteTrend(code, tech) {
+  const num = String(code).replace(/^(sh|sz|bj)/, '');
+  // 盘前/盘中:优先读缓存(上一交易日盘后抓取的真实价位),不做实时请求
+  if (!isAfterClose()) {
+    const cached = loadMinTrendCache()[num];
+    if (cached && (cached.m60 || cached.m15)) {
+      return {
+        m60: cached.m60 ? { ...cached.m60, cached: true } : null,
+        m15: cached.m15 ? { ...cached.m15, cached: true } : null
+      };
+    }
+  }
+  // 实时抓取(盘后必走;盘前/盘中缓存缺失时兜底尝试一次)
+  let m60 = null, m15 = null;
+  try {
+    [m60, m15] = await Promise.all([fetchMinuteTrend(code, 'm60'), fetchMinuteTrend(code, 'm15')]);
+  } catch (e) { /* 忽略 */ }
+  if (m60 || m15) {
+    try {
+      const mc = loadMinTrendCache();
+      mc[num] = { date: bjToday(), m60: m60 || null, m15: m15 || null };
+      saveMinTrendCache();
+    } catch (e) { /* 缓存写入失败不影响主流程 */ }
+    return { m60, m15 };
+  }
+  // 缓存兜底(实时失败)
+  const cached = loadMinTrendCache()[num];
+  if (cached && (cached.m60 || cached.m15)) {
+    return {
+      m60: cached.m60 ? { ...cached.m60, cached: true } : null,
+      m15: cached.m15 ? { ...cached.m15, cached: true } : null
+    };
+  }
+  // 日线MA5/MA20斜率近似(最终兜底,绝不显示"暂缺")
+  const approx = approxMinFromTech(tech);
+  return { m60: approx, m15: approx };
+}
 async function fetchMinuteTrend(code, klt) {
   const num = String(code).replace(/^(sh|sz|bj)/, '');
   // 北交所(43/83/87/88/92 开头)需 bj 前缀,否则接口返回空导致 60/15 分钟数据缺失
@@ -1404,25 +1470,14 @@ async function enrichWatchlistTech(list) {
     } catch (e) { /* 资金流缺失不阻塞 */ }
     // 封单/连板(非涨停显示 null → 渲染层"非涨停")
     if (sealMap[s.code]) s.seal = sealMap[s.code];
-    // 60/15分钟趋势:腾讯→新浪→本地缓存→日线MA趋势,四级兜底,坚决不空(显示 --)
+    // 60/15分钟趋势:盘后抓取存缓存,盘前/盘中优先读缓存,最终日线斜率近似兜底(绝不显示"暂缺")
     try {
-      const [m60, m15] = await Promise.all([fetchMinuteTrend(s.code, 'm60'), fetchMinuteTrend(s.code, 'm15')]);
-      let f60 = m60, f15 = m15;
-      // 仅缓存真实抓取值(兜底值不入缓存,保持缓存为可信历史价位)
-      if (m60 || m15) {
-        const mc = loadMinTrendCache();
-        mc[s.code] = { date: bjToday(), m60: m60 || null, m15: m15 || null };
-        saveMinTrendCache();
-      }
-      // 三级兜底:本地分钟趋势缓存(上次成功抓取的具体价位)
-      const mct = loadMinTrendCache()[s.code];
-      if (!f60 && mct && mct.m60) f60 = { ...mct.m60, cached: true };
-      if (!f15 && mct && mct.m15) f15 = { ...mct.m15, cached: true };
-      // 四级兜底:日线 MA 趋势(过去交易日日线算出的 MA5/MA10)
-      if (!f60 && s.tech && s.tech.trend) f60 = { trend: s.tech.trend, ma5: s.tech.ma5, ma10: s.tech.ma10, fallback: true };
-      if (!f15 && s.tech && s.tech.trend) f15 = { trend: s.tech.trend, ma5: s.tech.ma5, ma10: s.tech.ma10, fallback: true };
-      if (f60 || f15) s.minTrend = { m60: f60, m15: f15 };
-    } catch (e) { /* 分钟趋势缺失不阻塞 */ }
+      const mt = await resolveMinuteTrend(s.code, s.tech || null);
+      s.minTrend = { m60: mt.m60, m15: mt.m15 };
+    } catch (e) {
+      const approx = approxMinFromTech(s.tech || null);
+      s.minTrend = { m60: approx, m15: approx };
+    }
     // 所属板块当日涨跌幅(复盘资金归因对比)
     try {
       const secChg = matchSectorChange(s.category, boardChangeMap);

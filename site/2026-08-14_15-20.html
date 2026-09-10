@@ -2507,10 +2507,10 @@ async function addFetchedToWatchlist(code){
       fetchMinuteTrendF(code, 'm60'), fetchMinuteTrendF(code, 'm15'),
       fetchLimitUpSealF(code), fetchLhbDetailF(code), fetchEventsF(code)
     ]);
-    // 分钟线兜底:双源失败(如浏览器CORS拦截腾讯/新浪)时用日线MA趋势兜底,坚决不显示"--"
+    // 分钟线兜底:双源失败(如浏览器CORS拦截腾讯/新浪)时用日线MA5/MA20斜率近似,坚决不显示"暂缺"
     var f60 = ext[0], f15 = ext[1];
-    if (!f60 && data.tech && data.tech.trend) f60 = { trend: data.tech.trend, ma5: data.tech.ma5, ma10: data.tech.ma10, fallback: true };
-    if (!f15 && data.tech && data.tech.trend) f15 = { trend: data.tech.trend, ma5: data.tech.ma5, ma10: data.tech.ma10, fallback: true };
+    if (!f60) f60 = approxMinFromTechF(data.tech);
+    if (!f15) f15 = approxMinFromTechF(data.tech);
     if (f60 || f15) data.minTrend = { m60: f60, m15: f15 };
     if (ext[2]) data.seal = ext[2];
     if (ext[3]) data.lhb = ext[3];
@@ -2916,7 +2916,7 @@ function buildDecisionCardHtml(s){
   // 60/15分钟趋势(真实,含MA10/MA5具体价位)
   var m60=(s.minTrend&&s.minTrend.m60)||null;
   var m15=(s.minTrend&&s.minTrend.m15)||null;
-  function minLabel(m){if(!m)return '数据暂缺';var dir=m.trend==='up'?'多头':m.trend==='down'?'空头':'震荡';var ma=m.ma10!=null?('MA10 '+m.ma10):(m.ma5!=null?('MA5 '+m.ma5):'');var fb=m.cached?'·缓存':(m.fallback?'·日线兜底':'');return ma?(dir+'('+ma+')'+fb):(dir+fb);}
+  function minLabel(m){if(!m)return '震荡(近似)';var dir=m.trend==='up'?'多头':m.trend==='down'?'空头':'震荡';var ma=m.ma10!=null?('MA10 '+m.ma10):(m.ma5!=null?('MA5 '+m.ma5):'');var fb=m.cached?'·缓存':(m.approx?'·日线近似':'');return ma?(dir+'('+ma+')'+fb):(dir+fb);}
   var minTxt='60分 '+minLabel(m60)+' · 15分 '+minLabel(m15);
   // 事件风险(真实:东财财报/解禁 + 巨潮减持/增发/回购/股东大会/监管问询;3天内高影响标红)
   var evs=s.events||null;
@@ -2931,20 +2931,32 @@ function buildDecisionCardHtml(s){
   var planBStop=planBEntry*0.97, planBTarget=planBEntry*1.08;
   var planBRR=(planBTarget-planBEntry)/(planBEntry-planBStop);
   var atrC=p.atr||(price*0.03);
-  var tStop=price-Math.max(0.5*atrC,price*0.01);
-  var tTgt=price+Math.max(0.5*atrC,price*0.01);
-  var tRR=(price>tStop)?((tTgt-price)/(price-tStop)):1;
+  // 对称止损止盈 → 盈亏比恒为 1.00;用同一 tDist 避免浮点误差导致个别股票 tRR 略>1 而误显 C 行
+  var tDist=Math.max(0.5*atrC,price*0.01);
+  var tStop=price-tDist;
+  var tTgt=price+tDist;
+  var tRR=1;
   var tRRBad=tRR<1.5;
-  // 状态标签降级:方案C盈亏比不合格(做T风险极高)且主力资金流出 → 禁止"轻仓试错",强制"高风险观察"
-  var riskDowngrade=tRRBad&&(ff.d1||0)<0;
-  var effStatusLabel=riskDowngrade?'高风险观察':statusLabel;
-  var effConfTone=riskDowngrade?'down':confTone;
+  var tRRHide=tRR<=1.0;
   var trigA=price<=p.entry, trigB=price>=planBEntry, trigC=price>0;
+  // 情绪周期与硬逆势判定(提前到此,供状态覆盖与折叠使用)
+  var isHardTrade=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0);
+  // 状态机强制覆盖(致命防呆):现价盈亏比不合格 或 方案A/B均未触发 → 禁止"可交易/轻仓试错",强制"等待触发/高风险观察"
+  var rrNowBad=p.rrNow<1.5;
+  var abUnTriggered=!trigA&&!trigB;
+  var riskDowngrade=tRRBad&&(ff.d1||0)<0;
+  var effStatusLabel, effConfTone;
+  if(isHardTrade){effStatusLabel='不建议参与';effConfTone='down';}
+  else if(riskDowngrade){effStatusLabel='高风险观察';effConfTone='down';}
+  else if(rrNowBad||abUnTriggered){effStatusLabel='等待触发';effConfTone='down';}
+  else{effStatusLabel=statusLabel;effConfTone=confTone;}
+  var shouldCollapsePlan=isHardTrade||abUnTriggered;
+  var collapseLabel=isHardTrade?'⛔ 破位·严禁现价抄底':'⛔ 等待触发·未达入场条件';
   function planRow(name,trig,entryV,stopV,tgtV,rrVal,triggered,tone,bad){return '<tr class="'+(triggered?'':'tp-notrig')+'"><td class="tp-name">'+name+'</td><td class="tp-trig">'+escHtmlF(trig)+'</td><td class="tp-num">'+f2(entryV)+'</td><td class="tp-num stop">'+f2(stopV)+'</td><td class="tp-num">'+f2(tgtV)+'</td><td class="tp-rr '+(!triggered?'tp-rr-muted':(bad?'rr-bad':'rr-'+tone))+'">'+(triggered?rrVal.toFixed(2):'未触发')+'</td></tr>';}
   var planTable='<table class="tp-table"><tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>'+
     planRow('A 回踩低吸','回踩'+f2(p.entry)+'企稳',p.entry,p.stop,p.target,p.rr,trigA,rrTone(p.rr))+
     planRow('B 突破确认','放量突破'+f2(planBEntry),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
-    planRow('C 日内做T','现价'+f2(price)+'·ATR'+f2(atrC)+'动态止损',price,tStop,tTgt,tRR,trigC,rrTone(tRR),tRRBad)+
+    (tRRHide?'':planRow('C 日内做T','现价'+f2(price)+'·ATR'+f2(atrC)+'动态止损',price,tStop,tTgt,tRR,trigC,rrTone(tRR),tRRBad))+
     '</table>';
   var nowWarn=p.rrNow<1.5
     ?'<div class="tp-warn">⚠ 现价直接买入盈亏比 '+p.rrNow.toFixed(2)+'(<1.5),不合格 —— 等待回踩至 '+f2(p.entry)+' 再执行,当前仅观察。</div>'
@@ -2952,10 +2964,19 @@ function buildDecisionCardHtml(s){
   var tRRBadWarn=tRRBad?'<div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div>':'';
   // 复盘
   var keyVerify='最高'+f2(s.high)+' '+((pre&&s.high>=pre.price)?('触及压力'+f2(pre.price)):'未触及压力')+' · 最低'+f2(s.low)+' '+((sup&&s.low<=sup.price)?('触及支撑'+f2(sup.price)):'未触及支撑');
-  var fundVerify='主力净流入当日'+sign(ff.d1)+(ff.d1!=null?ff.d1.toFixed(2):'--')+'亿，'+(((ff.d1||0)>=0)?'符合做多预期':'与做多预期背离，需复核');
   var secChg=s.sectorChange||null;
+  var stockPctN=Number(s.pct)||0;
+  // 主力净流入极小(<0.1亿)且缩量滞涨 → "微幅流入,买方承接极弱,需警惕滞涨"(替代"符合做多预期"的乐观误读)
+  var isMicroInflow=(ff.d1!=null&&ff.d1>0&&ff.d1<0.1);
+  var isShrinking=(t.volRatio!=null&&t.volRatio<0.75);
+  var isFlatPrice=Math.abs(stockPctN)<=0.3;
+  var fundVerify;
+  if(isMicroInflow&&isShrinking&&isFlatPrice){
+    fundVerify='主力净流入当日'+sign(ff.d1)+ff.d1.toFixed(2)+'亿，微幅流入，买方承接极弱，需警惕滞涨';
+  }else{
+    fundVerify='主力净流入当日'+sign(ff.d1)+(ff.d1!=null?ff.d1.toFixed(2):'--')+'亿，'+(((ff.d1||0)>=0)?'符合做多预期':'与做多预期背离，需复核');
+  }
   if(secChg&&secChg.changePct!=null&&!isNaN(secChg.changePct)){
-    var stockPctN=Number(s.pct)||0;
     var diff=stockPctN-secChg.changePct;
     var cmp=diff<=-0.5?'弱于板块，弱势特征明显':(diff>=0.5?'强于板块，具备相对强度':'与板块基本同步');
     fundVerify+='；个股 '+(stockPctN>0?'+':'')+stockPctN.toFixed(2)+'% vs '+escHtmlF(secChg.boardName)+'板块 '+(secChg.changePct>0?'+':'')+secChg.changePct.toFixed(2)+'%，'+cmp;
@@ -2978,8 +2999,7 @@ function buildDecisionCardHtml(s){
   var upperShadow=(s.high>0&&price>0&&s.open>0&&((s.high-price)/price*100>3)&&price<s.open);
   var patternHtml=upperShadow?'<div class="dc-line dc-pattern">形态判定：今日大幅冲高回落，收长上影线，上方抛压极重，空头占优。</div>':'';
 
-  // 情绪总纲建议:情绪冰点+趋势空头+主力流出 → 高难度逆势标的
-  var isHardTrade=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0);
+  // 情绪总纲建议(硬逆势):强烈建议不参与(emotionCycle/isHardTrade 已在上面状态机处计算)
   var summaryHtml=isHardTrade?'<div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>':'';
 
   return '<div class="dc-head">'+
@@ -3006,8 +3026,8 @@ function buildDecisionCardHtml(s){
       '<div class="dc-line">开盘预期 '+escHtmlF(openExpect)+'</div>'+
     '</div>'+
     '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div><div class="dc-line dc-src-note">'+evNote+'</div></div>'+
-    '<div class="dc-block dc-plan '+(isHardTrade?'dc-plan-collapsed':'')+'">'+
-      '<div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">'+(isHardTrade?'▸':'▾')+'</span>'+(isHardTrade?'<span class="dc-plan-lock">⛔ 破位·严禁现价抄底</span><span class="dc-plan-expand">👆 点击展开</span>':'')+'</div>'+
+    '<div class="dc-block dc-plan '+(shouldCollapsePlan?'dc-plan-collapsed':'')+'">'+
+      '<div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">'+(shouldCollapsePlan?'▸':'▾')+'</span>'+(shouldCollapsePlan?'<span class="dc-plan-lock">'+collapseLabel+'</span><span class="dc-plan-expand">👆 点击展开</span>':'')+'</div>'+
       '<div class="dc-plan-body">'+planTable+tRRBadWarn+nowWarn+
       '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>'+(pos.capped?'（受单股上限压制，实际最高仓位15%）':'（单股≤15%、单题材≤30%）')+'</div>'+
       '<div class="dc-line dc-disc">执行纪律：跌破'+f2(p.stop)+'无条件止损 · 到达'+f2(p.target)+'无条件止盈 · 日内做T当日必须平T不隔夜</div>'+
@@ -3793,6 +3813,21 @@ function computeMinTrendFromClosesF(closes){
   var ma10=closes.length>=10?closes.slice(-10).reduce(function(a,b){return a+b;},0)/10:null;
   var trend=(ma10!=null)?(last>ma10*1.005?'up':last<ma10*0.995?'down':'flat'):(last>ma5?'up':'down');
   return {trend:trend,ma5:Math.round(ma5*100)/100,ma10:ma10!=null?Math.round(ma10*100)/100:null};
+}
+/* 日线级别近似趋势:MA20斜率 + 现价相对MA20位置 替代分钟线(无法抓取时的最终兜底,绝不返回空) */
+function approxMinFromTechF(tech){
+  var slope=(tech&&tech.ma20Slope)||'flat';
+  var price=tech&&tech.price;
+  var ma20=tech&&tech.ma20;
+  var trend='flat';
+  if(price!=null&&ma20!=null){
+    if(price>ma20&&slope!=='down')trend='up';
+    else if(price<ma20)trend='down';
+    else trend=(slope==='up')?'up':(slope==='down')?'down':'flat';
+  }else if(slope!=='flat'){
+    trend=slope;
+  }
+  return {trend:trend,ma5:(tech&&tech.ma5!=null)?tech.ma5:null,ma10:(tech&&tech.ma10!=null)?tech.ma10:null,approx:true};
 }
 async function fetchMinuteTrendF(code,klt){
   var num=String(code).replace(/^(sh|sz|bj)/,'');

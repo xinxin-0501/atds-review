@@ -1306,10 +1306,10 @@ function _divergence(s) {
 function _trendLabel(t) { return t === 'up' ? '多头' : t === 'repair' ? '修复' : t === 'down' ? '空头' : '震荡'; }
 function _weeklyLabel(t) { return t === 'up' ? '周线向上' : t === 'down' ? '周线向下' : '周线走平'; }
 function _minLabel(m) {
-  if (!m) return '数据暂缺';
+  if (!m) return '震荡(近似)';
   const dir = m.trend === 'up' ? '多头' : m.trend === 'down' ? '空头' : '震荡';
   const ma = m.ma10 != null ? ('MA10 ' + m.ma10) : (m.ma5 != null ? ('MA5 ' + m.ma5) : '');
-  const fb = m.cached ? '·缓存' : (m.fallback ? '·日线兜底' : '');
+  const fb = m.cached ? '·缓存' : (m.approx ? '·日线近似' : '');
   return ma ? (dir + '(' + ma + ')' + fb) : (dir + fb);
 }
 // 资金属性(龙虎榜席位归类;无龙虎榜则空,渲染层隐藏)
@@ -1459,19 +1459,33 @@ function buildStockRow(s, i, report) {
   const planBRR = (planBTarget - planBEntry) / (planBEntry - planBStop);
   // 做T:ATR动态止损(止损空间≥0.5 ATR,防瞬间扫损,不再用当日最低价导致0.08元级别的过窄止损)
   const atrC = p.atr || (price * 0.03);
-  const tStop = price - Math.max(0.5 * atrC, price * 0.01);
-  const tTgt = price + Math.max(0.5 * atrC, price * 0.01);
-  const tRR = (price > tStop) ? ((tTgt - price) / (price - tStop)) : 1;
-  // 做T对称止损止盈 → 盈亏比恒为1.00,判定为不合格并标红
+  // 对称止损止盈 → 盈亏比恒为 1.00;用同一 tDist 避免浮点误差导致个别股票 tRR 略>1 而误显 C 行
+  const tDist = Math.max(0.5 * atrC, price * 0.01);
+  const tStop = price - tDist;
+  const tTgt = price + tDist;
+  const tRR = tDist > 0 ? 1 : 1;
+  // 做T对称止损止盈 → 盈亏比恒为1.00,判定为不合格并标红;做T盈亏比<=1.0 → 该行折叠隐藏只留警告
   const tRRBad = tRR < 1.5;
-  // 状态标签降级:方案C盈亏比不合格(做T风险极高)且主力资金流出 → 禁止"轻仓试错",强制"高风险观察"
-  const riskDowngrade = tRRBad && (ff.d1 || 0) < 0;
-  const effStatusLabel = riskDowngrade ? '高风险观察' : statusLabel;
-  const effConfTone = riskDowngrade ? 'down' : confTone;
+  const tRRHide = tRR <= 1.0;
   // 触发判定:现价是否已到达触发条件(A回踩到位/B突破到位/C围绕现价始终可做)
   const trigA = price <= p.entry;
   const trigB = price >= planBEntry;
   const trigC = price > 0;
+  // 情绪周期与硬逆势判定(提前到此,供状态覆盖与折叠使用)
+  const emotionCycle = _emotionCycle(s);
+  const isHardTrade = (emotionCycle === '冰点' && t.trend === 'down' && (ff.d1 || 0) < 0);
+  // 状态机强制覆盖(致命防呆):现价盈亏比不合格 或 方案A/B均未触发 → 禁止"可交易/轻仓试错",强制"等待触发/高风险观察"
+  const rrNowBad = p.rrNow < 1.5;             // 现价直接买入盈亏比不合格
+  const abUnTriggered = !trigA && !trigB;      // 方案A/B均未触发
+  const riskDowngrade = tRRBad && (ff.d1 || 0) < 0;  // 做T不合格+主力流出
+  let effStatusLabel, effConfTone;
+  if (isHardTrade) { effStatusLabel = '不建议参与'; effConfTone = 'down'; }
+  else if (riskDowngrade) { effStatusLabel = '高风险观察'; effConfTone = 'down'; }
+  else if (rrNowBad || abUnTriggered) { effStatusLabel = '等待触发'; effConfTone = 'down'; }
+  else { effStatusLabel = statusLabel; effConfTone = confTone; }
+  // 折叠交易计划表:硬逆势 或 方案A/B均未触发(未达入场条件) → 折叠留提醒
+  const shouldCollapsePlan = isHardTrade || abUnTriggered;
+  const collapseLabel = isHardTrade ? '⛔ 破位·严禁现价抄底' : '⛔ 等待触发·未达入场条件';
   const planRow = (name, trig, entry, stop, tgt, rr, triggered, tone, bad) => `<tr class="${triggered ? '' : 'tp-notrig'}">
     <td class="tp-name">${name}</td>
     <td class="tp-trig">${esc(trig)}</td>
@@ -1484,7 +1498,7 @@ function buildStockRow(s, i, report) {
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
     ${planRow('A 回踩低吸', '回踩' + f2(p.entry) + '企稳', p.entry, p.stop, p.target, p.rr, trigA, _rrTone(p.rr))}
     ${planRow('B 突破确认', '放量突破' + f2(planBEntry), planBEntry, planBStop, planBTarget, planBRR, trigB, _rrTone(planBRR))}
-    ${planRow('C 日内做T', '现价' + f2(price) + '·ATR' + f2(atrC) + '动态止损', price, tStop, tTgt, tRR, trigC, _rrTone(tRR), tRRBad)}
+    ${tRRHide ? '' : planRow('C 日内做T', '现价' + f2(price) + '·ATR' + f2(atrC) + '动态止损', price, tStop, tTgt, tRR, trigC, _rrTone(tRR), tRRBad)}
   </table>`;
   // 现价追入校验
   const nowWarn = p.rrNow < 1.5
@@ -1495,7 +1509,16 @@ function buildStockRow(s, i, report) {
   // 资金验证归因:个股当日涨跌 vs 所属板块当日涨跌(完整归因)
   const secChg = s.sectorChange || null;
   const stockPctN = Number(s.pct) || 0;
-  let fundVerify = '主力净流入当日' + sign(ff.d1) + (ff.d1 != null ? ff.d1.toFixed(2) : '--') + '亿，' + ((ff.d1 || 0) >= 0 ? '符合做多预期' : '与做多预期背离，需复核');
+  // 主力净流入极小(<0.1亿)且缩量滞涨 → "微幅流入,买方承接极弱,需警惕滞涨"(替代"符合做多预期"的乐观误读)
+  const isMicroInflow = (ff.d1 != null && ff.d1 > 0 && ff.d1 < 0.1);
+  const isShrinking = (t.volRatio != null && t.volRatio < 0.75);
+  const isFlatPrice = Math.abs(stockPctN) <= 0.3;
+  let fundVerify;
+  if (isMicroInflow && isShrinking && isFlatPrice) {
+    fundVerify = '主力净流入当日' + sign(ff.d1) + ff.d1.toFixed(2) + '亿，微幅流入，买方承接极弱，需警惕滞涨';
+  } else {
+    fundVerify = '主力净流入当日' + sign(ff.d1) + (ff.d1 != null ? ff.d1.toFixed(2) : '--') + '亿，' + ((ff.d1 || 0) >= 0 ? '符合做多预期' : '与做多预期背离，需复核');
+  }
   if (secChg && secChg.changePct != null && !isNaN(secChg.changePct)) {
     const diff = stockPctN - secChg.changePct;
     const cmp = diff <= -0.5 ? '弱于板块，弱势特征明显' : (diff >= 0.5 ? '强于板块，具备相对强度' : '与板块基本同步');
@@ -1522,9 +1545,7 @@ function buildStockRow(s, i, report) {
     nextDayFocus = '明日观察量能与MA5得失，方向未明前继续观望。';
   }
 
-  // 情绪总纲建议:情绪冰点+趋势空头+主力流出 → 高难度逆势标的,强烈建议不参与
-  const emotionCycle = _emotionCycle(s);
-  const isHardTrade = (emotionCycle === '冰点' && t.trend === 'down' && (ff.d1 || 0) < 0);
+  // 情绪总纲建议(硬逆势):强烈建议不参与(emotionCycle/isHardTrade 已在上面状态机处计算)
   const summaryHtml = isHardTrade ? '<div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>' : '';
 
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
@@ -1555,8 +1576,8 @@ function buildStockRow(s, i, report) {
       <div class="dc-line dc-events">${evHtml}</div>
       <div class="dc-line dc-src-note">${evNote}</div>
     </div>
-    <div class="dc-block dc-plan ${isHardTrade ? 'dc-plan-collapsed' : ''}">
-      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">${isHardTrade ? '▸' : '▾'}</span>${isHardTrade ? '<span class="dc-plan-lock">⛔ 破位·严禁现价抄底</span><span class="dc-plan-expand">👆 点击展开</span>' : ''}</div>
+    <div class="dc-block dc-plan ${shouldCollapsePlan ? 'dc-plan-collapsed' : ''}">
+      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">${shouldCollapsePlan ? '▸' : '▾'}</span>${shouldCollapsePlan ? '<span class="dc-plan-lock">' + collapseLabel + '</span><span class="dc-plan-expand">👆 点击展开</span>' : ''}</div>
       <div class="dc-plan-body">${planTable}${tRRBadWarn}${nowWarn}
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>${pos.capped ? '（受单股上限压制，实际最高仓位15%）' : '（单股≤15%、单题材≤30%）'}</div>
       <div class="dc-line dc-disc">执行纪律：跌破${f2(p.stop)}无条件止损 · 到达${f2(p.target)}无条件止盈 · 日内做T当日必须平T不隔夜</div>
