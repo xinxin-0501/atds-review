@@ -13,7 +13,11 @@ const ROOT = path.resolve(__dirname, '..');
 const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'config.json'), 'utf8'));
 const DATA_DIR = path.join(ROOT, config.dataDir);
 
-const type = process.argv[2] || 'close';
+// argv[2] 支持两种: 'premarket'|'midday'|'close'(走 config.reportTypes 默认 time)
+//                或 'HH:MM'(盘中具体时间,自动归 midday 并用此 time 生成独立文件名)
+const argv2 = process.argv[2] || 'close';
+const timeOverride = /^\d{1,2}:\d{2}$/.test(argv2);
+const type = timeOverride ? 'midday' : argv2;
 const typeConf = config.reportTypes[type] || config.reportTypes.close;
 
 function fmtDate(d) {
@@ -1671,7 +1675,7 @@ async function main() {
   const explicitArg = process.argv[3] || '';
   // 支持显式传入目标日期 YYYYMMDD（用于补生成历史日期），否则用当前日期
   const date = explicitArg ? explicitArg.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : fmtDate(now);
-  const time = typeConf.time;
+  const time = timeOverride ? argv2 : typeConf.time;
   const generatedAt = `${date} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
   const isPre = type === 'premarket';
