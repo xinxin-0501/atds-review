@@ -97,15 +97,15 @@ jobs:
           fi
           TODAY=$(TZ='Asia/Shanghai' date +%Y-%m-%d)
           case "${{ steps.type.outputs.type }}" in
-            premarket) FT="08:30";;
+            premarket) FT="09:40";;
             midday)
-              # 午盘盘中更新:10:00/11:30/14:30 三次刷新,不跳过(覆盖最新数据)
+              # 午盘盘中更新:10:00/11:30/13:30/14:40 四次刷新,不跳过(覆盖最新数据)
               echo "午盘盘中更新,不跳过(每次刷新最新数据)"
               echo "skip=false" >> "$GITHUB_OUTPUT"
               exit 0
               ;;
             close) FT="16:20";;
-            *) FT="08:30";;
+            *) FT="09:40";;
           esac
           FN="${TODAY}_${FT//:/-}.json"
           if [ -f "data/reviews/${FN}" ]; then
