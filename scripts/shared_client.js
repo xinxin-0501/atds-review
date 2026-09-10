@@ -17,7 +17,10 @@ async function fetchStockData(raw){
       var f=m[1].split("~");if(f.length<40)continue;
       var retCode=String(f[2]||"").trim();
       if(retCode!==String(raw))continue;
-      var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
+      var data={code:retCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc,
+        prevClose:parseFloat(f[4])||0,open:parseFloat(f[5])||0,high:parseFloat(f[33])||0,low:parseFloat(f[34])||0,
+        amplitude:parseFloat(f[43])||0,volRatio:parseFloat(f[49])||0,avgPrice:parseFloat(f[51])||0,
+        floatMcap:parseFloat(f[44])||0,totalMcap:parseFloat(f[45])||0};
       if(!data.name)continue;
       return data;
     }catch(e){}
@@ -33,7 +36,7 @@ async function openStockResearch(code){
   if(!data){alert("未找到股票代码 "+code);return;}
   showDynamicResearch(data);
   var atds=70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
-  if(atds>=85 && !document.querySelector('.wl-stock-row[data-code="'+code+'"]')){addToWatchlistUI(data);saveWatchlist();setTimeout(function(){var el=document.querySelector('.wl-stock-row[data-code="'+code+'"]');if(el)el.style.background="#e8f5e9";},50);}
+  if(atds>=85 && !document.querySelector('.wl-stock-row[data-code="'+code+'"]')){try{await addFetchedToWatchlist(code);}catch(e){addToWatchlistUI(data);saveWatchlist();}}
 }
 async function addFetchedToWatchlist(code){
   code=String(code||"").trim();
@@ -56,15 +59,20 @@ async function addFetchedToWatchlist(code){
   }
   var data=await fetchStockData(code);
   if(!data){alert("未能获取行情,请检查网络后重试");return;}
-  // 拉 K 线 → 注入技术画像(让手动加的股也走五类文案,与 config 观察池一致)
+  // 拉 K 线 → 决策技术画像(ATR14/支撑压力/缺口/多周期),与 config 观察池一致
   try {
     var c0 = code.charAt(0);
-    var full = (c0 === '6' || c0 === '5') ? ('sh' + code) : ('sz' + code);
-    var kl = await fetchKlineF(full, 70);
-    if (kl && kl.length >= 20) {
-      data.tech = computeTechMetrics(kl);
+    var full = (c0 === '6' || c0 === '5') ? ('sh' + code) : ((c0 === '4' || c0 === '8' || c0 === '92') ? ('bj' + code) : ('sz' + code));
+    var kl = await fetchKlineF(full, 90);
+    if (kl && kl.length >= 30) {
+      data.tech = calcDecisionTech(kl);
     }
-  } catch (e) { /* K 线失败不影响加入,降级用粗逻辑 */ }
+  } catch (e) { /* K 线失败不影响加入,决策卡降级为粗逻辑 */ }
+  // 主力资金流(东财):失败不阻塞,决策卡显示 -- 
+  try {
+    var ff2 = await fetchStockFundFlowF(code);
+    if (ff2) data.fundFlow = ff2;
+  } catch (e) {}
   addToWatchlistUI(data);
   saveWatchlist();
   // 添加后立即强制刷新一次,确保显示最新实时行情(不等待 60s 定时)
@@ -259,7 +267,7 @@ function wlAdviceTextF(t, v, price){
   }
   // 2) 均线多头排列 + 缩量回踩到位(nearMa20, 量比<1.1):强势可关注
   if (t.bullArrange && (t.nearMa20 || (t.volRatio != null && t.volRatio < 1.1 && pctV < 3 && pctV >= -2))) {
-    return '强势可关注:沿 MA10(' + p2(t.ma10) + ') 上行,回踩 MA10 附近企稳可分批买入,跌破 MA20(' + p2(t.ma20) + ') 止盈';
+    return '强势可关注:沿 MA10(' + p2(t.ma10) + ') 上行,回踩 MA10 附近企稳可分批买入,跌破 MA20(' + p2(t.ma20) + ') 严格止损';
   }
   // 3) 放量突破 MA20 初期(MA20 上方 + 量比 > 1.3 + bias5 < 6):放量突破
   if (price > t.ma20 && t.volRatio != null && t.volRatio > 1.3 && (t.bias5 != null && t.bias5 < 6)) {
@@ -346,63 +354,151 @@ function autoGenStrategy(s,v,atds,turnover,tech){
   };
 }
 // 单独渲染 detail 区(供 refreshWatchlistQuotes 复用,保证手动添加个股 detail 也跟随最新行情)
-function buildWatchlistDetailHtml(data){
-  var v=Number(data.pct)||0;
-  var atds=70+Math.min(25,Math.max(-15,Math.round(v*2+(Number(data.turnover)||0)*0.5)));
-  var stopLoss=(Number(data.price)*0.95).toFixed(2);
-  var support=(Number(data.price)*0.92).toFixed(2);
-  var pressure=(Number(data.price)*1.08).toFixed(2);
-  var turnover=Number(data.turnover)||0;
-  var riskL=deriveRiskLevelF(v),horizonL=deriveTimeHorizonF(v,turnover);
-  // 优先使用基于 K 线的五类技术画像文案(data.tech 由 addFetchedToWatchlist 注入)
-  var tech=data.tech||null;
-  var adviceL=tech?wlAdviceToneF(tech,v):deriveAdviceF(v,atds,riskL.tone);
-  var riskLines=deriveRiskTextF(v,turnover);
-  var adviceText=tech?wlAdviceTextF(tech,v,data.price):deriveAdviceTextF(v,atds,riskL.tone);
-  var autoS=autoGenStrategy(data,v,atds,turnover,tech);
-  var catTag=v>=5?'强势突破':v>=2?'强势参与':v>=0.5?'震荡观察':v>=-1?'中性观望':v>=-3?'回调关注':'弱势规避';
-  if(tech){
-    if(adviceL.tone==='ok') catTag='满足跟踪';
-    else if(adviceL.tone==='mid') catTag='强势可关注';
-    else if(adviceL.tone==='break') catTag='放量突破';
-    else if(adviceL.tone==='wait') catTag='信号观望';
-    else catTag='不追高';
-  }
-  var metaHtml='<div class="wl-meta"><span class="wl-cat">自选股</span><span class="wl-tag">'+escHtmlF(catTag)+'</span></div>';
-  var blockLogic='<div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">'+escHtmlF(autoS.logic)+'</div></div>';
-  var blockCapital='<div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">'+escHtmlF(autoS.capital)+'</div></div>';
-  var blockKey='<div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">'+escHtmlF(autoS.keyLevels)+'</div></div>';
-  var parHtml='<div class="detail-block detail-block-par">'+
-    '<div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>'+
-    '<div class="par-body">'+
-      '<div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">'+escHtmlF(autoS.plan)+'</span></div>'+
-      '<div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">'+escHtmlF(adviceText)+'<span class="advice-tag-mini advice-'+adviceL.tone+'">'+escHtmlF(adviceL.name)+'</span></span></div>'+
-      '<div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-'+riskL.tone+'">'+escHtmlF(riskL.name)+'</span><ul>'+riskLines.map(function(l){return '<li>'+escHtmlF(l)+'</li>';}).join('')+'</ul></span></div>'+
-    '</div></div>';
-  var strategyBlocks='<div class="detail-grid detail-grid-strategy">'+blockLogic+blockCapital+blockKey+parHtml+'</div>';
-  var st=autoS.strategy;
-  var todayStHtml='<div class="wl-st-table">'+
-    '<div class="wl-st-title">🎯 个股风控</div>'+
-    '<div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:'+escHtmlF(st.entryStrategy)+' · 价格:<span class="wl-st-num">'+escHtmlF(st.entryPrice)+'</span> · 仓位:'+escHtmlF(st.entryPosition)+'</span></div>'+
-    '<div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:'+escHtmlF(st.stopLoss)+' · 止盈:'+escHtmlF(st.takeProfit)+' · 目标:<span class="wl-st-num">'+escHtmlF(st.target)+'</span></span></div>'+
-    (st.entryNote ? '<div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">'+escHtmlF(st.entryNote)+'</span></div>' : '')+
-    '<div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">'+escHtmlF(st.risk)+'</span></div>'+
-  '</div>';
-  var ts=autoS.todayStrategy;
-  var todayStrategyCard='<div class="card ts-stock-card">'+
-    '<div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div>'+
-    '<div class="ts-core"><span class="ts-core-tag">核心</span>'+escHtmlF(ts.core)+'</div>'+
-    '<ul class="ts-plans">'+
-      '<li><span class="ts-dot ts-dot-a"></span><b>方案A ('+escHtmlF(ts.planA.title)+')</b>: '+escHtmlF(ts.planA.content)+'</li>'+
-      '<li><span class="ts-dot ts-dot-b"></span><b>方案B ('+escHtmlF(ts.planB.title)+')</b>: '+escHtmlF(ts.planB.content)+'</li>'+
-    '</ul>'+
-    '<ul class="ts-plans">'+
-      '<li><span class="ts-dot"></span><b>二选一建议</b>: '+escHtmlF(ts.choice)+'</li>'+
-      '<li><span class="ts-dot"></span><b>仓位控制</b>: '+escHtmlF(ts.position)+'</li>'+
-    '</ul>'+
-    '<div class="ts-alert"><b>关键提醒</b>: '+escHtmlF(ts.alert)+'</div>'+
-  '</div>';
-  return metaHtml+strategyBlocks+todayStHtml+todayStrategyCard;
+// 交易决策卡(主卡片+复盘卡):镜像云端 buildStockRow 的 detail 结构,真实数据 + 量化盈亏比/置信度/仓位
+function buildDecisionCardHtml(s){
+  s=s||{};
+  var t=s.tech||{};
+  var ff=s.fundFlow||{};
+  var price=Number(s.price)||0;
+  var pct=Number(s.pct)||0;
+  function f2(x){return (x==null||isNaN(x))?'--':Number(x).toFixed(2);}
+  function sign(x){return (x==null||isNaN(x))?'':(x>0?'+':'');}
+  function supStrong(){var a=Array.isArray(t.supports)?t.supports:[];for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
+  function preStrong(){var a=Array.isArray(t.pressures)?t.pressures:[];for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
+  var sup=supStrong(), pre=preStrong();
+  var supPrice=sup?sup.price:(t.ma20||price*0.96);
+  var prePrice=pre?pre.price:(t.ma5||price*1.05);
+  var entry=(supPrice<price)?supPrice:price;
+  var atr=t.atr14||(price*0.03);
+  var stop=entry-Math.max(atr,entry*0.03);
+  var target=prePrice>entry?prePrice:(entry*1.06);
+  var rr=(target-entry)/(entry-stop);
+  var rrNow=(price>stop)?(target-price)/(price-stop):0;
+  var stopPct=entry>0?(entry-stop)/entry*100:3;
+  var p={entry:entry,stop:stop,target:target,rr:rr,rrNow:rrNow,stopPct:stopPct,sup:sup,pre:pre,atr:atr};
+  function rrTone(r){return r>=2?'good':r>=1.5?'ok':r>=1?'warn':'bad';}
+  // 置信度(趋势30/资金25/题材20/关键位15/盈亏比10)
+  var trendScore=t.trend==='up'?30:t.trend==='repair'?20:t.trend==='flat'?12:5;
+  var fundScore=12;
+  if((ff.d1||0)>0)fundScore+=6;
+  if((ff.d3||0)>0)fundScore+=4;
+  var vr=Number(s.volRatio)||(t.volRatio||1);
+  if(vr>=1.3)fundScore+=3;
+  fundScore=Math.min(25,fundScore);
+  var themeScore=8;
+  if(s.category)themeScore+=6;
+  if(Array.isArray(s.tags)&&s.tags.length)themeScore+=4;
+  themeScore=Math.min(20,themeScore);
+  var keyScore=6;
+  if(p.sup&&price<=p.sup.price*1.03)keyScore+=6;
+  if(p.pre&&price>=p.pre.price*0.97)keyScore+=3;
+  keyScore=Math.min(15,keyScore);
+  var rrScore=p.rr>=2?10:p.rr>=1.5?7:p.rr>=1?4:0;
+  var confTotal=Math.round(trendScore+fundScore+themeScore+keyScore+rrScore);
+  // 仓位计算器:单笔风险0.5%-1% ÷ 止损幅度
+  var stopPctMax=Math.max(p.stopPct,1);
+  var pos={low:Math.round(0.5/stopPctMax*100),high:Math.round(1/stopPctMax*100),stopPct:Math.round(stopPctMax*10)/10};
+  var confTone=confTotal>=75?'good':confTotal>=60?'ok':'warn';
+  var statusLabel=confTotal>=75?'可交易':confTotal>=60?'轻仓试错':'观察';
+  var priority=confTotal>=75&&p.rr>=2?'★★★':confTotal>=60?'★★':'★';
+  var rrToneVal=rrTone(p.rr);
+  // 开盘预期
+  var gapPct=(s.prevClose>0&&s.open>0)?((s.open-s.prevClose)/s.prevClose*100):null;
+  var openExpect=gapPct==null?'--':(gapPct>=2?'高开'+gapPct.toFixed(1)+'%·防冲高回落':gapPct<=-2?'低开'+gapPct.toFixed(1)+'%·看承接':'平开±2%·看方向');
+  var falsify=p.sup?('跌破'+f2(p.sup.price)+'('+(p.sup.label||'强支撑')+')且无法收回 → 逻辑失效'):'跌破近期低点且无法收回 → 逻辑失效';
+  // 催化/阶段/地位/分歧
+  var tagsArr=Array.isArray(s.tags)?s.tags:[];
+  var boardStatus=(tagsArr.join('').indexOf('首选')>=0)?'龙头/主攻':(tagsArr.join('').indexOf('稳健')>=0)?'中军':(tagsArr.join('').indexOf('补涨')>=0)?'补涨':'独立观察';
+  var catalystTxt=(s.logic||'')+(s.category||'');
+  var catalyst=/政策|产业|规划|国产|自主|国家/.test(catalystTxt)?'政策/产业':/招标|订单|中标|业绩|预增|扭亏|扭亏为盈/.test(catalystTxt)?'事件/业绩':/景气|主升|主线|需求|涨价|周期|复苏/.test(catalystTxt)?'行业景气':/资金|流入|抢筹|吸筹/.test(catalystTxt)?'资金驱动':'题材';
+  var ferment=pct>=7?'高潮/加速':pct>=3?'发酵':(pct>=0&&t.trend==='up')?'启动':pct<-2?'退潮':'混沌';
+  var divergence=pct>=5&&vr>=1.3?'一致加速':vr>=1.5?'分歧换手':vr<0.8?'缩量一致':'正常换手';
+  var trendLabel=t.trend==='up'?'多头':t.trend==='repair'?'修复':t.trend==='down'?'空头':'震荡';
+  var weeklyLabel=t.weeklyTrend==='up'?'周线向上':t.weeklyTrend==='down'?'周线向下':'周线走平';
+  var supList=Array.isArray(t.supports)?t.supports:[];
+  var preList=Array.isArray(t.pressures)?t.pressures:[];
+  var supHtml=supList.slice(0,3).map(function(x){return '<span class="lv lv-s'+(x.weight==='strong'?' lv-strong':'')+'">'+f2(x.price)+'<i>'+escHtmlF(x.label)+'</i></span>';}).join('')||'<span class="lv">--</span>';
+  var preHtml=preList.slice(0,3).map(function(x){return '<span class="lv lv-p'+(x.weight==='strong'?' lv-strong':'')+'">'+f2(x.price)+'<i>'+escHtmlF(x.label)+'</i></span>';}).join('')||'<span class="lv">--</span>';
+  var gapHtml=t.gapUp?('向上缺口 '+f2(t.gapUp.level)):(t.gapDown?('向下缺口 '+f2(t.gapDown.level)):'无近期缺口');
+  // 资金量能
+  var fundHtml='<span>主力净流入 <b class="'+((ff.d1||0)>=0?'up':'down')+'">'+sign(ff.d1)+(ff.d1!=null?ff.d1.toFixed(2):'--')+'亿</b></span>'+
+    '<span>3日 <b class="'+((ff.d3||0)>=0?'up':'down')+'">'+sign(ff.d3)+(ff.d3!=null?ff.d3.toFixed(2):'--')+'亿</b></span>'+
+    '<span>5日 <b class="'+((ff.d5||0)>=0?'up':'down')+'">'+sign(ff.d5)+(ff.d5!=null?ff.d5.toFixed(2):'--')+'亿</b></span>';
+  var volHtml='<span>量比 <b>'+((Number(s.volRatio)||t.volRatio||'--'))+'</b></span>'+
+    '<span>换手 <b>'+escHtmlF(s.turnover||'--')+'%</b></span>'+
+    '<span>振幅 <b>'+(Number(s.amplitude)?Number(s.amplitude).toFixed(2)+'%':'--')+'</b></span>'+
+    '<span>分歧 <b>'+escHtmlF(divergence)+'</b></span>';
+  // 交易计划表(方案A/B/C)
+  var planBEntry=pre?pre.price:(price*1.05);
+  var planBStop=planBEntry*0.97, planBTarget=planBEntry*1.08;
+  var planBRR=(planBTarget-planBEntry)/(planBEntry-planBStop);
+  function planRow(name,trig,entryV,stopV,tgtV,rrVal,tone){return '<tr><td class="tp-name">'+name+'</td><td class="tp-trig">'+escHtmlF(trig)+'</td><td class="tp-num">'+f2(entryV)+'</td><td class="tp-num stop">'+f2(stopV)+'</td><td class="tp-num">'+f2(tgtV)+'</td><td class="tp-rr rr-'+tone+'">'+rrVal.toFixed(2)+'</td></tr>';}
+  var cRR=(s.low&&s.high)?((s.high-price)/Math.max(price-s.low,0.01)):p.rr;
+  var planTable='<table class="tp-table"><tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>'+
+    planRow('A 回踩低吸','回踩'+f2(p.entry)+'企稳',p.entry,p.stop,p.target,p.rr,rrTone(p.rr))+
+    planRow('B 突破确认','放量突破'+f2(planBEntry),planBEntry,planBStop,planBTarget,planBRR,rrTone(planBRR))+
+    planRow('C 日内做T','区间['+f2(s.low)+','+f2(s.high)+']',price,f2(s.low||p.stop),f2(s.high||planBTarget),cRR,rrTone(cRR))+
+    '</table>';
+  var nowWarn=p.rrNow<1.5
+    ?'<div class="tp-warn">⚠ 现价直接买入盈亏比 '+p.rrNow.toFixed(2)+'(<1.5),不合格 —— 等待回踩至 '+f2(p.entry)+' 再执行,当前仅观察。</div>'
+    :'<div class="tp-warn tp-ok">现价盈亏比 '+p.rrNow.toFixed(2)+',可执行计划。</div>';
+  // 复盘
+  var keyVerify='最高'+f2(s.high)+' '+((pre&&s.high>=pre.price)?('触及压力'+f2(pre.price)):'未触及压力')+' · 最低'+f2(s.low)+' '+((sup&&s.low<=sup.price)?('触及支撑'+f2(sup.price)):'未触及支撑');
+  var fundVerify='主力净流入当日'+sign(ff.d1)+(ff.d1!=null?ff.d1.toFixed(2):'--')+'亿，'+(((ff.d1||0)>=0)?'符合做多预期':'与做多预期背离，需复核');
+
+  return '<div class="dc-head">'+
+    '<span class="dc-pri">'+priority+'</span>'+
+    '<span class="dc-name">'+escHtmlF(s.name)+' <i>'+escHtmlF(s.code)+'</i></span>'+
+    '<span class="dc-status '+((confTone==='good')?'up':(confTone==='ok')?'':'down')+'">'+statusLabel+'</span>'+
+    '<span class="dc-conf">置信度 '+confTotal+'</span>'+
+    '<span class="dc-rr rr-'+rrToneVal+'">盈亏比 '+p.rr.toFixed(2)+'</span>'+
+    '<span class="dc-time">'+new Date().toLocaleString('zh-CN',{hour12:false})+'</span>'+
+    '</div>'+
+    '<div class="dc-tags">'+(s.category?'<span class="dc-tag">'+escHtmlF(s.category)+'</span>':'')+tagsArr.map(function(x){return '<span class="dc-tag">'+escHtmlF(x)+'</span>';}).join('')+'<span class="dc-tag">催化:'+escHtmlF(catalyst)+'</span><span class="dc-tag">阶段:'+escHtmlF(ferment)+'</span><span class="dc-tag">地位:'+escHtmlF(boardStatus)+'</span></div>'+
+    (s.logic?'<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">'+escHtmlF(s.logic)+'</div></div>':'')+
+    '<div class="dc-block"><div class="dc-h">💰 资金与量能</div><div class="dc-grid2"><div class="dc-line">'+fundHtml+'</div><div class="dc-line">'+volHtml+'</div></div></div>'+
+    '<div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>'+
+      '<div class="dc-line">支撑 '+supHtml+'</div>'+
+      '<div class="dc-line">压力 '+preHtml+'</div>'+
+      '<div class="dc-line">缺口 '+escHtmlF(gapHtml)+' · ATR '+f2(t.atr14)+' · '+escHtmlF(trendLabel)+' · '+escHtmlF(weeklyLabel)+' · 开盘 '+escHtmlF(openExpect)+'</div>'+
+    '</div>'+
+    '<div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>'+planTable+nowWarn+
+      '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>（单股≤15%、单题材≤30%）</div>'+
+    '</div>'+
+    '<div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>'+
+      '<div class="dc-line">证伪条件：'+escHtmlF(falsify)+'</div>'+
+      '<div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>'+
+      '<div class="dc-line">置信度构成：趋势'+trendScore+'/30 + 资金'+fundScore+'/25 + 题材'+themeScore+'/20 + 关键位'+keyScore+'/15 + 盈亏比'+rrScore+'/10</div>'+
+    '</div>'+
+    '<div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
+      '<div class="dc-line">关键位验证：'+keyVerify+'</div>'+
+      '<div class="dc-line">资金验证：'+fundVerify+'</div>'+
+      '<div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>'+
+    '</div>';
+}
+function buildWatchlistDetailHtml(data){ return buildDecisionCardHtml(data); }
+/* 主行徽章:置信度 + 盈亏比(与决策卡同源计算,供 addToWatchlistUI / refreshWatchlistQuotes 复用) */
+function dcBadges(s){
+  var t=s.tech||{}, ff=s.fundFlow||{}, price=Number(s.price)||0;
+  function supStrong(){var a=Array.isArray(t.supports)?t.supports:[];for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
+  function preStrong(){var a=Array.isArray(t.pressures)?t.pressures:[];for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
+  var sup=supStrong(),pre=preStrong();
+  var supPrice=sup?sup.price:(t.ma20||price*0.96);
+  var prePrice=pre?pre.price:(t.ma5||price*1.05);
+  var entry=(supPrice<price)?supPrice:price;
+  var atr=t.atr14||(price*0.03);
+  var stop=entry-Math.max(atr,entry*0.03);
+  var target=prePrice>entry?prePrice:(entry*1.06);
+  var rr=(target-entry)/(entry-stop);
+  function rrTone(r){return r>=2?'good':r>=1.5?'ok':r>=1?'warn':'bad';}
+  var trendScore=t.trend==='up'?30:t.trend==='repair'?20:t.trend==='flat'?12:5;
+  var fundScore=12;if((ff.d1||0)>0)fundScore+=6;if((ff.d3||0)>0)fundScore+=4;
+  var vr=Number(s.volRatio)||(t.volRatio||1);if(vr>=1.3)fundScore+=3;fundScore=Math.min(25,fundScore);
+  var themeScore=8;if(s.category)themeScore+=6;if(Array.isArray(s.tags)&&s.tags.length)themeScore+=4;themeScore=Math.min(20,themeScore);
+  var keyScore=6;if(sup&&price<=sup.price*1.03)keyScore+=6;if(pre&&price>=pre.price*0.97)keyScore+=3;keyScore=Math.min(15,keyScore);
+  var rrScore=rr>=2?10:rr>=1.5?7:rr>=1?4:0;
+  var confTotal=Math.round(trendScore+fundScore+themeScore+keyScore+rrScore);
+  return {rr:rr,rrTone:rrTone(rr),confTotal:confTotal,confTone:confTotal>=75?'good':confTotal>=60?'ok':'warn'};
 }
 function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
@@ -421,20 +517,11 @@ function addToWatchlistUI(s){
   var n=stocksWrap.querySelectorAll(".wl-stock").length+1;
   var v=Number(s.pct)||0;
   var cls=v>=0?"up":"down";
-  var sigLabel, sigTone;
-  if(v>=5){sigLabel="强势突破";sigTone="break";}
-  else if(v>=2){sigLabel="强势承接";sigTone="strong";}
-  else if(v>=0.5){sigLabel="震荡上行";sigTone="up";}
-  else if(v>=-1){sigLabel="等待确认";sigTone="wait";}
-  else if(v>=-3){sigLabel="走势承压";sigTone="press";}
-  else{sigLabel="弱势回调";sigTone="weak";}
-  var atds=70+Math.min(25,Math.max(-15,Math.round(v*2+(Number(s.turnover)||0)*0.5)));
-  var stopLoss=(Number(s.price)*0.95).toFixed(2);
-  var support=(Number(s.price)*0.92).toFixed(2);
-  var pressure=(Number(s.price)*1.08).toFixed(2);
-  var turnover=Number(s.turnover)||0;
-  var detailHtml=buildWatchlistDetailHtml(s);
+  var m=dcBadges(s);
+  var rrTxt=m.rr>=1.5?(m.rr.toFixed(2)+' ✓'):m.rr.toFixed(2);
+  var detailHtml=buildDecisionCardHtml(s);
   var techJson=s.tech?JSON.stringify(s.tech):'null';
+  var ffJson=s.fundFlow?JSON.stringify(s.fundFlow):'null';
   var stock=document.createElement('div');
   stock.className='wl-stock';
   stock.setAttribute('data-stock-code',s.code);
@@ -443,20 +530,20 @@ function addToWatchlistUI(s){
     '<span class="wl-cell wl-cell-price"><b>最新价</b></span>'+
     '<span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>'+
     '<span class="wl-cell wl-cell-amt"><b>成交额</b></span>'+
-    '<span class="wl-cell wl-cell-atds"><b>ATDS</b></span>'+
-    '<span class="wl-cell wl-cell-sig"><b>策略信号</b></span>'+
+    '<span class="wl-cell wl-cell-atds"><b>置信度</b></span>'+
+    '<span class="wl-cell wl-cell-sig"><b>盈亏比</b></span>'+
     '<span class="wl-cell wl-cell-act"><b>操作</b></span>'+
     '</div>';
   stock.innerHTML='<div class="wl-stock-scroll">'+
     headRowHtml+
-    '<div class="wl-stock-row" data-code="'+escHtmlF(s.code)+'" data-tech=\''+techJson+'\'>'+
+    '<div class="wl-stock-row" data-code="'+escHtmlF(s.code)+'" data-tech=\''+techJson+'\' data-ff=\''+ffJson+'\'>'+
     '<span class="wl-cell wl-cell-rank"><span class="rank-no">'+n+'</span><span class="wl-name">'+escHtmlF(s.name)+'</span><span class="wl-code">'+escHtmlF(s.code)+'</span></span>'+
     '<span class="wl-cell wl-cell-price"><span class="price '+cls+'">'+Number(s.price).toFixed(2)+'</span></span>'+
     '<span class="wl-cell wl-cell-pct '+cls+'">'+(v>0?"+":"")+v.toFixed(2)+'%</span>'+
     '<span class="wl-cell wl-cell-amt">'+escHtmlF(s.amount||'--')+'</span>'+
-    '<span class="wl-cell wl-cell-atds">'+atds+'</span>'+
-    '<span class="wl-cell wl-cell-sig"><span class="sig sig-'+sigTone+'">'+sigLabel+'</span></span>'+
-    '<span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="'+escHtmlF(s.code)+'" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="'+escHtmlF(s.code)+'" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>'+
+    '<span class="wl-cell wl-cell-atds"><span class="conf conf-'+m.confTone+'">'+m.confTotal+'</span></span>'+
+    '<span class="wl-cell wl-cell-sig"><span class="rr rr-'+m.rrTone+'">'+rrTxt+'</span></span>'+
+    '<span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="'+escHtmlF(s.code)+'" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="'+escHtmlF(s.code)+'" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>'+
     '</div>'+
     '</div>'+
     '<div class="wl-detail auto-detail" data-detail-code="'+escHtmlF(s.code)+'">'+
@@ -562,16 +649,20 @@ function restoreSavedWatchlist(){
         var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);
         var m=text.match(/="([^"]+)"/);if(!m)continue;
         var f=m[1].split("~");if(f.length<40)continue;
-        var data={code:rawCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc};
+        var data={code:rawCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc,
+          prevClose:parseFloat(f[4])||0,open:parseFloat(f[5])||0,high:parseFloat(f[33])||0,low:parseFloat(f[34])||0,
+          amplitude:parseFloat(f[43])||0,volRatio:parseFloat(f[49])||0,avgPrice:parseFloat(f[51])||0,
+          floatMcap:parseFloat(f[44])||0,totalMcap:parseFloat(f[45])||0};
         if(!data.name)continue;
-        // 补拉 K 线 + 技术画像 → 让手动加的股也走五类文案(与亨通光电等 config 观察池一致)
+        // 补拉 K 线 → 决策技术画像(ATR14/支撑压力/缺口/多周期) + 主力资金流
         try{
-          var full=(c0==="6"||c0==="5")?("sh"+rawCode):("sz"+rawCode);
-          var kl=await fetchKlineF(full,70);
-          if(kl&&kl.length>=20){
-            data.tech=computeTechMetrics(kl);
+          var full=(c0==="6"||c0==="5")?("sh"+rawCode):((c0==="4"||c0==="8"||c0==="92")?("bj"+rawCode):("sz"+rawCode));
+          var kl=await fetchKlineF(full,90);
+          if(kl&&kl.length>=30){
+            data.tech=calcDecisionTech(kl);
           }
         }catch(e){/* K 线失败降级用粗逻辑 */}
+        try{var ff=await fetchStockFundFlowF(rawCode);if(ff)data.fundFlow=ff;}catch(e){}
         addToWatchlistUI(data);
       }catch(e){}
     }
@@ -606,50 +697,39 @@ async function refreshWatchlistQuotes(){
       var price=parseFloat(f[3])||0,pct=parseFloat(f[32])||0;
       var amount=((parseFloat(f[37])||0)/10000).toFixed(1)+'亿';
       var turnover=f[38]||'--';
+      var prevClose=parseFloat(f[4])||0,open=parseFloat(f[5])||0;
+      var high=parseFloat(f[33])||0,low=parseFloat(f[34])||0;
+      var amplitude=parseFloat(f[43])||0,volRatio=parseFloat(f[49])||0;
       var r=map[code];
       var cls=pct>=0?'up':'down';
-      var sig=deriveSigR(pct);
-      var atds=70+Math.min(25,Math.max(-15,Math.round(pct*2+(Number(turnover)||0)*0.5)));
+      // 主行:价/涨跌/成交额(全部标的实时更新)
       var priceEl=r.querySelector('.wl-cell-price .price');
       if(priceEl){priceEl.className='price '+cls;priceEl.textContent=price.toFixed(2);}
       var pctEl=r.querySelector('.wl-cell-pct');
       if(pctEl){pctEl.className='wl-cell wl-cell-pct '+cls;pctEl.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';}
       var amtEl=r.querySelector('.wl-cell-amt');
       if(amtEl)amtEl.textContent=amount;
-      var atdsEl=r.querySelector('.wl-cell-atds');
-      if(atdsEl)atdsEl.textContent=atds;
-      var sigEl=r.querySelector('.wl-cell-sig .sig');
-      if(sigEl){sigEl.className='sig sig-'+sig.tone;sigEl.textContent=sig.name;}
-      // detail 区域刷新:止损/支撑/压力 + 风险等级 + 风控时间 + 建议文本
-      // 关键修复:之前只更新 detail-spb,detail-grid 内的"风险/风控/建议"文本是添加时的快照
+      // 读回技术画像/资金流(data-tech/data-ff,手动股写入)
+      var tech=null,ff=null;
+      try{var tj=r.getAttribute('data-tech');if(tj&&tj!=='null')tech=JSON.parse(tj);}catch(e){}
+      try{var fj=r.getAttribute('data-ff');if(fj&&fj!=='null')ff=JSON.parse(fj);}catch(e){}
+      var sObj={code:code,name:f[1],price:price,pct:pct,amount:amount,turnover:turnover,prevClose:prevClose,open:open,high:high,low:low,amplitude:amplitude,volRatio:volRatio,tech:tech,fundFlow:ff};
+      // 手动新增股(auto-detail):整体重建决策卡 + 置信度/盈亏比徽章,让所有字段跟随最新行情
       var d=document.querySelector('.wl-detail[data-detail-code="'+code+'"]');
-      if(d){
-        // 1. 止损/支撑/压力 基于最新价更新
-        var spb=d.querySelectorAll('.detail-spb span');
-        if(spb.length>=3){
-          var sl=spb[0].childNodes[1];var su=spb[1].childNodes[1];var pr=spb[2].childNodes[1];
-          if(sl)sl.textContent=(price*0.95).toFixed(2);
-          if(su)su.textContent=(price*0.92).toFixed(2);
-          if(pr)pr.textContent=(price*1.08).toFixed(2);
-        }
-        // 2. 手动添加的 detail(auto-detail class): 整体重新生成(让所有字段跟随最新行情)
-        if(d.classList.contains('auto-detail')){
-          // 从 row 读回保存的 tech(若 K 线数据还在),让建议保持五类文案一致
-          var rowEl=document.querySelector('.wl-stock-row[data-code="'+code+'"]');
-          var techData=null;
-          if(rowEl&&rowEl.getAttribute('data-tech')){
-            try{ techData=JSON.parse(rowEl.getAttribute('data-tech')); }catch(e){}
-          }
-          d.innerHTML=buildWatchlistDetailHtml({code:code,name:f[1],price:price,pct:pct,amount:amount,turnover:turnover,setcode:'',tech:techData});
-        }
+      if(d&&d.classList.contains('auto-detail')){
+        var bd=dcBadges(sObj);
+        var confEl=r.querySelector('.wl-cell-atds .conf');
+        if(confEl){confEl.className='conf conf-'+bd.confTone;confEl.textContent=bd.confTotal;}
+        var rrEl=r.querySelector('.wl-cell-sig .rr');
+        if(rrEl){rrEl.className='rr rr-'+bd.rrTone;rrEl.textContent=(bd.rr>=1.5?(bd.rr.toFixed(2)+' ✓'):bd.rr.toFixed(2));}
+        d.innerHTML=buildDecisionCardHtml(sObj);
       }
     });
     var timeEl=document.querySelector('.wl-time');
     if(timeEl)timeEl.textContent='● '+new Date().toLocaleString('zh-CN',{hour12:false});
   }catch(e){}
   if(btn){btn.disabled=false;btn.textContent='↻ 刷新';}
-  // 异步补丁:对没有 tech 数据的行补拉 K 线 → 写入 data-tech → 重建 detail
-  // (本地老版手动加股此前未经过 K 线补全,需要走一遍让它享受五类文案)
+  // 异步补丁:对没有 tech 数据的手动行补拉 K 线 → 写入 data-tech/data-ff → 重建决策卡
   try{
     var noTechRows=document.querySelectorAll('.wl-stock-row[data-code]:not([data-tech]),.wl-stock-row[data-code][data-tech="null"]');
     if(noTechRows.length){
@@ -657,27 +737,27 @@ async function refreshWatchlistQuotes(){
         for(var k=0;k<noTechRows.length;k++){
           var rEl=noTechRows[k];
           var c=rEl.getAttribute('data-code');if(!c)continue;
+          var d=document.querySelector('.wl-detail[data-detail-code="'+c+'"]');
+          if(d&&!d.classList.contains('auto-detail'))continue;  // 配置股不重建,保留其题材/逻辑文案
           try{
             var c0=c.charAt(0);
-            var full=(c0==="6"||c0==="5")?("sh"+c):("sz"+c);
-            var kl=await fetchKlineF(full,70);
-            if(!kl||kl.length<20)continue;
-            var t=computeTechMetrics(kl);
+            var full=(c0==="6"||c0==="5")?("sh"+c):((c0==="4"||c0==="8"||c0==="92")?("bj"+c):("sz"+c));
+            var kl=await fetchKlineF(full,90);
+            if(!kl||kl.length<30)continue;
+            var t=calcDecisionTech(kl);
             rEl.setAttribute('data-tech',JSON.stringify(t));
-            // 重建该股的 detail,让建议切换为五类技术画像文案
+            var ff=await fetchStockFundFlowF(c);
+            if(ff)rEl.setAttribute('data-ff',JSON.stringify(ff));
             var priceEl=rEl.querySelector('.wl-cell-price .price');
             var pctEl=rEl.querySelector('.wl-cell-pct');
             var amtEl=rEl.querySelector('.wl-cell-amt');
-            var turnEl=rEl.querySelector('.wl-cell-pct');
             var price=priceEl?parseFloat(priceEl.textContent)||0:0;
             var pct=0;
             if(pctEl){var pm=pctEl.textContent.match(/([+\-]?[\d.]+)%/);if(pm)pct=parseFloat(pm[1])||0;}
             var amount=amtEl?amtEl.textContent:'--';
-            var turnover='--';
-            var d=document.querySelector('.wl-detail[data-detail-code="'+c+'"]');
             var name=rEl.querySelector('.wl-name')?rEl.querySelector('.wl-name').textContent:c;
             if(d){
-              d.innerHTML=buildWatchlistDetailHtml({code:c,name:name,price:price,pct:pct,amount:amount,turnover:turnover,setcode:'',tech:t});
+              d.innerHTML=buildDecisionCardHtml({code:c,name:name,price:price,pct:pct,amount:amount,turnover:'--',prevClose:0,open:0,high:0,low:0,amplitude:0,volRatio:0,tech:t,fundFlow:ff});
             }
           }catch(e){}
         }
@@ -697,10 +777,10 @@ function addWatchlistRefreshBtn(){
 }
 function initWatchlistAutoRefresh(){
   addWatchlistRefreshBtn();
-  setTimeout(refreshWatchlistQuotes,1500);            // 打开页面 1.5s 后自动刷一次
-  setInterval(refreshWatchlistQuotes,30000);          // 每 30 秒自动刷新
+  setTimeout(refreshWatchlistQuotes,800);             // 打开页面 0.8s 后自动刷一次
+  setInterval(refreshWatchlistQuotes,5000);           // 每 5 秒自动刷新(实时观察池)
 }
-(function(){var card=document.querySelector('.watchlist-card');if(card){addWatchlistRefreshBtn();setTimeout(refreshWatchlistQuotes,1500);setInterval(refreshWatchlistQuotes,60000);}})();
+(function(){var card=document.querySelector('.watchlist-card');if(card){addWatchlistRefreshBtn();setTimeout(refreshWatchlistQuotes,800);setInterval(refreshWatchlistQuotes,5000);}})();
 
 /* ============ 波背离选股:刷新行情 ============ */
 async function refreshWaveQuotes(){
@@ -1030,6 +1110,87 @@ function computeTechMetrics(klines){
     bullArrange: ma5 && ma10 && ma20 && ma60 ? (ma5 > ma10 && ma10 > ma20 && ma20 > ma60) : false,
     nearMa20: ma20 ? Math.abs(last - ma20) / ma20 * 100 <= 2 : false
   };
+}
+/* 交易决策技术画像:镜像云端 calcTechFromKline(ATR14/支撑压力/缺口/多周期),真实K线计算 */
+function calcDecisionTech(klines){
+  if(!Array.isArray(klines)||klines.length<30)return null;
+  var closes=klines.map(function(k){return parseFloat(k[2]);}).filter(function(n){return !isNaN(n);});
+  var vols=klines.map(function(k){return parseFloat(k[5])||0;});
+  var n=closes.length;
+  if(n<30)return null;
+  var last=closes[n-1];
+  function sma(m){return n>=m?closes.slice(-m).reduce(function(a,b){return a+b;},0)/m:null;}
+  var ma5=sma(5),ma10=sma(10),ma20=sma(20),ma60=sma(60);
+  var last5v=vols.slice(-5).reduce(function(a,b){return a+b;},0)/5;
+  var prev15v=vols.slice(-20,-5).reduce(function(a,b){return a+b;},0)/15;
+  var volRatio=prev15v>0?last5v/prev15v:null;
+  var ma20Prev=n>=25?closes.slice(-25,-5).reduce(function(a,b){return a+b;},0)/20:null;
+  var ma20Slope=(ma20!=null&&ma20Prev!=null)?(ma20>ma20Prev*1.002?'up':ma20<ma20Prev*0.998?'down':'flat'):'flat';
+  var bullArrange=!!(ma5&&ma10&&ma20&&ma60&&ma5>ma10&&ma10>ma20&&ma20>ma60);
+  var trend=bullArrange?'up':(!bullArrange&&ma10&&ma20&&ma10>ma20&&last>ma20&&ma20Slope!=='down')?'repair':(ma20!=null&&last<ma20)?'down':'flat';
+  function r2(x){return x==null?null:Math.round(x*100)/100;}
+  var atr14=null;
+  if(n>=15){
+    var trs=[];
+    for(var i=n-14;i<n;i++){
+      var h=parseFloat(klines[i][3]),l=parseFloat(klines[i][4]),pc=parseFloat(klines[i-1][2]);
+      if(isNaN(h)||isNaN(l)||isNaN(pc))continue;
+      trs.push(Math.max(h-l,Math.abs(h-pc),Math.abs(l-pc)));
+    }
+    if(trs.length)atr14=trs.reduce(function(a,b){return a+b;},0)/trs.length;
+  }
+  var highs60=klines.slice(-60,-1).map(function(k){return parseFloat(k[3]);}).filter(function(x){return !isNaN(x);});
+  var lows60=klines.slice(-60,-1).map(function(k){return parseFloat(k[4]);}).filter(function(x){return !isNaN(x);});
+  var high60=highs60.length?Math.max.apply(null,highs60):null;
+  var low60=lows60.length?Math.min.apply(null,lows60):null;
+  var gapUp=null,gapDown=null;
+  if(n>=2){
+    var prevH=parseFloat(klines[n-2][3]),prevL=parseFloat(klines[n-2][4]);
+    var curL=parseFloat(klines[n-1][4]),curH=parseFloat(klines[n-1][3]);
+    if(!isNaN(prevH)&&!isNaN(curL)&&curL>prevH)gapUp={level:r2(prevH),filled:false};
+    else if(!isNaN(prevL)&&!isNaN(curH)&&curH<prevL)gapDown={level:r2(prevL),filled:false};
+  }
+  var supports=[],pressures=[];
+  function addLvl(price,label,weight){
+    if(price==null||isNaN(price))return;
+    var item={price:r2(price),label:label,weight:weight};
+    if(price<last)supports.push(item);else if(price>last)pressures.push(item);
+  }
+  addLvl(ma5,'MA5','weak');addLvl(ma10,'MA10','weak');
+  addLvl(ma20,'MA20','strong');addLvl(ma60,'MA60','strong');
+  addLvl(low60,'近60日前低','strong');addLvl(high60,'近60日前高','strong');
+  [10,50,100,200,500].forEach(function(step){
+    var up=Math.ceil(last/step)*step,down=Math.floor(last/step)*step;
+    if(up>last)addLvl(up,'整数关口','weak');
+    if(down<last&&down>0)addLvl(down,'整数关口','weak');
+  });
+  supports.sort(function(a,b){return b.price-a.price;});
+  pressures.sort(function(a,b){return a.price-b.price;});
+  var weeklyCloses=[];
+  for(var w=0;w<n;w+=5)weeklyCloses.push(closes[w]);
+  var wkLast=weeklyCloses[weeklyCloses.length-1];
+  var wk5=weeklyCloses.length>=5?weeklyCloses.slice(-5).reduce(function(a,b){return a+b;},0)/5:null;
+  var weeklyTrend=(wkLast!=null&&wk5!=null)?(wkLast>wk5*1.005?'up':wkLast<wk5*0.995?'down':'flat'):'flat';
+  return {price:r2(last),ma5:r2(ma5),ma10:r2(ma10),ma20:r2(ma20),ma60:r2(ma60),ma20Slope:ma20Slope,trend:trend,
+    atr14:r2(atr14),high60:r2(high60),low60:r2(low60),gapUp:gapUp,gapDown:gapDown,supports:supports,pressures:pressures,
+    weeklyTrend:weeklyTrend,volRatio:volRatio!=null?Math.round(volRatio*100)/100:null,
+    bias20:ma20?Math.round((last/ma20-1)*1000)/10:null};
+}
+/* 个股主力资金流(东财 fflow/kline):主力净流入 当日/3日/5日,单位亿元;失败返回 null 不阻塞 */
+async function fetchStockFundFlowF(code){
+  try{
+    var num=String(code).replace(/^(sh|sz|bj)/,'');
+    var mkt=String(code).charAt(0)==='6'?'1':'0';
+    var url='https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5';
+    var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
+    var j=await res.json();
+    var kl=(j&&j.data&&j.data.klines)||[];
+    if(!kl.length)return null;
+    var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
+    function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
+    function yi(v){return Math.round(v/1e6)/100;}
+    return {d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
+  }catch(e){return null;}
 }
 function techPosText(t){
   if (!t) return 'K线数据不足';

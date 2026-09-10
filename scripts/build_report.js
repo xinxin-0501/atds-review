@@ -1193,11 +1193,11 @@ function wlTechAdviceText(pct, tech) {
   }
   // 3) 多头趋势中缩量回踩至MA10/MA20 附近 → 回踩企稳可买入
   if (up && b10 != null && b10 <= 4 && vol != null && vol < 1.15) {
-    return '强势可关注:多头趋势缩量回踩MA10(' + f2(tech.ma10) + ')附近,企稳可分批买入;跌破MA20(' + f2(tech.ma20) + ')则离场观望';
+    return '强势可关注:多头趋势缩量回踩MA10(' + f2(tech.ma10) + ')附近,企稳可分批买入;跌破MA20(' + f2(tech.ma20) + ')严格止损';
   }
   // 4) 多头趋势运行健康 → 满足条件可跟踪
   if (up) {
-    return '满足跟踪条件:均线多头排列,沿MA10(' + f2(tech.ma10) + ')上行。回踩不破可跟踪介入,跌破MA20(' + f2(tech.ma20) + ')止盈离场';
+    return '满足跟踪条件:均线多头排列,沿MA10(' + f2(tech.ma10) + ')上行。回踩不破可跟踪介入,跌破MA20(' + f2(tech.ma20) + ')严格止损';
   }
   // 5) 放量突破MA20(修复初期/平台突破) → 观察确认后纳入
   if ((tech.trend === 'repair' || tech.trend === 'flat') && p != null && tech.ma20 != null && p >= tech.ma20 && vol != null && vol >= 1.3 && v >= 2) {
@@ -1214,105 +1214,217 @@ function wlTechAdviceText(pct, tech) {
   // 8) 其余横盘/方向不明 → 观望
   return '信号尚不充分,建议先观望,等待趋势进一步明朗后再决定是否纳入跟踪';
 }
+// ===== 观察池交易决策卡:辅助计算(全部基于真实行情/K线/资金流,不造假) =====
+function _supStrong(s) {
+  const t = s.tech || {};
+  if (Array.isArray(t.supports) && t.supports.length) return t.supports.find(x => x.weight === 'strong') || t.supports[0];
+  return null;
+}
+function _preStrong(s) {
+  const t = s.tech || {};
+  if (Array.isArray(t.pressures) && t.pressures.length) return t.pressures.find(x => x.weight === 'strong') || t.pressures[0];
+  return null;
+}
+function _plan(s) {
+  const price = Number(s.price) || 0;
+  const t = s.tech || {};
+  const sup = _supStrong(s), pre = _preStrong(s);
+  const supPrice = sup ? sup.price : (t.ma20 || price * 0.96);
+  const prePrice = pre ? pre.price : (t.ma5 || price * 1.05);
+  const entry = (supPrice < price) ? supPrice : price;
+  const atr = t.atr14 || (price * 0.03);
+  const stop = entry - Math.max(atr, entry * 0.03);
+  const target = prePrice > entry ? prePrice : (entry * 1.06);
+  const rr = (target - entry) / (entry - stop);
+  const rrNow = (price > stop) ? (target - price) / (price - stop) : 0;
+  const stopPct = entry > 0 ? (entry - stop) / entry * 100 : 3;
+  return { entry, stop, target, rr, rrNow, stopPct, sup, pre, atr };
+}
+function _rrTone(rr) { return rr >= 2 ? 'good' : rr >= 1.5 ? 'ok' : rr >= 1 ? 'warn' : 'bad'; }
+function _rrToneLabel(rr) { return rr >= 2 ? '合格(≥2)' : rr >= 1.5 ? '合格(≥1.5)' : rr >= 1 ? '偏低(1-1.5)' : '不合格(<1)'; }
+function _confidence(s, p) {
+  const t = s.tech || {};
+  const trendScore = t.trend === 'up' ? 30 : t.trend === 'repair' ? 20 : t.trend === 'flat' ? 12 : 5;
+  const ff = s.fundFlow || {};
+  let fundScore = 12;
+  if ((ff.d1 || 0) > 0) fundScore += 6;
+  if ((ff.d3 || 0) > 0) fundScore += 4;
+  const vr = Number(s.volRatio) || (t.volRatio || 1);
+  if (vr >= 1.3) fundScore += 3;
+  fundScore = Math.min(25, fundScore);
+  let themeScore = 8;
+  if (s.category) themeScore += 6;
+  if (Array.isArray(s.tags) && s.tags.length) themeScore += 4;
+  themeScore = Math.min(20, themeScore);
+  let keyScore = 6;
+  const price = Number(s.price) || 0;
+  if (p.sup && price <= p.sup.price * 1.03) keyScore += 6;
+  if (p.pre && price >= p.pre.price * 0.97) keyScore += 3;
+  keyScore = Math.min(15, keyScore);
+  const rrScore = p.rr >= 2 ? 10 : p.rr >= 1.5 ? 7 : p.rr >= 1 ? 4 : 0;
+  const total = Math.round(trendScore + fundScore + themeScore + keyScore + rrScore);
+  return { total, trendScore, fundScore, themeScore, keyScore, rrScore };
+}
+function _positionPct(p) {
+  const stopPct = Math.max(p.stopPct, 1);
+  return { low: Math.round(0.5 / stopPct * 100), high: Math.round(1 / stopPct * 100), stopPct: Math.round(stopPct * 10) / 10 };
+}
+function _boardStatus(s) {
+  const tags = (s.tags || []).join('');
+  if (tags.includes('首选')) return '龙头/主攻';
+  if (tags.includes('稳健')) return '中军';
+  if (tags.includes('补涨')) return '补涨';
+  return '独立观察';
+}
+function _catalyst(s) {
+  const txt = (s.logic || '') + (s.category || '');
+  if (/政策|产业|规划|国产|自主|国家/.test(txt)) return '政策/产业';
+  if (/招标|订单|中标|业绩|预增|扭亏|扭亏为盈/.test(txt)) return '事件/业绩';
+  if (/景气|主升|主线|需求|涨价|周期|复苏/.test(txt)) return '行业景气';
+  if (/资金|流入|抢筹|吸筹/.test(txt)) return '资金驱动';
+  return '题材';
+}
+function _ferment(s) {
+  const v = Number(s.pct) || 0;
+  const t = (s.tech || {}).trend;
+  if (v >= 7) return '高潮/加速';
+  if (v >= 3) return '发酵';
+  if (v >= 0 && t === 'up') return '启动';
+  if (v < -2) return '退潮';
+  return '混沌';
+}
+function _divergence(s) {
+  const v = Number(s.pct) || 0;
+  const vr = Number(s.volRatio) || ((s.tech || {}).volRatio) || 1;
+  if (v >= 5 && vr >= 1.3) return '一致加速';
+  if (vr >= 1.5) return '分歧换手';
+  if (vr < 0.8) return '缩量一致';
+  return '正常换手';
+}
+function _trendLabel(t) { return t === 'up' ? '多头' : t === 'repair' ? '修复' : t === 'down' ? '空头' : '震荡'; }
+function _weeklyLabel(t) { return t === 'up' ? '周线向上' : t === 'down' ? '周线向下' : '周线走平'; }
+
 function buildStockRow(s, i, report) {
   const cls = upDownClass(s.pct);
-  const sig = deriveStockStrategy(s.pct);
-  const atds = deriveStockAtds(s.pct, s.turnover);
   const code = s.code;
-  const riskTone = deriveRiskLevel(s.pct).tone;
-  const riskLines = deriveRiskText(s.pct, s.turnover);
-  const horizons = deriveHorizonLines(s.pct, s.turnover);
-  const adviceText = deriveAdviceText(s.pct, atds, riskTone, s.tech);
-  const riskName = deriveRiskLevel(s.pct).name;
-  const horizonTone = deriveTimeHorizon(s.pct, s.turnover).tone;
-  const adviceTone = deriveAdvice(s.pct, atds, riskTone).tone;
-  const stopLoss = (s.price * 0.95).toFixed(2);
-  const support = (s.price * 0.92).toFixed(2);
-  const pressure = (s.price * 1.08).toFixed(2);
-  // 每只股票独立卡片:表头行 + 数据行(同一横滑容器)+ 详情卡
-  // 策略 4 块(逻辑/资金/关键位/操作)——仅在用户填了字段时渲染,旧股票无字段则不显示
-  const hasStrategy = s.logic || s.capital || (s.keyLevels && (s.keyLevels.support || s.keyLevels.pressure)) || s.plan;
-  let strategyBlocks = '';
-  if (hasStrategy) {
-    const fmtKL = () => {
-      if (!s.keyLevels) return '--';
-      const parts = [];
-      if (s.keyLevels.support != null) parts.push('支撑' + s.keyLevels.support);
-      if (s.keyLevels.pressure != null) parts.push('压力' + s.keyLevels.pressure);
-      if (s.keyLevels.low != null) parts.push('今日低点' + s.keyLevels.low);
-      if (s.keyLevels.buyBelow != null) parts.push('买在' + s.keyLevels.buyBelow + '下');
-      return parts.join(' / ') || '--';
-    };
-    const fmtPlan = () => {
-      // 加粗股数+金额:用 1000-2000股 / 3500-7000元 这种数字模式
-      return esc(s.plan || '--').replace(/(\d[\d,\-]*股)/g, '<b>$1</b>').replace(/(¥[\d\.]+|[\d\.]+元)/g, '<span class="wl-num">$1</span>');
-    };
-    const blockLogic = s.logic ? `<div class="detail-block"><div class="detail-h detail-h-custom">📐 逻辑</div><div class="detail-line">${esc(s.logic)}</div></div>` : '';
-    const blockCapital = s.capital ? `<div class="detail-block"><div class="detail-h detail-h-custom">💰 资金</div><div class="detail-line">${esc(s.capital)}</div></div>` : '';
-    const blockKey = s.keyLevels && (s.keyLevels.support || s.keyLevels.pressure) ? `<div class="detail-block"><div class="detail-h detail-h-custom">🎯 关键位</div><div class="detail-line">${esc(fmtKL())}</div></div>` : '';
-    // ⚡ 操作 + 建议 + 风险 —— 同一框架,占整行(grid-column:1/-1)与上面 4 块同宽
-    const adviceName = deriveAdvice(s.pct, atds, riskTone).name;
-    const planLine = s.plan ? `<div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content">${fmtPlan()}</span></div>` : `<div class="par-line"><span class="par-tag par-tag-plan">操作</span><span class="par-content par-empty">未设置操作 · 仅系统观测</span></div>`;
-    const adviceLine = `<div class="par-line"><span class="par-tag par-tag-advice">建议</span><span class="par-content">${esc(adviceText)}<span class="advice-tag-mini advice-${adviceTone}">${esc(adviceName)}</span></span></div>`;
-    const riskListHtml = riskLines.map(l => '<li>' + esc(l) + '</li>').join('');
-    const riskLine = `<div class="par-risk"><span class="par-tag par-tag-risk">风险</span><span class="par-risk-content"><span class="risk-tag risk-${riskTone}">${esc(riskName)}</span><ul>${riskListHtml}</ul></span></div>`;
-    const blockPlanAdviceRisk = `<div class="detail-block detail-block-par">
-      <div class="detail-h detail-h-custom">⚡ 操作 + 建议 + 风险</div>
-      <div class="par-body">${planLine}${adviceLine}${riskLine}</div>
-    </div>`;
-    strategyBlocks = '<div class="detail-grid detail-grid-strategy">' + blockLogic + blockCapital + blockKey + blockPlanAdviceRisk + '</div>';
-  }
-  // 个股今日执行策略(原全局 todayStrategy 改为按个股分发,仅盘前)——图片风格:策略/价格/仓位 + 止损/止盈/目标 + 风险
-  const st = s.strategy || {};
-  const hasStrategyTable = !!(st.entryStrategy || st.entryPrice || st.entryPosition || st.entryNote || st.stopLoss || st.takeProfit || st.target || st.risk);
-  let todayStrategyBlock = '';
-  if (hasStrategyTable) {
-    const cell = (v) => `<span>${esc(v || '--')}</span>`;
-    const cellNum = (v) => `<span class="wl-st-num">${esc(v || '--')}</span>`;
-    // 个股风控:par-line 列表式(与操作+建议+风险同款,手机端不再竖排)
-    const entry = '<div class="wl-st-line"><span class="par-tag par-tag-plan">入场</span><span class="wl-st-content">策略:' + esc(st.entryStrategy || '--') + ' · 价格:' + cellNum(st.entryPrice) + ' · 仓位:' + esc(st.entryPosition || '--') + '</span></div>';
-    const stop = '<div class="wl-st-line"><span class="par-tag par-tag-advice">风控</span><span class="wl-st-content">止损:' + esc(st.stopLoss || '--') + ' · 止盈:' + esc(st.takeProfit || '--') + ' · 目标:' + cellNum(st.target) + '</span></div>';
-    const risk = '<div class="wl-st-line wl-st-risk-line"><span class="par-tag par-tag-risk">风险</span><span class="wl-st-content">' + esc(st.risk || '--') + '</span></div>';
-    const note = st.entryNote ? '<div class="wl-st-line"><span class="par-tag par-tag-plan">入场说明</span><span class="wl-st-content">' + esc(st.entryNote) + '</span></div>' : '';
-    todayStrategyBlock = '<div class="wl-st-table">' +
-      '<div class="wl-st-title">🎯 个股风控</div>' +
-      entry + stop + note + risk +
-      '</div>';
-  }
-  // tags 徽标(从 config.tags 透传)
-  const tagsHtml = (Array.isArray(s.tags) && s.tags.length)
-    ? s.tags.map(t => '<span class="wl-tag">' + esc(t) + '</span>').join('')
-    : '';
-  const categoryHtml = s.category ? '<span class="wl-cat">' + esc(s.category) + '</span>' : '';
+  const p = _plan(s);
+  const conf = _confidence(s, p);
+  const pos = _positionPct(p);
+  const t = s.tech || {};
+  const ff = s.fundFlow || {};
+  const price = Number(s.price) || 0;
+  const rrTone = _rrTone(p.rr);
+  const confTone = conf.total >= 75 ? 'good' : conf.total >= 60 ? 'ok' : 'warn';
+  const statusLabel = conf.total >= 75 ? '可交易' : conf.total >= 60 ? '轻仓试错' : '观察';
+  const priority = conf.total >= 75 && p.rr >= 2 ? '★★★' : conf.total >= 60 ? '★★' : '★';
+  const f2 = (x) => (x == null || isNaN(x) ? '--' : Number(x).toFixed(2));
+  const sign = (x) => (x == null ? '' : x > 0 ? '+' : '');
+  // 开盘预期(基于昨收/今开/均价)
+  const gapPct = (s.prevClose > 0 && s.open > 0) ? ((s.open - s.prevClose) / s.prevClose * 100) : null;
+  const openExpect = gapPct == null ? '--' : (gapPct >= 2 ? '高开' + gapPct.toFixed(1) + '%·防冲高回落' : gapPct <= -2 ? '低开' + gapPct.toFixed(1) + '%·看承接' : '平开±2%·看方向');
+  // 证伪条件(真实,基于关键位)
+  const falsify = p.sup ? ('跌破' + f2(p.sup.price) + '(' + (p.sup.label || '强支撑') + ')且无法收回 → 逻辑失效') : '跌破近期低点且无法收回 → 逻辑失效';
+
+  // 紧凑表头行(常显)
   const headRow = `<div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
     <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>ATDS</b></span>
-    <span class="wl-cell wl-cell-sig"><b>策略信号</b></span>
+    <span class="wl-cell wl-cell-atds"><b>置信度</b></span>
+    <span class="wl-cell wl-cell-sig"><b>盈亏比</b></span>
     <span class="wl-cell wl-cell-act"><b>操作</b></span>
   </div>`;
-  const main = `<div class="wl-stock-row" data-code="${esc(code)}">
+  const rrTxt = p.rr >= 1.5 ? (p.rr.toFixed(2) + ' ✓') : p.rr.toFixed(2);
+  const techJson = (t && Object.keys(t).length) ? JSON.stringify(t).replace(/"/g, '&quot;') : 'null';
+  const ffJson = (ff && ff.d1 != null) ? JSON.stringify(ff).replace(/"/g, '&quot;') : 'null';
+  const main = `<div class="wl-stock-row" data-code="${esc(code)}" data-tech="${techJson}" data-ff="${ffJson}">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><span class="wl-name">${esc(s.name)}</span><span class="wl-code">${esc(code)}</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price ${cls}">${fmtNum(s.price)}</span></span>
+    <span class="wl-cell wl-cell-price"><span class="price ${cls}">${fmtNum(price)}</span></span>
     <span class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</span>
     <span class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</span>
-    <span class="wl-cell wl-cell-atds">${atds}</span>
-    <span class="wl-cell wl-cell-sig"><span class="sig sig-${sig.tone}">${esc(sig.name)}</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">全面分析</button><button class="wl-btn wl-btn-del" data-code="${esc(code)}" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-${confTone}">${conf.total}</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-${rrTone}">${rrTxt}</span></span>
+    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="${esc(code)}" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div>`;
-  const meta = (categoryHtml || tagsHtml) ? `<div class="wl-meta">${categoryHtml}${tagsHtml}</div>` : '';
-  // 每只个股下方的"今日执行策略"卡片(盘前 per-stock 内置,字段空不渲染)
-  const perStockTS = report.meta && report.meta.type === 'premarket' ? renderPerStockTodayStrategy(s) : '';
-  // 关键修复: perStockTS 移到 wl-detail 外,避免 div 嵌套不平衡
-  // (renderPerStockTodayStrategy 返回 <div class="card ts-stock-card">...</div>,嵌入到 wl-detail 会让 watchlist-card div 延伸到所有 ts-stock-card)
+
+  // 关键位 + 多周期 (真实)
+  const supStrong = _supStrong(s), preStrong = _preStrong(s);
+  const supList = Array.isArray(t.supports) ? t.supports : [];
+  const preList = Array.isArray(t.pressures) ? t.pressures : [];
+  const supHtml = supList.slice(0, 3).map(x => `<span class="lv lv-s ${x.weight === 'strong' ? 'lv-strong' : ''}">${f2(x.price)}<i>${esc(x.label)}</i></span>`).join('') || '<span class="lv">--</span>';
+  const preHtml = preList.slice(0, 3).map(x => `<span class="lv lv-p ${x.weight === 'strong' ? 'lv-strong' : ''}">${f2(x.price)}<i>${esc(x.label)}</i></span>`).join('') || '<span class="lv">--</span>';
+  const gapHtml = t.gapUp ? ('向上缺口 ' + f2(t.gapUp.level)) : (t.gapDown ? ('向下缺口 ' + f2(t.gapDown.level)) : '无近期缺口');
+
+  // 资金量能 (真实)
+  const fundHtml = `<span>主力净流入 <b class="${(ff.d1 || 0) >= 0 ? 'up' : 'down'}">${sign(ff.d1)}${ff.d1 != null ? ff.d1.toFixed(2) : '--'}亿</b></span>
+    <span>3日 <b class="${(ff.d3 || 0) >= 0 ? 'up' : 'down'}">${sign(ff.d3)}${ff.d3 != null ? ff.d3.toFixed(2) : '--'}亿</b></span>
+    <span>5日 <b class="${(ff.d5 || 0) >= 0 ? 'up' : 'down'}">${sign(ff.d5)}${ff.d5 != null ? ff.d5.toFixed(2) : '--'}亿</b></span>`;
+  const volHtml = `<span>量比 <b>${Number(s.volRatio) || '--'}</b></span>
+    <span>换手 <b>${esc(s.turnover || '--')}%</b></span>
+    <span>振幅 <b>${Number(s.amplitude) ? s.amplitude.toFixed(2) + '%' : '--'}</b></span>
+    <span>分歧 <b>${esc(_divergence(s))}</b></span>`;
+
+  // 交易计划表 (方案A/B/C,真实价位 + 盈亏比 + 仓位)
+  const planBEntry = preStrong ? preStrong.price : (price * 1.05);
+  const planBStop = planBEntry * 0.97, planBTarget = planBEntry * 1.08;
+  const planBRR = (planBTarget - planBEntry) / (planBEntry - planBStop);
+  const planRow = (name, trig, entry, stop, tgt, rr, tone) => `<tr>
+    <td class="tp-name">${name}</td>
+    <td class="tp-trig">${esc(trig)}</td>
+    <td class="tp-num">${f2(entry)}</td>
+    <td class="tp-num stop">${f2(stop)}</td>
+    <td class="tp-num">${f2(tgt)}</td>
+    <td class="tp-rr rr-${tone}">${rr.toFixed(2)}</td>
+  </tr>`;
+  const planTable = `<table class="tp-table">
+    <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
+    ${planRow('A 回踩低吸', '回踩' + f2(p.entry) + '企稳', p.entry, p.stop, p.target, p.rr, _rrTone(p.rr))}
+    ${planRow('B 突破确认', '放量突破' + f2(planBEntry), planBEntry, planBStop, planBTarget, planBRR, _rrTone(planBRR))}
+    ${planRow('C 日内做T', '区间[' + f2(s.low) + ',' + f2(s.high) + ']', price, f2(s.low || p.stop), f2(s.high || planBTarget), (s.low && s.high ? ((s.high - price) / (price - s.low)) : p.rr), _rrTone(s.low && s.high ? ((s.high - price) / Math.max(price - s.low, 0.01)) : p.rr))}
+  </table>`;
+  // 现价追入校验
+  const nowWarn = p.rrNow < 1.5
+    ? '<div class="tp-warn">⚠ 现价直接买入盈亏比 ' + p.rrNow.toFixed(2) + '(<1.5),不合格 —— 等待回踩至 ' + f2(p.entry) + ' 再执行,当前仅观察。</div>'
+    : '<div class="tp-warn tp-ok">现价盈亏比 ' + p.rrNow.toFixed(2) + ',可执行计划。</div>';
+
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
-    ${meta}
-    ${strategyBlocks}
-    ${todayStrategyBlock}
+    <div class="dc-head">
+      <span class="dc-pri">${priority}</span>
+      <span class="dc-name">${esc(s.name)} <i>${esc(code)}</i></span>
+      <span class="dc-status ${confTone === 'good' ? 'up' : confTone === 'ok' ? '' : 'down'}">${statusLabel}</span>
+      <span class="dc-conf">置信度 ${conf.total}</span>
+      <span class="dc-rr rr-${rrTone}">盈亏比 ${p.rr.toFixed(2)}</span>
+      <span class="dc-time">${esc(report.meta && report.meta.generatedAt || '')}</span>
+    </div>
+    <div class="dc-tags">${s.category ? '<span class="dc-tag">' + esc(s.category) + '</span>' : ''}${(s.tags || []).map(t => '<span class="dc-tag">' + esc(t) + '</span>').join('')}<span class="dc-tag">催化:${esc(_catalyst(s))}</span><span class="dc-tag">阶段:${esc(_ferment(s))}</span><span class="dc-tag">地位:${esc(_boardStatus(s))}</span></div>
+    ${s.logic ? '<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">' + esc(s.logic) + '</div></div>' : ''}
+    <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
+      <div class="dc-grid2">
+        <div class="dc-line">${fundHtml}</div>
+        <div class="dc-line">${volHtml}</div>
+      </div>
+    </div>
+    <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
+      <div class="dc-line">支撑 ${supHtml}</div>
+      <div class="dc-line">压力 ${preHtml}</div>
+      <div class="dc-line">缺口 ${esc(gapHtml)} · ATR ${f2(t.atr14)} · ${esc(_trendLabel(t.trend))} · ${esc(_weeklyLabel(t.weeklyTrend))} · 开盘 ${esc(openExpect)}</div>
+    </div>
+    <div class="dc-block"><div class="dc-h">📋 今日交易计划（量化）</div>${planTable}${nowWarn}
+      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>（单股≤15%、单题材≤30%）</div>
+    </div>
+    <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
+      <div class="dc-line">证伪条件：${esc(falsify)}</div>
+      <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
+      <div class="dc-line">置信度构成：趋势${conf.trendScore}/30 + 资金${conf.fundScore}/25 + 题材${conf.themeScore}/20 + 关键位${conf.keyScore}/15 + 盈亏比${conf.rrScore}/10</div>
+    </div>
+    <div class="dc-block dc-review"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+      <div class="dc-line">关键位验证：最高${f2(s.high)} ${(preStrong && s.high >= preStrong.price) ? '触及压力' + f2(preStrong.price) : '未触及压力'} · 最低${f2(s.low)} ${(supStrong && s.low <= supStrong.price) ? '触及支撑' + f2(supStrong.price) : '未触及支撑'}</div>
+      <div class="dc-line">资金验证：主力净流入当日${sign(ff.d1)}${ff.d1 != null ? ff.d1.toFixed(2) : '--'}亿，${(ff.d1 || 0) >= 0 ? '符合做多预期' : '与做多预期背离，需复核'}</div>
+      <div class="dc-line">策略执行/归因：待人工复盘（历史胜率、平均盈亏、最大回撤随每日数据累计，未满样本前不展示）</div>
+    </div>
   </div>`;
-  return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}${perStockTS}</div>`;
+  return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;
 }
 
 function buildStockModal(s) {

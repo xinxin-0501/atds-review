@@ -48,6 +48,11 @@ async function fetchTencent(codes) {
       const f = m[1].split('~');
       out.push({
         name: f[1], code: f[2], price: parseFloat(f[3]), pct: parseFloat(f[32]),
+        prevClose: parseFloat(f[4]) || 0, open: parseFloat(f[5]) || 0,
+        high: parseFloat(f[33]) || 0, low: parseFloat(f[34]) || 0,
+        amplitude: parseFloat(f[43]) || 0, volRatio: parseFloat(f[49]) || 0,
+        avgPrice: parseFloat(f[51]) || 0,
+        floatMcap: parseFloat(f[44]) || 0, totalMcap: parseFloat(f[45]) || 0,
         amountWan: parseFloat(f[37]) || 0, turnover: parseFloat(f[38])
       });
     }
@@ -808,9 +813,67 @@ function calcTechFromKline(arr) {
   const range60 = hi60 > lo60 ? (last - lo60) / (hi60 - lo60) * 100 : 50;
   const pct5 = n >= 6 ? (last / closes[n - 6] - 1) * 100 : 0;
   const r2 = (x) => (x == null ? null : Math.round(x * 100) / 100);
+
+  // ATR14(真实平均波幅,用于校准止损距离)
+  let atr14 = null;
+  if (n >= 15) {
+    const trs = [];
+    for (let i = n - 14; i < n; i++) {
+      const h = parseFloat(arr[i][3]), l = parseFloat(arr[i][4]), pc = parseFloat(arr[i - 1][2]);
+      if ([h, l, pc].some(x => isNaN(x))) continue;
+      trs.push(Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc)));
+    }
+    if (trs.length) atr14 = trs.reduce((a, b) => a + b, 0) / trs.length;
+  }
+
+  // 前高/前低(近60日,不含今日)——支撑压力的真实依据
+  const highs60 = arr.slice(-60, -1).map(k => parseFloat(k[3])).filter(x => !isNaN(x));
+  const lows60 = arr.slice(-60, -1).map(k => parseFloat(k[4])).filter(x => !isNaN(x));
+  const high60 = highs60.length ? Math.max(...highs60) : null;
+  const low60 = lows60.length ? Math.min(...lows60) : null;
+
+  // 缺口锚点(今日相对昨日)
+  let gapUp = null, gapDown = null;
+  if (n >= 2) {
+    const prevH = parseFloat(arr[n - 2][3]), prevL = parseFloat(arr[n - 2][4]);
+    const curL = parseFloat(arr[n - 1][4]), curH = parseFloat(arr[n - 1][3]);
+    if (!isNaN(prevH) && !isNaN(curL) && curL > prevH) gapUp = { level: r2(prevH), filled: false };
+    else if (!isNaN(prevL) && !isNaN(curH) && curH < prevL) gapDown = { level: r2(prevL), filled: false };
+  }
+
+  // 支撑/压力(强弱 + 依据)——均线 + 前高前低 + 整数关口,全部真实计算
+  const supports = [], pressures = [];
+  const addLvl = (price, label, weight) => {
+    if (price == null || isNaN(price)) return;
+    const item = { price: r2(price), label, weight };
+    if (price < last) supports.push(item); else if (price > last) pressures.push(item);
+  };
+  addLvl(ma5, 'MA5', 'weak'); addLvl(ma10, 'MA10', 'weak');
+  addLvl(ma20, 'MA20', 'strong'); addLvl(ma60, 'MA60', 'strong');
+  addLvl(low60, '近60日前低', 'strong'); addLvl(high60, '近60日前高', 'strong');
+  [10, 50, 100, 200, 500].forEach(step => {
+    const up = Math.ceil(last / step) * step, down = Math.floor(last / step) * step;
+    if (up > last) addLvl(up, '整数关口', 'weak');
+    if (down < last && down > 0) addLvl(down, '整数关口', 'weak');
+  });
+  supports.sort((a, b) => b.price - a.price);
+  pressures.sort((a, b) => a.price - b.price);
+
+  // 多周期趋势:周线(5日聚合)+ 日线
+  const weeklyCloses = [];
+  for (let i = 0; i < n; i += 5) weeklyCloses.push(closes[i]);
+  const wkLast = weeklyCloses[weeklyCloses.length - 1];
+  const wk5 = weeklyCloses.length >= 5 ? weeklyCloses.slice(-5).reduce((a, b) => a + b, 0) / 5 : null;
+  const weeklyTrend = (wkLast != null && wk5 != null) ? (wkLast > wk5 * 1.005 ? 'up' : wkLast < wk5 * 0.995 ? 'down' : 'flat') : 'flat';
+
   return {
     price: r2(last), ma5: r2(ma5), ma10: r2(ma10), ma20: r2(ma20), ma60: r2(ma60),
     ma20Slope, trend,
+    atr14: r2(atr14),
+    high60: r2(high60), low60: r2(low60),
+    gapUp, gapDown,
+    supports, pressures,
+    weeklyTrend,
     volRatio: volRatio != null ? Math.round(volRatio * 100) / 100 : null,
     kdjGold,
     bias10: ma10 ? Math.round((last / ma10 - 1) * 1000) / 10 : null,
@@ -818,6 +881,25 @@ function calcTechFromKline(arr) {
     range60: Math.round(range60), pct5: Math.round(pct5 * 100) / 100
   };
 }
+// 个股主力资金流(东财 fflow/kline):主力净流入 当日/3日/5日,单位亿元
+async function fetchStockFundFlow(code) {
+  try {
+    const num = String(code).replace(/^(sh|sz|bj)/, '');
+    const mkt = String(code).charAt(0) === '6' ? '1' : '0';
+    const url = `https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid=${mkt}.${num}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5`;
+    const ac = new AbortController();
+    const timer = setTimeout(() => ac.abort(), 8000);
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, signal: ac.signal }).finally(() => clearTimeout(timer));
+    const j = await res.json();
+    const kl = (j && j.data && j.data.klines) || [];
+    if (!kl.length) return null;
+    const vals = kl.map(line => parseFloat((line.split(',')[1]) || 0) || 0);  // f52 主力净流入(元)
+    const sum = k => vals.slice(-k).reduce((a, b) => a + b, 0);
+    const yi = (v) => Math.round(v / 1e6) / 100;  // 元 → 亿元(2位)
+    return { d1: yi(sum(1)), d3: yi(sum(3)), d5: yi(sum(5)) };
+  } catch (e) { return null; }
+}
+
 async function enrichWatchlistTech(list) {
   const arr = await Promise.all((list || []).map(async (s) => {
     if (!s || !s.code) return s;
@@ -827,6 +909,10 @@ async function enrichWatchlistTech(list) {
       const t = calcTechFromKline(kl);
       if (t) s.tech = t;
     } catch (e) { /* 技术画像缺失时渲染层降级为通用建议 */ }
+    try {
+      const ff = await fetchStockFundFlow(s.code);
+      if (ff) s.fundFlow = ff;
+    } catch (e) { /* 资金流缺失不阻塞 */ }
     return s;
   }));
   return arr;
@@ -1698,6 +1784,10 @@ async function main() {
       pct: t.pct,
       amount: fmtAmount(t.amountWan),
       turnover: String(t.turnover),
+      // 真实行情扩展字段
+      prevClose: t.prevClose, open: t.open, high: t.high, low: t.low,
+      amplitude: t.amplitude, volRatio: t.volRatio, avgPrice: t.avgPrice,
+      floatMcap: t.floatMcap, totalMcap: t.totalMcap,
       // 透传策略字段（可缺失，渲染层判空）
       category: w.category || '',
       tags: Array.isArray(w.tags) ? w.tags : [],
@@ -1750,8 +1840,8 @@ async function main() {
   const techAnalysis = buildTechAnalysis(klineMap, config.indices);
   const playbook = derivePlaybook(zt.list, dragonPool);
 
-  // 盘前:为观察池补技术画像(MA/量比/KDJ/趋势),驱动"建议"按五类情形给出可执行结论
-  if (isPre && watchlist.length) {
+  // 观察池技术画像 + 主力资金流(MA/ATR/关键位/多周期/资金),全部真实计算
+  if (watchlist.length) {
     const t0 = Date.now();
     watchlist = await enrichWatchlistTech(watchlist);
     console.log('观察池技术画像:', watchlist.filter(s => s.tech).length + '/' + watchlist.length + ' 只 (' + (Date.now() - t0) + 'ms)');
