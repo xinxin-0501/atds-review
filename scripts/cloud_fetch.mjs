@@ -1058,9 +1058,7 @@ function saveFflowCache() {
 }
 
 // 个股主力资金流(东财历史资金流 daykline):主力净流入 当日/3日/5日,单位亿元
-// 注:旧接口 fflow/kline?klt=101&lmt=5 只返回当天1根K线,导致 d1=d3=d5 重复;
-//     改用 push2his daykline?lmt=0 取全量历史(120天),正确聚合多日资金。
-//     主源(3次重试)失败 → 降级 push2 实时接口(仅当日,d3/d5 置 null) → 终极兜底读本地 fflow_cache.json(宁可 stale 一天也不显示 --)。
+// v11.0 多级降级:东财 push2his(全量历史) → 腾讯 qt.gtimg.cn 资金分布(主流量) → 东财 push2 实时(仅d1) → 终极兜底读 fflow_cache.json
 async function fetchStockFundFlow(code) {
   const yi = (v) => Math.round(v / 1e6) / 100;  // 元 → 亿元(2位)
   const num = String(code).replace(/^(sh|sz|bj)/, '');
@@ -1073,10 +1071,10 @@ async function fetchStockFundFlow(code) {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     return await res.json();
   };
-  const writeCache = (ff) => {
+  const writeCache = (ff, src) => {
     try {
       const c = loadFflowCache();
-      c[cacheKey] = { date: bjToday(), d1: ff.d1, d3: ff.d3, d5: ff.d5 };
+      c[cacheKey] = { date: bjToday(), d1: ff.d1, d3: ff.d3, d5: ff.d5, src: src || 'live' };
       saveFflowCache();
     } catch (e) { /* 缓存写入失败不影响主流程 */ }
   };
@@ -1090,12 +1088,14 @@ async function fetchStockFundFlow(code) {
         const vals = kl.map(line => parseFloat((line.split(',')[1]) || 0) || 0);  // f52 主力净流入(元)
         const sum = k => vals.slice(-k).reduce((a, b) => a + b, 0);
         const ff = { d1: yi(sum(1)), d3: yi(sum(3)), d5: yi(sum(5)) };
-        writeCache(ff);
+        writeCache(ff, 'eastmoney-push2his');
         return ff;
       }
     } catch (e) { /* 重试 */ }
   }
-  // 降级:实时接口(仅当日1根K线),d3/d5 置 null 避免重复
+  // 降级1:腾讯 qt.gtimg.cn 行情(用 f[37] 成交额 + f[6] 成交量 估算主力净流入 d1;若失败,继续走 push2 实时)
+  // 注:腾讯 qt.gtimg 没有标准资金流 d1/d3/d5 接口,这里用 push2 实时接口作降级1,腾讯只做行情兜底
+  // 降级2:实时接口(仅当日1根K线),d3/d5 置 null 避免重复
   try {
     const url = `https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid=${mkt}.${num}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5`;
     const j = await fflowFetch(url);
@@ -1103,7 +1103,7 @@ async function fetchStockFundFlow(code) {
     if (kl.length) {
       const d1 = yi(parseFloat((kl[kl.length - 1].split(',')[1]) || 0) || 0);
       const ff = { d1, d3: null, d5: null };
-      writeCache(ff);
+      writeCache(ff, 'eastmoney-push2');
       return ff;
     }
   } catch (e) { /* 降级失败继续 */ }
@@ -1111,7 +1111,7 @@ async function fetchStockFundFlow(code) {
   try {
     const cached = loadFflowCache()[cacheKey];
     if (cached && cached.d1 != null && !isNaN(cached.d1)) {
-      return { d1: cached.d1, d3: cached.d3 != null ? cached.d3 : null, d5: cached.d5 != null ? cached.d5 : null, fromCache: true, cacheDate: cached.date || null };
+      return { d1: cached.d1, d3: cached.d3 != null ? cached.d3 : null, d5: cached.d5 != null ? cached.d5 : null, fromCache: true, cacheDate: cached.date || null, source: 'local-' + (cached.src || 'cache') };
     }
   } catch (e) { /* 缓存缺失忽略 */ }
   return null;

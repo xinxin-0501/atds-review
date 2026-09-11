@@ -1718,9 +1718,10 @@ function renderWatchlist(report) {
         '<button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button>' +
         '<button class="wl-tool" onclick="handleSearchStock()">个股分析</button>' +
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
+        '<button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button>' +
       '</div>' +
     '</div>' +
-    '<div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列</div>' +
+    '<div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div>' +
     '<div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll">' + stocks + '</div></div></div>' +
     '<div class="wl-details"></div>' +
     '</div>';
