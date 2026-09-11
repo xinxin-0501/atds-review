@@ -1285,7 +1285,7 @@ async function fetchLhbDetail(code) {
       else if (name.indexOf('沪股通') >= 0 || name.indexOf('深股通') >= 0) north += net;
       else youzi += net;
     }
-    const yi = v => Math.round(v / 1e4) / 100; // 元 → 亿元(2位)
+    const yi = v => Math.round(v / 1e6) / 100; // 元 → 亿元(÷1e8,2位;原 /1e4 致 100x 放大,与客户端 shared_client.js fetchLhbDetailF 同基数)
     // 资金属性(席位关键词归类):机构/游资/北向/混合
     const attr = [];
     if (inst > 0) attr.push('机构');
