@@ -3091,22 +3091,31 @@ function removeWatchlistRow(code){
   try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');if(wd[code]){delete wd[code];localStorage.setItem('atds_watchlist_data',JSON.stringify(wd));}}catch(e){console.warn('[removeWatchlistRow] atds_watchlist_data 删除失败:',e.message);}
   try{var h=localStorage.getItem("atds_watchlist_hidden");var hidden=h?JSON.parse(h):[];if(hidden.indexOf(code)<0)hidden.push(code);localStorage.setItem("atds_watchlist_hidden",JSON.stringify(hidden));}catch(e){console.warn('[removeWatchlistRow] atds_watchlist_hidden 写入失败:',e.message);}
 }
-// v11.0:强制重置本地缓存(清空所有 ATDS 本地状态,强制从云端重新拉取);用户自救急救按钮
+// v11.2 二次确认弹窗:防止误点导致本地数据丢失
+// ⚠️ 不再清空 atds_watchlist(手动加股列表),只清缓存——重置后用户新增的股仍在(用户明确诉求)
 function resetLocalCache(){
-  var KEYS=['atds_watchlist','atds_watchlist_data','atds_watchlist_hidden','atds_kline_cache','atds_ff_cache','atds_events_cache','atds_trade_status','atds_shadow','atds_qr_code'];
+  // 缓存类(可清):data caches + 隐藏标记 + 交易状态 + 模拟跟踪 + 二维码
+  var CACHE_KEYS=['atds_watchlist_data','atds_watchlist_hidden','atds_kline_cache','atds_ff_cache','atds_events_cache','atds_trade_status','atds_shadow','atds_qr_code'];
+  // 保留类:atds_watchlist(手动加股列表)、sim_track_*(其他模块的独立 checkbox 状态)
   // 额外清理 sim_track_* 单独的 checkbox 状态
   var simKeys=[];
   try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sim_track_')===0)simKeys.push(k);}}catch(e){}
   var removed=[];
-  KEYS.forEach(function(k){try{localStorage.removeItem(k);removed.push(k);}catch(e){}});
+  CACHE_KEYS.forEach(function(k){try{localStorage.removeItem(k);removed.push(k);}catch(e){}});
+  // sim_track_* 也清掉(模拟跟踪与重置后的最新价对齐)
   simKeys.forEach(function(k){try{localStorage.removeItem(k);removed.push(k);}catch(e){}});
-  console.log('[resetLocalCache] 已清空 keys:', removed.join(', '));
-  if(typeof showToast==='function'){showToast('已重置本地缓存,刷新页面强制从云端重新拉取','ok');}
+  // 读取 atds_watchlist 用于日志
+  var watchlistCount=0;
+  try{var w=JSON.parse(localStorage.getItem('atds_watchlist')||'[]');watchlistCount=Array.isArray(w)?w.length:0;}catch(e){}
+  console.log('[resetLocalCache] 已清空 keys:', removed.join(', '), '· 保留 atds_watchlist(', watchlistCount, '只手动加股)');
+  if(typeof showToast==='function'){showToast('已重置本地缓存('+removed.length+' 项),保留 '+watchlistCount+' 只手动加股,刷新页面强制从云端重新拉取','ok');}
   setTimeout(function(){try{location.reload();}catch(e){}},800);
 }
-// 二次确认弹窗:防止误点导致本地数据丢失
+// v11.2 二次确认弹窗:明确告知用户保留哪些数据
 function confirmResetCache(){
-  var msg='⚠️ 确定要重置本地缓存吗?\n\n将清空:\n• 自选股列表(手动添加的股)\n• 隐藏标记(被标记删除的股)\n• 资金/事件/K线缓存\n• 交易状态/模拟跟踪\n• 二维码\n\n云端配置和 review JSON 不受影响。\n刷新页面后将强制从云端重新拉取所有数据。';
+  var watchlistCount=0;
+  try{var w=JSON.parse(localStorage.getItem('atds_watchlist')||'[]');watchlistCount=Array.isArray(w)?w.length:0;}catch(e){}
+  var msg='⚠️ 确定要重置本地缓存吗?\n\n将清空:\n• 自选股数据缓存(手动加股的完整行情/资金/事件/龙虎榜)\n• 隐藏标记(被标记删除的股)\n• 资金/事件/K线缓存\n• 交易状态/模拟跟踪\n• 二维码\n\n✅ 保留:\n• 手动加股列表('+watchlistCount+' 只,刷新后从云端重新拉详情)\n• 云端配置和 review JSON\n\n刷新后将强制从云端重新拉取所有数据。';
   if(confirm(msg)){resetLocalCache();}
 }
 // 保存单只股票的全量数据(供退出重登时立即渲染,不依赖网络)
@@ -3213,14 +3222,11 @@ function restoreSavedWatchlist(){
     // 缓存渲染完成后强制刷新一次行情(价/涨跌)
     setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 200);
   }
-  // 再异步拉取最新行情/补齐缺失字段(CORS/失败不阻塞,缓存已可见)
+  // 再异步拉取最新行情/补齐缺失字段(v11.2:对所有股跑 enrich,不再跳过已在 DOM 的——v11.1 BUG:老股缓存丢失后字段永远空)
   (async function(){
     for(var i=0;i<extraCodes.length;i++){
       var rawCode=String(extraCodes[i]);
-      if(document.querySelector('.wl-stock[data-stock-code="'+rawCode+'"]')){
-        // 已有(来自缓存),跳过网络拉取(避免重复)
-        continue;
-      }
+      var existing=document.querySelector('.wl-stock[data-stock-code="'+rawCode+'"]');
       var c0=rawCode.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
       var data=null;
       try{
@@ -3262,7 +3268,25 @@ function restoreSavedWatchlist(){
         if(!data.category)data.category='题材';
         data.atds=atdsR;
       }catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'autoGenStrategy 失败:',e.message);}
-      addToWatchlistUI(data);
+      // v11.2:已在 DOM 的股不重复 addToWatchlistUI(避免丢滚动位置),改为更新 data-attribute + 重新生成 detail 内容
+      if(existing){
+        try{
+          var row=existing.querySelector('.wl-stock-row[data-code="'+rawCode+'"]');
+          if(row){
+            row.setAttribute('data-tech', data.tech?JSON.stringify(data.tech):'null');
+            row.setAttribute('data-ff', data.fundFlow?JSON.stringify(data.fundFlow):'null');
+            var priceEl=row.querySelector('.wl-cell-price .price');
+            if(priceEl){var cls=(Number(data.pct)||0)>=0?'up':'down';priceEl.className='price '+cls;priceEl.textContent=Number(data.price||0).toFixed(2);}
+            var pctEl=row.querySelector('.wl-cell-pct');
+            if(pctEl){var cls2=(Number(data.pct)||0)>=0?'up':'down';pctEl.className='wl-cell wl-cell-pct '+cls2;pctEl.textContent=((Number(data.pct)||0)>0?'+':'')+Number(data.pct||0).toFixed(2)+'%';}
+            var amtEl=row.querySelector('.wl-cell-amt');if(amtEl)amtEl.textContent=data.amount||'--';
+          }
+          var detail=existing.querySelector('.wl-detail[data-detail-code="'+rawCode+'"]');
+          if(detail){detail.innerHTML=buildDecisionCardHtml(data);}
+        }catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'DOM 更新失败:',e.message);}
+      }else{
+        addToWatchlistUI(data);
+      }
       saveWatchlistStockData(rawCode,data);
     }
   })();
