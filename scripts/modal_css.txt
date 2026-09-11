@@ -510,6 +510,25 @@
 .ev-loading{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:9px;background:#fff7e6;border:1px dashed #f59e0b;color:#b45309}
 .ev-loading::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;animation:ev-load-pulse 1s ease-in-out infinite}
 @keyframes ev-load-pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+/* v11.6 事件风险新结构:完整标题 + 巨潮原文链接 */
+.ev-item{display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:7px;font-size:10px;background:#f8f9fb;border:1px solid #e5e7eb;width:100%;box-sizing:border-box}
+.ev-item.ev-h{background:#fff0f0;border-color:#f0c0c0}
+.ev-item.ev-m{background:#fff8e1;border-color:#ffe0b2}
+.ev-item.ev-l{background:#fafafa;border-color:#e0e0e0}
+.ev-item.ev-red-alert{background:#fff0f0;border-color:#c62828;animation:ev-pulse 1.5s ease-in-out infinite}
+.ev-head{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:9px}
+.ev-type{font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,0.06);color:#333}
+.ev-item.ev-h .ev-type{background:#c62828;color:#fff}
+.ev-item.ev-m .ev-type{background:#e65100;color:#fff}
+.ev-dir{padding:1px 5px;border-radius:4px;font-weight:600;font-size:8px}
+.ev-dir-good{background:#e8f5e9;color:#2e7d32}
+.ev-dir-bad{background:#ffebee;color:#c62828}
+.ev-cnt{color:#6b7280;font-size:9px}
+.ev-src{opacity:.7;font-size:8px;color:#9ca3af}
+.ev-title{color:#1f2937;font-size:11px;line-height:1.45;font-weight:500;word-break:break-all}
+.ev-link{display:inline-flex;align-items:center;gap:2px;padding:3px 8px;border-radius:5px;background:#2563eb;color:#fff;font-size:9px;font-weight:600;text-decoration:none;align-self:flex-start;margin-top:2px}
+.ev-link:hover{background:#1d4ed8;text-decoration:none}
+.ev-link:active{background:#1e40af}
 
 /* ==================== 观察池 Pro 交互层样式(第十二轮) ==================== */
 /* 控制条 */
