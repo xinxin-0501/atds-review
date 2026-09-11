@@ -1329,6 +1329,39 @@ function saveEventsCache() {
     fs.writeFileSync(p, JSON.stringify(_eventsCache, null, 2), 'utf8');
   } catch (e) { console.error('saveEventsCache 失败:', e.message); }
 }
+// v11.3 龙虎榜缓存(服务端云端采集时落盘,客户端 fetchLhbDetailF 失败时跨域兜底读云端,解决"手动加股龙虎榜显示'近期未上榜'")
+let _lhbCache = null;
+function loadLhbCache() {
+  if (_lhbCache) return _lhbCache;
+  try {
+    const p = path.join(ROOT, 'data', 'lhb_cache.json');
+    if (fs.existsSync(p)) {
+      const j = JSON.parse(fs.readFileSync(p, 'utf8')) || {};
+      _lhbCache = { date: j.date || '', byCode: j.byCode || {} };
+    } else {
+      _lhbCache = { date: '', byCode: {} };
+    }
+  } catch (e) { _lhbCache = { date: '', byCode: {} }; }
+  return _lhbCache;
+}
+function saveLhbCache(watchlist) {
+  try {
+    if (!_lhbCache) _lhbCache = loadLhbCache();
+    const today = bjToday();
+    if (!_lhbCache.byCode || typeof _lhbCache.byCode !== 'object') _lhbCache.byCode = {};
+    if (Array.isArray(watchlist)) {
+      for (const s of watchlist) {
+        if (s && s.code && s.lhb && s.lhb.date) {
+          _lhbCache.byCode[String(s.code)] = s.lhb;
+        }
+      }
+    }
+    _lhbCache.date = today;
+    const p = path.join(ROOT, 'data', 'lhb_cache.json');
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, JSON.stringify(_lhbCache, null, 2), 'utf8');
+  } catch (e) { console.error('saveLhbCache 失败:', e.message); }
+}
 function bjToday() {
   return new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
 }
@@ -2497,6 +2530,8 @@ async function main() {
   }
   // 事件缓存落盘(巨潮公告类,供下次盘中读缓存,随 git 提交持久化)
   saveEventsCache();
+  // v11.3 龙虎榜缓存落盘(随 git 提交持久化,客户端 fetchLhbDetailF 失败时跨域兜底读云端)
+  saveLhbCache(watchlist);
 
   // 国际联动：盘中/盘前外盘快照
   const intlMkt = await fetchIntlMkt();
