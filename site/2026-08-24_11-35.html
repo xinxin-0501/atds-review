@@ -4628,6 +4628,19 @@ async function addFetchedToWatchlist(code){
       data.eventsStatus = { cninfo: ext[4].cninfoStatus || (ext[4].status === 'ok' ? 'ok' : 'fail'), srcUsed: ext[4].srcUsed || '' };
     }
   } catch (e) { console.warn('[addFetchedToWatchlist]', code, '并发拉取失败:', e.message); }
+  // v11.1:自动生成 strategy 字段(logic/capital/plan/strategy/todayStrategy)——手动加股不再缺"逻辑与催化"模块
+  try {
+    var atds = 70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
+    var auto = autoGenStrategy(data, Number(data.pct)||0, atds, Number(data.turnover)||0, data.tech);
+    data.logic = auto.logic;
+    data.capital = auto.capital;
+    data.keyLevels = auto.keyLevels;
+    data.plan = auto.plan;
+    data.strategy = auto.strategy;
+    data.todayStrategy = auto.todayStrategy;
+    if (!data.category) data.category = '题材';
+    data.atds = atds;
+  } catch (e) { console.warn('[addFetchedToWatchlist]', code, 'autoGenStrategy 失败:', e.message); }
   addToWatchlistUI(data);
   // 保存全量数据(供退出重登时立即渲染,不依赖网络)
   saveWatchlistStockData(String(code), data);
@@ -5460,21 +5473,48 @@ function restoreSavedWatchlist(){
         continue;
       }
       var c0=rawCode.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
+      var data=null;
       try{
         var res=await fetch("https://qt.gtimg.cn/q="+sc+rawCode);
         var buf=await res.arrayBuffer();var text=new TextDecoder("gbk").decode(buf);
-        var m=text.match(/="([^"]+)"/);if(!m)continue;
-        var f=m[1].split("~");if(f.length<40)continue;
-        var data={code:rawCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc,
-          prevClose:parseFloat(f[4])||0,open:parseFloat(f[5])||0,high:parseFloat(f[33])||0,low:parseFloat(f[34])||0,
-          amplitude:parseFloat(f[43])||0,volRatio:parseFloat(f[49])||0,avgPrice:parseFloat(f[51])||0,
-          floatMcap:parseFloat(f[44])||0,totalMcap:parseFloat(f[45])||0};
-        if(!data.name)continue;
-        try{var full=(c0==="6"||c0==="5")?("sh"+rawCode):((c0==="4"||c0==="8"||c0==="92")?("bj"+rawCode):("sz"+rawCode));var kl=await fetchKlineF(full,90);if(kl&&kl.length>=30){data.tech=calcDecisionTech(kl);}}catch(e){/* 缓存兜底 */}
-        try{var ff=await fetchStockFundFlowF(rawCode);if(ff)data.fundFlow=ff;}catch(e){}
-        addToWatchlistUI(data);
-        saveWatchlistStockData(rawCode,data);
-      }catch(e){}
+        var m=text.match(/="([^"]+)"/);
+        if(m){
+          var f=m[1].split("~");
+          if(f.length>=40){
+            data={code:rawCode,name:f[1],price:parseFloat(f[3]),pct:parseFloat(f[32])||0,amount:((parseFloat(f[37])||0)/10000).toFixed(1)+"亿",turnover:f[38]||"--",setcode:sc,
+              prevClose:parseFloat(f[4])||0,open:parseFloat(f[5])||0,high:parseFloat(f[33])||0,low:parseFloat(f[34])||0,
+              amplitude:parseFloat(f[43])||0,volRatio:parseFloat(f[49])||0,avgPrice:parseFloat(f[51])||0,
+              floatMcap:parseFloat(f[44])||0,totalMcap:parseFloat(f[45])||0};
+          }
+        }
+      }catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'qt.gtimg 拉行情失败:',e.message);}
+      // v11.1:即使行情拉不到,也要占位渲染(避免"退出重进消失");占位卡片显示"--"等基础信息
+      if(!data){
+        data={code:rawCode,name:rawCode+' (加载中)',price:0,pct:0,amount:'--亿',turnover:'--',setcode:sc,prevClose:0,open:0,high:0,low:0,amplitude:0,volRatio:0,avgPrice:0,floatMcap:0,totalMcap:0};
+      }
+      // 补齐缺失字段(K线/资金流/龙虎榜/事件/封单/分钟线)——v11.1 手机端缺模块根因
+      try{var full=(c0==="6"||c0==="5")?("sh"+rawCode):((c0==="4"||c0==="8"||c0==="92")?("bj"+rawCode):("sz"+rawCode));var kl=await fetchKlineF(full,90);if(kl&&kl.length>=30){data.tech=calcDecisionTech(kl);}}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'K线失败:',e.message);}
+      try{var ff=await fetchStockFundFlowF(rawCode);if(ff)data.fundFlow=ff;}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, '资金流失败:',e.message);}
+      try{var evRes=await fetchEventsF(rawCode);if(evRes){if(Array.isArray(evRes.events)&&evRes.events.length)data.events=evRes.events;data.eventsStatus={cninfo:evRes.cninfoStatus||(evRes.status==='ok'?'ok':'fail'),srcUsed:evRes.srcUsed||''};}}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, '事件失败:',e.message);}
+      try{var lhb=await fetchLhbDetailF(rawCode);if(lhb)data.lhb=lhb;}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, '龙虎榜失败:',e.message);}
+      try{var seal=await fetchLimitUpSealF(rawCode);if(seal)data.seal=seal;}catch(e){/* 封单缺失不警告 */}
+      try{
+        var extMin=await Promise.all([fetchMinuteTrendF(rawCode,'m60'), fetchMinuteTrendF(rawCode,'m15')]);
+        var f60=extMin[0],f15=extMin[1];
+        if(!f60)f60=approxMinFromTechF(data.tech);
+        if(!f15)f15=approxMinFromTechF(data.tech);
+        if(f60||f15)data.minTrend={m60:f60,m15:f15};
+      }catch(e){/* 分钟线缺失不警告 */}
+      // v11.1:补 autoGenStrategy 生成 logic/capital/plan/strategy/todayStrategy,手机端不再缺"逻辑与催化"模块
+      try{
+        var atdsR=70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
+        var autoR=autoGenStrategy(data,Number(data.pct)||0,atdsR,Number(data.turnover)||0,data.tech);
+        data.logic=autoR.logic;data.capital=autoR.capital;data.keyLevels=autoR.keyLevels;data.plan=autoR.plan;data.strategy=autoR.strategy;data.todayStrategy=autoR.todayStrategy;
+        if(!data.category)data.category='题材';
+        data.atds=atdsR;
+      }catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'autoGenStrategy 失败:',e.message);}
+      addToWatchlistUI(data);
+      saveWatchlistStockData(rawCode,data);
     }
   })();
 }
