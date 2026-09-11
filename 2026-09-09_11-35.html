@@ -5684,18 +5684,24 @@ async function fetchLimitUpSealF(code){
     return null;
   }catch(e){return null;}
 }
-/* 龙虎榜(东财):聚合机构/游资/北向净买,未上榜返回 null */
+/* 龙虎榜(东财):聚合机构/游资/北向净买,未上榜返回 null
+   v11.3 客户端多级降级:
+   - 主源:东财 RPT_BILLBOARD_DAILYDETAILSBUY/SELL(fetch 失败→null)
+   - 降级:读云端 data/lhb_cache.json(同源跨域,GitHub Pages CORS *),解决手动加股显示"近期未上榜"问题 */
 async function fetchLhbDetailF(code){
+  var num=String(code).replace(/^(sh|sz|bj)/,'');
+  var flt='(SECURITY_CODE%3D%22'+num+'%22)';
+  var base='https://datacenter-web.eastmoney.com/api/data/v1/get';
+  var hdr={'User-Agent':'Mozilla/5.0','Referer':'https://data.eastmoney.com/'};
   try{
-    var num=String(code).replace(/^(sh|sz|bj)/,'');
-    var flt='(SECURITY_CODE%3D%22'+num+'%22)';
-    var base='https://datacenter-web.eastmoney.com/api/data/v1/get';
-    var hdr={'User-Agent':'Mozilla/5.0','Referer':'https://data.eastmoney.com/'};
     var rb=await fetch(base+'?reportName=RPT_BILLBOARD_DAILYDETAILSBUY&columns=ALL&filter='+flt+'&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1',{headers:hdr});
     var rs=await fetch(base+'?reportName=RPT_BILLBOARD_DAILYDETAILSSELL&columns=ALL&filter='+flt+'&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1',{headers:hdr});
     var jb=await rb.json(),js=await rs.json();
     var rows=[].concat(((jb&&jb.result&&jb.result.data)||[]),((js&&js.result&&js.result.data)||[]));
-    if(!rows.length)return null;
+    if(!rows.length){
+      // 降级:读云端 lhb_cache.json
+      return await tryCloudLhbCache(num,code);
+    }
     var latest=rows.map(function(r){return r.TRADE_DATE;}).filter(Boolean).sort().slice(-1)[0]||'';
     var dayRows=rows.filter(function(r){return r.TRADE_DATE===latest;});
     var inst=0,north=0,youzi=0;
@@ -5706,7 +5712,7 @@ async function fetchLhbDetailF(code){
       else if(nm.indexOf('沪股通')>=0||nm.indexOf('深股通')>=0)north+=net;
       else youzi+=net;
     }
-    function yi(v){return Math.round(v/1e6)/100;}   // 元 → 亿(与 fflow 同基数;原 /1e4 致 100x 放大)
+    function yi(v){return Math.round(v/1e6)/100;}
     var attr=[];
     if(inst>0)attr.push('机构');
     if(north>0)attr.push('北向');
@@ -5721,6 +5727,22 @@ async function fetchLhbDetailF(code){
       }
     }
     return {date:latest.slice(0,10),explain:(dayRows[0]&&dayRows[0].EXPLANATION)||'',changeRate:(dayRows[0]&&dayRows[0].CHANGE_RATE)||0,inst:yi(inst),north:yi(north),youzi:yi(youzi),fundAttr:fundAttr,famousSeats:famousSeats};
+  }catch(e){
+    // 东财主源异常时也走云端兜底
+    try{return await tryCloudLhbCache(num,code);}catch(e2){return null;}
+  }
+}
+async function tryCloudLhbCache(num,rawCode){
+  try{
+    var r=await fetch('data/lhb_cache.json',{cache:'no-store'});
+    if(!r.ok)return null;
+    var j=await r.json();
+    var byCode=j&&j.byCode?j.byCode:{};
+    var entry=byCode[num]||byCode[rawCode]||byCode[String(num)]||byCode[String(rawCode)];
+    if(entry&&entry.date){
+      return Object.assign({},entry,{fromCache:true,cacheDate:j.date||null});
+    }
+    return null;
   }catch(e){return null;}
 }
 /* 事件日历(东财+巨潮):客户端 v11.0 多级降级
