@@ -4661,16 +4661,16 @@ function buildDecisionCardHtml(s){
   var evEmpty=(evStatus.cninfo==='fail')?'<span class="ev">数据源暂时不可用，请自行前往巨潮资讯网查询</span>':'<span class="ev">近期无重大事件公告</span>';
   // v11.6:事件最多显示 10 条(原 5);标题显示完整长度(截 28 字避免过长);有巨潮原文链接的附"查看原文"
   var evHtml=(evs&&evs.length)
-    ?evs.slice(0,10).map(function(e){var red=(e.level==='高'&&e.left>=-3&&e.left<=3)?' ev-red-alert':'';var cnt=e.left>0?(' T-'+e.left+'天'):(e.left<0?(' '+Math.abs(e.left)+'天前'):' 今日');var rawTitle=e.fullTitle||e.name||'';var showTitle=rawTitle?(rawTitle.length>28?(rawTitle.slice(0,28)+'…'):rawTitle):'';var linkHtml=e.cninfoUrl?'<a class="ev-link" href="'+escHtmlF(e.cninfoUrl)+'" target="_blank" rel="noopener" title="查看巨潮原文">查看原文↗</a>':'';return '<span class="ev-item ev-'+(e.level==='高'?'h':e.level==='中'?'m':'l')+' '+(e.dir==='利好'?'ev-good':e.dir==='利空'?'ev-bad':'')+red+'"><span class="ev-head"><span class="ev-type">'+escHtmlF(e.type)+'</span>'+(e.dir&&e.dir!=='中性'?'<span class="ev-dir ev-dir-'+(e.dir==='利好'?'good':'bad')+'">'+escHtmlF(e.dir)+'</span>':'')+'<span class="ev-cnt">'+cnt+'</span>'+(e.source?'<span class="ev-src">〔'+escHtmlF(e.source)+'〕</span>':'')+'</span><span class="ev-title" title="'+escHtmlF(e.detail||rawTitle||e.date||'')+'">'+escHtmlF(showTitle)+'</span>'+linkHtml+'</span>';}).join('')
+    ?evs.slice(0,10).map(function(e){var red=(e.level==='高'&&e.left>=-3&&e.left<=3)?' ev-red-alert':'';var cnt=e.left>0?(' T-'+e.left+'天'):(e.left<0?(' '+Math.abs(e.left)+'天前'):' 今日');var rawTitle=e.fullTitle||e.name||'';var showTitle=rawTitle?(rawTitle.length>28?(rawTitle.slice(0,28)+'…'):rawTitle):'';var linkHtml=e.cninfoUrl?'<a class="ev-link" href="'+escHtmlF(e.cninfoUrl)+'" target="_blank" rel="noopener" title="查看公告原文">查看原文↗</a>':'';return '<span class="ev-item ev-'+(e.level==='高'?'h':e.level==='中'?'m':'l')+' '+(e.dir==='利好'?'ev-good':e.dir==='利空'?'ev-bad':'')+red+'"><span class="ev-head"><span class="ev-type">'+escHtmlF(e.type)+'</span>'+(e.dir&&e.dir!=='中性'?'<span class="ev-dir ev-dir-'+(e.dir==='利好'?'good':'bad')+'">'+escHtmlF(e.dir)+'</span>':'')+'<span class="ev-cnt">'+cnt+'</span>'+(e.source?'<span class="ev-src">〔'+escHtmlF(e.source)+'〕</span>':'')+'</span><span class="ev-title" title="'+escHtmlF(e.detail||rawTitle||e.date||'')+'">'+escHtmlF(showTitle)+'</span>'+linkHtml+'</span>';}).join('')
     :evEmpty;
-  // v11.7:evNote 区分巨潮实际状态——cninfoStatus='fail' 源不可用 / srcUsed='eastmoney' 源可能 CORS 失败或近 30 天无减持/回购/问询类公告(常见于新股)
+  // v11.9:evNote 按公告来源区分——东财公告直连(eastmoney+ann) / 巨潮或云端缓存(eastmoney+cninfo) / 无公告类事件(仅东财财报解禁)
   var evNote;
-  if(evStatus.cninfo==='fail'){
-    evNote='⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财';
-  }else if(evStatus.srcUsed==='eastmoney'||(!evStatus.srcUsed)){
-    evNote='⚠ 巨潮本次未匹配到（近期无减持/回购/问询等关键词公告，或 CORS 被浏览器拦截），财报/解禁来自东财；如需查减持/回购，请点"+搜索加入"旁的"个股分析"查看公告列表';
+  if(evStatus.srcUsed==='eastmoney+ann'){
+    evNote='来源：东财公告(减持/增发/回购/问询/异常波动) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文';
+  }else if(evStatus.srcUsed==='eastmoney+cninfo'){
+    evNote='来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文';
   }else{
-    evNote='来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告';
+    evNote='⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财';
   }
   // 交易计划表(方案A/B/C;未触发方案盈亏比置灰+未触发标签;做T用ATR动态止损)
   var planBEntry=pre?pre.price:(price*1.05);
@@ -4922,7 +4922,7 @@ function removeWatchlistRow(code){
 // ⚠️ 不再清空 atds_watchlist(手动加股列表),只清缓存——重置后用户新增的股仍在(用户明确诉求)
 function resetLocalCache(){
   // 缓存类(可清):data caches + 隐藏标记 + 交易状态 + 模拟跟踪 + 二维码
-  var CACHE_KEYS=['atds_watchlist_data','atds_watchlist_hidden','atds_kline_cache','atds_ff_cache','atds_events_cache','atds_trade_status','atds_shadow','atds_qr_code'];
+  var CACHE_KEYS=['atds_watchlist_data','atds_watchlist_hidden','atds_kline_cache','atds_ff_cache','atds_lhb_cache','atds_events_cache','atds_trade_status','atds_shadow','atds_qr_code'];
   // 保留类:atds_watchlist(手动加股列表)、sim_track_*(其他模块的独立 checkbox 状态)
   // 额外清理 sim_track_* 单独的 checkbox 状态
   var simKeys=[];
@@ -5845,8 +5845,10 @@ async function fetchLhbDetailF(code){
     var jb=await rb.json(),js=await rs.json();
     var rows=[].concat(((jb&&jb.result&&jb.result.data)||[]),((js&&js.result&&js.result.data)||[]));
     if(!rows.length){
-      // 降级:读云端 lhb_cache.json
-      return await tryCloudLhbCache(num,code);
+      // 降级:读云端 lhb_cache.json → 本地缓存(手动加股的上榜记录)
+      var clc=await tryCloudLhbCache(num,code);
+      if(clc)return clc;
+      return tryLocalLhbCache(num,code);
     }
     var latest=rows.map(function(r){return r.TRADE_DATE;}).filter(Boolean).sort().slice(-1)[0]||'';
     var dayRows=rows.filter(function(r){return r.TRADE_DATE===latest;});
@@ -5872,10 +5874,14 @@ async function fetchLhbDetailF(code){
         if(nm2.indexOf(famousKw[k])>=0&&!seen[nm2]){seen[nm2]=1;famousSeats.push(nm2);break;}
       }
     }
-    return {date:latest.slice(0,10),explain:(dayRows[0]&&dayRows[0].EXPLANATION)||'',changeRate:(dayRows[0]&&dayRows[0].CHANGE_RATE)||0,inst:yi(inst),north:yi(north),youzi:yi(youzi),fundAttr:fundAttr,famousSeats:famousSeats};
+    var lhbRes={date:latest.slice(0,10),explain:(dayRows[0]&&dayRows[0].EXPLANATION)||'',changeRate:(dayRows[0]&&dayRows[0].CHANGE_RATE)||0,inst:yi(inst),north:yi(north),youzi:yi(youzi),fundAttr:fundAttr,famousSeats:famousSeats};
+    // v11.9:写 localStorage 兜底,手动加股的上榜记录可缓存,datacenter 抽风时仍能显示上次真实数据
+    try{var lhc=JSON.parse(localStorage.getItem('atds_lhb_cache')||'{}');lhc[num]=lhbRes;localStorage.setItem('atds_lhb_cache',JSON.stringify(lhc));}catch(e3){}
+    return lhbRes;
   }catch(e){
-    // 东财主源异常时也走云端兜底
-    try{return await tryCloudLhbCache(num,code);}catch(e2){return null;}
+    // 东财主源异常时走云端兜底 → 本地缓存兜底
+    try{var cc=await tryCloudLhbCache(num,code);if(cc)return cc;}catch(e2){}
+    return tryLocalLhbCache(num,code);
   }
 }
 async function tryCloudLhbCache(num,rawCode){
@@ -5888,6 +5894,15 @@ async function tryCloudLhbCache(num,rawCode){
     if(entry&&entry.date){
       return Object.assign({},entry,{fromCache:true,cacheDate:j.date||null});
     }
+    return null;
+  }catch(e){return null;}
+}
+/* 龙虎榜本地缓存兜底:datacenter 抽风且云端无此股(手动加股)时,读上次成功上榜记录 */
+function tryLocalLhbCache(num,rawCode){
+  try{
+    var lc=JSON.parse(localStorage.getItem('atds_lhb_cache')||'{}');
+    var entry=lc[num]||lc[rawCode]||lc[String(num)]||lc[String(rawCode)];
+    if(entry&&entry.date)return Object.assign({},entry,{fromCache:true,cacheDate:entry.date});
     return null;
   }catch(e){return null;}
 }
@@ -5976,6 +5991,25 @@ async function fetchEventsF(code){
       }
     }catch(e){/* 缓存拉取失败 */}
   }
+  // v11.9:东财公告直连兜底——手动加股不在云端缓存(events_cache 只覆盖11只观察池),巨潮又403,
+  // 此时用东财公告搜索(CORS *)直连补公告类事件(减持/回购/问询/异常波动),与11只观察池同等稳定。
+  var hasAnnType=false;
+  for(var hi=0;hi<events.length;hi++){
+    var et=events[hi].type;
+    if(et==='减持'||et==='增持'||et==='增发'||et==='回购'||et==='股东大会'||et==='监管问询'||et==='异常波动'||et==='停牌'||et==='复牌'||et==='重组'){hasAnnType=true;break;}
+  }
+  if(!hasAnnType){
+    try{
+      var eastAnn=await fetchEastmoneyAnnF(num);
+      if(eastAnn&&eastAnn.length){
+        for(var ei=0;ei<eastAnn.length;ei++){
+          var edup=events.some(function(x){return x.type===eastAnn[ei].type&&x.date===eastAnn[ei].date;});
+          if(!edup)events.push(eastAnn[ei]);
+        }
+        if(srcUsed==='eastmoney')srcUsed='eastmoney+ann';
+      }
+    }catch(e){/* 东财公告直连失败,继续 */}
+  }
   // 最后兜底:所有源(东财直连+巨潮直连+云端缓存)都失败 → localStorage
   if(!events.length){
     try{
@@ -6034,6 +6068,44 @@ async function fetchCninfoEventsF(num){
           var d=anns[i].announcementTime?new Date(anns[i].announcementTime+8*3600*1000).toISOString().slice(0,10):today;
           var left=daysLeft(d);
           evs.push({type:KW[k][1],eventType:KW[k][1],name:title.slice(0,30),title:title.slice(0,30),fullTitle:title,date:d,eventDate:d,left:left,countdown:left>0?('T-'+left+'天'):(left<0?Math.abs(left)+'天前':'今日'),dir:dir2,direction:dir2,level:KW[k][3],impactLevel:KW[k][3],detail:title.slice(0,48),source:'巨潮',announcementId:announcementId,orgId:annOrgId,cninfoUrl:cninfoUrl});
+          break;
+        }
+      }
+    }
+    return evs;
+  }catch(e){return null;}
+}
+/* 客户端直连东财公告搜索(替代巨潮403的公告源):减持/增持/回购/问询/股东大会/增发/异常波动/重组等
+   np-anotice-stock.eastmoney.com CORS * 已验证(200 + Access-Control-Allow-Origin:*),手机端可直连。
+   返回事件数组(空数组=成功无匹配),失败返回 null 让 fetchEventsF 走兜底。
+   这是"手动加股与11只观察池一样稳定显示事件风险"的关键:手动加股不在云端 events_cache.json 里,
+   巨潮又 403,只有东财公告搜索能客户端直连拿到公告类事件。 */
+async function fetchEastmoneyAnnF(num){
+  try{
+    var today=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10);
+    var start=new Date(Date.now()+8*3600*1000-45*86400000).toISOString().slice(0,10);
+    var KW=[['减持','减持','利空','高'],['增持','增持','利好','中'],['增发','增发','中性','中'],['非公开发行','增发','中性','中'],['定增','增发','中性','中'],['配股','增发','中性','中'],['回购','回购','利好','中'],['股东大会','股东大会','中性','低'],['股东会','股东大会','中性','低'],['临时股东会','股东大会','中性','低'],['问询','监管问询','利空','高'],['关注函','监管问询','利空','高'],['监管函','监管问询','利空','高'],['警示函','监管问询','利空','高'],['立案','监管问询','利空','高'],['处罚','监管问询','利空','高'],['异常波动','异常波动','中性','中'],['停牌','停牌','中性','中'],['复牌','复牌','中性','低'],['重组','重组','中性','中'],['并购','重组','中性','中'],['收购','重组','中性','中']];
+    function daysLeft(d){return Math.round((new Date(d+'T00:00:00+08:00')-new Date(today+'T00:00:00+08:00'))/86400000);}
+    var url='https://np-anotice-stock.eastmoney.com/api/security/ann?sr=-1&page_size=50&page_index=1&ann_type=A&stock_list='+num+'&f_node=0&s_node=0';
+    var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://data.eastmoney.com/'}});
+    if(!res.ok)return null;
+    var j=await res.json();
+    var list=(j&&j.data&&j.data.list)||[];
+    var evs=[];
+    for(var i=0;i<list.length;i++){
+      var it=list[i];
+      var title=String(it.title||it.title_ch||'').replace(/<[^>]+>/g,'');
+      if(!title)continue;
+      var artCode=it.art_code||'';
+      var annUrl=artCode?('https://data.eastmoney.com/notices/detail/'+num+'/'+artCode+'.html'):'';
+      var d=(it.notice_date||'').slice(0,10)||today;
+      if(d<start||d>today)continue; // 只看近45天
+      for(var k=0;k<KW.length;k++){
+        if(title.indexOf(KW[k][0])>=0){
+          var dir2=KW[k][2];
+          if(KW[k][1]==='回购'&&/注销/.test(title))dir2='中性';
+          var left=daysLeft(d);
+          evs.push({type:KW[k][1],eventType:KW[k][1],name:title.slice(0,30),title:title.slice(0,30),fullTitle:title,date:d,eventDate:d,left:left,countdown:left>0?('T-'+left+'天'):(left<0?Math.abs(left)+'天前':'今日'),dir:dir2,direction:dir2,level:KW[k][3],impactLevel:KW[k][3],detail:title.slice(0,48),source:'东财公告',announcementId:artCode,cninfoUrl:annUrl});
           break;
         }
       }
