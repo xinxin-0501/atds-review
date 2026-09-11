@@ -580,6 +580,9 @@
 .dc-integrity.ok{color:#2e7d32;background:#e8f5e9;border:1px solid #c8e6c9}
 .dc-integrity.warn{color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0}
 .dc-integrity.loading{color:#1a5c8a;background:#e3f2fd;border:1px solid #90caf9;animation:dc-pulse 1.6s ease-in-out infinite}
+/* 资金流数据暂缺/缓存标记(d1/d3/d5 为 null → 显示"数据暂缺"而非 --亿) */
+.ff-missing{font-style:normal;font-weight:600;color:#b8860b;background:#fff8e1;border-radius:3px;padding:0 4px;margin-left:2px;font-size:10px}
+.ff-cache{font-style:normal;font-weight:600;color:#1a5c8a;background:#e3f2fd;border-radius:3px;padding:0 4px;margin-left:3px;font-size:10px}
 /* 全局绿色 Toast 提示(模拟跟踪勾选反馈) */
 .atds-toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(16px);background:#2e7d32;color:#fff;font-size:12px;font-weight:600;padding:10px 18px;border-radius:22px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:all .3s ease;z-index:9999;max-width:86%;text-align:center;line-height:1.4}
 .atds-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -2215,9 +2218,9 @@
     <div class="dc-tags"><span class="dc-tag">催化:稀土</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:发酵</span><span class="dc-tag">情绪:发酵</span><span class="dc-tag">地位:跟风</span><span class="dc-tag">容错低</span></div>
     
     <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
-      <div class="dc-line"><span>主力净流入 <b class="up">--亿</b></span>
-    <span>3日 <b class="up">--亿</b></span>
-    <span>5日 <b class="up">--亿</b></span></div>
+      <div class="dc-line"><span>主力净流入 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
+    <span>3日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
+    <span>5日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span></div>
       <div class="dc-line"><span>量比 <b>--</b></span>
     <span>换手 <b>5.46%</b></span>
     <span>较昨日量 <b class="">--</b></span>
@@ -2274,7 +2277,7 @@
     <div class="dc-block dc-review" data-review-code="600392" data-name="盛和资源" data-price="23.9" data-entry="22.944" data-stop="22.227" data-target="25.095"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
       
-      <div class="dc-line">资金验证：资金数据加载失败/暂缺，无法验证做多预期，当前仅观察</div>
+      <div class="dc-line">资金验证：资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察</div>
       <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="600392" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="600392" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="600392" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="600392" onclick="recordTTrade(this)">记做T</button></div>
       <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="600392" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
       <div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤；波段与做T胜率分开展示">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
@@ -2957,10 +2960,17 @@ function buildDecisionCardHtml(s){
   var supHtml=supList.slice(0,3).map(function(x){return '<span class="lv lv-s'+(x.weight==='strong'?' lv-strong':'')+'">'+f2(x.price)+'<i>'+escHtmlF(x.label)+'</i></span>';}).join('')||'<span class="lv">--</span>';
   var preHtml=preList.slice(0,3).map(function(x){return '<span class="lv lv-p'+(x.weight==='strong'?' lv-strong':'')+'">'+f2(x.price)+'<i>'+escHtmlF(x.label)+'</i></span>';}).join('')||'<span class="lv">--</span>';
   var gapHtml=t.gapUp?('向上缺口 '+f2(t.gapUp.level)+(t.gapUp.filled?'·已回补':'·未回补')):(t.gapDown?('向下缺口 '+f2(t.gapDown.level)+(t.gapDown.filled?'·已回补':'·未回补')):'无近期缺口');
-  // 资金量能
-  var fundHtml='<span>主力净流入 <b class="'+((ff.d1||0)>=0?'up':'down')+'">'+sign(ff.d1)+(ff.d1!=null?ff.d1.toFixed(2):'--')+'亿</b></span>'+
-    '<span>3日 <b class="'+((ff.d3||0)>=0?'up':'down')+'">'+sign(ff.d3)+(ff.d3!=null?ff.d3.toFixed(2):'--')+'亿</b></span>'+
-    '<span>5日 <b class="'+((ff.d5||0)>=0?'up':'down')+'">'+sign(ff.d5)+(ff.d5!=null?ff.d5.toFixed(2):'--')+'亿</b></span>';
+  // 资金量能 (d1/d3/d5 null → 显示「数据暂缺」而非 --亿;fromCache 标记缓存数据)
+  var ffMissTip=' title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"';
+  var ffCacheTip=' title="数据源抽风，已降级读取本地缓存'+(ff.cacheDate?'（'+ff.cacheDate+'）':'')+'，数据可能滞后"';
+  function ffCell(v,label){
+    var miss=(v==null||isNaN(v));
+    var tip=miss?ffMissTip:(ff.fromCache?ffCacheTip:'');
+    var tone=miss?'':(v>=0?'up':'down');
+    var txt=miss?'<i class="ff-missing">数据暂缺</i>':(sign(v)+v.toFixed(2)+'亿'+(ff.fromCache?'<i class="ff-cache">缓存</i>':''));
+    return '<span>'+label+' <b class="'+tone+'"'+tip+'>'+txt+'</b></span>';
+  }
+  var fundHtml=ffCell(ff.d1,'主力净流入')+ffCell(ff.d3,'3日')+ffCell(ff.d5,'5日');
   var tvol=t.volChgPct;
   var volChgTxt=tvol!=null?(tvol>=0?'+':'')+tvol.toFixed(1)+'%':'--';
   var volChgCls=tvol!=null?(tvol>=0?'up':'down'):'';
@@ -3062,8 +3072,12 @@ function buildDecisionCardHtml(s){
   var isMicroInflow=(ff.d1!=null&&ff.d1>0&&ff.d1<0.1);
   var isShrinking=(t.volRatio!=null&&t.volRatio<0.75);
   var isFlatPrice=Math.abs(stockPctN)<=0.3;
+  // 数据缺失致命防呆:d1 为 null/-- 时禁止"符合做多预期"误判
+  var d1Missing=(ff.d1==null||isNaN(ff.d1));
   var fundVerify;
-  if(upperShadow&&(ff.d1||0)>0){
+  if(d1Missing){
+    fundVerify='资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察';
+  }else if(upperShadow&&(ff.d1||0)>0){
     fundVerify='主力净流入当日'+sign(ff.d1)+ff.d1.toFixed(2)+'亿，资金逆势流入，存在试盘可能';
   }else if(isMicroInflow&&isShrinking&&isFlatPrice){
     fundVerify='主力净流入当日'+sign(ff.d1)+ff.d1.toFixed(2)+'亿，微幅流入，买方承接极弱，需警惕滞涨';
@@ -3074,6 +3088,10 @@ function buildDecisionCardHtml(s){
     var diff=stockPctN-secChg.changePct;
     var cmp=diff<=-0.5?'弱于板块，弱势特征明显':(diff>=0.5?'强于板块，具备相对强度':'与板块基本同步');
     fundVerify+='；个股 '+(stockPctN>0?'+':'')+stockPctN.toFixed(2)+'% vs '+escHtmlF(secChg.boardName)+'板块 '+(secChg.changePct>0?'+':'')+secChg.changePct.toFixed(2)+'%，'+cmp;
+  }
+  // 资金数据来自本地缓存时,明确提示滞后(避免把 stale 数据当实时做多预期)
+  if(ff.fromCache){
+    fundVerify+='；资金数据来自本地缓存'+(ff.cacheDate?'（'+ff.cacheDate+'）':'')+'，可能滞后';
   }
   var nextDayFocus;
   if(t.ma5&&price){
@@ -3103,7 +3121,7 @@ function buildDecisionCardHtml(s){
   var summaryHtml=isHardTrade?'<div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>':'';
   // 数据完整性校验(资金/关键位/龙虎榜/分钟线 任一缺失 → 标黄)
   var diMissing=[];
-  if(ff.d1==null||isNaN(ff.d1))diMissing.push('资金');
+  if(d1Missing)diMissing.push('资金');
   if(!t.ma5)diMissing.push('关键位');
   if(!s.lhb)diMissing.push('龙虎榜');
   if(s.minTrend&&((s.minTrend.m60&&s.minTrend.m60.approx)||(s.minTrend.m15&&s.minTrend.m15.approx)))diMissing.push('分钟线');
@@ -3907,40 +3925,43 @@ function calcDecisionTech(klines){
     volChgPct:volChgPct,volToday:volToday,volYesterday:volYesterday,
     bias20:ma20?Math.round((last/ma20-1)*1000)/10:null};
 }
-/* 个股主力资金流(东财 fflow/kline):主力净流入 当日/3日/5日,单位亿元;失败返回 null 不阻塞 */
+/* 个股主力资金流(东财 fflow/kline):主力净流入 当日/3日/5日,单位亿元;主源3次重试→降级实时→本地缓存兜底(fromCache 标记),失败返回 null 不阻塞 */
 async function fetchStockFundFlowF(code){
   var num=String(code).replace(/^(sh|sz|bj)/,'');
   var mkt=String(code).charAt(0)==='6'?'1':'0';
   function yi(v){return Math.round(v/1e6)/100;}
-  // 主源:历史资金流(120天),正确聚合 d1/d3/d5
-  try{
-    var url='https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63';
-    var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
-    var j=await res.json();
-    var kl=(j&&j.data&&j.data.klines)||[];
-    if(kl.length>=3){
-      var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
-      function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
-      var ff={d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
-      // 写入浏览器本地缓存(供失败兜底)
-      try{var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}'); fc[code]={...ff,date:new Date().toISOString().slice(0,10)}; localStorage.setItem('atds_ff_cache',JSON.stringify(fc));}catch(e2){}
-      return ff;
-    }
-  }catch(e){/* 降级 */}
+  function writeCache(ff){try{var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}'); fc[code]={d1:ff.d1,d3:ff.d3,d5:ff.d5,date:new Date().toISOString().slice(0,10)}; localStorage.setItem('atds_ff_cache',JSON.stringify(fc));}catch(e){}}
+  // 主源:历史资金流(120天),重试 3 次(东财偶发超时/限流)
+  for(var attempt=0;attempt<3;attempt++){
+    try{
+      var url='https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63';
+      var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
+      var j=await res.json();
+      var kl=(j&&j.data&&j.data.klines)||[];
+      if(kl.length>=3){
+        var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
+        function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
+        var ff={d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
+        writeCache(ff);
+        return ff;
+      }
+    }catch(e){/* 重试 */}
+  }
   // 降级:实时接口(仅当日),d3/d5 置 null 避免重复
   try{
     var url2='https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5';
     var res2=await fetch(url2,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
     var j2=await res2.json();
     var kl2=(j2&&j2.data&&j2.data.klines)||[];
-    if(!kl2.length)return null;
-    var d1=yi(parseFloat((kl2[kl2.length-1].split(',')[1])||0)||0);
-    var ff2={d1:d1,d3:null,d5:null};
-    try{var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}'); fc[code]={...ff2,date:new Date().toISOString().slice(0,10)}; localStorage.setItem('atds_ff_cache',JSON.stringify(fc));}catch(e2){}
-    return ff2;
+    if(kl2.length){
+      var d1=yi(parseFloat((kl2[kl2.length-1].split(',')[1])||0)||0);
+      var ff2={d1:d1,d3:null,d5:null};
+      writeCache(ff2);
+      return ff2;
+    }
   }catch(e){/* 降级到缓存 */}
-  // 失败兜底:浏览器本地缓存
-  try{var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}'); if(fc[code]&&fc[code].d1!=null) return {d1:fc[code].d1,d3:fc[code].d3,d5:fc[code].d5};}catch(e){}
+  // 失败兜底:浏览器本地缓存(标记 fromCache)
+  try{var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}'); if(fc[code]&&fc[code].d1!=null) return {d1:fc[code].d1,d3:fc[code].d3!=null?fc[code].d3:null,d5:fc[code].d5!=null?fc[code].d5:null,fromCache:true,cacheDate:fc[code].date||null};}catch(e){}
   return null;
 }
 /* 分钟级趋势:60/15分钟 多空;腾讯 mkline 优先,新浪 getKLineData 兜底;失败返回 null */
