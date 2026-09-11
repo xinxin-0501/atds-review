@@ -3379,10 +3379,13 @@ async function refreshWatchlistQuotes(){
       var tech=null,ff=null;
       try{var tj=r.getAttribute('data-tech');if(tj&&tj!=='null')tech=JSON.parse(tj);}catch(e){}
       try{var fj=r.getAttribute('data-ff');if(fj&&fj!=='null')ff=JSON.parse(fj);}catch(e){}
-      var sObj={code:code,name:f[1],price:price,pct:pct,amount:amount,turnover:turnover,prevClose:prevClose,open:open,high:high,low:low,amplitude:amplitude,volRatio:volRatio,tech:tech,fundFlow:ff};
       // 手动新增股(auto-detail):整体重建决策卡 + 置信度/盈亏比徽章,让所有字段跟随最新行情
+      // v11.5:从 localStorage 读全量缓存(含 events/lhb/logic/minTrend/seal 等已补齐字段),仅覆盖实时行情字段。
+      //        否则 5s 刷新会用精简对象重建决策卡,把 addFetchedToWatchlist 刚补齐的字段全部清空——这正是"删除重加后 detail 缺事件/龙虎榜/逻辑"的根因。
       var d=document.querySelector('.wl-detail[data-detail-code="'+code+'"]');
       if(d&&d.classList.contains('auto-detail')){
+        var fullData=loadWatchlistStockData(code)||{};
+        var sObj=Object.assign({},fullData,{code:code,name:f[1],price:price,pct:pct,amount:amount,turnover:turnover,prevClose:prevClose,open:open,high:high,low:low,amplitude:amplitude,volRatio:volRatio,tech:tech||fullData.tech||null,fundFlow:ff||fullData.fundFlow||null});
         var bd=dcBadges(sObj);
         var confEl=r.querySelector('.wl-cell-atds .conf');
         if(confEl){confEl.className='conf conf-'+bd.confTone;confEl.textContent=bd.confTotal;}
@@ -3424,7 +3427,10 @@ async function refreshWatchlistQuotes(){
             var amount=amtEl?amtEl.textContent:'--';
             var name=rEl.querySelector('.wl-name')?rEl.querySelector('.wl-name').textContent:c;
             if(d){
-              d.innerHTML=buildDecisionCardHtml({code:c,name:name,price:price,pct:pct,amount:amount,turnover:'--',prevClose:0,open:0,high:0,low:0,amplitude:0,volRatio:0,tech:t,fundFlow:ff});
+              // v11.5:同样合并全量缓存,避免补拉 K 线重建时清空 events/lhb/logic 等已补齐字段
+              var fullData2=loadWatchlistStockData(c)||{};
+              var sObj2=Object.assign({},fullData2,{code:c,name:name,price:price,pct:pct,amount:amount,turnover:'--',prevClose:fullData2.prevClose||0,open:fullData2.open||0,high:fullData2.high||0,low:fullData2.low||0,amplitude:fullData2.amplitude||0,volRatio:fullData2.volRatio||0,tech:t,fundFlow:ff||fullData2.fundFlow||null});
+              d.innerHTML=buildDecisionCardHtml(sObj2);
               applyReviewState(d.querySelector('.dc-review'));   // 补拉后重建,恢复勾选/交易状态
             }
           }catch(e){}
