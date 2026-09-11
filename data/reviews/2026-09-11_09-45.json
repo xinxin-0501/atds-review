@@ -4,7 +4,7 @@
     "time": "09:45",
     "type": "premarket",
     "typeLabel": "盘前简报",
-    "generatedAt": "2026-09-11 21:36:45",
+    "generatedAt": "2026-09-11 22:37:28",
     "market": "A股",
     "dataSource": "腾讯行情 + 东方财富公开接口",
     "dataAsOfDate": "2026-09-11",
@@ -992,7 +992,10 @@
       "fundFlow": {
         "d1": 2.32,
         "d3": 1.76,
-        "d5": 2.02
+        "d5": 2.02,
+        "fromCache": true,
+        "cacheDate": "2026-09-11",
+        "source": "local-eastmoney-push2his"
       },
       "minTrend": {
         "m60": {
@@ -1005,10 +1008,6 @@
           "ma5": 65.01,
           "ma10": 64.07
         }
-      },
-      "sectorChange": {
-        "boardName": "光通信模块",
-        "changePct": 0.07
       },
       "lhb": {
         "date": "2026-08-25",
@@ -1119,7 +1118,8 @@
         }
       ],
       "eventsStatus": {
-        "cninfo": "ok"
+        "cninfo": "ok",
+        "srcUsed": "eastmoney+cninfo"
       },
       "marketRegime": {
         "label": "弱",
@@ -1209,7 +1209,10 @@
       "fundFlow": {
         "d1": -0.53,
         "d3": 0,
-        "d5": -0.37
+        "d5": -0.37,
+        "fromCache": true,
+        "cacheDate": "2026-09-11",
+        "source": "local-eastmoney-push2his"
       },
       "minTrend": {
         "m60": {
@@ -1299,7 +1302,8 @@
         }
       ],
       "eventsStatus": {
-        "cninfo": "ok"
+        "cninfo": "ok",
+        "srcUsed": "eastmoney+cninfo"
       },
       "riskSignals": [
         "现价跌破MA5",
@@ -1398,7 +1402,10 @@
       "fundFlow": {
         "d1": 1.78,
         "d3": -0.62,
-        "d5": -3.5
+        "d5": -3.5,
+        "fromCache": true,
+        "cacheDate": "2026-09-11",
+        "source": "local-eastmoney-push2his"
       },
       "minTrend": {
         "m60": {
@@ -1473,7 +1480,8 @@
         }
       ],
       "eventsStatus": {
-        "cninfo": "ok"
+        "cninfo": "ok",
+        "srcUsed": "eastmoney+cninfo"
       },
       "riskSignals": [
         "跌破MA20趋势转弱"
@@ -1568,7 +1576,10 @@
       "fundFlow": {
         "d1": 31.2,
         "d3": 20.75,
-        "d5": 102.02
+        "d5": 102.02,
+        "fromCache": true,
+        "cacheDate": "2026-09-11",
+        "source": "local-eastmoney-push2his"
       },
       "minTrend": {
         "m60": {
@@ -1627,7 +1638,8 @@
         }
       ],
       "eventsStatus": {
-        "cninfo": "ok"
+        "cninfo": "ok",
+        "srcUsed": "eastmoney+cninfo"
       },
       "marketRegime": {
         "label": "弱",
@@ -1818,7 +1830,8 @@
         }
       ],
       "eventsStatus": {
-        "cninfo": "ok"
+        "cninfo": "ok",
+        "srcUsed": "eastmoney+cninfo"
       },
       "riskSignals": [
         "现价跌破MA5",
@@ -1934,7 +1947,8 @@
         "famousSeats": []
       },
       "eventsStatus": {
-        "cninfo": "empty"
+        "cninfo": "empty",
+        "srcUsed": "eastmoney"
       },
       "riskSignals": [
         "现价跌破MA5",
@@ -2069,10 +2083,6 @@
           "ma10": 32.45
         }
       },
-      "sectorChange": {
-        "boardName": "机器人",
-        "changePct": -2.44
-      },
       "lhb": {
         "date": "2026-07-06",
         "explain": "日跌幅达到15%的前5只证券",
@@ -2101,7 +2111,8 @@
         }
       ],
       "eventsStatus": {
-        "cninfo": "empty"
+        "cninfo": "empty",
+        "srcUsed": "eastmoney"
       },
       "riskSignals": [
         "现价跌破MA5"
@@ -2237,10 +2248,6 @@
           "ma10": 3.37
         }
       },
-      "sectorChange": {
-        "boardName": "种植业",
-        "changePct": -2.79
-      },
       "lhb": {
         "date": "2026-08-18",
         "explain": "日涨幅偏离值达到7%的前5只证券",
@@ -2317,7 +2324,8 @@
         }
       ],
       "eventsStatus": {
-        "cninfo": "ok"
+        "cninfo": "ok",
+        "srcUsed": "eastmoney+cninfo"
       },
       "riskSignals": [
         "现价跌破MA5"
@@ -2448,10 +2456,6 @@
           "ma10": 3.61
         }
       },
-      "sectorChange": {
-        "boardName": "游戏Ⅲ",
-        "changePct": -1.98
-      },
       "lhb": {
         "date": "2024-11-28",
         "explain": "日换手率达到30%的前5只证券",
@@ -2468,7 +2472,8 @@
         ]
       },
       "eventsStatus": {
-        "cninfo": "empty"
+        "cninfo": "empty",
+        "srcUsed": "eastmoney"
       },
       "riskSignals": [
         "现价跌破MA5",
@@ -2598,10 +2603,6 @@
           "ma10": 16.22
         }
       },
-      "sectorChange": {
-        "boardName": "种植业",
-        "changePct": -2.79
-      },
       "lhb": {
         "date": "2026-09-10",
         "explain": "有价格涨跌幅限制的日收盘价格跌幅偏离值达到7%的前五只证券",
@@ -2617,7 +2618,8 @@
         ]
       },
       "eventsStatus": {
-        "cninfo": "empty"
+        "cninfo": "empty",
+        "srcUsed": "eastmoney"
       },
       "riskSignals": [
         "现价跌破MA5"
@@ -2727,7 +2729,10 @@
       "fundFlow": {
         "d1": -0.35,
         "d3": -6.58,
-        "d5": -5.65
+        "d5": -5.65,
+        "fromCache": true,
+        "cacheDate": "2026-09-11",
+        "source": "local-eastmoney-push2his"
       },
       "minTrend": {
         "m60": {
@@ -2740,10 +2745,6 @@
           "ma5": 4.73,
           "ma10": 4.74
         }
-      },
-      "sectorChange": {
-        "boardName": "种植业",
-        "changePct": -2.79
       },
       "lhb": {
         "date": "2026-09-10",
@@ -2790,7 +2791,8 @@
         }
       ],
       "eventsStatus": {
-        "cninfo": "ok"
+        "cninfo": "ok",
+        "srcUsed": "eastmoney+cninfo"
       },
       "riskSignals": [
         "现价跌破MA5"
@@ -2824,7 +2826,7 @@
       "techTag": "主线+成长",
       "trendSub": "资金聚焦 / +10.0%",
       "flowMain": "11.90",
-      "flowMid": "9.85",
+      "flowMid": "10.67",
       "rank": 1,
       "leadOpen": 16.8,
       "leadClose": 18.7,
@@ -2852,7 +2854,7 @@
       "techTag": "异动高+空间+高",
       "trendSub": "连续强势 / +10.0%",
       "flowMain": "2.60",
-      "flowMid": "2.05",
+      "flowMid": "2.16",
       "rank": 2
     },
     {
@@ -2874,7 +2876,7 @@
       "techTag": "异动高+空间+高",
       "trendSub": "连续强势 / +13.3%",
       "flowMain": "1.20",
-      "flowMid": "1.10",
+      "flowMid": "0.84",
       "rank": 3,
       "leadOpen": 7.29,
       "leadClose": 7.29,
@@ -2902,7 +2904,7 @@
       "techTag": "主线+趋势技术",
       "trendSub": "异动爆发 / +10.1%",
       "flowMain": "3.90",
-      "flowMid": "4.62",
+      "flowMid": "3.24",
       "rank": 4
     },
     {
@@ -2924,7 +2926,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.20",
-      "flowMid": "0.85",
+      "flowMid": "1.33",
       "rank": 5
     },
     {
@@ -2946,7 +2948,7 @@
       "techTag": "主线+成长",
       "trendSub": "资金聚焦 / +10.0%",
       "flowMain": "1.80",
-      "flowMid": "1.86",
+      "flowMid": "1.65",
       "rank": 6
     },
     {
@@ -2968,7 +2970,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.10",
-      "flowMid": "1.25",
+      "flowMid": "0.81",
       "rank": 7
     },
     {
@@ -2990,7 +2992,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.50",
-      "flowMid": "0.41",
+      "flowMid": "0.55",
       "rank": 8
     },
     {
@@ -3012,7 +3014,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +9.9%",
       "flowMain": "0.90",
-      "flowMid": "0.90",
+      "flowMid": "0.89",
       "rank": 9
     },
     {
@@ -3034,7 +3036,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.1%",
       "flowMain": "0.90",
-      "flowMid": "0.73",
+      "flowMid": "0.67",
       "rank": 10
     },
     {
@@ -3056,7 +3058,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.00",
-      "flowMid": "0.78",
+      "flowMid": "0.72",
       "rank": 11
     },
     {
@@ -3078,7 +3080,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.10",
-      "flowMid": "0.86",
+      "flowMid": "0.81",
       "rank": 12
     },
     {
@@ -3100,7 +3102,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.50",
-      "flowMid": "0.37",
+      "flowMid": "0.47",
       "rank": 13
     },
     {
@@ -3122,7 +3124,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.1%",
       "flowMain": "0.50",
-      "flowMid": "0.56",
+      "flowMid": "0.42",
       "rank": 14
     },
     {
@@ -3144,7 +3146,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.70",
-      "flowMid": "0.60",
+      "flowMid": "0.55",
       "rank": 15
     },
     {
@@ -3166,7 +3168,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.1%",
       "flowMain": "0.20",
-      "flowMid": "0.21",
+      "flowMid": "0.24",
       "rank": 16
     },
     {
@@ -3188,7 +3190,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.60",
-      "flowMid": "0.69",
+      "flowMid": "0.68",
       "rank": 17
     },
     {
@@ -3210,7 +3212,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.50",
-      "flowMid": "0.60",
+      "flowMid": "0.57",
       "rank": 18
     },
     {
@@ -3232,7 +3234,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.40",
-      "flowMid": "0.40",
+      "flowMid": "0.41",
       "rank": 19
     },
     {
@@ -3254,7 +3256,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "2.70",
-      "flowMid": "2.79",
+      "flowMid": "1.99",
       "rank": 20
     },
     {
@@ -3276,7 +3278,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.30",
-      "flowMid": "1.21",
+      "flowMid": "1.26",
       "rank": 21
     },
     {
@@ -3298,7 +3300,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.20",
-      "flowMid": "0.17",
+      "flowMid": "0.19",
       "rank": 22
     }
   ],
@@ -6348,31 +6350,31 @@
   "intlMkt": {
     "us.DJI": {
       "name": "道琼斯",
-      "price": 52693.75,
-      "change": 629.65,
-      "changePct": 1.21,
-      "time": "2026-09-11 09:37:40"
+      "price": 52444.03,
+      "change": 379.93,
+      "changePct": 0.73,
+      "time": "2026-09-11 10:38:59"
     },
     "us.IXIC": {
       "name": "纳斯达克",
-      "price": 26365.87,
-      "change": 284.15,
-      "changePct": 1.09,
-      "time": "2026-09-11 09:37:40"
+      "price": 26330.1,
+      "change": 248.38,
+      "changePct": 0.95,
+      "time": "2026-09-11 10:38:59"
     },
     "hf_CL": {
       "name": "纽约原油",
-      "price": 98.61,
-      "change": -3.77,
-      "changePct": -3.68,
-      "time": "21:37:05"
+      "price": 99.61,
+      "change": -2.8,
+      "changePct": -2.73,
+      "time": "22:38:01"
     },
     "hf_GC": {
       "name": "纽约黄金",
-      "price": 4437.21,
-      "change": 0.68,
-      "changePct": 0.02,
-      "time": "21:37:07"
+      "price": 4411.87,
+      "change": 0.1,
+      "changePct": 0,
+      "time": "22:39:02"
     }
   },
   "closeEmotion": {
@@ -6608,20 +6610,6 @@
         "name": "光伏",
         "stocks": [
           "安彩高科"
-        ],
-        "picks": [
-          {
-            "code": "605117",
-            "name": "德业股份",
-            "pct": 2.88,
-            "turnover": 1.09
-          },
-          {
-            "code": "300051",
-            "name": "琏升科技",
-            "pct": 1.29,
-            "turnover": 6.45
-          }
         ]
       }
     ],
