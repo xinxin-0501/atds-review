@@ -917,6 +917,7 @@ async function refreshWatchlistQuotes(){
         var rrEl=r.querySelector('.wl-cell-sig .rr');
         if(rrEl){rrEl.className='rr rr-'+bd.rrTone;rrEl.textContent=(bd.rr>=1.5?(bd.rr.toFixed(2)+' ✓'):bd.rr.toFixed(2));}
         d.innerHTML=buildDecisionCardHtml(sObj);
+        applyReviewState(d.querySelector('.dc-review'));   // 重建后恢复勾选/交易状态,避免 5 秒刷新清空
       }
     });
     var timeEl=document.querySelector('.wl-time');
@@ -952,6 +953,7 @@ async function refreshWatchlistQuotes(){
             var name=rEl.querySelector('.wl-name')?rEl.querySelector('.wl-name').textContent:c;
             if(d){
               d.innerHTML=buildDecisionCardHtml({code:c,name:name,price:price,pct:pct,amount:amount,turnover:'--',prevClose:0,open:0,high:0,low:0,amplitude:0,volRatio:0,tech:t,fundFlow:ff});
+              applyReviewState(d.querySelector('.dc-review'));   // 补拉后重建,恢复勾选/交易状态
             }
           }catch(e){}
         }
@@ -972,9 +974,15 @@ function addWatchlistRefreshBtn(){
 function initWatchlistAutoRefresh(){
   addWatchlistRefreshBtn();
   setTimeout(refreshWatchlistQuotes,800);             // 打开页面 0.8s 后自动刷一次
-  setInterval(refreshWatchlistQuotes,5000);           // 每 5 秒自动刷新(实时观察池)
+  _wlStartAutoRefresh();
 }
-(function(){var card=document.querySelector('.watchlist-card');if(card){addWatchlistRefreshBtn();setTimeout(refreshWatchlistQuotes,800);setInterval(refreshWatchlistQuotes,5000);}})();
+// 受控自动刷新:悬停在"盘后复盘"交互区时暂停,避免打断用户勾选/点击
+var _wlRefreshTimer=null,_wlRefreshPaused=false;
+function _wlStartAutoRefresh(){
+  if(_wlRefreshTimer)return;
+  _wlRefreshTimer=setInterval(function(){ if(_wlRefreshPaused)return; try{refreshWatchlistQuotes();}catch(e){} },5000);
+}
+(function(){var card=document.querySelector('.watchlist-card');if(card){addWatchlistRefreshBtn();setTimeout(refreshWatchlistQuotes,800);_wlStartAutoRefresh();}})();
 
 /* ============ 波背离选股:刷新行情 ============ */
 async function refreshWaveQuotes(){
@@ -1937,13 +1945,12 @@ function setTradeStatus(btn,status){
     for(var i=0;i<btns.length;i++)btns[i].classList.remove('ts-active');
     btn.classList.add('ts-active');
   }
-  // 联动交互:点击"未买入" → 自动勾选"系统模拟跟踪"并弹窗提示
+  // 联动交互:点击"未买入" → 自动勾选"系统模拟跟踪"(toggleShadowTrack 内部会弹绿色 Toast)
   if(status==='not_bought'&&block){
     var shadowCb=block.querySelector('.ts-shadow-check');
     if(shadowCb&&!shadowCb.checked){
       shadowCb.checked=true;
       toggleShadowTrack(shadowCb);
-      try{alert('已为您开启模拟跟踪，验证策略有效性。');}catch(e){}
     }
   }
   updateReviewProgress();
@@ -1956,8 +1963,11 @@ function toggleShadowTrack(cb){
   var m=getShadowMap();
   if(cb.checked&&block){
     m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:parseFloat(block.getAttribute('data-entry'))||null,stop:parseFloat(block.getAttribute('data-stop'))||null,target:parseFloat(block.getAttribute('data-target'))||null,openedDate:new Date().toISOString().slice(0,10),settled:false};
-  }else if(m[code]){
-    delete m[code];
+    try{localStorage.setItem('sim_track_'+code,'true');}catch(e){}
+    showToast('已加入模拟跟踪队列，开始累积样本');
+  }else{
+    if(m[code])delete m[code];
+    try{localStorage.removeItem('sim_track_'+code);}catch(e){}
   }
   setShadowMap(m);
   updateReviewProgress();
@@ -2000,21 +2010,54 @@ function updateReviewProgress(){
   for(var m2=0;m2<statEls.length;m2++)statEls[m2].textContent=txt;
 }
 
-function initReviewState(){
+// 绿色 Toast 反馈(复用单例,避免反复建 DOM)
+function showToast(msg,type){
+  try{
+    var t=document.getElementById('atds-toast');
+    if(!t){
+      t=document.createElement('div');
+      t.id='atds-toast';
+      t.className='atds-toast';
+      document.body.appendChild(t);
+    }
+    t.textContent=msg;
+    t.style.background=(type==='warn')?'#d49000':'#2e7d32';
+    t.classList.add('show');
+    clearTimeout(t.__timer);
+    t.__timer=setTimeout(function(){t.classList.remove('show');},2200);
+  }catch(e){}
+}
+// 恢复单个 .dc-review 块的勾选/交易状态(供 initReviewState 与 refreshWatchlistQuotes 重建后复用)
+function applyReviewState(block){
+  if(!block)return;
+  var code=block.getAttribute('data-review-code');
+  if(!code)return;
   var sm=getTradeStatusMap();
-  var sh=getShadowMap();
+  var rec=sm[code];
+  if(rec&&rec.status){
+    var btns=block.querySelectorAll('.ts-btn');
+    for(var j=0;j<btns.length;j++){ if(btns[j].getAttribute('data-status')===rec.status)btns[j].classList.add('ts-active'); }
+  }
+  var cb=block.querySelector('.ts-shadow-check');
+  if(cb){
+    var sh=getShadowMap();
+    var enabled=sh[code]&&sh[code].enabled;
+    if(!enabled){ try{ enabled=localStorage.getItem('sim_track_'+code)==='true'; }catch(e){} }
+    cb.checked=!!enabled;
+  }
+  bindReviewHoverPause(block);   // 重建后的块重新挂悬停暂停,避免刷新打断交互
+}
+// 悬停在复盘区时暂停自动刷新,离开后恢复(避免刷新打断勾选/点击)
+function bindReviewHoverPause(block){
+  if(!block||block.getAttribute('data-hover-bound'))return;
+  block.setAttribute('data-hover-bound','1');
+  block.addEventListener('mouseenter',function(){_wlRefreshPaused=true;});
+  block.addEventListener('mouseleave',function(){_wlRefreshPaused=false;});
+}
+function initReviewState(){
   var blocks=document.querySelectorAll('.dc-review');
   for(var i=0;i<blocks.length;i++){
-    var block=blocks[i];
-    var code=block.getAttribute('data-review-code');
-    if(!code)continue;
-    var rec=sm[code];
-    if(rec&&rec.status){
-      var btns=block.querySelectorAll('.ts-btn');
-      for(var j=0;j<btns.length;j++){ if(btns[j].getAttribute('data-status')===rec.status)btns[j].classList.add('ts-active'); }
-    }
-    var cb=block.querySelector('.ts-shadow-check');
-    if(cb&&sh[code]&&sh[code].enabled)cb.checked=true;
+    applyReviewState(blocks[i]);
   }
   settleAllShadowTrades();
 }

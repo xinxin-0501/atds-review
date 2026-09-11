@@ -1580,7 +1580,13 @@ function buildStockRow(s, i, report) {
   }
   // 明日核心观察点(次日操作指引):现价距离MA5超3% → 不机械写"收复MA5",改支撑位止跌企稳
   let nextDayFocus;
-  if (t.ma5 && price) {
+  // 连续缩量阴跌防呆:缩量+主力净流出+趋势空头+阴跌 → 不写"止跌企稳"诱导抄底,改放量大阳线确认
+  const _v = Number(s.pct) || 0;
+  const isShrinkDrip = (t.trend === 'down') && (_v < 0) && ((ff.d1 || 0) < 0) &&
+    ((t.volChgPct != null && t.volChgPct < -20) || (t.volRatio != null && t.volRatio < 0.75));
+  if (isShrinkDrip) {
+    nextDayFocus = '连续缩量阴跌（缩量+主力净流出+趋势空头），不出现放量大阳线，坚决不抄底。';
+  } else if (t.ma5 && price) {
     const ma5GapPct = Math.abs(price - t.ma5) / t.ma5 * 100;
     if (ma5GapPct > 3) {
       const supRef = (p.sup && p.sup.price) ? p.sup.price : (t.ma20 || price * 0.97);
@@ -2382,6 +2388,13 @@ function renderMainRank(report) {
   </div>`;
 }
 
+function renderFollowerRiskBanner(report) {
+  const list = report.watchlist || [];
+  const hasFollower = list.some(s => _boardStatus(s) === '跟风');
+  if (!hasFollower) return '';
+  return '<div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>';
+}
+
 function renderPremarketReport(report, nav) {
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -2394,6 +2407,7 @@ function renderPremarketReport(report, nav) {
 <div class="phone">
 ${renderHeader(report, nav)}
 ${renderHero(report)}
+${renderFollowerRiskBanner(report)}
 <div class="section">
   ${renderWatchlist(report)}
   ${renderPremarketCockpit(report)}
