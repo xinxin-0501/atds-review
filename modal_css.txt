@@ -574,6 +574,9 @@
 .dc-integrity.ok{color:#2e7d32;background:#e8f5e9;border:1px solid #c8e6c9}
 .dc-integrity.warn{color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0}
 .dc-integrity.loading{color:#1a5c8a;background:#e3f2fd;border:1px solid #90caf9;animation:dc-pulse 1.6s ease-in-out infinite}
+/* 资金流数据暂缺/缓存标记(d1/d3/d5 为 null → 显示"数据暂缺"而非 --亿) */
+.ff-missing{font-style:normal;font-weight:600;color:#b8860b;background:#fff8e1;border-radius:3px;padding:0 4px;margin-left:2px;font-size:10px}
+.ff-cache{font-style:normal;font-weight:600;color:#1a5c8a;background:#e3f2fd;border-radius:3px;padding:0 4px;margin-left:3px;font-size:10px}
 /* 全局绿色 Toast 提示(模拟跟踪勾选反馈) */
 .atds-toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(16px);background:#2e7d32;color:#fff;font-size:12px;font-weight:600;padding:10px 18px;border-radius:22px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:all .3s ease;z-index:9999;max-width:86%;text-align:center;line-height:1.4}
 .atds-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}

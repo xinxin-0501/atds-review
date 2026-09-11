@@ -1437,10 +1437,17 @@ function buildStockRow(s, i, report) {
   const preHtml = preList.slice(0, 3).map(x => `<span class="lv lv-p ${x.weight === 'strong' ? 'lv-strong' : ''}">${f2(x.price)}<i>${esc(x.label)}</i></span>`).join('') || '<span class="lv">--</span>';
   const gapHtml = t.gapUp ? ('向上缺口 ' + f2(t.gapUp.level) + (t.gapUp.filled ? '·已回补' : '·未回补')) : (t.gapDown ? ('向下缺口 ' + f2(t.gapDown.level) + (t.gapDown.filled ? '·已回补' : '·未回补')) : '无近期缺口');
 
-  // 资金量能 (真实)
-  const fundHtml = `<span>主力净流入 <b class="${(ff.d1 || 0) >= 0 ? 'up' : 'down'}">${sign(ff.d1)}${ff.d1 != null ? ff.d1.toFixed(2) : '--'}亿</b></span>
-    <span>3日 <b class="${(ff.d3 || 0) >= 0 ? 'up' : 'down'}">${sign(ff.d3)}${ff.d3 != null ? ff.d3.toFixed(2) : '--'}亿</b></span>
-    <span>5日 <b class="${(ff.d5 || 0) >= 0 ? 'up' : 'down'}">${sign(ff.d5)}${ff.d5 != null ? ff.d5.toFixed(2) : '--'}亿</b></span>`;
+  // 资金量能 (真实);d1/d3/d5 为 null → 显示「数据暂缺」而非 --亿;fromCache 标记缓存数据(数据源抽风已降级)
+  const ffMissTip = ' title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"';
+  const ffCacheTip = ' title="数据源抽风，已降级读取本地缓存' + (ff.cacheDate ? '（' + ff.cacheDate + '）' : '') + '，数据可能滞后"';
+  const ffCell = (v, label) => {
+    const miss = v == null || isNaN(v);
+    const tip = miss ? ffMissTip : (ff.fromCache ? ffCacheTip : '');
+    const tone = miss ? '' : (v >= 0 ? 'up' : 'down');
+    const txt = miss ? '<i class="ff-missing">数据暂缺</i>' : (sign(v) + v.toFixed(2) + '亿' + (ff.fromCache ? '<i class="ff-cache">缓存</i>' : ''));
+    return `<span>${label} <b class="${tone}"${tip}>${txt}</b></span>`;
+  };
+  const fundHtml = ffCell(ff.d1, '主力净流入') + '\n    ' + ffCell(ff.d3, '3日') + '\n    ' + ffCell(ff.d5, '5日');
   const tvol = t.volChgPct;
   const volChgTxt = tvol != null ? (tvol >= 0 ? '+' : '') + tvol.toFixed(1) + '%' : '--';
   const volChgCls = tvol != null ? (tvol >= 0 ? 'up' : 'down') : '';
@@ -1560,7 +1567,7 @@ function buildStockRow(s, i, report) {
   const d1Missing = (ff.d1 == null || isNaN(ff.d1));
   let fundVerify;
   if (d1Missing) {
-    fundVerify = '资金数据加载失败/暂缺，无法验证做多预期，当前仅观察';
+    fundVerify = '资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察';
   } else if (upperShadow && (ff.d1 || 0) > 0) {
     fundVerify = '主力净流入当日' + sign(ff.d1) + ff.d1.toFixed(2) + '亿，资金逆势流入，存在试盘可能';
   } else if (isMicroInflow && isShrinking && isFlatPrice) {
@@ -1572,6 +1579,10 @@ function buildStockRow(s, i, report) {
     const diff = stockPctN - secChg.changePct;
     const cmp = diff <= -0.5 ? '弱于板块，弱势特征明显' : (diff >= 0.5 ? '强于板块，具备相对强度' : '与板块基本同步');
     fundVerify += '；个股 ' + (stockPctN > 0 ? '+' : '') + stockPctN.toFixed(2) + '% vs ' + esc(secChg.boardName) + '板块 ' + (secChg.changePct > 0 ? '+' : '') + secChg.changePct.toFixed(2) + '%，' + cmp;
+  }
+  // 资金数据来自本地缓存时,明确提示滞后(避免把 stale 数据当实时做多预期)
+  if (ff.fromCache) {
+    fundVerify += '；资金数据来自本地缓存' + (ff.cacheDate ? '（' + ff.cacheDate + '）' : '') + '，可能滞后';
   }
   // 复盘形态判定(资金方向区分):长上影线 + 主力净流入 = 冲高回落但资金逆势流入(试盘);长上影线 + 净流出 = 抛压极重空头占优
   let patternHtml = '';

@@ -1038,40 +1038,83 @@ function calcTechFromKline(arr) {
     range60: Math.round(range60), pct5: Math.round(pct5 * 100) / 100
   };
 }
+// 个股主力资金流缓存(独立文件,保存最近一次成功抓取的 d1/d3/d5,东财接口抽风/限流/超时的终极兜底)
+let _fflowCache = null;
+function loadFflowCache() {
+  if (_fflowCache) return _fflowCache;
+  try {
+    const p = path.join(ROOT, 'data', 'fflow_cache.json');
+    if (fs.existsSync(p)) _fflowCache = JSON.parse(fs.readFileSync(p, 'utf8')) || {};
+  } catch (e) { /* 缓存损坏忽略 */ }
+  if (!_fflowCache || typeof _fflowCache !== 'object') _fflowCache = {};
+  return _fflowCache;
+}
+function saveFflowCache() {
+  try {
+    const p = path.join(ROOT, 'data', 'fflow_cache.json');
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, JSON.stringify(_fflowCache, null, 2), 'utf8');
+  } catch (e) { console.error('saveFflowCache 失败:', e.message); }
+}
+
 // 个股主力资金流(东财历史资金流 daykline):主力净流入 当日/3日/5日,单位亿元
 // 注:旧接口 fflow/kline?klt=101&lmt=5 只返回当天1根K线,导致 d1=d3=d5 重复;
 //     改用 push2his daykline?lmt=0 取全量历史(120天),正确聚合多日资金。
-//     主源失败时降级到 push2 实时接口(仅当日),d3/d5 置 null(显示 --)绝不重复 d1。
+//     主源(3次重试)失败 → 降级 push2 实时接口(仅当日,d3/d5 置 null) → 终极兜底读本地 fflow_cache.json(宁可 stale 一天也不显示 --)。
 async function fetchStockFundFlow(code) {
   const yi = (v) => Math.round(v / 1e6) / 100;  // 元 → 亿元(2位)
   const num = String(code).replace(/^(sh|sz|bj)/, '');
   const mkt = String(code).charAt(0) === '6' ? '1' : '0';
-  // 主源:历史资金流(120天)
-  try {
-    const url = `https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid=${mkt}.${num}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63`;
+  const cacheKey = num;
+  const fflowFetch = async (url) => {
     const ac = new AbortController();
     const timer = setTimeout(() => ac.abort(), 8000);
     const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, signal: ac.signal }).finally(() => clearTimeout(timer));
-    const j = await res.json();
-    const kl = (j && j.data && j.data.klines) || [];
-    if (kl.length >= 3) {
-      const vals = kl.map(line => parseFloat((line.split(',')[1]) || 0) || 0);  // f52 主力净流入(元)
-      const sum = k => vals.slice(-k).reduce((a, b) => a + b, 0);
-      return { d1: yi(sum(1)), d3: yi(sum(3)), d5: yi(sum(5)) };
-    }
-  } catch (e) { /* 降级 */ }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  };
+  const writeCache = (ff) => {
+    try {
+      const c = loadFflowCache();
+      c[cacheKey] = { date: bjToday(), d1: ff.d1, d3: ff.d3, d5: ff.d5 };
+      saveFflowCache();
+    } catch (e) { /* 缓存写入失败不影响主流程 */ }
+  };
+  // 主源:历史资金流(120天),重试 3 次(东财偶发超时/限流)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const url = `https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid=${mkt}.${num}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63`;
+      const j = await fflowFetch(url);
+      const kl = (j && j.data && j.data.klines) || [];
+      if (kl.length >= 3) {
+        const vals = kl.map(line => parseFloat((line.split(',')[1]) || 0) || 0);  // f52 主力净流入(元)
+        const sum = k => vals.slice(-k).reduce((a, b) => a + b, 0);
+        const ff = { d1: yi(sum(1)), d3: yi(sum(3)), d5: yi(sum(5)) };
+        writeCache(ff);
+        return ff;
+      }
+    } catch (e) { /* 重试 */ }
+  }
   // 降级:实时接口(仅当日1根K线),d3/d5 置 null 避免重复
   try {
     const url = `https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid=${mkt}.${num}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5`;
-    const ac = new AbortController();
-    const timer = setTimeout(() => ac.abort(), 8000);
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, signal: ac.signal }).finally(() => clearTimeout(timer));
-    const j = await res.json();
+    const j = await fflowFetch(url);
     const kl = (j && j.data && j.data.klines) || [];
-    if (!kl.length) return null;
-    const d1 = yi(parseFloat((kl[kl.length - 1].split(',')[1]) || 0) || 0);
-    return { d1, d3: null, d5: null };
-  } catch (e) { return null; }
+    if (kl.length) {
+      const d1 = yi(parseFloat((kl[kl.length - 1].split(',')[1]) || 0) || 0);
+      const ff = { d1, d3: null, d5: null };
+      writeCache(ff);
+      return ff;
+    }
+  } catch (e) { /* 降级失败继续 */ }
+  // 终极兜底:读本地缓存(过去成功抓取的资金流,宁可 stale 一天也不显示 --,标记 fromCache)
+  try {
+    const cached = loadFflowCache()[cacheKey];
+    if (cached && cached.d1 != null && !isNaN(cached.d1)) {
+      return { d1: cached.d1, d3: cached.d3 != null ? cached.d3 : null, d5: cached.d5 != null ? cached.d5 : null, fromCache: true, cacheDate: cached.date || null };
+    }
+  } catch (e) { /* 缓存缺失忽略 */ }
+  return null;
 }
 
 // 分钟级趋势:60/15分钟收盘价 vs MA10 判断多空,真实计算
