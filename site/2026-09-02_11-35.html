@@ -4125,6 +4125,16 @@ async function addFetchedToWatchlist(code){
   }
   if(!/^\d{6}$/.test(code)){alert("无效股票代码: "+code);return;}
   console.log('[addFetchedToWatchlist] 进入, code=', JSON.stringify(code), '类型=', typeof code);
+  // v11.4:如果 code 在 atds_watchlist_hidden 里(用户曾删除过原配置股),从 hidden 移除——用户重新搜索加入即"恢复",下次刷新不会再被 hidden 过滤掉
+  try{
+    var hRaw=localStorage.getItem('atds_watchlist_hidden');
+    var hArr=hRaw?JSON.parse(hRaw):[];
+    if(Array.isArray(hArr)&&hArr.indexOf(code)>=0){
+      hArr=hArr.filter(function(c){return String(c)!==String(code);});
+      localStorage.setItem('atds_watchlist_hidden',JSON.stringify(hArr));
+      console.log('[addFetchedToWatchlist] 已从 atds_watchlist_hidden 移除 code=',code,'(用户重新加入,恢复原配置股)');
+    }
+  }catch(e){console.warn('[addFetchedToWatchlist] hidden 清理失败:',e.message);}
   // 检查是否已存在
   if(document.querySelector('.wl-stock-row[data-code="'+code+'"]')){
     alert("已在观察池中");
@@ -4167,7 +4177,7 @@ async function addFetchedToWatchlist(code){
       data.eventsStatus = { cninfo: ext[4].cninfoStatus || (ext[4].status === 'ok' ? 'ok' : 'fail'), srcUsed: ext[4].srcUsed || '' };
     }
   } catch (e) { console.warn('[addFetchedToWatchlist]', code, '并发拉取失败:', e.message); }
-  // v11.1:自动生成 strategy 字段(logic/capital/plan/strategy/todayStrategy)——手动加股不再缺"逻辑与催化"模块
+  // v11.4:自动生成 strategy 字段——手动加股不再缺"逻辑与催化"模块;终极保底:autoGenStrategy 抛错时也用最简模板填充
   try {
     var atds = 70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
     var auto = autoGenStrategy(data, Number(data.pct)||0, atds, Number(data.turnover)||0, data.tech);
@@ -4179,7 +4189,17 @@ async function addFetchedToWatchlist(code){
     data.todayStrategy = auto.todayStrategy;
     if (!data.category) data.category = '题材';
     data.atds = atds;
-  } catch (e) { console.warn('[addFetchedToWatchlist]', code, 'autoGenStrategy 失败:', e.message); }
+  } catch (e) {
+    console.warn('[addFetchedToWatchlist]', code, 'autoGenStrategy 失败,使用兜底模板:', e.message);
+    var vfb=Number(data.pct)||0;
+    data.logic = vfb>=5?'强势突破,关注量能持续性':vfb>=2?'强势承接,技术偏强':vfb>=-1?'震荡整理,方向待确认':vfb>=-3?'回调观察,关注支撑位':'弱势回调,严格控制仓位';
+    data.capital='换手 '+(Number(data.turnover)||0).toFixed(2)+'%,关注资金异动';
+    data.keyLevels='建议参考实时价位,关键位数据拉取中';
+    data.plan='参考实时行情,严控仓位';
+    data.strategy={entryStrategy:'回踩低吸',entryPrice:'参考实时价位',entryPosition:'保守仓位',entryNote:'严格执行止损',stopLoss:'--',takeProfit:'--',target:'--',risk:'严格执行止损'};
+    data.todayStrategy={core:'数据补全中,稍后刷新',planA:{title:'求稳回踩',content:'参考实时价位'},planB:{title:'突破确认',content:'参考实时价位'},choice:'先观望',position:'保守仓位',alert:'数据补全后再判断'};
+    data.category=data.category||'题材';
+  }
   addToWatchlistUI(data);
   // 保存全量数据(供退出重登时立即渲染,不依赖网络)
   saveWatchlistStockData(String(code), data);
@@ -4983,6 +5003,21 @@ function restoreSavedWatchlist(){
   try{hiddenRaw=localStorage.getItem("atds_watchlist_hidden");}catch(e){}
   var hidden=[];
   try{hidden=JSON.parse(hiddenRaw)||[];}catch(e){}
+  // v11.4 清理"孤儿 hidden":用户曾删除某股(进 hidden)又手动重加(进 atds_watchlist)→ 从 hidden 移除,避免下次刷新被过滤掉
+  if(raw){
+    try{
+      var wlArr=JSON.parse(raw)||[];
+      if(Array.isArray(wlArr)&&Array.isArray(hidden)&&hidden.length){
+        var wlSet=new Set(wlArr.map(function(c){return String(c);}));
+        var newHidden=hidden.filter(function(c){return !wlSet.has(String(c));});
+        if(newHidden.length!==hidden.length){
+          console.log('[restoreSavedWatchlist] 清理孤儿 hidden:',hidden.filter(function(c){return wlSet.has(String(c));}),'→',newHidden);
+          hidden=newHidden;
+          try{localStorage.setItem('atds_watchlist_hidden',JSON.stringify(newHidden));}catch(e){}
+        }
+      }
+    }catch(e){console.warn('[restoreSavedWatchlist] 孤儿 hidden 清理失败:',e.message);}
+  }
   var card=document.querySelector('.watchlist-card');
   if(!card){console.warn('[restoreSavedWatchlist] 未找到 .watchlist-card 容器');return;}
   var configCodes=[];
@@ -5050,14 +5085,24 @@ function restoreSavedWatchlist(){
         if(!f15)f15=approxMinFromTechF(data.tech);
         if(f60||f15)data.minTrend={m60:f60,m15:f15};
       }catch(e){/* 分钟线缺失不警告 */}
-      // v11.1:补 autoGenStrategy 生成 logic/capital/plan/strategy/todayStrategy,手机端不再缺"逻辑与催化"模块
+      // v11.4:补 autoGenStrategy 生成 logic/capital/plan/strategy/todayStrategy,终极兜底即使抛错也用最简模板填充
       try{
         var atdsR=70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
         var autoR=autoGenStrategy(data,Number(data.pct)||0,atdsR,Number(data.turnover)||0,data.tech);
         data.logic=autoR.logic;data.capital=autoR.capital;data.keyLevels=autoR.keyLevels;data.plan=autoR.plan;data.strategy=autoR.strategy;data.todayStrategy=autoR.todayStrategy;
         if(!data.category)data.category='题材';
         data.atds=atdsR;
-      }catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'autoGenStrategy 失败:',e.message);}
+      }catch(e){
+        console.warn('[restoreSavedWatchlist]', rawCode, 'autoGenStrategy 失败,使用兜底模板:',e.message);
+        var vfb2=Number(data.pct)||0;
+        data.logic=vfb2>=5?'强势突破,关注量能持续性':vfb2>=2?'强势承接,技术偏强':vfb2>=-1?'震荡整理,方向待确认':vfb2>=-3?'回调观察,关注支撑位':'弱势回调,严格控制仓位';
+        data.capital='换手 '+(Number(data.turnover)||0).toFixed(2)+'%,关注资金异动';
+        data.keyLevels='建议参考实时价位,关键位数据拉取中';
+        data.plan='参考实时行情,严控仓位';
+        data.strategy={entryStrategy:'回踩低吸',entryPrice:'参考实时价位',entryPosition:'保守仓位',entryNote:'严格执行止损',stopLoss:'--',takeProfit:'--',target:'--',risk:'严格执行止损'};
+        data.todayStrategy={core:'数据补全中,稍后刷新',planA:{title:'求稳回踩',content:'参考实时价位'},planB:{title:'突破确认',content:'参考实时价位'},choice:'先观望',position:'保守仓位',alert:'数据补全后再判断'};
+        data.category=data.category||'题材';
+      }
       // v11.2:已在 DOM 的股不重复 addToWatchlistUI(避免丢滚动位置),改为更新 data-attribute + 重新生成 detail 内容
       if(existing){
         try{
