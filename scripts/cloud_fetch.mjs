@@ -1508,9 +1508,11 @@ async function fetchEvents(code, name) {
   const cache = loadEventsCache();
   let cninfo = null;
   let cninfoStatus = 'empty'; // ok=有事件 / empty=成功无事件 / fail=源不可用
+  let srcUsed = 'eastmoney';
   if (cache.date === today && Object.prototype.hasOwnProperty.call(cache.byCode, num)) {
     cninfo = cache.byCode[num] || [];
     cninfoStatus = cninfo.length ? 'ok' : 'empty';
+    if (cninfo.length) srcUsed = 'eastmoney+cninfo';
   } else {
     try {
       cninfo = await fetchCninfoEvents(num, name);
@@ -1519,6 +1521,7 @@ async function fetchEvents(code, name) {
       cninfoStatus = 'fail';
     } else {
       cninfoStatus = cninfo.length ? 'ok' : 'empty';
+      if (cninfo.length) srcUsed = 'eastmoney+cninfo';
       cache.byCode[num] = cninfo; // 仅成功(含空数组)才缓存;fail 不缓存,下次重试
       cache.date = today;
     }
@@ -1533,7 +1536,8 @@ async function fetchEvents(code, name) {
   // 排序:影响等级 高>中>低,同级按日期升序(最近/最紧迫在前)
   const lvRank = { '高': 0, '中': 1, '低': 2 };
   events.sort((a, b) => (lvRank[a.level] ?? 2) - (lvRank[b.level] ?? 2) || (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-  return { events: events.length ? events : null, cninfoStatus };
+  // v11.7:与客户端一致——返回 srcUsed 供渲染层区分巨潮实际状态
+  return { events: events.length ? events : null, cninfoStatus, srcUsed };
 }
 
 async function enrichWatchlistTech(list) {
@@ -1586,12 +1590,13 @@ async function enrichWatchlistTech(list) {
       const lhb = await fetchLhbDetail(s.code);
       if (lhb) s.lhb = lhb;
     } catch (e) { /* 龙虎榜缺失不阻塞 */ }
-    // 事件日历(东财+巨潮合并)
-    try {
-      const ev = await fetchEvents(s.code, s.name);
-      if (ev && ev.events) s.events = ev.events;
-      if (ev) s.eventsStatus = { cninfo: ev.cninfoStatus };
-    } catch (e) { /* 事件缺失不阻塞 */ }
+// 事件日历(东财+巨潮合并)
+      try {
+        const ev = await fetchEvents(s.code, s.name);
+        if (ev && ev.events) s.events = ev.events;
+        // v11.7:与客户端一致——eventsStatus 含 srcUsed 供渲染层区分
+        if (ev) s.eventsStatus = { cninfo: ev.cninfoStatus, srcUsed: ev.srcUsed || 'eastmoney' };
+      } catch (e) { /* 事件缺失不阻塞 */ }
     // 量化风险信号(可观测规则固化,触发则高亮)
     const riskSignals = [];
     const tt = s.tech || {};

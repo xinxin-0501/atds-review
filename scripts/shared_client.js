@@ -393,23 +393,23 @@ var _CONCEPT_BIZ = [
 // v11.6:概念正则(镜像 buildDecisionCardHtml 第 500 行 / build_report.js _concept)
 var _CONCEPT_REGEX_MAP = {
   '种业': /转基因|种子|种业/,
-  '种植/土地': /种植|土地流转|耕地/,
-  '天然气': /燃气|天然气|LNG|油气管网/,
-  '地产链': /地产|房地产|物业|城中村|基建/,
-  '光模块': /光模块|海缆|光通信|旭创|新易盛/,
-  '算力': /算力|CPO|AI算力|数据中心/,
-  '机器人': /机器人|减速器|人形/,
-  '传媒/IP': /传媒|IP|游戏|影视|出版/,
-  '稀土': /稀土|永磁|盛和|北方稀土/,
-  '小金属': /小金属/,
-  '军工': /军工|航天|国防|天银/,
-  '半导体材料': /半导体|芯片|集成电路|国瓷|电子陶瓷|MLCC/,
-  '新能源': /光伏|储能|锂电|新能源/,
-  '农业': /农业|农牧|养殖|粮食|生猪/,
-  '医药': /美诺华|医药|创新药|医疗|制药/,
-  '证券': /证券|券商/,
-  '银行': /银行/,
-  '保险': /保险/
+  '种植/土地': /种植|土地流转|耕地|林业/,
+  '天然气': /燃气|天然气|LNG|油气管网|石油|石化|油气|煤化工/,
+  '地产链': /地产|房地产|物业|城中村|基建|建筑|装饰|家居|建材|厨电/,
+  '光模块': /光模块|海缆|光通信|旭创|新易盛|光器件|连接器/,
+  '算力': /算力|CPO|AI算力|数据中心|服务器|云计算|软件|信息/,
+  '机器人': /机器人|减速器|人形|机械|自动化|智能制造/,
+  '传媒/IP': /传媒|IP|游戏|影视|出版|广告|视频|在线|网络|互联/,
+  '稀土': /稀土|永磁|磁材/,
+  '小金属': /小金属|钨|钼|锗|锑|铟|镓/,
+  '军工': /军工|航天|国防|天银|船舶|兵装/,
+  '半导体材料': /半导体|芯片|集成电路|国瓷|电子陶瓷|MLCC|封装|PCB|电子/,
+  '新能源': /光伏|储能|锂电|新能源|风电|核电|氢能|电池|电动/,
+  '农业': /农业|农牧|养殖|粮食|生猪|种业|种子|化肥|农药|饲料/,
+  '医药': /美诺华|医药|创新药|医疗|制药|医院|生物|健康|中药|诊断|疫苗/,
+  '证券': /证券|券商|财富|金融|信托|互金|理财/,
+  '银行': /银行|农商|工商|建设|招商|兴业|平安/,
+  '保险': /保险|人寿|财险|太保|新华|平安|太平洋/
 };
 function autoGenStrategy(s, v, atds, turnover, tech, existingLogic) {
   tech = tech || null;
@@ -450,15 +450,13 @@ function autoGenStrategy(s, v, atds, turnover, tech, existingLogic) {
     } else if (hits.length === 1) {
       logic = hits[0][1] + '方向,' + boardName + stage + '的' + boardStatus + ',' + valuation + '。';
     } else {
-      // 无概念命中:回退到原 MA 技术文本
-      if (tech) {
-        if (tech.bullArrange) logic = '均线多头排列(MA5>MA10>MA20>MA60),趋势向上,回踩可跟踪';
-        else if (price < tech.ma20) logic = '现价跌破 MA20(' + Number(tech.ma20).toFixed(2) + '),趋势走弱,观望';
-        else if (tech.bias5 != null && tech.bias5 > 8) logic = '短期乖离大,股价偏离 MA5 ' + tech.bias5.toFixed(1) + '%,不宜追高';
-        else logic = '现价运行于 MA10(' + Number(tech.ma10).toFixed(2) + ')与 MA20(' + Number(tech.ma20).toFixed(2) + ')之间,关注方向选择';
-      } else {
-        logic = v >= 5 ? '强势突破,关注量能持续性' : v >= 2 ? '强势承接,技术偏强' : v >= -1 ? '震荡整理,方向待确认' : v >= -3 ? '回调观察,关注支撑位' : '弱势回调,严格控制仓位';
-      }
+      // v11.7:无概念命中时改用 business-driven 通用模板(不再用 MA 技术文本)
+      // 用户诉求："所有手动新增个股都改为 business-driven 风格",MA 技术文本被认为"敷衍"
+      // v11.6 只解决了有概念命中(2只配置股+18概念模板),漏了无概念命中时的兜底
+      var dirDesc = v >= 5 ? '强势突破' : v >= 2 ? '强势承接' : v >= 0.5 ? '震荡上行' : v >= -1 ? '震荡整理' : v >= -3 ? '走势承压' : '弱势回调';
+      var tradeStage2 = trend === 'up' ? '多头' : (trend === 'down' ? '空头' : '震荡');
+      var stockName2 = (s && s.name) || '该股';
+      logic = stockName2 + '方向，' + dirDesc + '，' + boardStatus + '，' + valuation + '，趋势' + tradeStage2 + '，关注板块联动与量能持续性。';
     }
   }
   var capital = turnover >= 5 ? '主力活跃,换手率 ' + s.turnover + '%,资金博弈加剧' : turnover >= 2 ? '换手温和(' + s.turnover + '%),资金参与一般' : turnover >= 0.5 ? '换手一般(' + s.turnover + '%)' : '换手偏低(' + s.turnover + '%),关注资金异动';
@@ -650,7 +648,15 @@ function buildDecisionCardHtml(s){
   var evHtml=(evs&&evs.length)
     ?evs.slice(0,10).map(function(e){var red=(e.level==='高'&&e.left>=-3&&e.left<=3)?' ev-red-alert':'';var cnt=e.left>0?(' T-'+e.left+'天'):(e.left<0?(' '+Math.abs(e.left)+'天前'):' 今日');var rawTitle=e.fullTitle||e.name||'';var showTitle=rawTitle?(rawTitle.length>28?(rawTitle.slice(0,28)+'…'):rawTitle):'';var linkHtml=e.cninfoUrl?'<a class="ev-link" href="'+escHtmlF(e.cninfoUrl)+'" target="_blank" rel="noopener" title="查看巨潮原文">查看原文↗</a>':'';return '<span class="ev-item ev-'+(e.level==='高'?'h':e.level==='中'?'m':'l')+' '+(e.dir==='利好'?'ev-good':e.dir==='利空'?'ev-bad':'')+red+'"><span class="ev-head"><span class="ev-type">'+escHtmlF(e.type)+'</span>'+(e.dir&&e.dir!=='中性'?'<span class="ev-dir ev-dir-'+(e.dir==='利好'?'good':'bad')+'">'+escHtmlF(e.dir)+'</span>':'')+'<span class="ev-cnt">'+cnt+'</span>'+(e.source?'<span class="ev-src">〔'+escHtmlF(e.source)+'〕</span>':'')+'</span><span class="ev-title" title="'+escHtmlF(e.detail||rawTitle||e.date||'')+'">'+escHtmlF(showTitle)+'</span>'+linkHtml+'</span>';}).join('')
     :evEmpty;
-  var evNote=(evStatus.cninfo==='fail')?'⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财':'来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告';
+  // v11.7:evNote 区分巨潮实际状态——cninfoStatus='fail' 源不可用 / srcUsed='eastmoney' 源可能 CORS 失败或近 30 天无减持/回购/问询类公告(常见于新股)
+  var evNote;
+  if(evStatus.cninfo==='fail'){
+    evNote='⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财';
+  }else if(evStatus.srcUsed==='eastmoney'||(!evStatus.srcUsed)){
+    evNote='⚠ 巨潮本次未匹配到（近期无减持/回购/问询等关键词公告，或 CORS 被浏览器拦截），财报/解禁来自东财；如需查减持/回购，请点"+搜索加入"旁的"个股分析"查看公告列表';
+  }else{
+    evNote='来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告';
+  }
   // 交易计划表(方案A/B/C;未触发方案盈亏比置灰+未触发标签;做T用ATR动态止损)
   var planBEntry=pre?pre.price:(price*1.05);
   var planBStop=planBEntry*0.97, planBTarget=planBEntry*1.08;

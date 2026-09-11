@@ -1495,9 +1495,15 @@ function buildStockRow(s, i, report) {
         return `<span class="ev-item ev-${e.level === '高' ? 'h' : e.level === '中' ? 'm' : 'l'} ${e.dir === '利好' ? 'ev-good' : e.dir === '利空' ? 'ev-bad' : ''}${red}"><span class="ev-head"><span class="ev-type">${esc(e.type)}</span>${(e.dir && e.dir !== '中性') ? `<span class="ev-dir ev-dir-${e.dir === '利好' ? 'good' : 'bad'}">${esc(e.dir)}</span>` : ''}<span class="ev-cnt">${cnt}</span>${e.source ? `<span class="ev-src">〔${esc(e.source)}〕</span>` : ''}</span><span class="ev-title" title="${esc(e.detail || rawTitle || e.date || '')}">${esc(showTitle)}</span>${linkHtml}</span>`;
       }).join('')
     : evEmpty;
-  const evNote = (evStatus.cninfo === 'fail')
-    ? '⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财'
-    : '来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告';
+  // v11.7:与客户端同步——区分巨潮实际状态(cninfoStatus=fail 源不可用 / srcUsed=eastmoney 未匹配或 CORS)
+  let evNote;
+  if (evStatus.cninfo === 'fail') {
+    evNote = '⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财';
+  } else if (evStatus.srcUsed === 'eastmoney' || !evStatus.srcUsed) {
+    evNote = '⚠ 巨潮本次未匹配到（近期无减持/回购/问询等关键词公告，或 CORS 被浏览器拦截），财报/解禁来自东财；如需查减持/回购，请点"+搜索加入"旁的"个股分析"查看公告列表';
+  } else {
+    evNote = '来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告';
+  }
 
   // 交易计划表 (方案A/B/C,真实价位 + 盈亏比 + 仓位;未触发方案盈亏比置灰+未触发标签)
   const planBEntry = preStrong ? preStrong.price : (price * 1.05);
