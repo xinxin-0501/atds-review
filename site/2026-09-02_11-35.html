@@ -6020,7 +6020,7 @@ async function fetchEventsF(code){
       events.push({type:'解禁',eventType:'解禁',name:l.FREE_SHARES_TYPE||'限售解禁',date:d2,eventDate:d2,left:left2,countdown:'T-'+left2+'天',dir:'利空',direction:'利空',level:cap>50000?'高':cap>10000?'中':'低',impactLevel:cap>50000?'高':cap>10000?'中':'低',detail:'解禁市值约'+Math.round(cap/10000*100)/100+'亿',source:'东财'});
     }
   }catch(e){}
-  // 巨潮公告(减持/增发/回购/股东大会/问询):客户端直连 cninfo(国内手机 IP),失败时降级到缓存
+  // 巨潮公告(减持/增发/回购/股东大会/问询):客户端直连 cninfo(国内手机 IP),失败时降级到云端缓存(服务端采集,无 CORS)
   var cninfoEvents=null;
   try{
     cninfoEvents=await fetchCninfoEventsF(num);
@@ -6031,9 +6031,10 @@ async function fetchEventsF(code){
       }
       srcUsed='eastmoney+cninfo';
     }
-  }catch(e){/* cninfo 客户端失败,继续读缓存 */}
-  // 缓存兜底:如果所有源都失败(events 空)→ 读云端 events_cache.json + localStorage
-  if(!events.length){
+  }catch(e){/* cninfo 客户端失败(403/CORS),下面从云端缓存补巨潮 */}
+  // v11.8 关键修复:巨潮直连失败(403/CORS)时,即使东财已有数据,也必须从云端缓存补巨潮事件。
+  // 原逻辑 if(!events.length) 只在"东财也全空"时才读缓存,导致"东财有数据→巨潮事件永远丢失"。
+  if(cninfoEvents===null){
     try{
       var r=await fetch('data/events_cache.json',{cache:'no-store'});
       if(r.ok){
@@ -6041,21 +6042,28 @@ async function fetchEventsF(code){
         var byCode=j3&&j3.byCode?j3.byCode:{};
         var cached=byCode[num]||byCode[rawCode];
         if(Array.isArray(cached)&&cached.length){
-          events=cached.slice();
-          srcUsed='cloud-events-cache';
+          var mergedCninfo=0;
+          for(var ci2=0;ci2<cached.length;ci2++){
+            var cev=cached[ci2];
+            // 云端缓存只存巨潮事件(source='巨潮'),合并去重
+            var dup2=events.some(function(x){return x.type===cev.type&&x.date===cev.date;});
+            if(!dup2){events.push(cev);mergedCninfo++;}
+          }
+          if(mergedCninfo>0)srcUsed='eastmoney+cninfo';
         }
       }
     }catch(e){/* 缓存拉取失败 */}
-    if(!events.length){
-      try{
-        var lc=JSON.parse(localStorage.getItem('atds_events_cache')||'{}');
-        var localEntry=lc[num]||lc[rawCode];
-        if(Array.isArray(localEntry)&&localEntry.length){
-          events=localEntry.slice();
-          srcUsed='local-events-cache';
-        }
-      }catch(e){}
-    }
+  }
+  // 最后兜底:所有源(东财直连+巨潮直连+云端缓存)都失败 → localStorage
+  if(!events.length){
+    try{
+      var lc=JSON.parse(localStorage.getItem('atds_events_cache')||'{}');
+      var localEntry=lc[num]||lc[rawCode];
+      if(Array.isArray(localEntry)&&localEntry.length){
+        events=localEntry.slice();
+        srcUsed='local-events-cache';
+      }
+    }catch(e){}
   }
   // 排序:高 > 中 > 低,同级按日期升序(最近/最紧迫在前)
   var lvRank={'高':0,'中':1,'低':2};
