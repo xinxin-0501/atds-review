@@ -1556,13 +1556,17 @@ function buildStockRow(s, i, report) {
   const isMicroInflow = (ff.d1 != null && ff.d1 > 0 && ff.d1 < 0.1);
   const isShrinking = (t.volRatio != null && t.volRatio < 0.75);
   const isFlatPrice = Math.abs(stockPctN) <= 0.3;
+  // 数据缺失致命防呆:d1 为 null/-- 时禁止"符合做多预期"误判
+  const d1Missing = (ff.d1 == null || isNaN(ff.d1));
   let fundVerify;
-  if (upperShadow && (ff.d1 || 0) > 0) {
+  if (d1Missing) {
+    fundVerify = '资金数据加载失败/暂缺，无法验证做多预期，当前仅观察';
+  } else if (upperShadow && (ff.d1 || 0) > 0) {
     fundVerify = '主力净流入当日' + sign(ff.d1) + ff.d1.toFixed(2) + '亿，资金逆势流入，存在试盘可能';
   } else if (isMicroInflow && isShrinking && isFlatPrice) {
     fundVerify = '主力净流入当日' + sign(ff.d1) + ff.d1.toFixed(2) + '亿，微幅流入，买方承接极弱，需警惕滞涨';
   } else {
-    fundVerify = '主力净流入当日' + sign(ff.d1) + (ff.d1 != null ? ff.d1.toFixed(2) : '--') + '亿，' + ((ff.d1 || 0) >= 0 ? '符合做多预期' : '与做多预期背离，需复核');
+    fundVerify = '主力净流入当日' + sign(ff.d1) + ff.d1.toFixed(2) + '亿，' + ((ff.d1 || 0) >= 0 ? '符合做多预期' : '与做多预期背离，需复核');
   }
   if (secChg && secChg.changePct != null && !isNaN(secChg.changePct)) {
     const diff = stockPctN - secChg.changePct;
@@ -1602,12 +1606,23 @@ function buildStockRow(s, i, report) {
 
   // 情绪总纲建议(硬逆势):强烈建议不参与(emotionCycle/isHardTrade 已在上面状态机处计算)
   const summaryHtml = isHardTrade ? '<div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>' : '';
+  // 数据完整性校验(资金/关键位/龙虎榜/分钟线 任一缺失 → 标黄)
+  const diMissing = [];
+  if (d1Missing) diMissing.push('资金');
+  if (!t.ma5) diMissing.push('关键位');
+  if (!s.lhb) diMissing.push('龙虎榜');
+  if (s.minTrend && ((s.minTrend.m60 && s.minTrend.m60.approx) || (s.minTrend.m15 && s.minTrend.m15.approx))) diMissing.push('分钟线');
+  const dataIntegrity = { complete: diMissing.length === 0, missing: diMissing };
+  const integrityBadge = dataIntegrity.complete
+    ? '<span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>'
+    : '<span class="dc-integrity warn" title="缺失:' + diMissing.join('、') + ' · 决策受限,谨慎交易">⚠ 数据暂缺·' + diMissing.join('/') + '</span>';
 
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
     <div class="dc-head">
       <span class="dc-pri">${priority}</span>
       <span class="dc-name">${esc(s.name)} <i>${esc(code)}</i></span>
       <span class="dc-status ${effConfTone === 'good' ? 'up' : effConfTone === 'ok' ? '' : 'down'}">${effStatusLabel}</span>
+      ${integrityBadge}
       <span class="dc-conf">置信度 ${conf.total}</span>
       <span class="dc-rr ${rrHeadCls}"${rrHeadTitle}>盈亏比 ${p.rr.toFixed(2)}</span>
       <span class="dc-time">${esc(report.meta && report.meta.generatedAt || '')}</span>
