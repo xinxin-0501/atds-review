@@ -1485,16 +1485,19 @@ function buildStockRow(s, i, report) {
     ? '<span class="ev">数据源暂时不可用，请自行前往巨潮资讯网查询</span>'
     : '<span class="ev">近期无重大事件公告</span>';
   const evHtml = (evs && evs.length)
-    ? evs.slice(0, 5).map(e => {
+    ? evs.slice(0, 10).map(e => {
         const red = (e.level === '高' && e.left >= -3 && e.left <= 3) ? ' ev-red-alert' : '';
         const cnt = e.left > 0 ? ' T-' + e.left + '天' : (e.left < 0 ? ' ' + Math.abs(e.left) + '天前' : ' 今日');
-        const short = (e.name && e.name.length > 14) ? e.name.slice(0, 14) + '…' : (e.name || '');
-        return `<span class="ev ev-${e.level === '高' ? 'h' : e.level === '中' ? 'm' : 'l'} ${e.dir === '利好' ? 'ev-good' : e.dir === '利空' ? 'ev-bad' : ''}${red}" title="${esc(e.detail || e.date || '')}">${esc(e.type)}${short ? '·' + esc(short) : ''}${cnt}${e.dir !== '中性' ? '·' + esc(e.dir) : ''}${e.source ? '〔' + esc(e.source) + '〕' : ''}</span>`;
+        // v11.6:显示完整标题(截 28 字)+ 巨潮原文链接(与客户端同步)
+        const rawTitle = e.fullTitle || e.name || '';
+        const showTitle = rawTitle ? (rawTitle.length > 28 ? rawTitle.slice(0, 28) + '…' : rawTitle) : '';
+        const linkHtml = e.cninfoUrl ? `<a class="ev-link" href="${esc(e.cninfoUrl)}" target="_blank" rel="noopener" title="查看巨潮原文">查看原文↗</a>` : '';
+        return `<span class="ev-item ev-${e.level === '高' ? 'h' : e.level === '中' ? 'm' : 'l'} ${e.dir === '利好' ? 'ev-good' : e.dir === '利空' ? 'ev-bad' : ''}${red}"><span class="ev-head"><span class="ev-type">${esc(e.type)}</span>${(e.dir && e.dir !== '中性') ? `<span class="ev-dir ev-dir-${e.dir === '利好' ? 'good' : 'bad'}">${esc(e.dir)}</span>` : ''}<span class="ev-cnt">${cnt}</span>${e.source ? `<span class="ev-src">〔${esc(e.source)}〕</span>` : ''}</span><span class="ev-title" title="${esc(e.detail || rawTitle || e.date || '')}">${esc(showTitle)}</span>${linkHtml}</span>`;
       }).join('')
     : evEmpty;
   const evNote = (evStatus.cninfo === 'fail')
     ? '⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财'
-    : '来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；盘中读缓存，盘前盘后刷新';
+    : '来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告';
 
   // 交易计划表 (方案A/B/C,真实价位 + 盈亏比 + 仓位;未触发方案盈亏比置灰+未触发标签)
   const planBEntry = preStrong ? preStrong.price : (price * 1.05);

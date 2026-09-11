@@ -1429,6 +1429,10 @@ async function fetchCninfoEvents(code, name) {
   for (const a of anns) {
     const title = String(a.announcementTitle || '').replace(/<[^>]+>/g, '');
     if (!title) continue;
+    // v11.6:抓 announcementId + orgId,渲染层显示完整标题 + 巨潮原文链接(与客户端 fetchCninfoEventsF 同步)
+    const announcementId = a.announcementId || '';
+    const annOrgId = a.orgId || orgId;
+    const cninfoUrl = announcementId ? ('http://www.cninfo.com.cn/new/disclosure/detail?orgId=' + encodeURIComponent(annOrgId) + '&announcementId=' + encodeURIComponent(announcementId)) : '';
     for (const [kw, type, dir, level] of KW) {
       if (title.indexOf(kw) >= 0) {
         // 精度修正:"回购注销限制性股票"是中性动作,非市场回购利好,避免方向误导
@@ -1439,11 +1443,13 @@ async function fetchCninfoEvents(code, name) {
         events.push({
           type, eventType: type,
           name: title.slice(0, 30), title: title.slice(0, 30),
+          fullTitle: title,
           date: d, eventDate: d, left,
           countdown: left > 0 ? ('T-' + left + '天') : (left < 0 ? Math.abs(left) + '天前' : '今日'),
           dir: d2, direction: d2, level, impactLevel: level,
           detail: title.slice(0, 48),
-          source: '巨潮'
+          source: '巨潮',
+          announcementId, orgId: annOrgId, cninfoUrl
         });
         break; // 每条公告只归入一个事件类型
       }
