@@ -4,7 +4,7 @@
     "time": "16:20",
     "type": "close",
     "typeLabel": "收盘复盘",
-    "generatedAt": "2026-09-11 16:22:00",
+    "generatedAt": "2026-09-11 17:37:54",
     "market": "A股",
     "dataSource": "腾讯行情 + 东方财富公开接口",
     "dataAsOfDate": "2026-09-11",
@@ -990,9 +990,11 @@
         "pct5": 4.85
       },
       "fundFlow": {
-        "d1": 2.32,
-        "d3": 1.76,
-        "d5": 2.02
+        "d1": -13.66,
+        "d3": -4.36,
+        "d5": -12.41,
+        "fromCache": true,
+        "cacheDate": "2026-09-11"
       },
       "minTrend": {
         "m60": {
@@ -1005,10 +1007,6 @@
           "ma5": 65.01,
           "ma10": 64.07
         }
-      },
-      "sectorChange": {
-        "boardName": "光通信模块",
-        "changePct": 0.07
       },
       "lhb": {
         "date": "2026-08-25",
@@ -1566,9 +1564,11 @@
         "pct5": 13.76
       },
       "fundFlow": {
-        "d1": 31.2,
-        "d3": 20.75,
-        "d5": 102.02
+        "d1": -13.26,
+        "d3": 3.05,
+        "d5": 75.84,
+        "fromCache": true,
+        "cacheDate": "2026-09-11"
       },
       "minTrend": {
         "m60": {
@@ -1707,9 +1707,11 @@
         "pct5": -6.95
       },
       "fundFlow": {
-        "d1": -0.56,
-        "d3": -2.21,
-        "d5": -2.13
+        "d1": -0.49,
+        "d3": -1.08,
+        "d5": -3.96,
+        "fromCache": true,
+        "cacheDate": "2026-09-11"
       },
       "minTrend": {
         "m60": {
@@ -2069,10 +2071,6 @@
           "ma10": 32.45
         }
       },
-      "sectorChange": {
-        "boardName": "机器人",
-        "changePct": -2.44
-      },
       "lhb": {
         "date": "2026-07-06",
         "explain": "日跌幅达到15%的前5只证券",
@@ -2236,10 +2234,6 @@
           "ma5": 3.37,
           "ma10": 3.37
         }
-      },
-      "sectorChange": {
-        "boardName": "种植业",
-        "changePct": -2.79
       },
       "lhb": {
         "date": "2026-08-18",
@@ -2432,9 +2426,11 @@
         "pct5": -3.72
       },
       "fundFlow": {
-        "d1": 0,
-        "d3": -0.13,
-        "d5": -0.4
+        "d1": 0.19,
+        "d3": -0.3,
+        "d5": -0.15,
+        "fromCache": true,
+        "cacheDate": "2026-09-11"
       },
       "minTrend": {
         "m60": {
@@ -2447,10 +2443,6 @@
           "ma5": 3.62,
           "ma10": 3.61
         }
-      },
-      "sectorChange": {
-        "boardName": "游戏Ⅲ",
-        "changePct": -1.98
       },
       "lhb": {
         "date": "2024-11-28",
@@ -2598,10 +2590,6 @@
           "ma10": 16.22
         }
       },
-      "sectorChange": {
-        "boardName": "种植业",
-        "changePct": -2.79
-      },
       "lhb": {
         "date": "2026-09-10",
         "explain": "有价格涨跌幅限制的日收盘价格跌幅偏离值达到7%的前五只证券",
@@ -2725,9 +2713,11 @@
         "pct5": 8.49
       },
       "fundFlow": {
-        "d1": -0.35,
-        "d3": -6.58,
-        "d5": -5.65
+        "d1": -2.72,
+        "d3": -5.76,
+        "d5": -4,
+        "fromCache": true,
+        "cacheDate": "2026-09-11"
       },
       "minTrend": {
         "m60": {
@@ -2740,10 +2730,6 @@
           "ma5": 4.73,
           "ma10": 4.74
         }
-      },
-      "sectorChange": {
-        "boardName": "种植业",
-        "changePct": -2.79
       },
       "lhb": {
         "date": "2026-09-10",
@@ -2824,14 +2810,34 @@
       "techTag": "主线+成长",
       "trendSub": "资金聚焦 / +10.0%",
       "flowMain": "11.90",
-      "flowMid": "14.00",
+      "flowMid": "9.14",
       "rank": 1,
       "leadOpen": 16.8,
       "leadClose": 18.7,
       "leadHigh": 18.7,
       "leadLow": 16.67,
       "leadVol": 154274626,
-      "leadTurnover": 11.3
+      "leadTurnover": 11.3,
+      "picks": [
+        {
+          "code": "002636",
+          "name": "金安国纪",
+          "pct": 7.86,
+          "turnover": 15.52
+        },
+        {
+          "code": "301176",
+          "name": "逸豪新材",
+          "pct": 7.28,
+          "turnover": 16.44
+        },
+        {
+          "code": "688655",
+          "name": "迅捷兴",
+          "pct": 6.75,
+          "turnover": 13.07
+        }
+      ]
     },
     {
       "name": "电力",
@@ -2852,8 +2858,28 @@
       "techTag": "异动高+空间+高",
       "trendSub": "连续强势 / +10.0%",
       "flowMain": "2.60",
-      "flowMid": "2.12",
-      "rank": 2
+      "flowMid": "1.98",
+      "rank": 2,
+      "picks": [
+        {
+          "code": "600032",
+          "name": "浙江新能",
+          "pct": 5.53,
+          "turnover": 3.58
+        },
+        {
+          "code": "002617",
+          "name": "露笑科技",
+          "pct": 4.57,
+          "turnover": 11.08
+        },
+        {
+          "code": "600982",
+          "name": "宁波能源",
+          "pct": 3.56,
+          "turnover": 7.05
+        }
+      ]
     },
     {
       "name": "通信设备",
@@ -2874,14 +2900,34 @@
       "techTag": "异动高+空间+高",
       "trendSub": "连续强势 / +13.3%",
       "flowMain": "1.20",
-      "flowMid": "1.27",
+      "flowMid": "1.38",
       "rank": 3,
       "leadOpen": 7.29,
       "leadClose": 7.29,
       "leadHigh": 7.29,
       "leadLow": 6.84,
       "leadVol": 45827680,
-      "leadTurnover": 0
+      "leadTurnover": 0,
+      "picks": [
+        {
+          "code": "688143",
+          "name": "长盈通",
+          "pct": 15.49,
+          "turnover": 16.88
+        },
+        {
+          "code": "300183",
+          "name": "东软载波",
+          "pct": 9.2,
+          "turnover": 7.06
+        },
+        {
+          "code": "601869",
+          "name": "长飞光纤",
+          "pct": 8.78,
+          "turnover": 4.62
+        }
+      ]
     },
     {
       "name": "家居用品",
@@ -2902,8 +2948,28 @@
       "techTag": "主线+趋势技术",
       "trendSub": "异动爆发 / +10.1%",
       "flowMain": "3.90",
-      "flowMid": "4.36",
-      "rank": 4
+      "flowMid": "3.05",
+      "rank": 4,
+      "picks": [
+        {
+          "code": "603226",
+          "name": "菲林格尔",
+          "pct": 7.41,
+          "turnover": 4.08
+        },
+        {
+          "code": "002853",
+          "name": "皮阿诺",
+          "pct": 3.24,
+          "turnover": 1.33
+        },
+        {
+          "code": "603221",
+          "name": "爱丽家居",
+          "pct": 2.25,
+          "turnover": 5.2
+        }
+      ]
     },
     {
       "name": "玻璃玻纤",
@@ -2924,8 +2990,28 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.20",
-      "flowMid": "1.20",
-      "rank": 5
+      "flowMid": "1.26",
+      "rank": 5,
+      "picks": [
+        {
+          "code": "300196",
+          "name": "长海股份",
+          "pct": 8.36,
+          "turnover": 18.09
+        },
+        {
+          "code": "605006",
+          "name": "山东玻纤",
+          "pct": 6.64,
+          "turnover": 16.35
+        },
+        {
+          "code": "301526",
+          "name": "国际复材",
+          "pct": 4.32,
+          "turnover": 16.39
+        }
+      ]
     },
     {
       "name": "地面兵装",
@@ -2946,7 +3032,7 @@
       "techTag": "主线+成长",
       "trendSub": "资金聚焦 / +10.0%",
       "flowMain": "1.80",
-      "flowMid": "1.62",
+      "flowMid": "2.14",
       "rank": 6
     },
     {
@@ -2968,7 +3054,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.10",
-      "flowMid": "1.23",
+      "flowMid": "0.83",
       "rank": 7
     },
     {
@@ -2990,7 +3076,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.50",
-      "flowMid": "0.52",
+      "flowMid": "0.44",
       "rank": 8
     },
     {
@@ -3012,7 +3098,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +9.9%",
       "flowMain": "0.90",
-      "flowMid": "0.80",
+      "flowMid": "0.72",
       "rank": 9
     },
     {
@@ -3034,7 +3120,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.1%",
       "flowMain": "0.90",
-      "flowMid": "0.94",
+      "flowMid": "0.99",
       "rank": 10
     },
     {
@@ -3056,7 +3142,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.00",
-      "flowMid": "1.04",
+      "flowMid": "0.78",
       "rank": 11
     },
     {
@@ -3078,7 +3164,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.10",
-      "flowMid": "0.95",
+      "flowMid": "0.88",
       "rank": 12
     },
     {
@@ -3100,7 +3186,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.50",
-      "flowMid": "0.48",
+      "flowMid": "0.43",
       "rank": 13
     },
     {
@@ -3122,7 +3208,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.1%",
       "flowMain": "0.50",
-      "flowMid": "0.53",
+      "flowMid": "0.37",
       "rank": 14
     },
     {
@@ -3144,7 +3230,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.70",
-      "flowMid": "0.83",
+      "flowMid": "0.75",
       "rank": 15
     },
     {
@@ -3166,7 +3252,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.1%",
       "flowMain": "0.20",
-      "flowMid": "0.22",
+      "flowMid": "0.19",
       "rank": 16
     },
     {
@@ -3188,7 +3274,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.60",
-      "flowMid": "0.70",
+      "flowMid": "0.44",
       "rank": 17
     },
     {
@@ -3210,7 +3296,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.50",
-      "flowMid": "0.47",
+      "flowMid": "0.42",
       "rank": 18
     },
     {
@@ -3232,7 +3318,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.40",
-      "flowMid": "0.29",
+      "flowMid": "0.32",
       "rank": 19
     },
     {
@@ -3254,7 +3340,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "2.70",
-      "flowMid": "1.93",
+      "flowMid": "2.70",
       "rank": 20
     },
     {
@@ -3276,7 +3362,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "1.30",
-      "flowMid": "0.95",
+      "flowMid": "1.43",
       "rank": 21
     },
     {
@@ -3298,7 +3384,7 @@
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
       "flowMain": "0.20",
-      "flowMid": "0.22",
+      "flowMid": "0.16",
       "rank": 22
     }
   ],
@@ -6362,17 +6448,17 @@
     },
     "hf_CL": {
       "name": "纽约原油",
-      "price": 100.66,
-      "change": -1.78,
-      "changePct": -1.74,
-      "time": "16:23:00"
+      "price": 99.79,
+      "change": -2.62,
+      "changePct": -2.56,
+      "time": "17:39:06"
     },
     "hf_GC": {
       "name": "纽约黄金",
-      "price": 4389.1,
-      "change": -0.41,
+      "price": 4385.53,
+      "change": -0.49,
       "changePct": -0.01,
-      "time": "16:23:03"
+      "time": "17:39:07"
     }
   },
   "closeEmotion": {
@@ -6565,19 +6651,79 @@
         "name": "元件",
         "count": 9,
         "maxLB": 2,
-        "leadStock": "超声电子"
+        "leadStock": "超声电子",
+        "picks": [
+          {
+            "code": "002636",
+            "name": "金安国纪",
+            "pct": 7.86,
+            "turnover": 15.52
+          },
+          {
+            "code": "301176",
+            "name": "逸豪新材",
+            "pct": 7.28,
+            "turnover": 16.44
+          },
+          {
+            "code": "688655",
+            "name": "迅捷兴",
+            "pct": 6.75,
+            "turnover": 13.07
+          }
+        ]
       },
       {
         "name": "电力",
         "count": 4,
         "maxLB": 3,
-        "leadStock": "闽东电力"
+        "leadStock": "闽东电力",
+        "picks": [
+          {
+            "code": "600032",
+            "name": "浙江新能",
+            "pct": 5.53,
+            "turnover": 3.58
+          },
+          {
+            "code": "002617",
+            "name": "露笑科技",
+            "pct": 4.57,
+            "turnover": 11.08
+          },
+          {
+            "code": "600982",
+            "name": "宁波能源",
+            "pct": 3.56,
+            "turnover": 7.05
+          }
+        ]
       },
       {
         "name": "通信设备",
         "count": 3,
         "maxLB": 3,
-        "leadStock": "鼎信通讯"
+        "leadStock": "鼎信通讯",
+        "picks": [
+          {
+            "code": "688143",
+            "name": "长盈通",
+            "pct": 15.49,
+            "turnover": 16.88
+          },
+          {
+            "code": "300183",
+            "name": "东软载波",
+            "pct": 9.2,
+            "turnover": 7.06
+          },
+          {
+            "code": "601869",
+            "name": "长飞光纤",
+            "pct": 8.78,
+            "turnover": 4.62
+          }
+        ]
       }
     ],
     "defense": [
@@ -6608,6 +6754,20 @@
         "name": "光伏",
         "stocks": [
           "安彩高科"
+        ],
+        "picks": [
+          {
+            "code": "605117",
+            "name": "德业股份",
+            "pct": 2.88,
+            "turnover": 1.09
+          },
+          {
+            "code": "300051",
+            "name": "琏升科技",
+            "pct": 1.29,
+            "turnover": 6.45
+          }
         ]
       }
     ],
@@ -7174,7 +7334,9 @@
         "name": "元件",
         "category": "可买入",
         "picks": [
-          "超声电子"
+          "金安国纪",
+          "逸豪新材",
+          "迅捷兴"
         ],
         "reason": "元件 主线确认、9家涨停·最高2板、净流入11.9亿;明日只做龙头不追高,看量能能否延续"
       },
@@ -7182,7 +7344,9 @@
         "name": "电力",
         "category": "可买入",
         "picks": [
-          "闽东电力"
+          "浙江新能",
+          "露笑科技",
+          "宁波能源"
         ],
         "reason": "电力 主线确认、4家涨停·最高3板、净流入2.6亿;明日只做龙头不追高,看量能能否延续"
       },
@@ -7206,7 +7370,9 @@
         "name": "家居用品",
         "category": "等回调",
         "picks": [
-          "瑞尔特"
+          "菲林格尔",
+          "皮阿诺",
+          "爱丽家居"
         ],
         "reason": "家居用品 主线确认、1家涨停·最高4板、净流入3.9亿;短期过热,等回调企稳再择机"
       }
