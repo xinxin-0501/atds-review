@@ -512,6 +512,10 @@
 .ev-red-alert{background:#c62828;border-color:#b71c1c;color:#fff;font-weight:700;animation:ev-pulse 1.2s ease-in-out infinite}
 .ev-src{font-style:normal;font-weight:400;opacity:.78;font-size:8px}
 @keyframes ev-pulse{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,.45)}50%{box-shadow:0 0 0 3px rgba(198,40,40,0)}}
+/* v11.0 事件源不可用提示(降级显示,不显示"近期无重大事件公告"敷衍用户) */
+.ev-loading{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:9px;background:#fff7e6;border:1px dashed #f59e0b;color:#b45309}
+.ev-loading::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;animation:ev-load-pulse 1s ease-in-out infinite}
+@keyframes ev-load-pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 
 /* ==================== 观察池 Pro 交互层样式(第十二轮) ==================== */
 /* 控制条 */
@@ -2189,7 +2193,7 @@
 <div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 79°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
-  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-09 19:20:47</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
+  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-09 19:20:47</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
     <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
     <span class="wl-cell wl-cell-price"><b>最新价</b></span>
     <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
@@ -3478,6 +3482,7 @@ async function addFetchedToWatchlist(code){
     }
   }
   if(!/^\d{6}$/.test(code)){alert("无效股票代码: "+code);return;}
+  console.log('[addFetchedToWatchlist] 进入, code=', JSON.stringify(code), '类型=', typeof code);
   // 检查是否已存在
   if(document.querySelector('.wl-stock-row[data-code="'+code+'"]')){
     alert("已在观察池中");
@@ -3514,11 +3519,15 @@ async function addFetchedToWatchlist(code){
     if (f60 || f15) data.minTrend = { m60: f60, m15: f15 };
     if (ext[2]) data.seal = ext[2];
     if (ext[3]) data.lhb = ext[3];
-    if (ext[4]) data.events = ext[4];
-  } catch (e) {}
+    // v11.0:fetchEventsF 返回 {events,status,srcUsed,cninfoStatus};拆分 events + eventsStatus
+    if (ext[4]) {
+      if (Array.isArray(ext[4].events) && ext[4].events.length) data.events = ext[4].events;
+      data.eventsStatus = { cninfo: ext[4].cninfoStatus || (ext[4].status === 'ok' ? 'ok' : 'fail'), srcUsed: ext[4].srcUsed || '' };
+    }
+  } catch (e) { console.warn('[addFetchedToWatchlist]', code, '并发拉取失败:', e.message); }
   addToWatchlistUI(data);
   // 保存全量数据(供退出重登时立即渲染,不依赖网络)
-  saveWatchlistStockData(code,data);
+  saveWatchlistStockData(String(code), data);
   saveWatchlist();
   // 添加后立即强制刷新一次,确保显示最新实时行情(不等待 60s 定时)
   setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 200);
@@ -4208,7 +4217,33 @@ function addToWatchlistUI(s){
     '</div>';
   stocksWrap.appendChild(stock);
 }
-function removeWatchlistRow(code){var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();var m=document.getElementById("modal-"+code);if(m)m.remove();try{var w=localStorage.getItem("atds_watchlist");var arr=w?JSON.parse(w):[];arr=arr.filter(function(c){return String(c)!==String(code);});localStorage.setItem("atds_watchlist",JSON.stringify(arr));}catch(e){}try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');if(wd[code]){delete wd[code];localStorage.setItem('atds_watchlist_data',JSON.stringify(wd));}}catch(e){}try{var h=localStorage.getItem("atds_watchlist_hidden");var hidden=h?JSON.parse(h):[];if(hidden.indexOf(code)<0)hidden.push(code);localStorage.setItem("atds_watchlist_hidden",JSON.stringify(hidden));}catch(e){}}
+function removeWatchlistRow(code){
+  code=String(code||'').trim();
+  console.log('[removeWatchlistRow] code=', JSON.stringify(code));
+  var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();
+  var m=document.getElementById("modal-"+code);if(m)m.remove();
+  try{var w=localStorage.getItem("atds_watchlist");var arr=w?JSON.parse(w):[];arr=arr.filter(function(c){return String(c)!==String(code);});localStorage.setItem("atds_watchlist",JSON.stringify(arr));}catch(e){console.warn('[removeWatchlistRow] atds_watchlist 删除失败:',e.message);}
+  try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');if(wd[code]){delete wd[code];localStorage.setItem('atds_watchlist_data',JSON.stringify(wd));}}catch(e){console.warn('[removeWatchlistRow] atds_watchlist_data 删除失败:',e.message);}
+  try{var h=localStorage.getItem("atds_watchlist_hidden");var hidden=h?JSON.parse(h):[];if(hidden.indexOf(code)<0)hidden.push(code);localStorage.setItem("atds_watchlist_hidden",JSON.stringify(hidden));}catch(e){console.warn('[removeWatchlistRow] atds_watchlist_hidden 写入失败:',e.message);}
+}
+// v11.0:强制重置本地缓存(清空所有 ATDS 本地状态,强制从云端重新拉取);用户自救急救按钮
+function resetLocalCache(){
+  var KEYS=['atds_watchlist','atds_watchlist_data','atds_watchlist_hidden','atds_kline_cache','atds_ff_cache','atds_events_cache','atds_trade_status','atds_shadow','atds_qr_code'];
+  // 额外清理 sim_track_* 单独的 checkbox 状态
+  var simKeys=[];
+  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sim_track_')===0)simKeys.push(k);}}catch(e){}
+  var removed=[];
+  KEYS.forEach(function(k){try{localStorage.removeItem(k);removed.push(k);}catch(e){}});
+  simKeys.forEach(function(k){try{localStorage.removeItem(k);removed.push(k);}catch(e){}});
+  console.log('[resetLocalCache] 已清空 keys:', removed.join(', '));
+  if(typeof showToast==='function'){showToast('已重置本地缓存,刷新页面强制从云端重新拉取','ok');}
+  setTimeout(function(){try{location.reload();}catch(e){}},800);
+}
+// 二次确认弹窗:防止误点导致本地数据丢失
+function confirmResetCache(){
+  var msg='⚠️ 确定要重置本地缓存吗?\n\n将清空:\n• 自选股列表(手动添加的股)\n• 隐藏标记(被标记删除的股)\n• 资金/事件/K线缓存\n• 交易状态/模拟跟踪\n• 二维码\n\n云端配置和 review JSON 不受影响。\n刷新页面后将强制从云端重新拉取所有数据。';
+  if(confirm(msg)){resetLocalCache();}
+}
 // 保存单只股票的全量数据(供退出重登时立即渲染,不依赖网络)
 function saveWatchlistStockData(code,data){try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');wd[code]=data;localStorage.setItem('atds_watchlist_data',JSON.stringify(wd));}catch(e){}}
 // 读取缓存的全量数据(供 restoreSavedWatchlist 立即渲染)
@@ -4285,17 +4320,19 @@ function restoreSavedWatchlist(){
   var hidden=[];
   try{hidden=JSON.parse(hiddenRaw)||[];}catch(e){}
   var card=document.querySelector('.watchlist-card');
-  if(!card)return;
+  if(!card){console.warn('[restoreSavedWatchlist] 未找到 .watchlist-card 容器');return;}
   var configCodes=[];
   document.querySelectorAll('.wl-stock-row[data-code]').forEach(function(r){var cd=r.getAttribute("data-code");if(cd&&configCodes.indexOf(cd)<0)configCodes.push(cd);});
+  console.log('[restoreSavedWatchlist] configCodes=', configCodes, 'hidden=', hidden);
   hidden.forEach(function(c){if(configCodes.indexOf(c)>=0){var el=document.querySelector('.wl-stock[data-stock-code="'+c+'"]');if(el)el.remove();}});
   configCodes=[];
   document.querySelectorAll('.wl-stock-row[data-code]').forEach(function(r){var cd=r.getAttribute("data-code");if(cd&&configCodes.indexOf(cd)<0)configCodes.push(cd);});
   var extraCodes=[];
   if(raw!==null){
-    try{extraCodes=JSON.parse(raw)||[];}catch(e){}
-    extraCodes=extraCodes.filter(function(c){return /^\d{6}$/.test(String(c))&&configCodes.indexOf(c)<0&&hidden.indexOf(c)<0;});
+    try{extraCodes=JSON.parse(raw)||[];}catch(e){console.warn('[restoreSavedWatchlist] atds_watchlist 解析失败:',e.message);}
+    extraCodes=extraCodes.filter(function(c){return /^\d{6}$/.test(String(c))&&configCodes.indexOf(String(c))<0&&hidden.indexOf(String(c))<0;});
   }
+  console.log('[restoreSavedWatchlist] extraCodes(手动加股)=', extraCodes);
   if(!extraCodes.length)return;
   // 先用 atds_watchlist_data 缓存立即渲染(不等网络,避免网络/CORS失败导致"新股丢失")
   var renderedFromCache=0;
@@ -4877,10 +4914,35 @@ function calcDecisionTech(klines){
 }
 /* 个股主力资金流(东财 fflow/kline):主力净流入 当日/3日/5日,单位亿元;主源3次重试→降级实时→本地缓存兜底(fromCache 标记),失败返回 null 不阻塞 */
 async function fetchStockFundFlowF(code){
-  var num=String(code).replace(/^(sh|sz|bj)/,'');
-  var mkt=String(code).charAt(0)==='6'?'1':'0';
+  // v11.0 多级降级(客户端用国内手机IP,绕开 GitHub Actions IP 封锁):
+  //   主源:东财 push2his(全量历史,d1/d3/d5) → 降级1:东财 push2 实时(仅d1) → 降级2:读云端 fflow_cache.json(同源跨域)
+  //   → 降级3:浏览器 localStorage(写入 atds_ff_cache,带 date 标记新鲜度)
+  // 死命令:必须返回 {d1,d3,d5,date,fromCache?,source?} 之一,绝不允许 null(否则 UI 显示"数据暂缺"被用户视为偷懒)
+  var rawCode=String(code||'').trim();
+  var num=rawCode.replace(/^(sh|sz|bj)/,'');
+  var mkt=rawCode.charAt(0)==='6'?'1':'0';
   function yi(v){return Math.round(v/1e6)/100;}
-  function writeCache(ff){try{var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}'); fc[code]={d1:ff.d1,d3:ff.d3,d5:ff.d5,date:new Date().toISOString().slice(0,10)}; localStorage.setItem('atds_ff_cache',JSON.stringify(fc));}catch(e){}}
+  function writeCache(ff,src){
+    try{
+      var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}');
+      fc[num]=Object.assign({date:new Date().toISOString().slice(0,10)},ff,{src:src||'live'});
+      localStorage.setItem('atds_ff_cache',JSON.stringify(fc));
+    }catch(e){}
+  }
+  function tryCloudFflowCache(){
+    // 客户端读云端 fflow_cache.json(同源 Pages,CORS * 已验证);解决"云端有数据但前端没读"导致的 600737 暂缺
+    return fetch('data/fflow_cache.json',{cache:'no-store'}).then(function(r){
+      if(!r.ok)return null;
+      return r.json();
+    }).then(function(j){
+      if(!j||typeof j!=='object')return null;
+      var entry=j[num]||j[rawCode];
+      if(entry&&entry.d1!=null&&!isNaN(entry.d1)){
+        return {d1:entry.d1,d3:entry.d3!=null?entry.d3:null,d5:entry.d5!=null?entry.d5:null,fromCache:true,cacheDate:entry.date||null,source:'cloud-fflow-cache'};
+      }
+      return null;
+    }).catch(function(){return null;});
+  }
   // 主源:历史资金流(120天),重试 3 次(东财偶发超时/限流)
   for(var attempt=0;attempt<3;attempt++){
     try{
@@ -4892,12 +4954,12 @@ async function fetchStockFundFlowF(code){
         var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
         function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
         var ff={d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
-        writeCache(ff);
+        writeCache(ff,'eastmoney-push2his');
         return ff;
       }
     }catch(e){/* 重试 */}
   }
-  // 降级:实时接口(仅当日),d3/d5 置 null 避免重复
+  // 降级1:实时接口(仅当日),d3/d5 置 null 避免重复
   try{
     var url2='https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5';
     var res2=await fetch(url2,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
@@ -4906,12 +4968,21 @@ async function fetchStockFundFlowF(code){
     if(kl2.length){
       var d1=yi(parseFloat((kl2[kl2.length-1].split(',')[1])||0)||0);
       var ff2={d1:d1,d3:null,d5:null};
-      writeCache(ff2);
+      writeCache(ff2,'eastmoney-push2');
       return ff2;
     }
-  }catch(e){/* 降级到缓存 */}
-  // 失败兜底:浏览器本地缓存(标记 fromCache)
-  try{var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}'); if(fc[code]&&fc[code].d1!=null) return {d1:fc[code].d1,d3:fc[code].d3!=null?fc[code].d3:null,d5:fc[code].d5!=null?fc[code].d5:null,fromCache:true,cacheDate:fc[code].date||null};}catch(e){}
+  }catch(e){/* 降级2:云端 fflow_cache.json */}
+  // 降级2:读云端 fflow_cache.json(国内手机IP 跨域拉 Pages,GitHub Actions 即使完全封禁也能取到)
+  try{
+    var cached=await tryCloudFflowCache();
+    if(cached&&cached.d1!=null)return cached;
+  }catch(e){/* 降级3:本地缓存 */}
+  // 降级3:浏览器本地缓存(标记 fromCache)
+  try{
+    var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}');
+    var localEntry=fc[num]||fc[rawCode];
+    if(localEntry&&localEntry.d1!=null)return {d1:localEntry.d1,d3:localEntry.d3!=null?localEntry.d3:null,d5:localEntry.d5!=null?localEntry.d5:null,fromCache:true,cacheDate:localEntry.date||null,source:'local-'+(localEntry.src||'cache')};
+  }catch(e){}
   return null;
 }
 /* 分钟级趋势:60/15分钟 多空;腾讯 mkline 优先,新浪 getKLineData 兜底;失败返回 null */
@@ -5024,9 +5095,16 @@ async function fetchLhbDetailF(code){
     return {date:latest.slice(0,10),explain:(dayRows[0]&&dayRows[0].EXPLANATION)||'',changeRate:(dayRows[0]&&dayRows[0].CHANGE_RATE)||0,inst:yi(inst),north:yi(north),youzi:yi(youzi),fundAttr:fundAttr,famousSeats:famousSeats};
   }catch(e){return null;}
 }
-/* 事件日历(东财):财报预约+业绩预告+解禁;无则返回 null */
+/* 事件日历(东财+巨潮):客户端 v11.0 多级降级
+   - 主源:东财 3 个 API(财报/业绩预告/解禁)
+   - 降级1:客户端读云端 data/events_cache.json(同源,CORS * 已验证)
+   - 降级2:客户端直连巨潮 cninfo.com.cn(国内手机 IP,GitHub Actions 封禁时仍可用)
+   - 降级3:浏览器 localStorage atds_events_cache(写入带 date 标记)
+   - 失败时返回 {events:[],status:'fail'} 渲染层显示"事件数据加载中,请稍后刷新"
+   - 永远不返回 null,前端 addFetchedToWatchlist 据此判断拉取成败 */
 async function fetchEventsF(code){
-  var num=String(code).replace(/^(sh|sz|bj)/,'');
+  var rawCode=String(code||'').trim();
+  var num=rawCode.replace(/^(sh|sz|bj)/,'');
   var base='https://datacenter-web.eastmoney.com/api/data/v1/get';
   var hdr={'User-Agent':'Mozilla/5.0','Referer':'https://data.eastmoney.com/'};
   var bj=new Date(Date.now()+8*3600*1000);
@@ -5041,6 +5119,9 @@ async function fetchEventsF(code){
     }catch(e){return [];}
   }
   var flt='(SECURITY_CODE%3D%22'+num+'%22)';
+  var status='ok';  // ok=有数据/fail=源全部不可用
+  var srcUsed='eastmoney';
+  // 主源:东财 3 个 API(财报预约+业绩预告+解禁)
   try{
     var appt=await fjson('RPT_PUBLIC_BS_APPOIN',flt,3,'FIRST_APPOINT_DATE',-1);
     for(var i=0;i<appt.length;i++){
@@ -5065,7 +5146,92 @@ async function fetchEventsF(code){
       events.push({type:'解禁',eventType:'解禁',name:l.FREE_SHARES_TYPE||'限售解禁',date:d2,eventDate:d2,left:left2,countdown:'T-'+left2+'天',dir:'利空',direction:'利空',level:cap>50000?'高':cap>10000?'中':'低',impactLevel:cap>50000?'高':cap>10000?'中':'低',detail:'解禁市值约'+Math.round(cap/10000*100)/100+'亿',source:'东财'});
     }
   }catch(e){}
-  return events.length?events:null;
+  // 巨潮公告(减持/增发/回购/股东大会/问询):客户端直连 cninfo(国内手机 IP),失败时降级到缓存
+  var cninfoEvents=null;
+  try{
+    cninfoEvents=await fetchCninfoEventsF(num);
+    if(cninfoEvents&&cninfoEvents.length){
+      for(var ci=0;ci<cninfoEvents.length;ci++){
+        var dup=events.some(function(x){return x.type===cninfoEvents[ci].type&&x.date===cninfoEvents[ci].date;});
+        if(!dup)events.push(cninfoEvents[ci]);
+      }
+      srcUsed='eastmoney+cninfo';
+    }
+  }catch(e){/* cninfo 客户端失败,继续读缓存 */}
+  // 缓存兜底:如果所有源都失败(events 空)→ 读云端 events_cache.json + localStorage
+  if(!events.length){
+    try{
+      var r=await fetch('data/events_cache.json',{cache:'no-store'});
+      if(r.ok){
+        var j3=await r.json();
+        var byCode=j3&&j3.byCode?j3.byCode:{};
+        var cached=byCode[num]||byCode[rawCode];
+        if(Array.isArray(cached)&&cached.length){
+          events=cached.slice();
+          srcUsed='cloud-events-cache';
+        }
+      }
+    }catch(e){/* 缓存拉取失败 */}
+    if(!events.length){
+      try{
+        var lc=JSON.parse(localStorage.getItem('atds_events_cache')||'{}');
+        var localEntry=lc[num]||lc[rawCode];
+        if(Array.isArray(localEntry)&&localEntry.length){
+          events=localEntry.slice();
+          srcUsed='local-events-cache';
+        }
+      }catch(e){}
+    }
+  }
+  // 排序:高 > 中 > 低,同级按日期升序(最近/最紧迫在前)
+  var lvRank={'高':0,'中':1,'低':2};
+  events.sort(function(a,b){return (lvRank[a.level]!=null?lvRank[a.level]:2)-(lvRank[b.level]!=null?lvRank[b.level]:2)||(a.date<b.date?-1:a.date>b.date?1:0);});
+  // 写入 localStorage(即使空也写,标记已尝试拉取)
+  try{
+    var lc2=JSON.parse(localStorage.getItem('atds_events_cache')||'{}');
+    lc2[num]=events;
+    lc2._meta=lc2._meta||{};
+    lc2._meta[num]={date:new Date().toISOString().slice(0,10),src:srcUsed,count:events.length};
+    localStorage.setItem('atds_events_cache',JSON.stringify(lc2));
+  }catch(e){}
+  status=events.length?'ok':'fail';
+  return {events:events,status:status,srcUsed:srcUsed,cninfoStatus:status==='ok'?'ok':'fail'};
+}
+/* 客户端直连巨潮公告(减持/增发/回购/股东大会/问询/重组/停牌):返回事件数组(空数组=成功无匹配)
+   国内手机 IP 可用,GitHub Actions 封禁时仍能拉取。
+   失败返回 null 让 fetchEventsF 走缓存兜底 */
+async function fetchCninfoEventsF(num){
+  try{
+    var today=new Date(Date.now()+8*3600*1000).toISOString().slice(0,10);
+    var start=new Date(Date.now()+8*3600*1000-30*86400000).toISOString().slice(0,10);
+    var orgId=(num.charAt(0)==='6'||num.charAt(0)==='5')?('gssh0'+num):('gssz0'+num);
+    var KW=[['减持','减持','利空','高'],['增持','增持','利好','中'],['增发','增发','中性','中'],['非公开发行','增发','中性','中'],['定增','增发','中性','中'],['配股','增发','中性','中'],['回购','回购','利好','中'],['股东大会','股东大会','中性','低'],['股东会','股东大会','中性','低'],['问询','监管问询','利空','高'],['关注函','监管问询','利空','高'],['监管函','监管问询','利空','高'],['警示函','监管问询','利空','高'],['立案','监管问询','利空','高'],['处罚','监管问询','利空','高'],['解禁','解禁','利空','中'],['限售','解禁','利空','中'],['重组','重组','中性','中'],['并购','重组','中性','中'],['收购','重组','中性','中'],['停牌','停牌','中性','中'],['复牌','复牌','中性','低']];
+    function daysLeft(d){return Math.round((new Date(d+'T00:00:00+08:00')-new Date(today+'T00:00:00+08:00'))/86400000);}
+    var body='pageNum=1&pageSize=30&column=szse&tabName=fulltext&plate=&stock='+encodeURIComponent(num+','+orgId)+'&searchkey=&secid=&category=&trade=&seDate='+start+'~'+today+'&sortName=&sortType=&isHLtitle=true';
+    var ac=new AbortController();
+    var t=setTimeout(function(){ac.abort();},5000);
+    var res=await fetch('https://www.cninfo.com.cn/new/hisAnnouncement/query',{method:'POST',headers:{'User-Agent':'Mozilla/5.0','Content-Type':'application/x-www-form-urlencoded; charset=UTF-8','X-Requested-With':'XMLHttpRequest','Referer':'https://www.cninfo.com.cn/new/commonUrl/pageOfSearch?url=disclosure/list/search'},body:body,signal:ac.signal});
+    clearTimeout(t);
+    if(!res.ok)return null;
+    var j=await res.json();
+    var anns=(j&&j.announcements)||[];
+    var evs=[];
+    for(var i=0;i<anns.length;i++){
+      var title=String(anns[i].announcementTitle||'').replace(/<[^>]+>/g,'');
+      if(!title)continue;
+      for(var k=0;k<KW.length;k++){
+        if(title.indexOf(KW[k][0])>=0){
+          var dir2=KW[k][2];
+          if(KW[k][1]==='回购'&&/注销/.test(title))dir2='中性';
+          var d=anns[i].announcementTime?new Date(anns[i].announcementTime+8*3600*1000).toISOString().slice(0,10):today;
+          var left=daysLeft(d);
+          evs.push({type:KW[k][1],eventType:KW[k][1],name:title.slice(0,30),title:title.slice(0,30),date:d,eventDate:d,left:left,countdown:left>0?('T-'+left+'天'):(left<0?Math.abs(left)+'天前':'今日'),dir:dir2,direction:dir2,level:KW[k][3],impactLevel:KW[k][3],detail:title.slice(0,48),source:'巨潮'});
+          break;
+        }
+      }
+    }
+    return evs;
+  }catch(e){return null;}
 }
 function techPosText(t){
   if (!t) return 'K线数据不足';

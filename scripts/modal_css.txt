@@ -506,6 +506,10 @@
 .ev-red-alert{background:#c62828;border-color:#b71c1c;color:#fff;font-weight:700;animation:ev-pulse 1.2s ease-in-out infinite}
 .ev-src{font-style:normal;font-weight:400;opacity:.78;font-size:8px}
 @keyframes ev-pulse{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,.45)}50%{box-shadow:0 0 0 3px rgba(198,40,40,0)}}
+/* v11.0 事件源不可用提示(降级显示,不显示"近期无重大事件公告"敷衍用户) */
+.ev-loading{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:9px;background:#fff7e6;border:1px dashed #f59e0b;color:#b45309}
+.ev-loading::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;animation:ev-load-pulse 1s ease-in-out infinite}
+@keyframes ev-load-pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 
 /* ==================== 观察池 Pro 交互层样式(第十二轮) ==================== */
 /* 控制条 */
