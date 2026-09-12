@@ -20,6 +20,11 @@ on:
           - premarket
           - midday
           - close
+      date:
+        description: '可选:补生成指定日期报告 YYYYMMDD(留空=当天;用于周末/非交易日补跑历史报告)'
+        required: false
+        default: ''
+        type: string
   # 第三方 cron(cron-job.org 等)每 10 分钟触发,实现不开机也能云端自动更新
   repository_dispatch:
     types: [daily-review, trigger-run]
@@ -144,6 +149,7 @@ jobs:
         if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && github.event_name != 'push'
         run: |
           TYPE="${{ steps.type.outputs.type }}"
+          DATE_ARG="${{ github.event.inputs.date }}"
           if [ "$TYPE" = "midday" ]; then
             HOUR=$(TZ='Asia/Shanghai' date +%H%M)
             HOUR=$((10#$HOUR))
@@ -152,9 +158,9 @@ jobs:
             elif [ "$HOUR" -le 1340 ]; then SLOT="13:30";
             else SLOT="14:40"; fi
             echo "盘中时点: $SLOT"
-            node --dns-result-order=ipv4first scripts/cloud_fetch.mjs "$SLOT"
+            node --dns-result-order=ipv4first scripts/cloud_fetch.mjs "$SLOT" $DATE_ARG
           else
-            node --dns-result-order=ipv4first scripts/cloud_fetch.mjs "$TYPE"
+            node --dns-result-order=ipv4first scripts/cloud_fetch.mjs "$TYPE" $DATE_ARG
           fi
 
       - name: Build report HTML
