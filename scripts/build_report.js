@@ -1257,6 +1257,29 @@ function _plan(s) {
   const stopPct = entry > 0 ? (entry - stop) / entry * 100 : 3;
   return { entry, stop, target, rr, rrNow, stopPct, sup, pre, atr };
 }
+// v11.10 状态机(列表行徽章 + 卡片头部共用):非"可交易" → 盈亏比/置信度置灰,
+// 修复"不建议参与/高风险观察却显示绿色高盈亏比"的视觉冲突。列表行渲染在状态机之前,
+// 故抽成独立函数供列表行提前调用,保证列表行与卡片状态完全一致。
+function _effStatus(s, p, ff, t, confTotal, confTone) {
+  const price = Number(s.price) || 0;
+  const preStrong = _preStrong(s);
+  const planBEntry = preStrong ? preStrong.price : (price * 1.05);
+  const trigA = price <= p.entry;
+  const trigB = price >= planBEntry;
+  const abUnTriggered = !trigA && !trigB;
+  const emotionCycle = _emotionCycle(s);
+  const isHardTrade = (emotionCycle === '冰点' && t.trend === 'down' && (ff.d1 || 0) < 0);
+  const upperShadow = (s.high > 0 && price > 0 && s.open > 0 && ((s.high - price) / price * 100 > 3) && price < s.open);
+  const rrNowBad = p.rrNow < 1.5;
+  const riskDowngrade = (ff.d1 || 0) < 0; // 做T盈亏比恒=1<1.5 → tRRBad 恒真
+  let label, tone;
+  if (isHardTrade) { label = '不建议参与'; tone = 'down'; }
+  else if (upperShadow) { label = '高风险观察'; tone = 'down'; }
+  else if (riskDowngrade) { label = '高风险观察'; tone = 'down'; }
+  else if (rrNowBad || abUnTriggered) { label = '等待触发'; tone = 'down'; }
+  else { label = confTotal >= 75 ? '可交易' : confTotal >= 60 ? '轻仓试错' : '观察'; tone = confTone; }
+  return { label, tone, actionable: label === '可交易', isHardTrade, upperShadow, abUnTriggered, trigA, trigB, rrNowBad };
+}
 function _rrTone(rr) { return rr >= 2 ? 'good' : rr >= 1.5 ? 'ok' : rr >= 1 ? 'warn' : 'bad'; }
 function _rrToneLabel(rr) { return rr >= 2 ? '合格(≥2)' : rr >= 1.5 ? '合格(≥1.5)' : rr >= 1 ? '偏低(1-1.5)' : '不合格(<1)'; }
 function _confidence(s, p) {
@@ -1391,6 +1414,8 @@ function buildStockRow(s, i, report) {
   const rrTone = _rrTone(p.rr);
   const confTone = conf.total >= 75 ? 'good' : conf.total >= 60 ? 'ok' : 'warn';
   const statusLabel = conf.total >= 75 ? '可交易' : conf.total >= 60 ? '轻仓试错' : '观察';
+  // v11.10:状态机提前计算,供列表行徽章 + 卡片头部共用(修复列表行"不建议参与却显绿色") 
+  const _eff = _effStatus(s, p, ff, t, conf.total, confTone);
   const priority = conf.total >= 75 && p.rr >= 2 ? '★★★' : conf.total >= 60 ? '★★' : '★';
   const f2 = (x) => (x == null || isNaN(x) ? '--' : Number(x).toFixed(2));
   const sign = (x) => (x == null ? '' : x > 0 ? '+' : '');
@@ -1423,8 +1448,8 @@ function buildStockRow(s, i, report) {
     <span class="wl-cell wl-cell-price"><span class="price ${cls}">${fmtNum(price)}</span></span>
     <span class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</span>
     <span class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-${confTone}">${conf.total}</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-${rrTone}">${rrTxt}</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-${_eff.actionable ? confTone : 'down'}">${conf.total}</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-${_eff.actionable ? rrTone : 'muted'}">${_eff.actionable ? rrTxt : p.rr.toFixed(2)}</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="${esc(code)}" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div>`;
 
@@ -1487,22 +1512,22 @@ function buildStockRow(s, i, report) {
   const evHtml = (evs && evs.length)
     ? evs.slice(0, 10).map(e => {
         const red = (e.level === '高' && e.left >= -3 && e.left <= 3) ? ' ev-red-alert' : '';
-        const cnt = e.left > 0 ? ' T-' + e.left + '天' : (e.left < 0 ? ' ' + Math.abs(e.left) + '天前' : ' 今日');
+        const cnt = e.left > 0 ? (e.left > 90 ? ' 距今' + e.left + '天·远期' : ' T-' + e.left + '天') : (e.left < 0 ? ' ' + Math.abs(e.left) + '天前' : ' 今日');
         // v11.6:显示完整标题(截 28 字)+ 巨潮原文链接(与客户端同步)
         const rawTitle = e.fullTitle || e.name || '';
         const showTitle = rawTitle ? (rawTitle.length > 28 ? rawTitle.slice(0, 28) + '…' : rawTitle) : '';
-        const linkHtml = e.cninfoUrl ? `<a class="ev-link" href="${esc(e.cninfoUrl)}" target="_blank" rel="noopener" title="查看巨潮原文">查看原文↗</a>` : '';
+        const linkHtml = e.cninfoUrl ? `<a class="ev-link" href="${esc(e.cninfoUrl)}" target="_blank" rel="noopener" title="查看公告原文">查看原文↗</a>` : '';
         return `<span class="ev-item ev-${e.level === '高' ? 'h' : e.level === '中' ? 'm' : 'l'} ${e.dir === '利好' ? 'ev-good' : e.dir === '利空' ? 'ev-bad' : ''}${red}"><span class="ev-head"><span class="ev-type">${esc(e.type)}</span>${(e.dir && e.dir !== '中性') ? `<span class="ev-dir ev-dir-${e.dir === '利好' ? 'good' : 'bad'}">${esc(e.dir)}</span>` : ''}<span class="ev-cnt">${cnt}</span>${e.source ? `<span class="ev-src">〔${esc(e.source)}〕</span>` : ''}</span><span class="ev-title" title="${esc(e.detail || rawTitle || e.date || '')}">${esc(showTitle)}</span>${linkHtml}</span>`;
       }).join('')
     : evEmpty;
-  // v11.7:与客户端同步——区分巨潮实际状态(cninfoStatus=fail 源不可用 / srcUsed=eastmoney 未匹配或 CORS)
+  // v11.9:与客户端同步——按公告来源区分(东财公告 eastmoney+ann / 巨潮或云端缓存 eastmoney+cninfo / 无公告类事件)
   let evNote;
-  if (evStatus.cninfo === 'fail') {
-    evNote = '⚠ 巨潮公告源暂时不可用，减持/增发/回购/问询等已降级；财报/解禁来自东财';
-  } else if (evStatus.srcUsed === 'eastmoney' || !evStatus.srcUsed) {
-    evNote = '⚠ 巨潮本次未匹配到（近期无减持/回购/问询等关键词公告，或 CORS 被浏览器拦截），财报/解禁来自东财；如需查减持/回购，请点"+搜索加入"旁的"个股分析"查看公告列表';
+  if (evStatus.srcUsed === 'eastmoney+ann') {
+    evNote = '来源：东财公告(减持/增发/回购/问询/异常波动) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文';
+  } else if (evStatus.srcUsed === 'eastmoney+cninfo') {
+    evNote = '来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文';
   } else {
-    evNote = '来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告';
+    evNote = '⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财';
   }
 
   // 交易计划表 (方案A/B/C,真实价位 + 盈亏比 + 仓位;未触发方案盈亏比置灰+未触发标签)
@@ -1532,19 +1557,15 @@ function buildStockRow(s, i, report) {
   const rrNowBad = p.rrNow < 1.5;             // 现价直接买入盈亏比不合格
   const abUnTriggered = !trigA && !trigB;      // 方案A/B均未触发
   const riskDowngrade = tRRBad && (ff.d1 || 0) < 0;  // 做T不合格+主力流出
-  let effStatusLabel, effConfTone;
-  if (isHardTrade) { effStatusLabel = '不建议参与'; effConfTone = 'down'; }
-  else if (upperShadow) { effStatusLabel = '高风险观察'; effConfTone = 'down'; }
-  else if (riskDowngrade) { effStatusLabel = '高风险观察'; effConfTone = 'down'; }
-  else if (rrNowBad || abUnTriggered) { effStatusLabel = '等待触发'; effConfTone = 'down'; }
-  else { effStatusLabel = statusLabel; effConfTone = confTone; }
+  // v11.10:状态机已由 _effStatus 提前计算(列表行徽章与卡片共用),此处复用,消除双重计算导致的不一致
+  const effStatusLabel = _eff.label, effConfTone = _eff.tone;
   // 盈亏比状态绑定:未触发/非"可交易" → 置灰 + "预案盈亏比"提示;仅"可交易"显示绿色
-  const rrActionable = (effStatusLabel === '可交易');
+  const rrActionable = _eff.actionable;
   const rrHeadCls = rrActionable ? ('rr-' + rrTone) : 'rr-muted';
   const rrHeadTitle = rrActionable ? '' : ' title="为预案盈亏比，需回踩触发后生效，现价买入无效"';
   // 折叠交易计划表:硬逆势 或 方案A/B均未触发(未达入场条件) → 折叠留提醒
-  const shouldCollapsePlan = isHardTrade || abUnTriggered;
-  const collapseLabel = isHardTrade ? '⛔ 破位·严禁现价抄底' : '⛔ 等待触发·未达入场条件';
+  const shouldCollapsePlan = _eff.isHardTrade || abUnTriggered;
+  const collapseLabel = _eff.isHardTrade ? '⛔ 破位·严禁现价抄底' : '⛔ 等待触发·未达入场条件';
   const planRow = (name, trig, entry, stop, tgt, rr, triggered, tone, bad) => `<tr class="${triggered ? '' : 'tp-notrig'}">
     <td class="tp-name">${name}</td>
     <td class="tp-trig">${esc(trig)}</td>
@@ -1560,8 +1581,11 @@ function buildStockRow(s, i, report) {
     ${tRRHide ? '' : planRow('C 日内做T', '现价' + f2(price) + '·ATR' + f2(atrC) + '动态止损', price, tStop, tTgt, tRR, trigC, _rrTone(tRR), tRRBad)}
   </table>`;
   // 现价追入校验
-  const nowWarn = p.rrNow < 1.5
-    ? '<div class="tp-warn">⚠ 现价直接买入盈亏比 ' + p.rrNow.toFixed(2) + '(<1.5),不合格 —— 等待回踩至 ' + f2(p.entry) + ' 再执行,当前仅观察。</div>'
+  // 现价追入校验(v11.10:与状态机联动——非"可交易"状态即使现价盈亏比"看似合格",也禁止出现"可执行计划"暗示)
+  const nowWarn = !rrActionable
+    ? (p.rrNow < 1.5
+        ? '<div class="tp-warn">⚠ 现价直接买入盈亏比 ' + p.rrNow.toFixed(2) + '(<1.5),不合格 —— 等待回踩至 ' + f2(p.entry) + ' 再执行,当前仅观察。</div>'
+        : '<div class="tp-warn">⚠ 现价盈亏比 ' + p.rrNow.toFixed(2) + ' 看似合格，但当前状态为「' + effStatusLabel + '」，现价买入无效，严禁开仓，仅作观察。</div>')
     : '<div class="tp-warn tp-ok">现价盈亏比 ' + p.rrNow.toFixed(2) + ',可执行计划。</div>';
   // 做T盈亏比不合格警告
   const tRRBadWarn = tRRBad ? '<div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div>' : '';
@@ -1643,7 +1667,7 @@ function buildStockRow(s, i, report) {
       <span class="dc-name">${esc(s.name)} <i>${esc(code)}</i></span>
       <span class="dc-status ${effConfTone === 'good' ? 'up' : effConfTone === 'ok' ? '' : 'down'}">${effStatusLabel}</span>
       ${integrityBadge}
-      <span class="dc-conf">置信度 ${conf.total}</span>
+      <span class="dc-conf${rrActionable ? '' : ' dc-conf-down'}">置信度 ${conf.total}</span>
       <span class="dc-rr ${rrHeadCls}"${rrHeadTitle}>盈亏比 ${p.rr.toFixed(2)}</span>
       <span class="dc-time">${esc(report.meta && report.meta.generatedAt || '')}</span>
     </div>${summaryHtml}

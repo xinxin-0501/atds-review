@@ -1533,9 +1533,10 @@ async function fetchEvents(code, name) {
     }
   }
 
-  // 排序:影响等级 高>中>低,同级按日期升序(最近/最紧迫在前)
+  // 排序:影响等级 高>中>低,同级近90天优先(>90天远期事件排后),再按日期升序
   const lvRank = { '高': 0, '中': 1, '低': 2 };
-  events.sort((a, b) => (lvRank[a.level] ?? 2) - (lvRank[b.level] ?? 2) || (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  const nearFar = (e) => (e.left != null && e.left > 90 ? 1 : 0);
+  events.sort((a, b) => (lvRank[a.level] ?? 2) - (lvRank[b.level] ?? 2) || nearFar(a) - nearFar(b) || (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
   // v11.7:与客户端一致——返回 srcUsed 供渲染层区分巨潮实际状态
   return { events: events.length ? events : null, cninfoStatus, srcUsed };
 }
