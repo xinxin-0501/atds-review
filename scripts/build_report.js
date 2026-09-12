@@ -1443,7 +1443,10 @@ function buildStockRow(s, i, report) {
   const rrTxt = p.rr >= 1.5 ? (p.rr.toFixed(2) + ' ✓') : p.rr.toFixed(2);
   const techJson = (t && Object.keys(t).length) ? JSON.stringify(t).replace(/"/g, '&quot;') : 'null';
   const ffJson = (ff && ff.d1 != null) ? JSON.stringify(ff).replace(/"/g, '&quot;') : 'null';
-  const main = `<div class="wl-stock-row" data-code="${esc(code)}" data-tech="${techJson}" data-ff="${ffJson}">
+  // v11.11:把配置股完整数据(含手写 logic/tags/category/events/lhb/minTrend/seal)序列化到 data-stock,
+  //        供客户端 9:30 开盘后对配置股 detail 也做实时 rebuild(不再等 9:45 云端重跑)
+  const stockJson = JSON.stringify(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const main = `<div class="wl-stock-row" data-code="${esc(code)}" data-tech="${techJson}" data-ff="${ffJson}" data-stock="${stockJson}">
     <span class="wl-cell wl-cell-rank"><span class="rank-no">${i + 1}</span><span class="wl-name">${esc(s.name)}</span><span class="wl-code">${esc(code)}</span></span>
     <span class="wl-cell wl-cell-price"><span class="price ${cls}">${fmtNum(price)}</span></span>
     <span class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</span>
