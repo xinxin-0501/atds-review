@@ -58,18 +58,26 @@ def days_left(d, today):
     return (dt - tt).days
 
 
-def make_event(title, date_str, today, source):
+def make_event(title, date_str, today, source, url=""):
     t, d, lv = classify(title)
     if not t:
         return None
     left = days_left(date_str, today)
-    cnt = ("T-%d天" % left) if left > 0 else (("%d天前" % abs(left)) if left < 0 else "今日")
+    if left > 90:
+        cnt = "距今%d天·远期" % left          # 远期事件明确标注,避免"T-283天"制造近期焦虑
+    elif left > 0:
+        cnt = "T-%d天" % left
+    elif left < 0:
+        cnt = "%d天前" % abs(left)
+    else:
+        cnt = "今日"
     return {
         "type": t, "eventType": t,
-        "name": title[:30], "title": title[:30],
+        "name": title[:30], "title": title[:30], "fullTitle": title,
         "date": date_str, "eventDate": date_str, "left": left, "countdown": cnt,
         "dir": d, "direction": d, "level": lv, "impactLevel": lv,
         "detail": title[:48], "source": source,
+        "cninfoUrl": url or "",               # 巨潮原文链接(有则渲染"查看原文↗")
     }
 
 
@@ -123,7 +131,10 @@ def fetch_cninfo(code, name):
         title = str(a.get("announcementTitle") or "").replace("<em>", "").replace("</em>", "")
         ts = a.get("announcementTime")
         date_str = (datetime.datetime.fromtimestamp((ts + 8 * 3600 * 1000) / 1000, tz=datetime.timezone.utc).strftime("%Y-%m-%d") if ts else today)
-        out.append((title, date_str))
+        aid = a.get("announcementId") or ""
+        oid = a.get("orgId") or org_id
+        url = ("http://www.cninfo.com.cn/new/disclosure/detail?stockCode=%s&announcementId=%s&orgId=%s" % (num, aid, oid)) if aid else ""
+        out.append((title, date_str, url))
     return out
 
 
@@ -142,6 +153,9 @@ def fetch_akshare(code):
         return []
     title_col = next((c for c in df.columns if "标题" in c or "名称" in c or "title" in str(c).lower()), None)
     date_col = next((c for c in df.columns if "日期" in c or "时间" in c or "date" in str(c).lower()), None)
+    # AKShare 该接口本身返回"公告链接"列(巨潮详情页,含 announcementId+orgId)
+    # —— 之前只读 title/date 两列、丢弃链接列,导致事件无法渲染"查看原文↗"
+    link_col = next((c for c in df.columns if "链接" in c or "url" in str(c).lower() or "link" in str(c).lower()), None)
     out = []
     for _, row in df.iterrows():
         title = str(row.get(title_col, "") or "").strip()
@@ -150,7 +164,10 @@ def fetch_akshare(code):
         date_str = str(row.get(date_col, "") or "")[:10].replace("/", "-")
         if not date_str or date_str == "nan":
             date_str = today
-        out.append((title, date_str))
+        url = str(row.get(link_col, "") or "").strip() if link_col else ""
+        if url == "nan":
+            url = ""
+        out.append((title, date_str, url))
     return out
 
 
@@ -174,30 +191,33 @@ def main():
     by_code = {}
     for code, name in watch:
         events = []
-        source_ok = False
-        # 主源: AKShare
+        # 主源: AKShare(底层即巨潮个股公告接口,source 统一显示"巨潮"便于用户识别)
         try:
             raw = fetch_akshare(code)
             if raw is not None:
-                source_ok = True
-                source = "AKShare"
+                source = "巨潮"
             else:
                 # 降级: 巨潮直连
                 raw = fetch_cninfo(code, name)
                 if raw is not None:
-                    source_ok = True
                     source = "巨潮"
         except Exception:
             raw = None
         if raw is None:
             print(f"{code} {name}: 源不可用(不缓存,下次重试)")
             continue
-        for title, date_str in raw:
-            ev = make_event(title, date_str, today, source)
+        for title, date_str, url in raw:
+            ev = make_event(title, date_str, today, source, url)
             if ev:
                 events.append(ev)
+        # 排序:影响等级 高>中>低,同级近90天优先(远期事件排后),再按日期升序(与客户端/cloud_fetch.mjs 一致)
         lv_rank = {"高": 0, "中": 1, "低": 2}
-        events.sort(key=lambda e: (lv_rank.get(e["level"], 2), e["date"]))
+
+        def near_far(e):
+            lv = e.get("left")
+            return 1 if (lv is not None and lv > 90) else 0
+
+        events.sort(key=lambda e: (lv_rank.get(e["level"], 2), near_far(e), e["date"]))
         by_code[code] = events
         print(f"{code} {name}: {len(events)} 条事件 [{source}]")
 
