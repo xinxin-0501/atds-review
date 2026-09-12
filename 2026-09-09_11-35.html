@@ -4982,6 +4982,24 @@ function confirmResetCache(){
 function saveWatchlistStockData(code,data){try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');wd[code]=data;localStorage.setItem('atds_watchlist_data',JSON.stringify(wd));}catch(e){}}
 // 读取缓存的全量数据(供 restoreSavedWatchlist 立即渲染)
 function loadWatchlistStockData(code){try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');return wd[code]||null;}catch(e){return null;}}
+/* v11.11:把服务端渲染的配置股完整数据(data-stock)播种到 localStorage,供 9:30 后实时 rebuild 合并。
+   配置股详情卡由服务端静态渲染(含手写 logic/tags/category/events/lhb),不播种则客户端 rebuild 会丢失这些字段。 */
+function seedConfigStockData(){
+  try{
+    var rows=document.querySelectorAll('.wl-stock-row[data-code][data-stock]');
+    for(var i=0;i<rows.length;i++){
+      var code=String(rows[i].getAttribute('data-code')||'');
+      var raw=rows[i].getAttribute('data-stock');
+      if(!code||!raw||raw==='null')continue;
+      try{
+        var exist=loadWatchlistStockData(code);
+        if(exist)continue;                 // 已有本地数据(含手动更新)则不覆盖
+        var obj=JSON.parse(raw);
+        if(obj&&typeof obj==='object'){saveWatchlistStockData(code,obj);}
+      }catch(e){}
+    }
+  }catch(e){}
+}
 function saveWatchlist(){
   // 合并保存:DOM 收集的 codes + 之前 localStorage 中额外手动添加的 codes
   // (避免全量覆盖丢失用户手动添加的股票)
@@ -5176,7 +5194,7 @@ function restoreSavedWatchlist(){
     }
   })();
 }
-if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(restoreSavedWatchlist,600);});}
+if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
 
 /* ============ 观察池实时行情刷新(电脑关机后手机端仍可刷新) ============ */
 function escHtmlR(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -5219,20 +5237,38 @@ async function refreshWatchlistQuotes(){
       var tech=null,ff=null;
       try{var tj=r.getAttribute('data-tech');if(tj&&tj!=='null')tech=JSON.parse(tj);}catch(e){}
       try{var fj=r.getAttribute('data-ff');if(fj&&fj!=='null')ff=JSON.parse(fj);}catch(e){}
-      // 手动新增股(auto-detail):整体重建决策卡 + 置信度/盈亏比徽章,让所有字段跟随最新行情
-      // v11.5:从 localStorage 读全量缓存(含 events/lhb/logic/minTrend/seal 等已补齐字段),仅覆盖实时行情字段。
-      //        否则 5s 刷新会用精简对象重建决策卡,把 addFetchedToWatchlist 刚补齐的字段全部清空——这正是"删除重加后 detail 缺事件/龙虎榜/逻辑"的根因。
+      // 决策卡整体重建 + 置信度/盈亏比徽章,让所有字段跟随最新行情
+      // v11.5:从 localStorage 读全量缓存(含 events/lhb/logic/minTrend/seal),仅覆盖实时行情字段。
+      // v11.11:配置股(auto-detail 之外)也纳入实时——服务端渲染时已通过 data-stock 播种全量数据到 localStorage,
+      //         使 9:30 开盘后观察池所有个股 detail 都实时(不再等 9:45 云端重跑)。
+      //         为防无谓替换与手机卡顿:配置股首屏保留服务端渲染,仅当【行情价变化 且 距上次>8s】才重建;手动加股保持原即时重建。
       var d=document.querySelector('.wl-detail[data-detail-code="'+code+'"]');
-      if(d&&d.classList.contains('auto-detail')){
+      if(d){
         var fullData=loadWatchlistStockData(code)||{};
-        var sObj=Object.assign({},fullData,{code:code,name:f[1],price:price,pct:pct,amount:amount,turnover:turnover,prevClose:prevClose,open:open,high:high,low:low,amplitude:amplitude,volRatio:volRatio,tech:tech||fullData.tech||null,fundFlow:ff||fullData.fundFlow||null});
+        var sObj=Object.assign({},fullData,{code:code,name:f[1]||fullData.name,price:price,pct:pct,amount:amount,turnover:turnover,prevClose:prevClose,open:open,high:high,low:low,amplitude:amplitude,volRatio:volRatio,tech:tech||fullData.tech||null,fundFlow:ff||fullData.fundFlow||null});
         var bd=dcBadges(sObj);
         var confEl=r.querySelector('.wl-cell-atds .conf');
         if(confEl){confEl.className='conf conf-'+bd.confTone;confEl.textContent=bd.confTotal;}
         var rrEl=r.querySelector('.wl-cell-sig .rr');
         if(rrEl){rrEl.className='rr rr-'+bd.rrTone;rrEl.textContent=bd.rrTxt;}
-        d.innerHTML=buildDecisionCardHtml(sObj);
-        applyReviewState(d.querySelector('.dc-review'));   // 重建后恢复勾选/交易状态,避免 5 秒刷新清空
+        var isAuto=d.classList.contains('auto-detail');
+        if(isAuto){
+          d.innerHTML=buildDecisionCardHtml(sObj);
+          applyReviewState(d.querySelector('.dc-review'));   // 重建后恢复勾选/交易状态,避免刷新清空
+        }else{
+          var lastPrice=d.getAttribute('data-last-price');
+          var curPrice=price.toFixed(2);
+          var nowTs=Date.now();
+          var lastTs=Number(d.getAttribute('data-rebuild-ts')||0);
+          if(lastPrice===null){
+            d.setAttribute('data-last-price',curPrice);      // 首屏:只记录基准价,保留服务端渲染
+          }else if(lastPrice!==curPrice&&nowTs-lastTs>8000){
+            d.setAttribute('data-rebuild-ts',String(nowTs));
+            d.setAttribute('data-last-price',curPrice);
+            d.innerHTML=buildDecisionCardHtml(sObj);
+            applyReviewState(d.querySelector('.dc-review'));
+          }
+        }
       }
     });
     var timeEl=document.querySelector('.wl-time');
@@ -5248,7 +5284,7 @@ async function refreshWatchlistQuotes(){
           var rEl=noTechRows[k];
           var c=rEl.getAttribute('data-code');if(!c)continue;
           var d=document.querySelector('.wl-detail[data-detail-code="'+c+'"]');
-          if(d&&!d.classList.contains('auto-detail'))continue;  // 配置股不重建,保留其题材/逻辑文案
+          // v11.11:配置股同样允许重建(已通过 data-stock 播种全量数据,不再丢失题材/逻辑文案)
           try{
             var c0=c.charAt(0);
             var full=(c0==="6"||c0==="5")?("sh"+c):((c0==="4"||c0==="8"||c0==="92")?("bj"+c):("sz"+c));
