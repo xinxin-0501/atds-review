@@ -459,6 +459,7 @@
 .conf-good{background:#e8f5e9;color:#2e7d32}
 .conf-ok{background:#fff7e6;color:#d49000}
 .conf-warn{background:#f5f5f5;color:#888}
+.conf-down{background:#f2f2f2;color:#aaa;text-decoration:line-through}
 .rr-good{background:#e8f5e9;color:#2e7d32}
 .rr-ok{background:#e0f2f1;color:#00695c}
 .rr-warn{background:#fff7e6;color:#d49000}
@@ -477,6 +478,7 @@
 .dc-status.up{background:#e8f5e9;color:#2e7d32}
 .dc-status.down{background:#f5f5f5;color:#888}
 .dc-conf{font-size:9px;color:#666;font-weight:600}
+.dc-conf-down{color:#bbb;text-decoration:line-through}
 .dc-rr{font-size:9px;font-weight:700}
 .dc-time{margin-left:auto;font-size:9px;color:#999}
 .dc-tags{display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;border-bottom:1px dashed #f5f5f5}
@@ -2225,8 +2227,8 @@
     <span class="wl-cell wl-cell-price"><span class="price up">65.24</span></span>
     <span class="wl-cell wl-cell-pct up">+2.08%</span>
     <span class="wl-cell wl-cell-amt">109.0亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-good">76</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-warn">1.34</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">76</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">1.34</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600487" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="600487" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600487">
     <div class="dc-head">
@@ -2234,7 +2236,7 @@
       <span class="dc-name">亨通光电 <i>600487</i></span>
       <span class="dc-status down">等待触发</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 76</span>
+      <span class="dc-conf dc-conf-down">置信度 76</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 1.34</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -2260,8 +2262,8 @@
       <div class="dc-line">开盘预期 低开-3.0%·看承接</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
-      <div class="dc-line dc-events"><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">业绩预告</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 59天前</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="预计2026年1-6月扣除非经常性损益后的净利润盈利:304,964.22万元至360,234."></span></span><span class="ev-item ev-m "><span class="ev-head"><span class="ev-type">回购</span><span class="ev-cnt"> 15天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="安徽承义律师事务所关于江苏亨通光电股份有限公司2024年限制性股票激励计划回购注销部分限制性股票">安徽承义律师事务所关于江苏亨通光电股份有限公司2024年…</span></span><span class="ev-item ev-m ev-bad"><span class="ev-head"><span class="ev-type">解禁</span><span class="ev-dir ev-dir-bad">利空</span><span class="ev-cnt"> T-283天</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="解禁市值约4.22亿">股权激励限售股份</span></span><span class="ev-item ev-m ev-bad"><span class="ev-head"><span class="ev-type">解禁</span><span class="ev-dir ev-dir-bad">利空</span><span class="ev-cnt"> T-648天</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="解禁市值约4.22亿">股权激励限售股份</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 15天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="亨通光电关于召开2026年第四次临时股东会的通知">亨通光电关于召开2026年第四次临时股东会的通知</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 2天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="亨通光电2026年第四次临时股东会会议材料">亨通光电2026年第四次临时股东会会议材料</span></span></div>
-      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告</div>
+      <div class="dc-line dc-events"><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">业绩预告</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 59天前</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="预计2026年1-6月扣除非经常性损益后的净利润盈利:304,964.22万元至360,234."></span></span><span class="ev-item ev-m "><span class="ev-head"><span class="ev-type">回购</span><span class="ev-cnt"> 15天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="安徽承义律师事务所关于江苏亨通光电股份有限公司2024年限制性股票激励计划回购注销部分限制性股票">安徽承义律师事务所关于江苏亨通光电股份有限公司2024年…</span></span><span class="ev-item ev-m ev-bad"><span class="ev-head"><span class="ev-type">解禁</span><span class="ev-dir ev-dir-bad">利空</span><span class="ev-cnt"> 距今283天·远期</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="解禁市值约4.22亿">股权激励限售股份</span></span><span class="ev-item ev-m ev-bad"><span class="ev-head"><span class="ev-type">解禁</span><span class="ev-dir ev-dir-bad">利空</span><span class="ev-cnt"> 距今648天·远期</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="解禁市值约4.22亿">股权激励限售股份</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 15天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="亨通光电关于召开2026年第四次临时股东会的通知">亨通光电关于召开2026年第四次临时股东会的通知</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 2天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="亨通光电2026年第四次临时股东会会议材料">亨通光电2026年第四次临时股东会会议材料</span></span></div>
+      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -2319,8 +2321,8 @@
     <span class="wl-cell wl-cell-price"><span class="price down">20.98</span></span>
     <span class="wl-cell wl-cell-pct down">-3.98%</span>
     <span class="wl-cell wl-cell-amt">11.4亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-warn">44</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-good">4.12 ✓</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">44</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">4.12</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="600392" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600392">
     <div class="dc-head">
@@ -2328,7 +2330,7 @@
       <span class="dc-name">盛和资源 <i>600392</i></span>
       <span class="dc-status down">高风险观察</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 44</span>
+      <span class="dc-conf dc-conf-down">置信度 44</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 4.12</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -2355,7 +2357,7 @@
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events"><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">业绩预告</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 62天前</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="预计2026年1-6月扣除非经常性损益后的净利润盈利:79,000万元至92,000万元,同比上"></span></span><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">回购</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 9天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="盛和资源控股股份有限公司关于股份回购进展公告">盛和资源控股股份有限公司关于股份回购进展公告</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 13天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="盛和资源控股股份有限公司关于召开2026年第一次临时股东会的通知">盛和资源控股股份有限公司关于召开2026年第一次临时股东…</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 3天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="盛和资源控股股份有限公司2026年第一次临时股东会资料">盛和资源控股股份有限公司2026年第一次临时股东会资料</span></span></div>
-      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告</div>
+      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -2413,8 +2415,8 @@
     <span class="wl-cell wl-cell-price"><span class="price up">62.77</span></span>
     <span class="wl-cell wl-cell-pct up">+4.01%</span>
     <span class="wl-cell wl-cell-amt">63.3亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-warn">46</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-bad">0.60</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">46</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">0.60</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300285" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300285" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300285">
     <div class="dc-head">
@@ -2422,7 +2424,7 @@
       <span class="dc-name">国瓷材料 <i>300285</i></span>
       <span class="dc-status down">等待触发</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 46</span>
+      <span class="dc-conf dc-conf-down">置信度 46</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 0.60</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -2449,7 +2451,7 @@
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events"><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">回购</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 10天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="关于2026年中期权益分派实施后调整回购股份价格上限的公告">关于2026年中期权益分派实施后调整回购股份价格上限的公…</span></span><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">回购</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 9天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="关于回购公司股份的进展公告">关于回购公司股份的进展公告</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 10天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="关于召开2026年第二次临时股东会的通知">关于召开2026年第二次临时股东会的通知</span></span></div>
-      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告</div>
+      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -2507,8 +2509,8 @@
     <span class="wl-cell wl-cell-price"><span class="price up">926.00</span></span>
     <span class="wl-cell wl-cell-pct up">+4.03%</span>
     <span class="wl-cell wl-cell-amt">299.7亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-warn">57</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-bad">0.24</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">57</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">0.24</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300308" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300308" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300308">
     <div class="dc-head">
@@ -2516,7 +2518,7 @@
       <span class="dc-name">中际旭创 <i>300308</i></span>
       <span class="dc-status down">等待触发</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 57</span>
+      <span class="dc-conf dc-conf-down">置信度 57</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 0.24</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -2543,7 +2545,7 @@
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events"><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">回购</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 10天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="关于首次回购公司股份的公告">关于首次回购公司股份的公告</span></span><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">回购</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 9天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="关于回购股份事项前十名股东和前十名无限售条件股东持股情况的公告">关于回购股份事项前十名股东和前十名无限售条件股东持股情况…</span></span></div>
-      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告</div>
+      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -2601,8 +2603,8 @@
     <span class="wl-cell wl-cell-price"><span class="price down">25.42</span></span>
     <span class="wl-cell wl-cell-pct down">-3.93%</span>
     <span class="wl-cell wl-cell-amt">7.0亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-warn">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-good">3.53 ✓</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">41</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">3.53</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="603538" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="603538" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="603538">
     <div class="dc-head">
@@ -2610,7 +2612,7 @@
       <span class="dc-name">美诺华 <i>603538</i></span>
       <span class="dc-status down">高风险观察</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 41</span>
+      <span class="dc-conf dc-conf-down">置信度 41</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 3.53</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -2636,8 +2638,8 @@
       <div class="dc-line">开盘预期 平开±2%·看方向</div>
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
-      <div class="dc-line dc-events"><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 22天前</span><span class="ev-src">〔AKShare〕</span></span><span class="ev-title" title="宁波美诺华药业股份有限公司关于召开2026年第二次临时股东会的通知">宁波美诺华药业股份有限公司关于召开2026年第二次临时股…</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 14天前</span><span class="ev-src">〔AKShare〕</span></span><span class="ev-title" title="宁波美诺华药业股份有限公司2026年第二次临时股东会会议资料">宁波美诺华药业股份有限公司2026年第二次临时股东会会议…</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 6天前</span><span class="ev-src">〔AKShare〕</span></span><span class="ev-title" title="宁波美诺华药业股份有限公司2026年第二次临时股东会决议公告">宁波美诺华药业股份有限公司2026年第二次临时股东会决议…</span></span><span class="ev-item ev-l ev-bad"><span class="ev-head"><span class="ev-type">解禁</span><span class="ev-dir ev-dir-bad">利空</span><span class="ev-cnt"> T-259天</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="解禁市值约0.22亿">股权激励限售股份</span></span><span class="ev-item ev-l ev-bad"><span class="ev-head"><span class="ev-type">解禁</span><span class="ev-dir ev-dir-bad">利空</span><span class="ev-cnt"> T-290天</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="解禁市值约0.55亿">股权激励限售股份</span></span></div>
-      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告</div>
+      <div class="dc-line dc-events"><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 22天前</span><span class="ev-src">〔AKShare〕</span></span><span class="ev-title" title="宁波美诺华药业股份有限公司关于召开2026年第二次临时股东会的通知">宁波美诺华药业股份有限公司关于召开2026年第二次临时股…</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 14天前</span><span class="ev-src">〔AKShare〕</span></span><span class="ev-title" title="宁波美诺华药业股份有限公司2026年第二次临时股东会会议资料">宁波美诺华药业股份有限公司2026年第二次临时股东会会议…</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 6天前</span><span class="ev-src">〔AKShare〕</span></span><span class="ev-title" title="宁波美诺华药业股份有限公司2026年第二次临时股东会决议公告">宁波美诺华药业股份有限公司2026年第二次临时股东会决议…</span></span><span class="ev-item ev-l ev-bad"><span class="ev-head"><span class="ev-type">解禁</span><span class="ev-dir ev-dir-bad">利空</span><span class="ev-cnt"> 距今259天·远期</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="解禁市值约0.22亿">股权激励限售股份</span></span><span class="ev-item ev-l ev-bad"><span class="ev-head"><span class="ev-type">解禁</span><span class="ev-dir ev-dir-bad">利空</span><span class="ev-cnt"> 距今290天·远期</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="解禁市值约0.55亿">股权激励限售股份</span></span></div>
+      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -2695,8 +2697,8 @@
     <span class="wl-cell wl-cell-price"><span class="price down">31.46</span></span>
     <span class="wl-cell wl-cell-pct down">-1.69%</span>
     <span class="wl-cell wl-cell-amt">2.8亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-warn">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-good">3.88 ✓</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">41</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">3.88</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300342" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300342" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300342">
     <div class="dc-head">
@@ -2704,7 +2706,7 @@
       <span class="dc-name">天银机电 <i>300342</i></span>
       <span class="dc-status down">不建议参与</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 41</span>
+      <span class="dc-conf dc-conf-down">置信度 41</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 3.88</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div><div class="dc-summary">⛔ 情绪冰点+趋势空头+主力流出，属于高难度逆势标的，系统强烈建议不参与，仅作观察。</div>
@@ -2731,7 +2733,7 @@
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 巨潮本次未匹配到（近期无减持/回购/问询等关键词公告，或 CORS 被浏览器拦截），财报/解禁来自东财；如需查减持/回购，请点"+搜索加入"旁的"个股分析"查看公告列表</div>
+      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 破位·严禁现价抄底</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -2789,8 +2791,8 @@
     <span class="wl-cell wl-cell-price"><span class="price down">32.89</span></span>
     <span class="wl-cell wl-cell-pct down">-6.27%</span>
     <span class="wl-cell wl-cell-amt">14.6亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-good">76</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-good">2.96 ✓</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">76</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">2.96</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300607" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300607" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300607">
     <div class="dc-head">
@@ -2798,7 +2800,7 @@
       <span class="dc-name">拓斯达 <i>300607</i></span>
       <span class="dc-status down">高风险观察</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 76</span>
+      <span class="dc-conf dc-conf-down">置信度 76</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 2.96</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -2825,7 +2827,7 @@
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events"><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">业绩预告</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 60天前</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="预计2026年1-6月归属于上市公司股东的净利润盈利:9,000万元至11,500万元,同比上年"></span></span></div>
-      <div class="dc-line dc-src-note">⚠ 巨潮本次未匹配到（近期无减持/回购/问询等关键词公告，或 CORS 被浏览器拦截），财报/解禁来自东财；如需查减持/回购，请点"+搜索加入"旁的"个股分析"查看公告列表</div>
+      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -2883,8 +2885,8 @@
     <span class="wl-cell wl-cell-price"><span class="price down">3.37</span></span>
     <span class="wl-cell wl-cell-pct down">-1.75%</span>
     <span class="wl-cell wl-cell-amt">4.2亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-good">79</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-ok">1.78 ✓</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">79</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">1.78</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="002385" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="002385" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="002385">
     <div class="dc-head">
@@ -2892,7 +2894,7 @@
       <span class="dc-name">大北农 <i>002385</i></span>
       <span class="dc-status down">高风险观察</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 79</span>
+      <span class="dc-conf dc-conf-down">置信度 79</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 1.78</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -2919,7 +2921,7 @@
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events"><span class="ev-item ev-m ev-bad"><span class="ev-head"><span class="ev-type">业绩预告</span><span class="ev-dir ev-dir-bad">利空</span><span class="ev-cnt"> 58天前</span><span class="ev-src">〔东财〕</span></span><span class="ev-title" title="预计2026年1-6月扣除非经常性损益后的净利润亏损:59,000万元至67,000万元。"></span></span><span class="ev-item ev-m "><span class="ev-head"><span class="ev-type">回购</span><span class="ev-cnt"> 15天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="北京海润天睿律师事务所关于北京大北农科技集团股份有限公司2017年限制性股票激励计划部分限制性股">北京海润天睿律师事务所关于北京大北农科技集团股份有限公司…</span></span><span class="ev-item ev-m ev-good"><span class="ev-head"><span class="ev-type">回购</span><span class="ev-dir ev-dir-good">利好</span><span class="ev-cnt"> 8天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="关于回购股份进展情况的公告">关于回购股份进展情况的公告</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 15天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="关于召开2026年第四次临时股东会的通知">关于召开2026年第四次临时股东会的通知</span></span></div>
-      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告</div>
+      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -2942,7 +2944,7 @@
     <td class="tp-rr tp-rr-muted">未触发</td>
   </tr>
     
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn tp-ok">现价盈亏比 1.63,可执行计划。</div>
+  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价盈亏比 1.63 看似合格，但当前状态为「高风险观察」，现价买入无效，严禁开仓，仅作观察。</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损5.4% → 建议仓位 <b>9%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破3.18无条件止损 · 到达3.68无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -2977,8 +2979,8 @@
     <span class="wl-cell wl-cell-price"><span class="price down">3.62</span></span>
     <span class="wl-cell wl-cell-pct down">-1.90%</span>
     <span class="wl-cell wl-cell-amt">2.4亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-warn">50</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-bad">0.36</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">50</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">0.36</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300459" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300459" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="300459">
     <div class="dc-head">
@@ -2986,7 +2988,7 @@
       <span class="dc-name">汤姆猫 <i>300459</i></span>
       <span class="dc-status down">等待触发</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 50</span>
+      <span class="dc-conf dc-conf-down">置信度 50</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 0.36</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -3013,7 +3015,7 @@
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 巨潮本次未匹配到（近期无减持/回购/问询等关键词公告，或 CORS 被浏览器拦截），财报/解禁来自东财；如需查减持/回购，请点"+搜索加入"旁的"个股分析"查看公告列表</div>
+      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -3071,8 +3073,8 @@
     <span class="wl-cell wl-cell-price"><span class="price down">16.21</span></span>
     <span class="wl-cell wl-cell-pct down">-9.03%</span>
     <span class="wl-cell wl-cell-amt">32.1亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-ok">69</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-bad">0.60</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">69</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">0.60</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600737" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="600737" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600737">
     <div class="dc-head">
@@ -3080,7 +3082,7 @@
       <span class="dc-name">中粮糖业 <i>600737</i></span>
       <span class="dc-status down">高风险观察</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 69</span>
+      <span class="dc-conf dc-conf-down">置信度 69</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 0.60</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -3107,7 +3109,7 @@
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 巨潮本次未匹配到（近期无减持/回购/问询等关键词公告，或 CORS 被浏览器拦截），财报/解禁来自东财；如需查减持/回购，请点"+搜索加入"旁的"个股分析"查看公告列表</div>
+      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -3165,8 +3167,8 @@
     <span class="wl-cell wl-cell-price"><span class="price down">4.73</span></span>
     <span class="wl-cell wl-cell-pct down">-9.90%</span>
     <span class="wl-cell wl-cell-amt">20.9亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-good">76</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-good">2.80 ✓</span></span>
+    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">76</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">2.80</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600108" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="600108" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div></div><div class="wl-detail" data-detail-code="600108">
     <div class="dc-head">
@@ -3174,7 +3176,7 @@
       <span class="dc-name">亚盛集团 <i>600108</i></span>
       <span class="dc-status down">高风险观察</span>
       <span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>
-      <span class="dc-conf">置信度 76</span>
+      <span class="dc-conf dc-conf-down">置信度 76</span>
       <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 2.80</span>
       <span class="dc-time">2026-09-11 22:37:28</span>
     </div>
@@ -3201,7 +3203,7 @@
     </div>
     <div class="dc-block"><div class="dc-h">📅 事件风险</div>
       <div class="dc-line dc-events"><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 14天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="亚盛集团关于召开2026年第三次临时股东会的通知">亚盛集团关于召开2026年第三次临时股东会的通知</span></span><span class="ev-item ev-l "><span class="ev-head"><span class="ev-type">股东大会</span><span class="ev-cnt"> 1天前</span><span class="ev-src">〔巨潮〕</span></span><span class="ev-title" title="亚盛集团2026年第三次临时股东会资料">亚盛集团2026年第三次临时股东会资料</span></span></div>
-      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达巨潮公告</div>
+      <div class="dc-line dc-src-note">来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文</div>
     </div>
     <div class="dc-block dc-plan dc-plan-collapsed">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
@@ -4097,7 +4099,7 @@ function buildDecisionCardHtml(s){
   var evEmpty=(evStatus.cninfo==='fail')?'<span class="ev">数据源暂时不可用，请自行前往巨潮资讯网查询</span>':'<span class="ev">近期无重大事件公告</span>';
   // v11.6:事件最多显示 10 条(原 5);标题显示完整长度(截 28 字避免过长);有巨潮原文链接的附"查看原文"
   var evHtml=(evs&&evs.length)
-    ?evs.slice(0,10).map(function(e){var red=(e.level==='高'&&e.left>=-3&&e.left<=3)?' ev-red-alert':'';var cnt=e.left>0?(' T-'+e.left+'天'):(e.left<0?(' '+Math.abs(e.left)+'天前'):' 今日');var rawTitle=e.fullTitle||e.name||'';var showTitle=rawTitle?(rawTitle.length>28?(rawTitle.slice(0,28)+'…'):rawTitle):'';var linkHtml=e.cninfoUrl?'<a class="ev-link" href="'+escHtmlF(e.cninfoUrl)+'" target="_blank" rel="noopener" title="查看公告原文">查看原文↗</a>':'';return '<span class="ev-item ev-'+(e.level==='高'?'h':e.level==='中'?'m':'l')+' '+(e.dir==='利好'?'ev-good':e.dir==='利空'?'ev-bad':'')+red+'"><span class="ev-head"><span class="ev-type">'+escHtmlF(e.type)+'</span>'+(e.dir&&e.dir!=='中性'?'<span class="ev-dir ev-dir-'+(e.dir==='利好'?'good':'bad')+'">'+escHtmlF(e.dir)+'</span>':'')+'<span class="ev-cnt">'+cnt+'</span>'+(e.source?'<span class="ev-src">〔'+escHtmlF(e.source)+'〕</span>':'')+'</span><span class="ev-title" title="'+escHtmlF(e.detail||rawTitle||e.date||'')+'">'+escHtmlF(showTitle)+'</span>'+linkHtml+'</span>';}).join('')
+    ?evs.slice(0,10).map(function(e){var red=(e.level==='高'&&e.left>=-3&&e.left<=3)?' ev-red-alert':'';var cnt=e.left>0?(e.left>90?(' 距今'+e.left+'天·远期'):(' T-'+e.left+'天')):(e.left<0?(' '+Math.abs(e.left)+'天前'):' 今日');var rawTitle=e.fullTitle||e.name||'';var showTitle=rawTitle?(rawTitle.length>28?(rawTitle.slice(0,28)+'…'):rawTitle):'';var linkHtml=e.cninfoUrl?'<a class="ev-link" href="'+escHtmlF(e.cninfoUrl)+'" target="_blank" rel="noopener" title="查看公告原文">查看原文↗</a>':'';return '<span class="ev-item ev-'+(e.level==='高'?'h':e.level==='中'?'m':'l')+' '+(e.dir==='利好'?'ev-good':e.dir==='利空'?'ev-bad':'')+red+'"><span class="ev-head"><span class="ev-type">'+escHtmlF(e.type)+'</span>'+(e.dir&&e.dir!=='中性'?'<span class="ev-dir ev-dir-'+(e.dir==='利好'?'good':'bad')+'">'+escHtmlF(e.dir)+'</span>':'')+'<span class="ev-cnt">'+cnt+'</span>'+(e.source?'<span class="ev-src">〔'+escHtmlF(e.source)+'〕</span>':'')+'</span><span class="ev-title" title="'+escHtmlF(e.detail||rawTitle||e.date||'')+'">'+escHtmlF(showTitle)+'</span>'+linkHtml+'</span>';}).join('')
     :evEmpty;
   // v11.9:evNote 按公告来源区分——东财公告直连(eastmoney+ann) / 巨潮或云端缓存(eastmoney+cninfo) / 无公告类事件(仅东财财报解禁)
   var evNote;
@@ -4147,8 +4149,11 @@ function buildDecisionCardHtml(s){
     planRow('B 突破确认','放量突破'+f2(planBEntry),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
     (tRRHide?'':planRow('C 日内做T','现价'+f2(price)+'·ATR'+f2(atrC)+'动态止损',price,tStop,tTgt,tRR,trigC,rrTone(tRR),tRRBad))+
     '</table>';
-  var nowWarn=p.rrNow<1.5
-    ?'<div class="tp-warn">⚠ 现价直接买入盈亏比 '+p.rrNow.toFixed(2)+'(<1.5),不合格 —— 等待回踩至 '+f2(p.entry)+' 再执行,当前仅观察。</div>'
+  // 现价追入校验(v11.10:与状态机联动——非"可交易"状态即使现价盈亏比"看似合格",也禁止出现"可执行计划"暗示)
+  var nowWarn=!rrActionable
+    ?(p.rrNow<1.5
+        ?'<div class="tp-warn">⚠ 现价直接买入盈亏比 '+p.rrNow.toFixed(2)+'(<1.5),不合格 —— 等待回踩至 '+f2(p.entry)+' 再执行,当前仅观察。</div>'
+        :'<div class="tp-warn">⚠ 现价盈亏比 '+p.rrNow.toFixed(2)+' 看似合格，但当前状态为「'+effStatusLabel+'」，现价买入无效，严禁开仓，仅作观察。</div>')
     :'<div class="tp-warn tp-ok">现价盈亏比 '+p.rrNow.toFixed(2)+',可执行计划。</div>';
   var tRRBadWarn=tRRBad?'<div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div>':'';
   // 复盘
@@ -4221,7 +4226,7 @@ function buildDecisionCardHtml(s){
     '<span class="dc-name">'+escHtmlF(s.name)+' <i>'+escHtmlF(s.code)+'</i></span>'+
     '<span class="dc-status '+((effConfTone==='good')?'up':(effConfTone==='ok')?'':'down')+'">'+effStatusLabel+'</span>'+
     integrityBadge+
-    '<span class="dc-conf">置信度 '+confTotal+'</span>'+
+    '<span class="dc-conf'+(rrActionable?'':' dc-conf-down')+'">置信度 '+confTotal+'</span>'+
     '<span class="dc-rr '+rrHeadCls+'"'+rrHeadTitle+'>盈亏比 '+p.rr.toFixed(2)+'</span>'+
     '<span class="dc-time">'+new Date().toLocaleString('zh-CN',{hour12:false})+'</span>'+
     '</div>'+summaryHtml+
@@ -4273,9 +4278,19 @@ function buildDecisionCardHtml(s){
 function buildWatchlistDetailHtml(data){ return buildDecisionCardHtml(data); }
 /* 主行徽章:置信度 + 盈亏比(与决策卡同源计算,供 addToWatchlistUI / refreshWatchlistQuotes 复用) */
 function dcBadges(s){
-  var t=s.tech||{}, ff=s.fundFlow||{}, price=Number(s.price)||0;
-  function supStrong(){var seen={},a=Array.isArray(t.supports)?t.supports:[],out=[];for(var i=0;i<a.length;i++){var x=a[i];if(!x||x.price==null||isNaN(x.price))continue;var k=x.price.toFixed(2);if(seen[k])continue;seen[k]=1;if(price>0&&Math.abs(x.price-price)/price>0.20)continue;out.push(x);}out.sort(function(a,b){return b.price-a.price;});for(var j=0;j<out.length;j++){if(out[j].weight==='strong')return out[j];}return out[0]||null;}
-  function preStrong(){var seen={},a=Array.isArray(t.pressures)?t.pressures:[],out=[];for(var i=0;i<a.length;i++){var x=a[i];if(!x||x.price==null||isNaN(x.price))continue;var k=x.price.toFixed(2);if(seen[k])continue;seen[k]=1;if(price>0&&Math.abs(x.price-price)/price>0.20)continue;out.push(x);}out.sort(function(a,b){return a.price-b.price;});for(var j=0;j<out.length;j++){if(out[j].weight==='strong')return out[j];}return out[0]||null;}
+  s=s||{};
+  var t=s.tech||{}, ff=s.fundFlow||{}, price=Number(s.price)||0, pct=Number(s.pct)||0;
+  // 与卡片 buildDecisionCardHtml 同源:关键位按现价重划分(现价<位→支撑,>位→压力)
+  function splitLvls(){
+    var all=(Array.isArray(t.supports)?t.supports:[]).concat(Array.isArray(t.pressures)?t.pressures:[]);
+    var seen={},sup=[],pre=[];
+    for(var i=0;i<all.length;i++){var x=all[i];if(!x||x.price==null||isNaN(x.price))continue;var k=x.price.toFixed(2);if(seen[k])continue;seen[k]=1;if(price>0&&Math.abs(x.price-price)/price>0.20)continue;if(x.price<price)sup.push(x);else if(x.price>price)pre.push(x);}
+    sup.sort(function(a,b){return b.price-a.price;});
+    pre.sort(function(a,b){return a.price-b.price;});
+    return {sup:sup,pre:pre};
+  }
+  function supStrong(){var a=splitLvls().sup;for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
+  function preStrong(){var a=splitLvls().pre;for(var i=0;i<a.length;i++){if(a[i].weight==='strong')return a[i];}return a[0]||null;}
   var sup=supStrong(),pre=preStrong();
   var supPrice=sup?sup.price:(t.ma20||price*0.96);
   var prePrice=pre?pre.price:(t.ma5||price*1.05);
@@ -4284,6 +4299,7 @@ function dcBadges(s){
   var stop=entry-Math.max(atr,entry*0.03);
   var target=prePrice>entry?prePrice:(entry*1.06);
   var rr=(target-entry)/(entry-stop);
+  var rrNow=(price>stop)?(target-price)/(price-stop):0;
   function rrTone(r){return r>=2?'good':r>=1.5?'ok':r>=1?'warn':'bad';}
   var trendScore=t.trend==='up'?30:t.trend==='repair'?20:t.trend==='flat'?12:5;
   var fundScore=12;if((ff.d1||0)>0)fundScore+=6;if((ff.d3||0)>0)fundScore+=4;
@@ -4292,7 +4308,24 @@ function dcBadges(s){
   var keyScore=6;if(sup&&price<=sup.price*1.03)keyScore+=6;if(pre&&price>=pre.price*0.97)keyScore+=3;keyScore=Math.min(15,keyScore);
   var rrScore=rr>=2?10:rr>=1.5?7:rr>=1?4:0;
   var confTotal=Math.round(trendScore+fundScore+themeScore+keyScore+rrScore);
-  return {rr:rr,rrTone:rrTone(rr),confTotal:confTotal,confTone:confTotal>=75?'good':confTotal>=60?'ok':'warn'};
+  // v11.10 状态机(与 buildDecisionCardHtml 完全同步):非"可交易"→ 盈亏比/置信度置灰,修复"不建议参与却显绿色高盈亏比"
+  var planBEntry=pre?pre.price:(price*1.05);
+  var trigA=price<=entry, trigB=price>=planBEntry;
+  var abUnTriggered=!trigA&&!trigB;
+  var ferment=pct>=7?'高潮/加速':pct>=3?'发酵':(pct>=0&&t.trend==='up')?'启动':pct<-2?'退潮':'混沌';
+  var emotionCycle=ferment==='高潮/加速'?'加速':ferment==='退潮'?'退潮':ferment==='发酵'?'发酵':ferment==='启动'?'修复':'冰点';
+  var isHardTrade=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0);
+  var upperShadow=(s.high>0&&price>0&&s.open>0&&((s.high-price)/price*100>3)&&price<s.open);
+  var riskDowngrade=(ff.d1||0)<0; // 做T盈亏比恒=1<1.5 → tRRBad 恒真,故 riskDowngrade 等价于"资金净流出"
+  var rrNowBad=rrNow<1.5;
+  var effStatusLabel;
+  if(isHardTrade)effStatusLabel='不建议参与';
+  else if(upperShadow)effStatusLabel='高风险观察';
+  else if(riskDowngrade)effStatusLabel='高风险观察';
+  else if(rrNowBad||abUnTriggered)effStatusLabel='等待触发';
+  else effStatusLabel=confTotal>=75?'可交易':confTotal>=60?'轻仓试错':'观察';
+  var actionable=(effStatusLabel==='可交易');
+  return {rr:rr,rrTone:actionable?rrTone(rr):'muted',rrTxt:(actionable&&rr>=1.5)?(rr.toFixed(2)+' ✓'):rr.toFixed(2),confTotal:confTotal,confTone:actionable?(confTotal>=75?'good':confTotal>=60?'ok':'warn'):'down',status:effStatusLabel};
 }
 function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
@@ -4312,7 +4345,7 @@ function addToWatchlistUI(s){
   var v=Number(s.pct)||0;
   var cls=v>=0?"up":"down";
   var m=dcBadges(s);
-  var rrTxt=m.rr>=1.5?(m.rr.toFixed(2)+' ✓'):m.rr.toFixed(2);
+  var rrTxt=m.rrTxt;
   var detailHtml=buildDecisionCardHtml(s);
   var techJson=s.tech?JSON.stringify(s.tech):'null';
   var ffJson=s.fundFlow?JSON.stringify(s.fundFlow):'null';
@@ -4633,7 +4666,7 @@ async function refreshWatchlistQuotes(){
         var confEl=r.querySelector('.wl-cell-atds .conf');
         if(confEl){confEl.className='conf conf-'+bd.confTone;confEl.textContent=bd.confTotal;}
         var rrEl=r.querySelector('.wl-cell-sig .rr');
-        if(rrEl){rrEl.className='rr rr-'+bd.rrTone;rrEl.textContent=(bd.rr>=1.5?(bd.rr.toFixed(2)+' ✓'):bd.rr.toFixed(2));}
+        if(rrEl){rrEl.className='rr rr-'+bd.rrTone;rrEl.textContent=bd.rrTxt;}
         d.innerHTML=buildDecisionCardHtml(sObj);
         applyReviewState(d.querySelector('.dc-review'));   // 重建后恢复勾选/交易状态,避免 5 秒刷新清空
       }
@@ -5459,7 +5492,8 @@ async function fetchEventsF(code){
   }
   // 排序:高 > 中 > 低,同级按日期升序(最近/最紧迫在前)
   var lvRank={'高':0,'中':1,'低':2};
-  events.sort(function(a,b){return (lvRank[a.level]!=null?lvRank[a.level]:2)-(lvRank[b.level]!=null?lvRank[b.level]:2)||(a.date<b.date?-1:a.date>b.date?1:0);});
+  function nearFar(e){return (e.left!=null&&e.left>90)?1:0;}  // v11.10:>90天远期事件排后,避免"T-283天解禁"顶在最前制造焦虑
+  events.sort(function(a,b){return (lvRank[a.level]!=null?lvRank[a.level]:2)-(lvRank[b.level]!=null?lvRank[b.level]:2)||nearFar(a)-nearFar(b)||(a.date<b.date?-1:a.date>b.date?1:0);});
   // 写入 localStorage(即使空也写,标记已尝试拉取)
   try{
     var lc2=JSON.parse(localStorage.getItem('atds_events_cache')||'{}');
