@@ -525,10 +525,21 @@ async function resolveBoardCode(name) {
 async function fetchBoardChangeMap() {
   const map = {};
   const fsList = ['m:90+t:2', 'm:90+t:3']; // 行业板块 + 概念板块
+  // v11.14:原实现写死 push2.eastmoney.com;GitHub Actions 侧该主机不可达 → 全表为空 → 板块名解析全失败。
+  //         改为与 fetchBoardPicks 相同的多主机轮换,并打印条数便于后续诊断。
+  const tryHosts = ['https://push2.eastmoney.com', 'http://push2.eastmoney.com', 'https://push2delay.eastmoney.com', 'http://push2ex.eastmoney.com'];
   for (const fs of fsList) {
+    let base = null;
+    for (const h of tryHosts) {
+      try {
+        const j0 = await fetchJsonTxt(`${h}/api/qt/clist/get?pn=1&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=${fs}&fields=f12,f14,f3`, { timeout: 10000 });
+        if (j0 && j0.data && (j0.data.diff || []).length) { base = h; break; }
+      } catch (e) { /* 换下一个主机 */ }
+    }
+    if (!base) { console.warn('  [板块代码表] 无可用主机,跳过', fs); continue; }
     for (let pn = 1; pn <= 8; pn++) {
       try {
-        const url = `https://push2.eastmoney.com/api/qt/clist/get?pn=${pn}&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=${fs}&fields=f12,f14,f3`;
+        const url = `${base}/api/qt/clist/get?pn=${pn}&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=${fs}&fields=f12,f14,f3`;
         const j = await fetchJsonTxt(url, { timeout: 10000 });
         const diff = (j && j.data && j.data.diff) || [];
         if (!diff.length) break;
@@ -541,6 +552,7 @@ async function fetchBoardChangeMap() {
       } catch (e) { break; }
     }
   }
+  console.log('  [板块代码表] 共', Object.keys(map).length, '条');
   return map;
 }
 // 个股 category(自由文本) → 东财板块名 的别名映射(优先精确别名,再关键词兜底)
