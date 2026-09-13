@@ -5565,7 +5565,7 @@ function removeWatchlistRow(code){
 // ⚠️ 不再清空 atds_watchlist(手动加股列表),只清缓存——重置后用户新增的股仍在(用户明确诉求)
 function resetLocalCache(){
   // 缓存类(可清):data caches + 隐藏标记 + 交易状态 + 模拟跟踪 + 二维码
-  var CACHE_KEYS=['atds_watchlist_data','atds_watchlist_hidden','atds_kline_cache','atds_ff_cache','atds_lhb_cache','atds_events_cache','atds_trade_status','atds_shadow','atds_qr_code'];
+  var CACHE_KEYS=['atds_watchlist_data','atds_watchlist_hidden','atds_kline_cache','atds_ff_cache','atds_lhb_cache','atds_events_cache','atds_profile_cache','atds_trade_status','atds_shadow','atds_qr_code'];
   // 保留类:atds_watchlist(手动加股列表)、sim_track_*(其他模块的独立 checkbox 状态)
   // 额外清理 sim_track_* 单独的 checkbox 状态
   var simKeys=[];
