@@ -486,14 +486,33 @@ async function fetchJsonTxt(u, opts) {
     try { return JSON.parse(txt); } catch (e) { return null; }
   } catch (e) { return null; } finally { clearTimeout(timer); }
 }
-// 东财搜索建议接口:板块名 → BK 代码。兼容涨停池 hybk 截断名(如"汽车零部"→"汽车零部件" BK0481)
+// v11.14:板块名 → BK 代码。
+// 原实现只依赖 searchapi.eastmoney.com,该域名在 GitHub Actions 侧不可达 → "板块名解析失败" 7/7 → 候选股注入 0/7。
+// 改为:优先用 push2 clist 板块全表(与 hotSectors 同源,已验证 Actions 可达)在本地匹配,searchapi 仅作兜底。
+let _boardListCache = null;
+async function getBoardListCache() {
+  if (_boardListCache) return _boardListCache;
+  try { _boardListCache = (await fetchBoardChangeMap()) || {}; } catch (e) { _boardListCache = {}; }
+  return _boardListCache;
+}
 async function resolveBoardCode(name) {
+  const nm = String(name || '').trim();
+  if (!nm) return null;
+  // 1) 本地板块全表匹配(精确 → 截断名双向前后缀 → 包含),兼容"汽车零部"→"汽车零部件"
   try {
-    const j = await fetchJsonTxt('https://searchapi.eastmoney.com/api/suggest/get?input=' + encodeURIComponent(String(name).trim()) + '&type=14&count=12');
+    const map = await getBoardListCache();
+    const keys = Object.keys(map);
+    const hitKey = keys.find(k => k === nm)
+      || keys.find(k => k.length >= 2 && (k.startsWith(nm.slice(0, 2)) && (k.startsWith(nm) || nm.startsWith(k))))
+      || keys.find(k => k.includes(nm) || nm.includes(k));
+    if (hitKey && map[hitKey] && map[hitKey].code) return { name: hitKey, code: map[hitKey].code };
+  } catch (e) { /* 落到 searchapi 兜底 */ }
+  // 2) searchapi 兜底(仅在本地网络/其他环境可用时生效)
+  try {
+    const j = await fetchJsonTxt('https://searchapi.eastmoney.com/api/suggest/get?input=' + encodeURIComponent(nm) + '&type=14&count=12');
     const rows = (j && j.QuotationCodeTable && j.QuotationCodeTable.Data) || [];
     const boards = rows.filter(x => x && (x.Classify === 'BK' || x.SecurityType === '9'));
     if (!boards.length) return null;
-    const nm = String(name).trim();
     const hit = boards.find(x => x.Name === nm && String(x.TypeUS) === '2')
       || boards.find(x => x.Name === nm)
       || boards.find(x => x.TypeUS === '2' && String(x.Name).includes(nm.slice(0, Math.max(2, nm.length))))
