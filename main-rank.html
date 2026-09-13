@@ -2374,8 +2374,10 @@ async function addFetchedToWatchlist(code){
   try {
     var ext = await Promise.all([
       fetchMinuteTrendF(code, 'm60'), fetchMinuteTrendF(code, 'm15'),
-      fetchLimitUpSealF(code), fetchLhbDetailF(code), fetchEventsF(code)
+      fetchLimitUpSealF(code), fetchLhbDetailF(code), fetchEventsF(code),
+      fetchStockProfileF(code)
     ]);
+    if (ext[5] && ext[5].industry) data.industry = ext[5].industry;   // v11.19:行业名 → autoGenStrategy 生成 business 文案
     // 分钟线兜底:双源失败(如浏览器CORS拦截腾讯/新浪)时用日线MA5/MA20斜率近似,坚决不显示"暂缺"
     var f60 = ext[0], f15 = ext[1];
     if (!f60) f60 = approxMinFromTechF(data.tech);
@@ -2653,7 +2655,13 @@ var _CONFIG_STOCK_LOGIC = {
   '600487': '海缆+光模块双主线,受益AI算力需求爆发+海上风电招标回暖,在手订单充足',
   '600737': '中粮集团旗下,粮食+糖业央企,确定性高、波动小,适合稳健配置。',
   '300459': '汤姆猫IP+游戏+AI玩具,主线轮动跟随,弹性大但波动也大。',
-  '300607': '工业机器人+注塑机双主业,人形机器人产业链受益,业绩环比改善'
+  '300607': '工业机器人+注塑机双主业,人形机器人产业链受益,业绩环比改善',
+  // v11.19:补齐原缺 logic 的 5 只(与 config.json 保持一致,镜像双向同步)
+  '600392': '稀土冶炼分离+锆钛选矿双主业,矿端资源属性突出,跟随稀土板块周期波动,中位(20.98元)。',
+  '300285': '电子陶瓷材料平台(MLCC粉体/齿科/催化/氧化锆),新材料多赛道布局,中位(62.77元)。',
+  '300308': '光模块全球龙头(800G/1.6T),AI算力资本开支主线品种,高价股波动大(926元)。',
+  '603538': '特色原料药+CDMO双主业,以沙坦类等慢病用药为主,中位(25.42元)。',
+  '300342': '军工电子(星敏感器/卫星导航)+家用热保护器双主业,配套商业航天产业链,中位(31.46元)。'
 };
 // v11.6:概念→业务描述映射(给手动加股合成"双主业/核心受益/低位弹性"风格的 logic)
 var _CONCEPT_BIZ = [
@@ -2676,6 +2684,39 @@ var _CONCEPT_BIZ = [
   ['银行', '银行'],
   ['保险', '保险']
 ];
+// v11.19:东财行业名 → 业务描述(手动新增个股无 category/tags 时的兜底,数据来自东财 f127 行业字段)
+// 目的:让手动加股也能渲染出与 11 只配置股同等质量的 business-driven「逻辑与催化」,而非通用句式。
+var _INDUSTRY_BIZ = {
+  '饲料': '饲料/生猪养殖', '农牧饲渔': '农牧渔养殖', '种植业': '种子/种植', '农产品加工': '农产品加工',
+  '小金属': '稀土/小金属资源', '工业金属': '铜铝等工业金属', '贵金属': '黄金/白银', '能源金属': '锂钴等能源金属',
+  '电子化学品Ⅱ': '电子化学品/半导体材料', '半导体': '半导体设计制造', '元件': '被动元件', '光学光电子': '面板/光学',
+  '消费电子': '消费电子制造', '通信设备': '通信设备/光模块', '通信服务': '通信运营', '软件开发': '软件/AI应用',
+  '互联网服务': '互联网平台', '计算机设备': '计算机硬件/服务器', '游戏Ⅱ': '游戏/影视', '文化传媒': '传媒/出版',
+  '化学制药': '化学制药', '中药Ⅱ': '中药', '生物制品': '疫苗/生物药', '医疗器械': '医疗器械', '医疗服务': '医疗服务/诊断',
+  '医药商业': '医药流通', '电池': '锂电材料/电芯', '光伏设备': '光伏产业链', '风电设备': '风电零部件',
+  '电力行业': '发电/售电', '电网设备': '输变电设备', '汽车零部件': '汽车零部件', '乘用车': '整车制造',
+  '家电零部件Ⅱ': '家电零部件', '白色家电': '家电制造', '自动化设备': '自动化/工业机器人', '专用设备': '专用设备',
+  '通用设备': '通用机械', '航空装备Ⅱ': '航空装备', '航天装备Ⅱ': '航天/卫星产业链', '军工电子Ⅱ': '军工电子',
+  '船舶制造': '船舶制造', '房地产开发': '房地产开发', '工程建设': '建筑/基建', '水泥建材': '水泥建材',
+  '钢铁行业': '钢铁', '煤炭行业': '煤炭', '石油行业': '油气开采', '燃气Ⅱ': '城市燃气/LNG',
+  '银行Ⅱ': '银行', '保险Ⅱ': '保险', '证券Ⅱ': '券商', '多元金融': '综合金融',
+  '食品饮料': '食品饮料', '白酒Ⅱ': '白酒', '旅游及景区': '景区/旅游运营', '商业百货': '商业零售',
+  '纺织服装': '纺织服装', '化学制品': '化工制品', '化学原料': '化工原料', '塑料制品': '塑料制品',
+  '橡胶制品': '橡胶制品', '造纸印刷': '造纸印刷', '玻璃玻纤': '玻璃玻纤', '装修建材': '建材',
+  '家居用品': '家居用品', '环保行业': '环保治理', '公用事业': '公用事业', '工程机械': '工程机械',
+  '航空航天': '航空航天', '船舶': '船舶'
+};
+// 行业名归一化:去掉东财细分后缀 Ⅱ/Ⅲ 与空白
+function _normIndustryF(name){
+  return String(name||'').replace(/[ⅠⅡⅢ]/g,'').replace(/\s/g,'').trim();
+}
+function _industryBizF(industry){
+  var n=_normIndustryF(industry);
+  if(!n)return '';
+  if(_INDUSTRY_BIZ[n])return _INDUSTRY_BIZ[n];
+  for(var k in _INDUSTRY_BIZ){ if(n.indexOf(k)>=0||k.indexOf(n)>=0) return _INDUSTRY_BIZ[k]; }
+  return '';
+}
 // v11.6:概念正则(镜像 buildDecisionCardHtml 第 500 行 / build_report.js _concept)
 var _CONCEPT_REGEX_MAP = {
   '种业': /转基因|种子|种业/,
@@ -2736,13 +2777,20 @@ function autoGenStrategy(s, v, atds, turnover, tech, existingLogic) {
     } else if (hits.length === 1) {
       logic = hits[0][1] + '方向,' + boardName + stage + '的' + boardStatus + ',' + valuation + '。';
     } else {
-      // v11.7:无概念命中时改用 business-driven 通用模板(不再用 MA 技术文本)
-      // 用户诉求："所有手动新增个股都改为 business-driven 风格",MA 技术文本被认为"敷衍"
-      // v11.6 只解决了有概念命中(2只配置股+18概念模板),漏了无概念命中时的兜底
-      var dirDesc = v >= 5 ? '强势突破' : v >= 2 ? '强势承接' : v >= 0.5 ? '震荡上行' : v >= -1 ? '震荡整理' : v >= -3 ? '走势承压' : '弱势回调';
-      var tradeStage2 = trend === 'up' ? '多头' : (trend === 'down' ? '空头' : '震荡');
-      var stockName2 = (s && s.name) || '该股';
-      logic = stockName2 + '方向，' + dirDesc + '，' + boardStatus + '，' + valuation + '，趋势' + tradeStage2 + '，关注板块联动与量能持续性。';
+      // v11.19:无概念命中 → 先用【东财行业】生成 business-driven 文案(手动加股主路径)
+      // 数据来源:fetchStockProfileF 取东财 f127 行业字段,映射 _INDUSTRY_BIZ;比 v11.7 的通用句式更接近配置股手写风格
+      var indName = _normIndustryF(s && s.industry);
+      var indBiz = _industryBizF(s && s.industry);
+      if (indBiz) {
+        logic = indBiz + '为主业,属' + indName + '板块,' + valuation + ',板块处于' + stage + '。';
+      } else {
+        // v11.7:行业也拿不到时才用 business-driven 通用模板(不再用 MA 技术文本)
+        // 用户诉求："所有手动新增个股都改为 business-driven 风格",MA 技术文本被认为"敷衍"
+        var dirDesc = v >= 5 ? '强势突破' : v >= 2 ? '强势承接' : v >= 0.5 ? '震荡上行' : v >= -1 ? '震荡整理' : v >= -3 ? '走势承压' : '弱势回调';
+        var tradeStage2 = trend === 'up' ? '多头' : (trend === 'down' ? '空头' : '震荡');
+        var stockName2 = (s && s.name) || '该股';
+        logic = stockName2 + '方向，' + dirDesc + '，' + boardStatus + '，' + valuation + '，趋势' + tradeStage2 + '，关注板块联动与量能持续性。';
+      }
     }
   }
   var capital = turnover >= 5 ? '主力活跃,换手率 ' + s.turnover + '%,资金博弈加剧' : turnover >= 2 ? '换手温和(' + s.turnover + '%),资金参与一般' : turnover >= 0.5 ? '换手一般(' + s.turnover + '%)' : '换手偏低(' + s.turnover + '%),关注资金异动';
@@ -3422,6 +3470,8 @@ function restoreSavedWatchlist(){
         if(!f15)f15=approxMinFromTechF(data.tech);
         if(f60||f15)data.minTrend={m60:f60,m15:f15};
       }catch(e){/* 分钟线缺失不警告 */}
+      // v11.19:恢复缓存时若缺行业名(旧版本存的缓存),补拉一次,保证 business 文案质量
+      if(!data.industry){try{var pfR=await fetchStockProfileF(rawCode);if(pfR&&pfR.industry)data.industry=pfR.industry;}catch(e){}}
       // v11.4:补 autoGenStrategy 生成 logic/capital/plan/strategy/todayStrategy,终极兜底即使抛错也用最简模板填充
       try{
         var atdsR=70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
@@ -4023,6 +4073,38 @@ function calcDecisionTech(klines){
     weeklyTrend:weeklyTrend,volRatio:volRatio!=null?Math.round(volRatio*100)/100:null,
     volChgPct:volChgPct,volToday:volToday,volYesterday:volYesterday,
     bias20:ma20?Math.round((last/ma20-1)*1000)/10:null};
+}
+/* v11.19:个股画像(东财 f127 行业名 / f58 名称)。仅用于把行业名映射成 business-driven 逻辑文案,
+   不参与任何交易判断。实测 push2 stock/get 对本站点返回 Access-Control-Allow-Origin,客户端可直连。
+   结果缓存到 localStorage(atds_profile_cache),避免每次刷新重复请求。 */
+async function fetchStockProfileF(code){
+  var rawCode=String(code||'').trim();
+  var num=rawCode.replace(/^(sh|sz|bj)/,'');
+  var c0=num.charAt(0);
+  var mkt=(c0==='6'||c0==='5'||c0==='9')?'1':'0';
+  try{
+    var lc=JSON.parse(localStorage.getItem('atds_profile_cache')||'{}');
+    if(lc[num]&&lc[num].industry)return {industry:lc[num].industry,name:lc[num].name||'',fromCache:true};
+  }catch(e){}
+  var hosts=['https://push2.eastmoney.com','https://push2delay.eastmoney.com','http://push2ex.eastmoney.com'];
+  for(var i=0;i<hosts.length;i++){
+    try{
+      var url=hosts[i]+'/api/qt/stock/get?secid='+mkt+'.'+num+'&fields=f57,f58,f127,f128';
+      var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
+      if(!res.ok)continue;
+      var j=await res.json();
+      var d=j&&j.data;
+      if(!d||!d.f127)continue;
+      var out={industry:String(d.f127||''),name:String(d.f58||''),region:String(d.f128||'')};
+      try{
+        var lc2=JSON.parse(localStorage.getItem('atds_profile_cache')||'{}');
+        lc2[num]={industry:out.industry,name:out.name,ts:Date.now()};
+        localStorage.setItem('atds_profile_cache',JSON.stringify(lc2));
+      }catch(e){}
+      return out;
+    }catch(e){/* 换主机 */}
+  }
+  return null;
 }
 /* 个股主力资金流(东财 fflow/kline):主力净流入 当日/3日/5日,单位亿元;主源3次重试→降级实时→本地缓存兜底(fromCache 标记),失败返回 null 不阻塞 */
 async function fetchStockFundFlowF(code){
