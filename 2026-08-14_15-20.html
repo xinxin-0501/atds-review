@@ -5197,7 +5197,7 @@ function settleShadowTrade(code){
   else if(hitT){ doSettle('win',pct(target),'当日最高触及止盈'); }
   else if(hitS){ doSettle('loss',pct(stop),'当日最低触及止损'); }
   else if(rec.openedDate){
-    var held=Math.round((new Date(today)-new Date(rec.openedDate))/86400000);
+    var held=Math.floor((new Date(today)-new Date(rec.openedDate))/86400000);
     if(held>=10&&price){ doSettle('expired',pct(price),'持有'+held+'日未触及止盈/止损，按现价结算'); }
   }
   setShadowMap(sm);
@@ -5238,7 +5238,7 @@ function updateReviewProgress(){
     if(r&&r.enabled&&!r.settled){
       var px=Number(blocks[b].getAttribute('data-price'))||0;
       var gap=px&&r.target?Math.round((r.target-px)/px*10000)/100:null;
-      var held=r.openedDate?Math.round((Date.now()-new Date(r.openedDate))/86400000):0;
+      var held=r.openedDate?Math.floor((Date.now()-new Date(r.openedDate))/86400000):0;   // v11.23:当天应为"已0天"(原 round 会显示已1天)
       txt='跟踪中（已'+held+'天）：现价'+px+'，距止盈'+(gap!=null?(gap>=0?'+':'')+gap+'%':'--')+'（止损'+r.stop+'），触达即自动结算';
     } else {
       var mine=[];
