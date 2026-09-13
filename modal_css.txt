@@ -540,7 +540,19 @@
 .wl-pro-btn:hover{background:#c9722a}
 .wl-pro-countdown{display:inline-flex;align-items:center;gap:4px;margin-left:auto;font-size:9px;color:#999}
 .wl-refresh-bar{display:inline-block;width:52px;height:5px;background:#4caf50;border-radius:3px;vertical-align:middle;transition:width .1s linear}
-.wl-journal-stats{width:100%;font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:5px;padding:3px 7px;margin-top:3px}
+.wl-journal-stats{width:100%;font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:5px;padding:3px 7px;margin-top:3px;box-sizing:border-box;line-height:1.6;overflow-wrap:anywhere}
+/* v11.28:每笔明细(入场/结算日期与价格可核对) */
+.jrn-btn{display:inline-block;font-size:10px;font-weight:600;color:#8a6d3b;background:#fff;border:1px solid #e6d3a3;border-radius:10px;padding:4px 10px;min-height:26px;cursor:pointer;line-height:1.2;margin-left:4px}
+.jrn-btn.jrn-del{color:#b23;border-color:#e9b7b7}
+.jrn-warn{margin-top:3px;padding-top:3px;border-top:1px dashed #ecdca8}
+.jrn-wrap{margin-top:4px;padding-top:4px;border-top:1px solid #f0e3bd}
+.jrn-row{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:flex-start;padding:3px 0;border-bottom:1px dashed #f2e7c8}
+.jrn-row:last-child{border-bottom:0}
+.jrn-code{font-weight:700;color:#3a3a3a;flex:0 0 auto}
+.jrn-flow{flex:1 1 150px;min-width:0;color:#6b5b2e;overflow-wrap:anywhere}
+.jrn-num{flex:0 0 auto;font-weight:700;text-align:right}
+.jrn-pos .jrn-num{color:#c33}
+.jrn-neg .jrn-num{color:#2e7d32}
 /* 手动标签编辑器 */
 .dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
 .dc-te-label{color:#999;font-weight:600}
