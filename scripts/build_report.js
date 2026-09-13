@@ -2387,7 +2387,7 @@ function renderMainDirection(report) {
     const cls = upDownClass(s.changePct);
     const picks = (Array.isArray(s.picks) ? s.picks : []).slice(0, 3);
     const picksBody = picks.length
-      ? picks.map(pk => `<div class="md-pick" data-code="${esc(pk.code)}" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">${esc(pk.name)}</span><span class="md-pick-code">${esc(pk.code)}</span><span class="md-pick-pct ${upDownClass(pk.pct)}">${fmtPct(pk.pct)}</span><span class="md-pick-hint">未涨停 · 可观察</span></div>`).join('')
+      ? picks.map(pk => `<div class="md-pick" data-code="${esc(pk.code)}" onclick="event.stopPropagation();openStockResearch(this.dataset.code)"><span class="md-pick-name">${esc(pk.name)}</span><span class="md-pick-code">${esc(pk.code)}</span><span class="md-pick-pct ${upDownClass(pk.pct)}">${fmtPct(pk.pct)}</span><span class="md-pick-hint">${Number(pk.pct) >= 0 ? '未涨停 · 可观察' : '未涨停 · 绿盘观察'}</span></div>`).join('')
       : '<div class="md-picks-empty">候选数据暂缺</div>';
     return `<div class="md-card">
       <div class="md-item" onclick="toggleMdPicks(${i})">

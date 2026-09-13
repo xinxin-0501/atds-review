@@ -577,6 +577,7 @@ async function fetchBoardPicks(bkCode, ztSet, topN) {
         if (!j || !j.data) { if (attempt === 0) await new Promise(r => setTimeout(r, 300)); continue; }
         const diff = j.data.diff || [];
         const picks = [];
+        const fallback = [];                               // v11.13:红外兜底池(跌幅≤5%),红盘为空时启用
         for (const it of diff) {
           const code = String(it.f12 || '');
           const nm = String(it.f14 || '');
@@ -584,14 +585,17 @@ async function fetchBoardPicks(bkCode, ztSet, topN) {
           if (!/^(60|00|30|68)/.test(code)) continue;        // 剔除北交所(4/8/9 开头)
           if (/ST|退/.test(nm)) continue;                    // 剔除 ST/退市
           if (ztSet.has(code)) continue;                     // 剔除涨停(当日涨停池口径)
-          if (isNaN(pct) || pct < 0) continue;               // 仅取红盘候选
+          if (isNaN(pct)) continue;
           if (pct >= 19.8 && /^(30|68)/.test(code)) continue;// 创业板/科创板 涨停≈20cm
           if (pct >= 9.8 && /^(60|00)/.test(code)) continue; // 主板 涨停≈10cm
-          picks.push({ code, name: nm, pct: Math.round(pct * 100) / 100, turnover: it.f8 != null ? Number(it.f8) : null });
-          if (picks.length >= (topN || 3)) break;
+          const rec = { code, name: nm, pct: Math.round(pct * 100) / 100, turnover: it.f8 != null ? Number(it.f8) : null };
+          if (pct >= 0) { picks.push(rec); if (picks.length >= (topN || 3)) break; }
+          else if (pct >= -5) fallback.push(rec);            // 跌幅可控的红外候选
         }
         if (picks.length) return picks;
-        if (diff.length) return picks;  // 成分拿到了但无满足候选 → 返回空而非继续换 host
+        // v11.13:盘前/分化板块常无红盘候选(龙头涨停+跟风绿盘) → 用跌幅最小的兜底,消除"候选数据暂缺"
+        if (fallback.length) return fallback.sort((a, b) => b.pct - a.pct).slice(0, topN || 3);
+        if (diff.length) return [];  // 成分拿到了但无满足候选 → 返回空而非继续换 host
       } catch (e) { if (attempt === 0) await new Promise(r => setTimeout(r, 300)); }
     }
   }
