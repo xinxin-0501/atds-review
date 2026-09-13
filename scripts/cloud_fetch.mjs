@@ -522,7 +522,10 @@ async function resolveBoardCode(name) {
 }
 // 板块涨跌地图(行业+概念):name → { code, changePct },供复盘资金归因"个股 vs 板块"对比
 // 注意:clist 单页最多 pz=100,且按涨幅降序;需翻页才能覆盖下跌板块(如稀土/军工/算力)
+// v11.14:进程内缓存。原实现每次调用都翻页拉全表(最多 16 请求),而调用点在"复盘资金归因"里按股票循环 → 单次运行实测触发 8 次(≈128 请求),有限流风险。
+let _boardChangeMapMemo = null;
 async function fetchBoardChangeMap() {
+  if (_boardChangeMapMemo) return _boardChangeMapMemo;
   const map = {};
   const fsList = ['m:90+t:2', 'm:90+t:3']; // 行业板块 + 概念板块
   // v11.14:原实现写死 push2.eastmoney.com;GitHub Actions 侧该主机不可达 → 全表为空 → 板块名解析全失败。
@@ -553,6 +556,7 @@ async function fetchBoardChangeMap() {
     }
   }
   console.log('  [板块代码表] 共', Object.keys(map).length, '条');
+  _boardChangeMapMemo = map;
   return map;
 }
 // 个股 category(自由文本) → 东财板块名 的别名映射(优先精确别名,再关键词兜底)
