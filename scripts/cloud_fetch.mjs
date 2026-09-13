@@ -1185,12 +1185,17 @@ async function fetchStockFundFlow(code) {
   // v11.16:滚动序列累积。历史源(push2his)在 Actions 侧不可达时,旧实现会把已有的 d3/d5 **覆盖为 null**
   //        (2026-09-13 实测:11 只股票 d3/d5 全被清空) → "3日/5日资金缺失"。
   //        改为:按交易日累积 d1 序列并据此求和得 d3/d5;序列不足时保留上一次有效值,绝不用 null 覆盖有效值。
-  const writeCache = (ff, src) => {
+  const isWeekendKey = k => { const d = new Date(k + 'T00:00:00Z').getUTCDay(); return d === 0 || d === 6; };
+  const writeCache = (ff, src, seriesIn) => {
     try {
       const c = loadFflowCache();
       const prev = c[cacheKey] || {};
       const series = Object.assign({}, (loadFflowHistSeed()[cacheKey] || {}), prev.series || {});
-      if (ff.d1 != null && !isNaN(ff.d1)) series[bjToday()] = ff.d1;
+      // 清除非交易日键:周末跑批曾把周五的值写到"周日"键上,使同一交易日被重复计数(虚增 d3/d5)
+      for (const k of Object.keys(series)) if (isWeekendKey(k)) delete series[k];
+      // seriesIn:来自数据源自身 K 线的真实日期口径,优先于"今天"这一猜测
+      if (seriesIn) { for (const k of Object.keys(seriesIn)) { if (!isWeekendKey(k) && seriesIn[k] != null && !isNaN(seriesIn[k])) series[k] = seriesIn[k]; } }
+      else if (ff.d1 != null && !isNaN(ff.d1) && !isWeekendKey(bjToday())) { series[bjToday()] = ff.d1; }
       const allDays = Object.keys(series).filter(k => series[k] != null && !isNaN(series[k])).sort();
       const keep = allDays.slice(-6);                       // 只保留最近 6 个交易日
       const trimmed = {};
@@ -1218,7 +1223,12 @@ async function fetchStockFundFlow(code) {
         const vals = kl.map(line => parseFloat((line.split(',')[1]) || 0) || 0);  // f52 主力净流入(元)
         const sum = k => vals.slice(-k).reduce((a, b) => a + b, 0);
         const ff = { d1: yi(sum(1)), d3: yi(sum(3)), d5: yi(sum(5)) };
-        return writeCache(ff, 'eastmoney-push2his');
+        const seriesIn = {};                                   // 用历史接口自身的日期口径回填序列(自愈)
+        for (let i = Math.max(0, kl.length - 6); i < kl.length; i++) {
+          const p = kl[i].split(',');
+          seriesIn[p[0]] = yi(parseFloat(p[1]) || 0);
+        }
+        return writeCache(ff, 'eastmoney-push2his', seriesIn);
       }
     } catch (e) { /* 重试 */ }
   }
@@ -1230,9 +1240,11 @@ async function fetchStockFundFlow(code) {
     const j = await fflowFetch(url);
     const kl = (j && j.data && j.data.klines) || [];
     if (kl.length) {
-      const d1 = yi(parseFloat((kl[kl.length - 1].split(',')[1]) || 0) || 0);
+      const lastLine = kl[kl.length - 1].split(',');
+      const d1 = yi(parseFloat(lastLine[1] || 0) || 0);
       const ff = { d1, d3: null, d5: null };
-      return writeCache(ff, 'eastmoney-push2');
+      const seriesIn = {}; seriesIn[lastLine[0]] = d1;          // 实时接口只有当日 1 根,按其自身日期记账
+      return writeCache(ff, 'eastmoney-push2', seriesIn);
     }
   } catch (e) { /* 降级失败继续 */ }
   // 终极兜底:读本地缓存(过去成功抓取的资金流,宁可 stale 一天也不显示 --,标记 fromCache)
