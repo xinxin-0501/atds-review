@@ -572,14 +572,15 @@
 .dc-plan-collapsed .dc-plan-body{display:none}
 /* 盘后复盘:交易状态按钮 + 系统模拟跟踪 + 胜率进度提示 */
 .dc-trade-status{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
-.ts-btn{font-size:9px;font-weight:600;color:#666;background:#fff;border:1px solid #ddd;border-radius:12px;padding:3px 9px;cursor:pointer;line-height:1.2;transition:all .15s}
+.ts-btn{font-size:11px;font-weight:600;color:#666;background:#fff;border:1px solid #ddd;border-radius:14px;padding:6px 12px;min-height:30px;cursor:pointer;line-height:1.2;transition:all .15s;-webkit-tap-highlight-color:transparent}
+/* v11.27:移动端点击目标过小(实测 47×19px,远低于 44px 建议值,手机易点错) → 增大字号/内边距/最小高度 */
 .ts-btn:hover{border-color:#999;color:#333}
 .ts-btn.ts-active[data-status="bought"]{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32;font-weight:800}
 .ts-btn.ts-active[data-status="not_bought"]{background:#fff7e6;border-color:#d49000;color:#d49000;font-weight:800}
 .ts-btn.ts-active[data-status="sold"]{background:#eceff1;border-color:#607d8b;color:#455a64;font-weight:800}
 .dc-shadow{font-size:9px;color:#666}
-.ts-shadow{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
-.ts-shadow-check{accent-color:#e08a3c;cursor:pointer}
+.ts-shadow{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:5px 0;min-height:30px}
+.ts-shadow-check{accent-color:#e08a3c;cursor:pointer;width:18px;height:18px}   /* v11.27:13px→18px,增大手机点击区 */
 .ts-hint{display:inline-block;width:14px;height:14px;line-height:14px;text-align:center;background:#eee;color:#888;border-radius:50%;font-size:10px;font-weight:700;cursor:help;margin:0 2px;vertical-align:middle}
 .ts-progress-badge{font-size:9px;color:#999}
 .ts-progress{color:#b3541e;font-weight:800}
