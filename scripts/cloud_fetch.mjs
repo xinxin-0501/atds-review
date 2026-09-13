@@ -1156,6 +1156,19 @@ function saveFflowCache() {
     fs.writeFileSync(p, JSON.stringify(_fflowCache, null, 2), 'utf8');
   } catch (e) { console.error('saveFflowCache 失败:', e.message); }
 }
+// v11.16:资金流历史种子(仓库内,随代码走;非 data/* 缓存,不违反"data 缓存只由 Actions 管理")。
+// 用途:push2his 在 Actions 侧不可达时,writeCache 用它作为序列起点,使 d3/d5 可被算出而非缺失。
+// 维护:任何时候在本机/其他环境成功拉到 120 天历史,就把最近 6 个交易日合并写回该文件(可增量补充)。
+let _fflowSeed = null;
+function loadFflowHistSeed() {
+  if (_fflowSeed) return _fflowSeed;
+  _fflowSeed = {};
+  try {
+    const p = path.join(ROOT, 'scripts', 'fflow_hist_seed.json');
+    if (fs.existsSync(p)) _fflowSeed = JSON.parse(fs.readFileSync(p, 'utf8')) || {};
+  } catch (e) { /* 种子缺失忽略 */ }
+  return _fflowSeed;
+}
 
 // 个股主力资金流(东财历史资金流 daykline):主力净流入 当日/3日/5日,单位亿元
 // v11.0 多级降级:东财 push2his(全量历史) → 腾讯 qt.gtimg.cn 资金分布(主流量) → 东财 push2 实时(仅d1) → 终极兜底读 fflow_cache.json
@@ -1169,12 +1182,31 @@ async function fetchStockFundFlow(code) {
     if (!res) throw new Error('所有主机均无返回');
     return await res.json();
   };
+  // v11.16:滚动序列累积。历史源(push2his)在 Actions 侧不可达时,旧实现会把已有的 d3/d5 **覆盖为 null**
+  //        (2026-09-13 实测:11 只股票 d3/d5 全被清空) → "3日/5日资金缺失"。
+  //        改为:按交易日累积 d1 序列并据此求和得 d3/d5;序列不足时保留上一次有效值,绝不用 null 覆盖有效值。
   const writeCache = (ff, src) => {
     try {
       const c = loadFflowCache();
-      c[cacheKey] = { date: bjToday(), d1: ff.d1, d3: ff.d3, d5: ff.d5, src: src || 'live' };
+      const prev = c[cacheKey] || {};
+      const series = Object.assign({}, (loadFflowHistSeed()[cacheKey] || {}), prev.series || {});
+      if (ff.d1 != null && !isNaN(ff.d1)) series[bjToday()] = ff.d1;
+      const allDays = Object.keys(series).filter(k => series[k] != null && !isNaN(series[k])).sort();
+      const keep = allDays.slice(-6);                       // 只保留最近 6 个交易日
+      const trimmed = {};
+      for (const k of keep) trimmed[k] = series[k];
+      const round2 = v => Math.round(v * 100) / 100;         // series 值已是亿元,不可再走 yi()
+      let d3 = ff.d3, d5 = ff.d5;
+      if (d3 == null && keep.length >= 3) d3 = round2(keep.slice(-3).reduce((a, k) => a + series[k], 0));
+      if (d5 == null && keep.length >= 5) d5 = round2(keep.slice(-5).reduce((a, k) => a + series[k], 0));
+      if (d3 == null && prev.d3 != null) d3 = prev.d3;       // 序列仍不足 → 保留上次有效值(宁可滞后也不缺失)
+      if (d5 == null && prev.d5 != null) d5 = prev.d5;
+      const srcTag = (d3 !== ff.d3 || d5 !== ff.d5) ? (String(src || 'live') + '+series') : (src || 'live');
+      const rec = { date: bjToday(), d1: ff.d1, d3, d5, src: srcTag, series: trimmed };
+      c[cacheKey] = rec;
       saveFflowCache();
-    } catch (e) { /* 缓存写入失败不影响主流程 */ }
+      return rec;                       // 返回合并后的记录:调用方用合并值,避免"缓存有值但报告仍显示缺失"
+    } catch (e) { return ff; }
   };
   // 主源:历史资金流(120天),重试 3 次(东财偶发超时/限流)
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -1186,8 +1218,7 @@ async function fetchStockFundFlow(code) {
         const vals = kl.map(line => parseFloat((line.split(',')[1]) || 0) || 0);  // f52 主力净流入(元)
         const sum = k => vals.slice(-k).reduce((a, b) => a + b, 0);
         const ff = { d1: yi(sum(1)), d3: yi(sum(3)), d5: yi(sum(5)) };
-        writeCache(ff, 'eastmoney-push2his');
-        return ff;
+        return writeCache(ff, 'eastmoney-push2his');
       }
     } catch (e) { /* 重试 */ }
   }
@@ -1201,8 +1232,7 @@ async function fetchStockFundFlow(code) {
     if (kl.length) {
       const d1 = yi(parseFloat((kl[kl.length - 1].split(',')[1]) || 0) || 0);
       const ff = { d1, d3: null, d5: null };
-      writeCache(ff, 'eastmoney-push2');
-      return ff;
+      return writeCache(ff, 'eastmoney-push2');
     }
   } catch (e) { /* 降级失败继续 */ }
   // 终极兜底:读本地缓存(过去成功抓取的资金流,宁可 stale 一天也不显示 --,标记 fromCache)
