@@ -5201,12 +5201,30 @@ async function fetchStockFundFlowF(code){
   var num=rawCode.replace(/^(sh|sz|bj)/,'');
   var mkt=rawCode.charAt(0)==='6'?'1':'0';
   function yi(v){return Math.round(v/1e6)/100;}
+  // v11.16(与服务端 cloud_fetch.mjs writeCache 镜像同步):滚动序列累积。
+  // 历史源(push2his)失败时旧实现把 d3/d5 覆盖为 null → "3日/5日缺失"。改为按交易日累积 d1 序列求和,
+  // 序列不足则保留上次有效值;返回合并后的记录,避免"缓存有值但 UI 仍显示缺失"。
   function writeCache(ff,src){
     try{
       var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}');
-      fc[num]=Object.assign({date:new Date().toISOString().slice(0,10)},ff,{src:src||'live'});
+      var prev=fc[num]||{};
+      var series=Object.assign({},prev.series||{});
+      var today=new Date().toISOString().slice(0,10);
+      if(ff.d1!=null&&!isNaN(ff.d1))series[today]=ff.d1;
+      var days=Object.keys(series).filter(function(k){return series[k]!=null&&!isNaN(series[k]);}).sort();
+      var keep=days.slice(-6),trimmed={};
+      for(var i=0;i<keep.length;i++)trimmed[keep[i]]=series[keep[i]];
+      function r2(v){return Math.round(v*100)/100;}
+      var d3=ff.d3,d5=ff.d5;
+      if(d3==null&&keep.length>=3)d3=r2(keep.slice(-3).reduce(function(a,k){return a+series[k];},0));
+      if(d5==null&&keep.length>=5)d5=r2(keep.slice(-5).reduce(function(a,k){return a+series[k];},0));
+      if(d3==null&&prev.d3!=null)d3=prev.d3;
+      if(d5==null&&prev.d5!=null)d5=prev.d5;
+      var rec={date:today,d1:ff.d1,d3:d3,d5:d5,src:((d3!==ff.d3||d5!==ff.d5)?((src||'live')+'+series'):(src||'live')),series:trimmed};
+      fc[num]=rec;
       localStorage.setItem('atds_ff_cache',JSON.stringify(fc));
-    }catch(e){}
+      return rec;
+    }catch(e){return null;}
   }
   function tryCloudFflowCache(){
     // 客户端读云端 fflow_cache.json(同源 Pages,CORS * 已验证);解决"云端有数据但前端没读"导致的 600737 暂缺
@@ -5233,8 +5251,7 @@ async function fetchStockFundFlowF(code){
         var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
         function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
         var ff={d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
-        writeCache(ff,'eastmoney-push2his');
-        return ff;
+        return writeCache(ff,'eastmoney-push2his')||ff;
       }
     }catch(e){/* 重试 */}
   }
@@ -5247,8 +5264,7 @@ async function fetchStockFundFlowF(code){
     if(kl2.length){
       var d1=yi(parseFloat((kl2[kl2.length-1].split(',')[1])||0)||0);
       var ff2={d1:d1,d3:null,d5:null};
-      writeCache(ff2,'eastmoney-push2');
-      return ff2;
+      return writeCache(ff2,'eastmoney-push2')||ff2;
     }
   }catch(e){/* 降级2:云端 fflow_cache.json */}
   // 降级2:读云端 fflow_cache.json(国内手机IP 跨域拉 Pages,GitHub Actions 即使完全封禁也能取到)
