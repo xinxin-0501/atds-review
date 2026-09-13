@@ -1472,7 +1472,7 @@ function buildStockRow(s, i, report) {
     const miss = v == null || isNaN(v);
     const tip = miss ? ffMissTip : (ff.fromCache ? ffCacheTip : '');
     const tone = miss ? '' : (v >= 0 ? 'up' : 'down');
-    const txt = miss ? '<i class="ff-missing">数据暂缺</i>' : (sign(v) + v.toFixed(2) + '亿' + (ff.fromCache ? '<i class="ff-cache">缓存</i>' : ''));
+    const txt = miss ? '<i class="ff-missing">数据暂缺</i>' : (sign(v) + v.toFixed(2) + '亿' + (ff.fromCache ? '<i class="ff-cache">缓存</i>' : '') + (String(ff.source || '').indexOf('sina') >= 0 ? '<i class="ff-cache" title="东财历史资金流源不可达，已降级读取新浪逐日主力净额，口径与东财略有差异">新浪口径</i>' : ''));
     return `<span>${label} <b class="${tone}"${tip}>${txt}</b></span>`;
   };
   const fundHtml = ffCell(ff.d1, '主力净流入') + '\n    ' + ffCell(ff.d3, '3日') + '\n    ' + ffCell(ff.d5, '5日');
