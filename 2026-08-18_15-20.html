@@ -594,6 +594,8 @@
 .ts-progress-badge{font-size:9px;color:#999}
 .ts-progress{color:#b3541e;font-weight:800}
 .ts-winrate{font-size:9px;color:#2e7d32;font-weight:700}
+.ts-attr{font-weight:700;color:#0f766e}
+.ts-attr-bad{color:#c62828}
 .ts-t-btn{color:#6a1b9a;border-color:#ce93d8}
 .ts-t-btn:hover{border-color:#8e24aa;color:#6a1b9a}
 .dc-next-day{font-size:9px;color:#1a5c8a;background:#e3f2fd;border:1px solid #bbdefb;border-radius:4px;padding:3px 7px;margin-top:3px;font-weight:600}
@@ -2601,6 +2603,7 @@ async function addFetchedToWatchlist(code){
     data.category=data.category||'题材';
   }
   addToWatchlistUI(data);
+  try{updateReviewProgress();}catch(e){}   // v11.21:新加入的个股立即刷新"策略执行/归因"文本
   // 保存全量数据(供退出重登时立即渲染,不依赖网络)
   saveWatchlistStockData(String(code), data);
   saveWatchlist();
@@ -3328,7 +3331,7 @@ function buildDecisionCardHtml(s){
       '<div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤'+mr.capPct+'%（'+escHtmlF(mr.label)+'市）· 单笔风险0.5%-1%</div>'+
       '<div class="dc-line">置信度构成：趋势'+trendScore+'/30 + 资金'+fundScore+'/25 + 题材'+themeScore+'/20 + 关键位'+keyScore+'/15 + 盈亏比'+rrScore+'/10</div>'+
     '</div>'+
-    '<div class="dc-block dc-review" data-review-code="'+escHtmlF(s.code)+'" data-name="'+escHtmlF(s.name)+'" data-price="'+price+'" data-entry="'+p.entry+'" data-stop="'+p.stop+'" data-target="'+p.target+'"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
+    '<div class="dc-block dc-review" data-review-code="'+escHtmlF(s.code)+'" data-name="'+escHtmlF(s.name)+'" data-price="'+price+'" data-high="'+(Number(s.high)||price)+'" data-low="'+(Number(s.low)||price)+'" data-entry="'+p.entry+'" data-stop="'+p.stop+'" data-target="'+p.target+'"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
       '<div class="dc-line">关键位验证：'+keyVerify+'</div>'+patternHtml+
       '<div class="dc-line">资金验证：'+fundVerify+'</div>'+
       '<div class="dc-line dc-trade-status">交易状态：'+
@@ -3338,7 +3341,7 @@ function buildDecisionCardHtml(s){
         '<button class="ts-btn ts-t-btn" data-code="'+escHtmlF(s.code)+'" onclick="recordTTrade(this)">记做T</button>'+
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
-      '<div class="dc-line">策略执行/归因：待人工复盘 <span class="ts-hint" title="需积累10笔以上真实或模拟交易，系统才会展示胜率与回撤；波段与做T胜率分开展示">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
+      '<div class="dc-line">策略执行/归因：<span class="ts-attr">尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="系统用当日最高/最低判定是否触及止盈/止损并自动结算；模拟跟踪与真实交易分列；样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-next-day">🎯 明日核心观察点：'+nextDayFocus+'</div>'+
     '</div>';
 }
@@ -3778,6 +3781,12 @@ async function refreshWatchlistQuotes(){
     });
     var timeEl=document.querySelector('.wl-time');
     if(timeEl)timeEl.textContent='● '+new Date().toLocaleString('zh-CN',{hour12:false});
+    // v11.21:行情刷新后评估模拟跟踪(当日最高/最低触达止盈/止损即自动结算),60s 限频防抖动
+    var nowS=Date.now();
+    if(nowS-Number(window.__atdsSettleTs||0)>60000){
+      window.__atdsSettleTs=nowS;
+      try{settleAllShadowTrades();}catch(e){}
+    }
   }catch(e){}
   if(btn){btn.disabled=false;btn.textContent='↻ 刷新';}
   // 异步补丁:对没有 tech 数据的手动行补拉 K 线 → 写入 data-tech/data-ff → 重建决策卡
@@ -5158,23 +5167,37 @@ function toggleShadowTrack(cb){
   updateReviewProgress();
 }
 
+// v11.21:模拟跟踪结算。原实现只看"现价"是否 ≥止盈/≤止损,盘中冲高回落会被漏判;
+//        改为用当日最高/最低判定触达,并支持"持有超期未触发"按现价结算,同时记录 lastCheck 供"跟踪中"展示。
 function settleShadowTrade(code){
   var sm=getShadowMap();
   var rec=sm[code];
   if(!rec||!rec.enabled||rec.settled)return;
   var block=document.querySelector('.dc-review[data-review-code="'+code+'"]');
   if(!block)return;
-  var price=parseFloat(block.getAttribute('data-price'));
+  var price=parseFloat(block.getAttribute('data-price'))||0;
+  var high=parseFloat(block.getAttribute('data-high'))||0;
+  var low=parseFloat(block.getAttribute('data-low'))||0;
+  if(!high)high=price;
+  if(!low)low=price;
   var entry=rec.entry,stop=rec.stop,target=rec.target;
-  if(isNaN(price)||!entry||!stop||!target)return;
-  var result=null,pnl=null;
-  if(price>=target){result='win';pnl=Math.round((target-entry)/entry*10000)/100;}
-  else if(price<=stop){result='loss';pnl=Math.round((stop-entry)/entry*10000)/100;}
-  if(result){
-    rec.settled=true;rec.result=result;rec.pnl=pnl;
-    setShadowMap(sm);
-    addJournalEntry({code:code,name:rec.name||code,date:new Date().toISOString().slice(0,10),entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,strategy:'swing'});
+  if(!entry||!stop||!target)return;
+  var today=new Date().toISOString().slice(0,10);
+  rec.lastCheck={date:today,price:price,high:high,low:low};
+  var pct=function(v){return Math.round((v-entry)/entry*10000)/100;};
+  var doSettle=function(result,pnl,note){
+    rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=today;rec.settleNote=note||'';
+    addJournalEntry({code:code,name:rec.name||code,date:today,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',openedDate:rec.openedDate||'',strategy:'swing'});
+  };
+  var hitT=high>=target, hitS=low<=stop;
+  if(hitT&&hitS){ doSettle('loss',pct(stop),'当日最高触止盈、最低触止损，保守计为止损'); }
+  else if(hitT){ doSettle('win',pct(target),'当日最高触及止盈'); }
+  else if(hitS){ doSettle('loss',pct(stop),'当日最低触及止损'); }
+  else if(rec.openedDate){
+    var held=Math.round((new Date(today)-new Date(rec.openedDate))/86400000);
+    if(held>=10&&price){ doSettle('expired',pct(price),'持有'+held+'日未触及止盈/止损，按现价结算'); }
   }
+  setShadowMap(sm);
 }
 
 function settleAllShadowTrades(){
@@ -5183,16 +5206,58 @@ function settleAllShadowTrades(){
   updateReviewProgress();
 }
 
+// v11.21:归因文本动态化。原实现每块固定显示"待人工复盘",用户无法确认系统是否真的在跟踪。
+//        现按每只股票自己的模拟跟踪/真实交易记录生成状态;顶部进度/胜率按全部样本聚合(模拟与真实分列)。
 function updateReviewProgress(){
   var j=getJournal();
-  var total=j.length;
-  var wins=0;
-  for(var i=0;i<j.length;i++){ if((j[i].pnl||0)>0)wins++; }
+  var sm=getShadowMap();
+  var wins=0,losses=0,expired=0,sum=0,settled=0;
+  for(var i=0;i<j.length;i++){
+    var p=Number(j[i].pnl);
+    if(j[i].result==='win'||j[i].result==='loss'||j[i].result==='expired'){
+      settled++;
+      if(!isNaN(p))sum+=p;
+      if(j[i].result==='win')wins++;else if(j[i].result==='loss')losses++;else expired++;
+    }
+  }
+  var avg=settled?Math.round(sum/settled*100)/100:0;
+  var openCnt=0;
+  for(var c in sm){ if(sm[c]&&sm[c].enabled&&!sm[c].settled)openCnt++; }
+  var blocks=document.querySelectorAll('.dc-review');
+  for(var b=0;b<blocks.length;b++){
+    var code=blocks[b].getAttribute('data-review-code');
+    var attr=blocks[b].querySelector('.ts-attr');
+    if(!attr)continue;
+    var r=sm[code];
+    var txt;
+    if(r&&r.enabled&&!r.settled){
+      var px=Number(blocks[b].getAttribute('data-price'))||0;
+      var gap=px&&r.target?Math.round((r.target-px)/px*10000)/100:null;
+      var held=r.openedDate?Math.round((Date.now()-new Date(r.openedDate))/86400000):0;
+      txt='跟踪中（已'+held+'天）：现价'+px+'，距止盈'+(gap!=null?(gap>=0?'+':'')+gap+'%':'--')+'（止损'+r.stop+'），触达即自动结算';
+    } else {
+      var mine=[];
+      for(var q=0;q<j.length;q++){ if(String(j[q].code)===String(code))mine.push(j[q]); }
+      var last=mine.length?mine[mine.length-1]:null;
+      if(last&&last.shadow){
+        var rn={win:'止盈',loss:'止损',expired:'过期未触发'}[last.result]||(last.result||'已结算');
+        txt='模拟已结算：'+rn+' '+(last.pnl>0?'+':'')+(last.pnl==null?'--':last.pnl)+'%'+(last.note?'（'+last.note+'）':'');
+      } else if(last&&!last.shadow){
+        txt='真实交易已记录：'+(last.pnl!=null?((last.pnl>0?'+':'')+last.pnl+'%'):'盈亏待补');
+      } else {
+        txt='尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本';
+      }
+    }
+    attr.textContent=txt;
+  }
   var els=document.querySelectorAll('.ts-progress');
-  for(var k=0;k<els.length;k++)els[k].textContent=total+'/10';
+  for(var k=0;k<els.length;k++)els[k].textContent=j.length+'/10';
+  var wr=(wins+losses)?Math.round(wins/(wins+losses)*100):null;
+  var line=settled
+    ? (' · 已结算'+settled+'笔'+(wr!=null?('·胜率'+wr+'%'):'')+(expired?('·过期'+expired):'')+'，平均'+(avg>0?'+':'')+avg+'%'+((wins+losses+expired)<10?'（样本不足10笔，仅供参考）':''))
+    : (' · 跟踪中'+openCnt+'笔（未结算）');
   var statEls=document.querySelectorAll('.ts-winrate');
-  var txt=total>=10?(' · 已积累 '+total+' 笔，模拟/真实胜率 '+Math.round(wins/total*100)+'%'):'';
-  for(var m2=0;m2<statEls.length;m2++)statEls[m2].textContent=txt;
+  for(var m2=0;m2<statEls.length;m2++)statEls[m2].textContent=line;
 }
 
 // 绿色 Toast 反馈(复用单例,避免反复建 DOM)
