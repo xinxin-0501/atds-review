@@ -4722,6 +4722,8 @@ function buildDecisionCardHtml(s){
     evNote='来源：东财公告(减持/增发/回购/问询/异常波动) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文';
   }else if(evStatus.srcUsed==='eastmoney+cninfo'){
     evNote='来源：巨潮公告(减持/增发/回购/股东大会/问询) + 东财事件日历(财报/解禁)；点击"查看原文↗"直达公告原文';
+  }else if(evStatus.annFail){
+    evNote='⚠ 东财公告源本次不可达（网络/CORS），减持/回购/问询类公告可能缺失；财报/解禁来自东财';
   }else{
     evNote='⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财';
   }
@@ -6202,6 +6204,7 @@ async function fetchEventsF(code){
   // v11.9:东财公告直连兜底——手动加股不在云端缓存(events_cache 只覆盖11只观察池),巨潮又403,
   // 此时用东财公告搜索(CORS *)直连补公告类事件(减持/回购/问询/异常波动),与11只观察池同等稳定。
   var hasAnnType=false;
+  var annFail=false;   // v11.26:东财公告直连是否请求失败(区别于"成功但无匹配")
   for(var hi=0;hi<events.length;hi++){
     var et=events[hi].type;
     if(et==='减持'||et==='增持'||et==='增发'||et==='回购'||et==='股东大会'||et==='监管问询'||et==='异常波动'||et==='停牌'||et==='复牌'||et==='重组'){hasAnnType=true;break;}
@@ -6215,8 +6218,10 @@ async function fetchEventsF(code){
           if(!edup)events.push(eastAnn[ei]);
         }
         if(srcUsed==='eastmoney')srcUsed='eastmoney+ann';
+      }else if(!eastAnn){
+        annFail=true;   // v11.26:null=请求失败(网络/CORS),与"成功但无匹配(空数组)"区分,避免文案谎称"已核查"
       }
-    }catch(e){/* 东财公告直连失败,继续 */}
+    }catch(e){annFail=true;}
   }
   // 最后兜底:所有源(东财直连+巨潮直连+云端缓存)都失败 → localStorage
   if(!events.length){
@@ -6242,7 +6247,7 @@ async function fetchEventsF(code){
     localStorage.setItem('atds_events_cache',JSON.stringify(lc2));
   }catch(e){}
   status=events.length?'ok':'fail';
-  return {events:events,status:status,srcUsed:srcUsed,cninfoStatus:status==='ok'?'ok':'fail'};
+  return {events:events,status:status,srcUsed:srcUsed,annFail:!!annFail,cninfoStatus:status==='ok'?'ok':'fail'};
 }
 /* 客户端直连巨潮公告(减持/增发/回购/股东大会/问询/重组/停牌):返回事件数组(空数组=成功无匹配)
    国内手机 IP 可用,GitHub Actions 封禁时仍能拉取。
