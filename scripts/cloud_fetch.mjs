@@ -593,30 +593,36 @@ async function fetchBoardChangeMap() {
   //         改为与 fetchBoardPicks 相同的多主机轮换,并打印条数便于后续诊断。
   const tryHosts = ['https://push2.eastmoney.com', 'http://push2.eastmoney.com', 'https://push2delay.eastmoney.com', 'http://push2ex.eastmoney.com'];
   for (const fs of fsList) {
-    let base = null;
+    let best = null, bestHost = '';
     for (const h of tryHosts) {
-      try {
-        const j0 = await fetchJsonTxt(`${h}/api/qt/clist/get?pn=1&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=${fs}&fields=f12,f14,f3`, { timeout: 10000 });
-        if (j0 && j0.data && (j0.data.diff || []).length) { base = h; break; }
-      } catch (e) { /* 换下一个主机 */ }
-    }
-    if (!base) { console.warn('  [板块代码表] 无可用主机,跳过', fs); continue; }
-    for (let pn = 1; pn <= 8; pn++) {
-      try {
-        const url = `${base}/api/qt/clist/get?pn=${pn}&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=${fs}&fields=f12,f14,f3`;
-        const j = await fetchJsonTxt(url, { timeout: 10000 });
-        const diff = (j && j.data && j.data.diff) || [];
-        if (!diff.length) break;
+      const m = {};
+      let pages = 0, failed = false;
+      // v11.20:翻页直到空页(上限 20 页)。原实现「diff.length < 100 就 break」+ 上限 8 页,
+      //        在某主机每页返回不足 100 条时会**提前截断**(实测 999→603 条),导致板块名解析失败、"候选数据暂缺"。
+      for (let pn = 1; pn <= 20; pn++) {
+        let j = null;
+        try {
+          j = await emFetchJson(`${h}/api/qt/clist/get?pn=${pn}&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=${fs}&fields=f12,f14,f3`, { 'User-Agent': 'Mozilla/5.0' }, 10000);
+        } catch (e) { failed = true; break; }
+        if (!j || !j.data) { if (pn === 1) failed = true; break; }
+        const diff = j.data.diff || [];
+        if (!diff.length) break;                       // 自然结束(空页)
         for (const it of diff) {
           if (it.f14 && it.f3 != null && !isNaN(Number(it.f3))) {
-            map[String(it.f14).trim()] = { code: it.f12, changePct: Math.round(Number(it.f3) * 100) / 100 };
+            m[String(it.f14).trim()] = { code: it.f12, changePct: Math.round(Number(it.f3) * 100) / 100 };
           }
         }
-        if (diff.length < 100) break; // 最后一页
-      } catch (e) { break; }
+        pages++;
+      }
+      const n = Object.keys(m).length;
+      console.log('  [板块代码表]', fs, h, '→', n, '条 /', pages, '页', failed ? '(中途失败)' : '');
+      if (n && !failed) { best = m; bestHost = h; break; }                 // 完整读取,直接采用
+      if (n && (!best || n > Object.keys(best).length)) { best = m; bestHost = h; }  // 保留较大的部分结果
     }
+    if (best) Object.assign(map, best);
+    else console.warn('  [板块代码表] 无可用主机,跳过', fs);
   }
-  console.log('  [板块代码表] 共', Object.keys(map).length, '条');
+  console.log('  [板块代码表] 合计', Object.keys(map).length, '条');
   _boardChangeMapMemo = map;
   return map;
 }
