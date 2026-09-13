@@ -5725,6 +5725,9 @@ function restoreSavedWatchlist(){
     }
   }
   if(renderedFromCache){
+    // v11.22:缓存渲染发生在 600ms,晚于 initReviewState(500ms) → 恢复出来的手动加股拿不到状态应用,
+    //        "系统模拟跟踪"勾选框会显示为未勾(影子仓数据其实仍在),用户会误以为跟踪丢失。此处补一次全量应用。
+    try{initReviewState();}catch(e){}
     // 缓存渲染完成后强制刷新一次行情(价/涨跌)
     setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 200);
   }
@@ -7321,10 +7324,12 @@ function updateReviewProgress(){
   var wins=0,losses=0,expired=0,sum=0,settled=0;
   for(var i=0;i<j.length;i++){
     var p=Number(j[i].pnl);
-    if(j[i].result==='win'||j[i].result==='loss'||j[i].result==='expired'){
+    var rs=j[i].result;
+    if(!rs&&!isNaN(p)&&j[i].pnl!=null)rs=(p>=0?'win':'loss');   // v11.22:兼容旧版无 result 字段的历史记录,避免"进度有数、已结算为0"的不一致
+    if(rs==='win'||rs==='loss'||rs==='expired'){
       settled++;
       if(!isNaN(p))sum+=p;
-      if(j[i].result==='win')wins++;else if(j[i].result==='loss')losses++;else expired++;
+      if(rs==='win')wins++;else if(rs==='loss')losses++;else expired++;
     }
   }
   var avg=settled?Math.round(sum/settled*100)/100:0;
