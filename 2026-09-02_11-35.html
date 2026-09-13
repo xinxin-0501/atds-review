@@ -5979,61 +5979,59 @@ async function fetchStockFundFlowF(code){
       return null;
     }).catch(function(){return null;});
   }
-  // 主源:历史资金流(120天),重试 3 次(东财偶发超时/限流)
-  for(var attempt=0;attempt<3;attempt++){
-    try{
-      var url='https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63';
-      var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
-      var j=await res.json();
-      var kl=(j&&j.data&&j.data.klines)||[];
-      if(kl.length>=3){
-        var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
-        function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
-        var ff={d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
-        var seriesIn={};
-        for(var si=Math.max(0,kl.length-6);si<kl.length;si++){var sp=kl[si].split(',');seriesIn[sp[0]]=yi(parseFloat(sp[1])||0);}
-        return writeCache(ff,'eastmoney-push2his',seriesIn)||ff;
-      }
-    }catch(e){/* 重试 */}
+  // v11.25 主源:历史资金流(120天)改多主机轮换。实测浏览器 Origin 下:push2his 常无响应、
+  //   push2delay 返回 200+ACAO(但 daykline 仅 1 根)、push2 无响应。
+  //   因此:优先取完整历史;退而用单根 K 线作为当日 d1 并写入本地序列,序列累积到 3/5 个交易日后自动补齐(自愈)。
+  var histHosts=['https://push2his.eastmoney.com','https://push2delay.eastmoney.com','https://push2.eastmoney.com'];
+  var oneBar=null;
+  for(var hi=0;hi<histHosts.length;hi++){
+    for(var attempt=0;attempt<2;attempt++){
+      try{
+        var url=histHosts[hi]+'/api/qt/stock/fflow/daykline/get?lmt=0&klt=101&secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63';
+        var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
+        if(!res.ok)break;                                   // 该主机拒绝(如 CORS)→ 直接换主机
+        var j=await res.json();
+        var kl=(j&&j.data&&j.data.klines)||[];
+        if(kl.length>=3){
+          var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
+          function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
+          var ff={d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
+          var seriesIn={};
+          for(var si=Math.max(0,kl.length-6);si<kl.length;si++){var sp=kl[si].split(',');seriesIn[sp[0]]=yi(parseFloat(sp[1])||0);}
+          return writeCache(ff,'eastmoney-'+histHosts[hi].replace(/^https?:\/\//,'').split('.')[0],seriesIn)||ff;
+        }
+        if(kl.length===1&&!oneBar){var p0=kl[0].split(',');oneBar={d1:yi(parseFloat(p0[1])||0),date:p0[0]};}
+        break;                                              // 主机有响应但数据不足 → 换下一主机
+      }catch(e){ /* 该主机失败:重试一次后换主机 */ }
+      await new Promise(function(r){setTimeout(r,300);});
+    }
   }
-  // 降级1.5:新浪资金流历史(v11.18)。东财历史源 push2his 在部分网络不可达(实测 Actions 侧间歇不可达),
-  //        手动新增个股又无云端缓存兜底 → 用新浪逐日 r0_net(主力=大单+超大单净额)补齐 d1/d3/d5。
-  //        口径与东财 f52 不完全一致,故 source 标 'sina-r0',渲染层显示「新浪口径」徽章,不伪装成东财数据。
-  try{
-    var sinaUrl='https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/MoneyFlow.ssl_qsfx_zjlrqs?page=1&num=10&sort=opendate&asc=0&daima='+(mkt==='1'?'sh':'sz')+num;
-    var resS=await fetch(sinaUrl,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://finance.sina.com.cn/'}});
-    var jsS=await resS.json();
-    if(Array.isArray(jsS)&&jsS.length){
-      var mapS={};
-      for(var si2=0;si2<jsS.length;si2++){
-        var rowS=jsS[si2];if(!rowS||!rowS.opendate)continue;
-        var vS=parseFloat(rowS.r0_net);if(isNaN(vS))continue;
-        mapS[String(rowS.opendate)]=Math.round(vS/1e6)/100;
+  // 降级1.4:历史源全不可用时,若某主机已返回单根 K 线(push2delay 常见),用它作为当日 d1 并入本地序列
+  if(oneBar&&oneBar.d1!=null){
+    var oneMap={}; oneMap[oneBar.date]=oneBar.d1;
+    var rec1=writeCache({d1:oneBar.d1,d3:null,d5:null},'eastmoney-onebar',oneMap);
+    if(rec1)return rec1;
+  }
+  // v11.25 移除 v11.18 的"新浪逐日资金流"兜底:实测新浪 MoneyFlow 接口不返回 Access-Control-Allow-Origin,
+  //   浏览器端必被 CORS 拦截(真机实测报"blocked by CORS policy")→ 该兜底在手机端从未生效,属误导性设计,删除。
+  // 降级1:实时接口(仅当日)。v11.25 改多主机轮换(push2 实测可能无响应,push2delay 有 ACAO 可用)
+  var rtHosts=['https://push2.eastmoney.com','https://push2delay.eastmoney.com'];
+  for(var ri=0;ri<rtHosts.length;ri++){
+    try{
+      var url2=rtHosts[ri]+'/api/qt/stock/fflow/kline/get?secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5';
+      var res2=await fetch(url2,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
+      if(!res2.ok)continue;
+      var j2=await res2.json();
+      var kl2=(j2&&j2.data&&j2.data.klines)||[];
+      if(kl2.length){
+        var lastLine=kl2[kl2.length-1].split(',');
+        var d1=yi(parseFloat(lastLine[1]||0)||0);
+        var ff2={d1:d1,d3:null,d5:null};
+        var seriesIn2={};seriesIn2[lastLine[0]]=d1;
+        return writeCache(ff2,'eastmoney-rt',seriesIn2)||ff2;
       }
-      var daysS=Object.keys(mapS).sort();
-      if(daysS.length){
-        var sumS=function(k){var arr=daysS.slice(-k),t=0;for(var q=0;q<arr.length;q++)t+=mapS[arr[q]];return Math.round(t*100)/100;};
-        var ffS={d1:mapS[daysS[daysS.length-1]],d3:daysS.length>=3?sumS(3):null,d5:daysS.length>=5?sumS(5):null};
-        var seriesInS={};for(var q2=0;q2<daysS.length;q2++)seriesInS[daysS[q2]]=mapS[daysS[q2]];
-        var recS=writeCache(ffS,'sina-r0',seriesInS);
-        return recS||ffS;
-      }
-    }
-  }catch(e){/* 新浪失败,继续降级 */}
-  // 降级1:实时接口(仅当日),d3/d5 置 null 避免重复
-  try{
-    var url2='https://push2.eastmoney.com/api/qt/stock/fflow/kline/get?secid='+mkt+'.'+num+'&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63&klt=101&lmt=5';
-    var res2=await fetch(url2,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://quote.eastmoney.com/'}});
-    var j2=await res2.json();
-    var kl2=(j2&&j2.data&&j2.data.klines)||[];
-    if(kl2.length){
-      var lastLine=kl2[kl2.length-1].split(',');
-      var d1=yi(parseFloat(lastLine[1]||0)||0);
-      var ff2={d1:d1,d3:null,d5:null};
-      var seriesIn2={};seriesIn2[lastLine[0]]=d1;
-      return writeCache(ff2,'eastmoney-push2',seriesIn2)||ff2;
-    }
-  }catch(e){/* 降级2:云端 fflow_cache.json */}
+    }catch(e){/* 换主机 */}
+  }
   // 降级2:读云端 fflow_cache.json(国内手机IP 跨域拉 Pages,GitHub Actions 即使完全封禁也能取到)
   try{
     var cached=await tryCloudFflowCache();
