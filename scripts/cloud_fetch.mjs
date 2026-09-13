@@ -60,11 +60,76 @@ async function fetchTencent(codes) {
   } catch (e) { console.error('fetchTencent 失败:', e.message); return []; }
 }
 
+/* ===== v11.15 东财多主机轮换 =====
+   背景:GitHub Actions 侧东财各主机可用性不一致(实测 push2.eastmoney.com 不可达),
+        凡写死单一主机的请求会**静默返回空数据且不报错**(2026-09-13 板块候选全空即此因)。
+   策略:按主机组轮换取首个成功响应;首次命中主机写入日志,便于诊断。非东财 URL 行为不变。 */
+const EM_HOST_GROUPS = {
+  qt:     ['https://push2.eastmoney.com', 'http://push2.eastmoney.com', 'https://push2delay.eastmoney.com', 'http://push2ex.eastmoney.com'],
+  qthis:  ['https://push2his.eastmoney.com', 'https://push2.eastmoney.com', 'http://push2ex.eastmoney.com', 'https://push2delay.eastmoney.com'],
+  zt:     ['http://push2ex.eastmoney.com', 'https://push2ex.eastmoney.com', 'https://push2delay.eastmoney.com'],
+  dc:     ['https://datacenter-web.eastmoney.com', 'https://datacenter.eastmoney.com'],
+  search: ['https://searchapi.eastmoney.com']
+};
+const _emHostHit = {};
+function _emPoolOf(url) {
+  let host = '';
+  try { host = new URL(url).host; } catch (e) { return null; }
+  const path = url.replace(/^https?:\/\/[^/]+/, '').split('?')[0];
+  // 路径专属池优先:push2ex 的 /getTopic*Pool 与 datacenter 的 /api/data/v1/get 只能在同一主机族取到,
+  // 若仅按 host 匹配会落到 push2 族(该主机不提供这些路径),白白浪费尝试次数。
+  if (/^\/getTopic(ZT|ZB)Pool/.test(path)) return EM_HOST_GROUPS.zt;
+  if (/^\/api\/data\/v1\/get/.test(path)) return EM_HOST_GROUPS.dc;
+  for (const k of Object.keys(EM_HOST_GROUPS)) {
+    if (EM_HOST_GROUPS[k].some(h => h.replace(/^https?:\/\//, '') === host)) return EM_HOST_GROUPS[k];
+  }
+  return null;
+}
+function _emKeyOf(url) { return url.replace(/^https?:\/\/[^/]+/, '').split('?')[0]; }
+function emCandidates(url) {
+  const pool = _emPoolOf(url);
+  if (!pool || pool.length <= 1) return [url];
+  const path = url.replace(/^https?:\/\/[^/]+/, '');
+  const memo = _emHostHit[_emKeyOf(url)];
+  const list = pool.map(h => h + path);
+  if (memo) {
+    const idx = list.findIndex(x => x.startsWith(memo));   // 上次命中主机优先,减少无效请求
+    if (idx > 0) { const [hit] = list.splice(idx, 1); list.unshift(hit); }
+  }
+  return list;
+}
+// 依次尝试候选主机,返回首个 ok 的 Response;全部失败返回 null
+async function emFetch(url, headers, timeoutMs, retries) {
+  const cands = emCandidates(url);
+  const key = _emKeyOf(url);
+  const rounds = Math.max(1, retries || 1);
+  for (let r = 0; r < rounds; r++) {
+    for (const u of cands) {
+      const ac = new AbortController();
+      const timer = setTimeout(() => ac.abort(), timeoutMs || 9000);
+      try {
+        const res = await fetch(u, { headers: headers || { 'User-Agent': 'Mozilla/5.0' }, signal: ac.signal });
+        if (!res.ok) continue;
+        const host = (u.match(/^https?:\/\/[^/]+/) || [''])[0];
+        if (_emHostHit[key] !== host) { _emHostHit[key] = host; console.log('  [东财主机]', key, '→', host); }
+        return res;
+      } catch (e) { /* 换主机 */ } finally { clearTimeout(timer); }
+    }
+    if (rounds > 1) await new Promise(r2 => setTimeout(r2, 400));
+  }
+  return null;
+}
+async function emFetchJson(url, headers, timeoutMs, retries) {
+  const res = await emFetch(url, headers, timeoutMs, retries);
+  if (!res) return null;
+  try { return await res.json(); } catch (e) { return null; }
+}
+
 async function fetchZT(dateArg) {
   try {
     const url = `http://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=50&sort=fbt%3Aasc&date=${dateArg || process.argv[3] || ''}`;
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-    const j = await res.json();
+    const j = await emFetchJson(url, { 'User-Agent': 'Mozilla/5.0' }, 10000);
+    if (!j) throw new Error('所有主机均无返回');
     const d = j.data || {};
     const list = (d.pool || []).map(s => ({
       code: String(s.c), name: s.n, price: (s.p || 0) / 1000,
@@ -79,20 +144,17 @@ async function fetchZT(dateArg) {
 
 async function fetchZB(dateArg) {
   const url = `http://push2ex.eastmoney.com/getTopicZBPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=5&sort=fund%3Aasc&date=${dateArg || process.argv[3] || ''}`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-  const j = await res.json();
+  const j = (await emFetchJson(url, { 'User-Agent': 'Mozilla/5.0' }, 10000)) || {};
   return (j.data && j.data.tc) || 0;
 }
 
 async function fetchBreadth() {
-  // 东财沪深指数上涨/下跌/平盘家数(f104/f105/f106)。HTTPS + 超时 + 最多3次重试,兼容 GitHub Actions 境外环境
+  // 东财沪深指数上涨/下跌/平盘家数(f104/f105/f106)。v11.15:改走 emFetchJson 多主机轮换
   const url = 'https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f1,f2,f3,f104,f105,f106&secids=1.000001,0.399001,0.399006';
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const ac = new AbortController();
-      const timer = setTimeout(() => ac.abort(), 10000);
-      const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ac.signal }).finally(() => clearTimeout(timer));
-      const j = await res.json();
+      const j = await emFetchJson(url, { 'User-Agent': 'Mozilla/5.0' }, 10000);
+      if (!j) throw new Error('所有主机均无返回');
       const diff = (j.data && j.data.diff) || [];
       let up = 0, down = 0, flat = 0;
       for (const it of diff) { up += it.f104 || 0; down += it.f105 || 0; flat += it.f106 || 0; }
@@ -253,8 +315,7 @@ async function fetchKlineRaw(code, count = 250) {
     const mkt = code.indexOf('sh') === 0 ? '1' : '0';
     const num = code.slice(2);
     const emUrl = `https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=${mkt}.${num}&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=20200101&end=20991231`;
-    const r = await fetchT(emUrl, { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' });
-    const j = await r.json();
+    const j = await emFetchJson(emUrl, { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, 9000);
     const kl = (j && j.data && j.data.klines) || [];
     if (Array.isArray(kl) && kl.length) {
       return kl.slice(-count).map(line => {
@@ -1104,10 +1165,8 @@ async function fetchStockFundFlow(code) {
   const mkt = String(code).charAt(0) === '6' ? '1' : '0';
   const cacheKey = num;
   const fflowFetch = async (url) => {
-    const ac = new AbortController();
-    const timer = setTimeout(() => ac.abort(), 8000);
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, signal: ac.signal }).finally(() => clearTimeout(timer));
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const res = await emFetch(url, { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, 8000);
+    if (!res) throw new Error('所有主机均无返回');
     return await res.json();
   };
   const writeCache = (ff, src) => {
@@ -1274,10 +1333,7 @@ async function fetchLimitUpPool() {
     const bj = new Date(Date.now() + 8 * 3600 * 1000);
     const dateStr = bj.toISOString().slice(0, 10).replace(/-/g, '');
     const url = `https://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=320&sort=fbt%3Aasc&date=${dateStr}`;
-    const ac = new AbortController();
-    const timer = setTimeout(() => ac.abort(), 8000);
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, signal: ac.signal }).finally(() => clearTimeout(timer));
-    const j = await res.json();
+    const j = (await emFetchJson(url, { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, 10000)) || {};
     const pool = (j && j.data && j.data.pool) || [];
     const map = {};
     for (const s of pool) {
@@ -1301,14 +1357,10 @@ async function fetchLhbDetail(code) {
     const flt = `(SECURITY_CODE%3D%22${num}%22)`;
     const base = 'https://datacenter-web.eastmoney.com/api/data/v1/get';
     const hdr = { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://data.eastmoney.com/' };
-    const ac = new AbortController();
-    const timer = setTimeout(() => ac.abort(), 9000);
-    const [rb, rs] = await Promise.all([
-      fetch(`${base}?reportName=RPT_BILLBOARD_DAILYDETAILSBUY&columns=ALL&filter=${flt}&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1`, { headers: hdr, signal: ac.signal }),
-      fetch(`${base}?reportName=RPT_BILLBOARD_DAILYDETAILSSELL&columns=ALL&filter=${flt}&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1`, { headers: hdr, signal: ac.signal })
+    const [jb, js] = await Promise.all([
+      emFetchJson(`${base}?reportName=RPT_BILLBOARD_DAILYDETAILSBUY&columns=ALL&filter=${flt}&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1`, hdr, 9000),
+      emFetchJson(`${base}?reportName=RPT_BILLBOARD_DAILYDETAILSSELL&columns=ALL&filter=${flt}&pageSize=30&sortColumns=TRADE_DATE&sortTypes=-1`, hdr, 9000)
     ]);
-    clearTimeout(timer);
-    const jb = await rb.json(), js = await rs.json();
     const rows = [
       ...((jb && jb.result && jb.result.data) || []),
       ...((js && js.result && js.result.data) || [])
@@ -1506,14 +1558,10 @@ async function fetchEvents(code, name) {
   const daysLeft = (d) => Math.round((new Date(d) - new Date(today)) / 86400000);
   const events = [];
   const fjson = async (reportName, filter, pageSize, sortColumns, sortTypes) => {
-    const ac = new AbortController();
-    const t = setTimeout(() => ac.abort(), 8000);
     try {
-      const res = await fetch(`${base}?reportName=${reportName}&columns=ALL&filter=${filter}&pageSize=${pageSize}&sortColumns=${sortColumns}&sortTypes=${sortTypes}`, { headers: hdr, signal: ac.signal });
-      clearTimeout(t);
-      const j = await res.json();
+      const j = await emFetchJson(`${base}?reportName=${reportName}&columns=ALL&filter=${filter}&pageSize=${pageSize}&sortColumns=${sortColumns}&sortTypes=${sortTypes}`, hdr, 8000);
       return (j && j.result && j.result.data) || [];
-    } catch (e) { clearTimeout(t); return []; }
+    } catch (e) { return []; }
   };
   const flt = `(SECURITY_CODE%3D%22${num}%22)`;
 
@@ -1657,10 +1705,8 @@ async function fetchTotalAmount() {
   // 源1:东财 HTTPS push2 沪深指数 f6(成交额,元)——GitHub Actions 境外环境可用
   try {
     const url = 'https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f6&secids=1.000001,0.399001';
-    const ac = new AbortController();
-    const timer = setTimeout(() => ac.abort(), 8000);
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: ac.signal }).finally(() => clearTimeout(timer));
-    const j = await res.json();
+    const j = await emFetchJson(url, { 'User-Agent': 'Mozilla/5.0' }, 8000);
+    if (!j) throw new Error('所有主机均无返回');
     const diff = (j.data && j.data.diff) || [];
     let total = 0;
     for (const it of diff) total += (it.f6 || 0);  // f6 成交额(元)
@@ -1692,8 +1738,7 @@ async function fetchNewHighCount(dateArg) {
   try {
     // 优先尝试东财 push2ex "新高"接口
     const url = `http://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=200&sort=fbt%3Aasc&date=${dateArg || process.argv[3] || ''}`;
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-    const j = await res.json();
+    const j = (await emFetchJson(url, { 'User-Agent': 'Mozilla/5.0' }, 10000)) || {};
     const pool = (j.data && j.data.pool) || [];
     // 用 lbc=1(首板)+ pct>=5% 近似"今日创新高"代理指标
     const proxy = pool.filter(s => (s.lbc || 1) === 1 && (s.zdp || 0) >= 5);
