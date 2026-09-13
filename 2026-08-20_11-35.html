@@ -6501,7 +6501,7 @@ async function refreshWatchlistQuotes(){
         var isAuto=d.classList.contains('auto-detail');
         if(isAuto){
           d.innerHTML=buildDecisionCardHtml(sObj);
-          applyReviewState(d.querySelector('.dc-review'));   // 重建后恢复勾选/交易状态,避免刷新清空
+          restoreReviewUI(d.querySelector('.dc-review'));   // 重建后恢复勾选/交易状态,避免刷新清空
         }else{
           var lastPrice=d.getAttribute('data-last-price');
           var curPrice=price.toFixed(2);
@@ -6513,7 +6513,7 @@ async function refreshWatchlistQuotes(){
             d.setAttribute('data-rebuild-ts',String(nowTs));
             d.setAttribute('data-last-price',curPrice);
             d.innerHTML=buildDecisionCardHtml(sObj);
-            applyReviewState(d.querySelector('.dc-review'));
+            restoreReviewUI(d.querySelector('.dc-review'));
           }
         }
       }
@@ -6560,7 +6560,7 @@ async function refreshWatchlistQuotes(){
               var fullData2=loadWatchlistStockData(c)||{};
               var sObj2=Object.assign({},fullData2,{code:c,name:name,price:price,pct:pct,amount:amount,turnover:'--',prevClose:fullData2.prevClose||0,open:fullData2.open||0,high:fullData2.high||0,low:fullData2.low||0,amplitude:fullData2.amplitude||0,volRatio:fullData2.volRatio||0,tech:t,fundFlow:ff||fullData2.fundFlow||null});
               d.innerHTML=buildDecisionCardHtml(sObj2);
-              applyReviewState(d.querySelector('.dc-review'));   // 补拉后重建,恢复勾选/交易状态
+              restoreReviewUI(d.querySelector('.dc-review'));   // 补拉后重建,恢复勾选/交易状态
             }
           }catch(e){}
         }
@@ -7945,6 +7945,12 @@ function settleAllShadowTrades(){
   updateReviewProgress();
 }
 
+// v11.24:任何 decision 卡重建后,除恢复勾选/交易状态外,还必须重算归因文本。
+// 否则重建出来的新块 .ts-attr 会退回模板默认值("尚未跟踪"),用户会误以为跟踪丢失。
+function restoreReviewUI(block){
+  try{applyReviewState(block);}catch(e){}
+  try{updateReviewProgress();}catch(e){}
+}
 // v11.21:归因文本动态化。原实现每块固定显示"待人工复盘",用户无法确认系统是否真的在跟踪。
 //        现按每只股票自己的模拟跟踪/真实交易记录生成状态;顶部进度/胜率按全部样本聚合(模拟与真实分列)。
 function updateReviewProgress(){
