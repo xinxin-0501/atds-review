@@ -550,7 +550,19 @@
 .wl-pro-btn:hover{background:#c9722a}
 .wl-pro-countdown{display:inline-flex;align-items:center;gap:4px;margin-left:auto;font-size:9px;color:#999}
 .wl-refresh-bar{display:inline-block;width:52px;height:5px;background:#4caf50;border-radius:3px;vertical-align:middle;transition:width .1s linear}
-.wl-journal-stats{width:100%;font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:5px;padding:3px 7px;margin-top:3px}
+.wl-journal-stats{width:100%;font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:5px;padding:3px 7px;margin-top:3px;box-sizing:border-box;line-height:1.6;overflow-wrap:anywhere}
+/* v11.28:每笔明细(入场/结算日期与价格可核对) */
+.jrn-btn{display:inline-block;font-size:10px;font-weight:600;color:#8a6d3b;background:#fff;border:1px solid #e6d3a3;border-radius:10px;padding:4px 10px;min-height:26px;cursor:pointer;line-height:1.2;margin-left:4px}
+.jrn-btn.jrn-del{color:#b23;border-color:#e9b7b7}
+.jrn-warn{margin-top:3px;padding-top:3px;border-top:1px dashed #ecdca8}
+.jrn-wrap{margin-top:4px;padding-top:4px;border-top:1px solid #f0e3bd}
+.jrn-row{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:flex-start;padding:3px 0;border-bottom:1px dashed #f2e7c8}
+.jrn-row:last-child{border-bottom:0}
+.jrn-code{font-weight:700;color:#3a3a3a;flex:0 0 auto}
+.jrn-flow{flex:1 1 150px;min-width:0;color:#6b5b2e;overflow-wrap:anywhere}
+.jrn-num{flex:0 0 auto;font-weight:700;text-align:right}
+.jrn-pos .jrn-num{color:#c33}
+.jrn-neg .jrn-num{color:#2e7d32}
 /* 手动标签编辑器 */
 .dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
 .dc-te-label{color:#999;font-weight:600}
@@ -2463,7 +2475,7 @@ async function fetchKlineF(code, count) {
     const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
     if (Array.isArray(series) && series.length) {
       // 写入浏览器本地缓存(供 CORS/网络失败时兜底)
-      try { var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); kc[code]={date:new Date().toISOString().slice(0,10),series:series.slice(-120)}; localStorage.setItem('atds_kline_cache',JSON.stringify(kc)); } catch(e2) {}
+      try { var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); kc[code]={date:bjTodayF(),series:series.slice(-120)}; localStorage.setItem('atds_kline_cache',JSON.stringify(kc)); } catch(e2) {}
       return series;
     }
   } catch (e) {}
@@ -3177,7 +3189,7 @@ function buildDecisionCardHtml(s){
         '<button class="ts-btn ts-t-btn" data-code="'+escHtmlF(s.code)+'" onclick="recordTTrade(this)">记做T</button>'+
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
-      '<div class="dc-line">策略执行/归因：<span class="ts-attr">尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="系统用当日最高/最低判定是否触及止盈/止损并自动结算；模拟跟踪与真实交易分列；样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
+      '<div class="dc-line">策略执行/归因：<span class="ts-attr">尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（未触发入场不计入样本）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-next-day">🎯 明日核心观察点：'+nextDayFocus+'</div>'+
     '</div>';
 }
@@ -3296,28 +3308,25 @@ function removeWatchlistRow(code){
 // v11.2 二次确认弹窗:防止误点导致本地数据丢失
 // ⚠️ 不再清空 atds_watchlist(手动加股列表),只清缓存——重置后用户新增的股仍在(用户明确诉求)
 function resetLocalCache(){
-  // 缓存类(可清):data caches + 隐藏标记 + 交易状态 + 模拟跟踪 + 二维码
-  var CACHE_KEYS=['atds_watchlist_data','atds_watchlist_hidden','atds_kline_cache','atds_ff_cache','atds_lhb_cache','atds_events_cache','atds_profile_cache','atds_trade_status','atds_shadow','atds_qr_code'];
-  // 保留类:atds_watchlist(手动加股列表)、sim_track_*(其他模块的独立 checkbox 状态)
-  // 额外清理 sim_track_* 单独的 checkbox 状态
-  var simKeys=[];
-  try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sim_track_')===0)simKeys.push(k);}}catch(e){}
+  // v11.28:本函数只清【派生缓存】。交易状态 / 模拟跟踪 / 复盘日志属【用户数据】,一律保留
+  // (用户反馈:重置缓存后打钩消失但进度残留 → 状态自相矛盾。根因是只清了 atds_shadow 没清 atds_trade_journal)。
+  // 需要清空跟踪数据请用「清空复盘数据」按钮(带二次确认)。
+  var CACHE_KEYS=['atds_watchlist_data','atds_watchlist_hidden','atds_kline_cache','atds_ff_cache','atds_lhb_cache','atds_events_cache','atds_profile_cache','atds_qr_code'];
   var removed=[];
   CACHE_KEYS.forEach(function(k){try{localStorage.removeItem(k);removed.push(k);}catch(e){}});
-  // sim_track_* 也清掉(模拟跟踪与重置后的最新价对齐)
-  simKeys.forEach(function(k){try{localStorage.removeItem(k);removed.push(k);}catch(e){}});
-  // 读取 atds_watchlist 用于日志
   var watchlistCount=0;
   try{var w=JSON.parse(localStorage.getItem('atds_watchlist')||'[]');watchlistCount=Array.isArray(w)?w.length:0;}catch(e){}
-  console.log('[resetLocalCache] 已清空 keys:', removed.join(', '), '· 保留 atds_watchlist(', watchlistCount, '只手动加股)');
-  if(typeof showToast==='function'){showToast('已重置本地缓存('+removed.length+' 项),保留 '+watchlistCount+' 只手动加股,刷新页面强制从云端重新拉取','ok');}
+  var jn=getJournal().length, sh=getShadowMap(), track=0;
+  for(var kk in sh){ if(sh[kk]&&sh[kk].enabled)track++; }
+  console.log('[resetLocalCache] 已清空 keys:', removed.join(', '), '· 保留 atds_watchlist(', watchlistCount, '只)、复盘日志', jn, '笔、跟踪', track, '只');
+  if(typeof showToast==='function'){showToast('已重置本地缓存('+removed.length+' 项)；保留 '+watchlistCount+' 只手动加股、'+track+' 只模拟跟踪、'+jn+' 笔复盘样本','ok');}
   setTimeout(function(){try{location.reload();}catch(e){}},800);
 }
 // v11.2 二次确认弹窗:明确告知用户保留哪些数据
 function confirmResetCache(){
   var watchlistCount=0;
   try{var w=JSON.parse(localStorage.getItem('atds_watchlist')||'[]');watchlistCount=Array.isArray(w)?w.length:0;}catch(e){}
-  var msg='⚠️ 确定要重置本地缓存吗?\n\n将清空:\n• 自选股数据缓存(手动加股的完整行情/资金/事件/龙虎榜)\n• 隐藏标记(被标记删除的股)\n• 资金/事件/K线缓存\n• 交易状态/模拟跟踪\n• 二维码\n\n✅ 保留:\n• 手动加股列表('+watchlistCount+' 只,刷新后从云端重新拉详情)\n• 云端配置和 review JSON\n\n刷新后将强制从云端重新拉取所有数据。';
+  var msg='⚠️ 确定要重置本地缓存吗?\n\n将清空(仅派生缓存):\n• 自选股数据缓存(手动加股的行情/资金/事件/龙虎榜快照)\n• 隐藏标记(被标记删除的股)\n• 资金/事件/K线/行业画像缓存\n• 二维码\n\n✅ 保留(用户数据,不再是本按钮的清理范围):\n• 手动加股列表('+watchlistCount+' 只,刷新后从云端重新拉详情)\n• 交易状态标记(已买入/未买入/已卖出)\n• 系统模拟跟踪的勾选与进展\n• 复盘交易日志(胜率样本)\n\n如需清空跟踪与复盘数据,请点「清空复盘数据」。\n\n刷新后将强制从云端重新拉取所有数据。';
   if(confirm(msg)){resetLocalCache();}
 }
 // 保存单只股票的全量数据(供退出重登时立即渲染,不依赖网络)
@@ -4159,10 +4168,12 @@ async function fetchStockFundFlowF(code){
       var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}');
       var prev=fc[num]||{};
       var series=Object.assign({},prev.series||{});
-      var today=new Date().toISOString().slice(0,10);
+      // v11.28:改北京日期;无日期兜底分支只在收盘后(北京 15:00 后)落键,避免盘中把昨收值写到今天键上造成错标
+      var today=bjTodayF();
+      var bjHour=new Date(Date.now()+8*3600*1000).getUTCHours();
       for(var kk in series)if(isWeekendKey(kk))delete series[kk];      // 清除周末键,避免同一交易日重复计数
       if(seriesIn){for(var k2 in seriesIn){if(!isWeekendKey(k2)&&seriesIn[k2]!=null&&!isNaN(seriesIn[k2]))series[k2]=seriesIn[k2];}}
-      else if(ff.d1!=null&&!isNaN(ff.d1)&&!isWeekendKey(today))series[today]=ff.d1;
+      else if(ff.d1!=null&&!isNaN(ff.d1)&&!isWeekendKey(today)&&bjHour>=15)series[today]=ff.d1;
       var days=Object.keys(series).filter(function(k){return series[k]!=null&&!isNaN(series[k]);}).sort();
       var keep=days.slice(-6),trimmed={};
       for(var i=0;i<keep.length;i++)trimmed[keep[i]]=series[keep[i]];
@@ -4532,7 +4543,7 @@ async function fetchEventsF(code){
     var lc2=JSON.parse(localStorage.getItem('atds_events_cache')||'{}');
     lc2[num]=events;
     lc2._meta=lc2._meta||{};
-    lc2._meta[num]={date:new Date().toISOString().slice(0,10),src:srcUsed,count:events.length};
+    lc2._meta[num]={date:bjTodayF(),src:srcUsed,count:events.length};
     localStorage.setItem('atds_events_cache',JSON.stringify(lc2));
   }catch(e){}
   status=events.length?'ok':'fail';
@@ -4896,31 +4907,101 @@ function startRefreshCountdown(){
   },100);
 }
 /* 复盘交易日志(localStorage):统计胜率/平均盈亏/连续亏损 */
+// v11.28:统一北京日期。原用 toISOString() 取 UTC 日期:用户在 08:00 前打开(盘前高频场景)
+//        会把当天记成昨天,且时间差算出负数(出现"已观察-1天")。A 股工具一律以北京日期记账。
+function bjTodayF(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); }
+function bjDaysBetweenF(from,to){
+  if(!from||!to)return 0;
+  var a=Date.parse(String(from).slice(0,10)+'T00:00:00Z'), b=Date.parse(String(to).slice(0,10)+'T00:00:00Z');
+  if(isNaN(a)||isNaN(b))return 0;
+  var d=Math.floor((b-a)/86400000);
+  return d<0?0:d;
+}
 function getJournal(){ try{return JSON.parse(localStorage.getItem('atds_trade_journal')||'[]');}catch(e){return [];} }
 function addJournalEntry(entry){ try{var j=getJournal();j.push(entry);localStorage.setItem('atds_trade_journal',JSON.stringify(j));}catch(e){} }
 function recordTrade(code,name,entry,stop,target){
   var price=Number(document.querySelector('.wl-stock-row[data-code="'+code+'"] .price')||{})||0;
   var pnl=null;
   if(price&&entry&&price!==entry)pnl=Math.round((price-entry)/entry*10000)/100;
-  addJournalEntry({code:code,name:name||code,date:new Date().toISOString().slice(0,10),entry:entry,stop:stop,target:target,close:price,pnl:pnl,strategy:'swing'});
+  addJournalEntry({code:code,name:name||code,date:bjTodayF(),entry:entry,stop:stop,target:target,close:price,pnl:pnl,strategy:'swing'});
   renderJournalStats();
   var pnlTxt=pnl==null?'--':((pnl>0?'+':'')+pnl+'%');
   alert('已记录交易:'+name+'('+code+') 入场'+entry+' 现价'+price+' 盈亏'+pnlTxt);
 }
+var jrnOpen=false;   // v11.28:明细展开开关
+function toggleJournalDetail(){ jrnOpen=!jrnOpen; renderJournalStats(); }
+// v11.28:统计口径改为"有效样本"制,并新增【每笔明细】——用户要求能看到何时入场、何时结算,否则胜率不可信。
 function renderJournalStats(){
   var el=document.getElementById('wl-journal-stats'); if(!el)return;
   var j=getJournal();
-  if(!j.length){el.innerHTML='复盘统计:暂无交易记录';return;}
-  function calcStats(arr){
-    var wins=0,losses=0,sumWin=0,sumLoss=0;
-    for(var i=0;i<arr.length;i++){var p=arr[i].pnl||0;if(p>0){wins++;sumWin+=p;}else if(p<0){losses++;sumLoss+=p;}}
-    return {winRate:arr.length?Math.round(wins/arr.length*100)+'%':'--',avgWin:wins?Math.round(sumWin/wins*100)/100:'--',avgLoss:losses?Math.round(sumLoss/losses*100)/100:'--',n:arr.length};
+  var c=reviewClassification();
+  if(!j.length){
+    var tm0=getTradeStatusMap(),tn0=0;
+    for(var t0 in tm0){ if(tm0[t0]&&tm0[t0].status)tn0++; }
+    el.innerHTML='📒 模拟跟踪复盘：暂无样本 —— 勾选个股「系统模拟跟踪」后开始累计'+
+      (tn0?('<div class="jrn-warn">已有 '+tn0+' 只标记了交易状态　<button class="jrn-btn jrn-del" onclick="confirmClearReviewData()">清空复盘数据</button></div>'):'');
+    return;
   }
-  var swing=calcStats(j.filter(function(x){return x.strategy!=='tTrade';}));
-  var tT=calcStats(j.filter(function(x){return x.strategy==='tTrade';}));
-  var html='复盘统计：波段策略胜率 <b>'+swing.winRate+'</b>（'+swing.n+'笔 · 均盈 '+swing.avgWin+'% / 均亏 '+swing.avgLoss+'%）'+
-    ' ｜ 日内做T胜率 <b>'+(tT.n?tT.winRate:'--')+'</b>（'+tT.n+'笔'+(tT.n?' · 均盈 '+tT.avgWin+'% / 均亏 '+tT.avgLoss+'%':'')+'）';
-  el.innerHTML=html;
+  var head='📒 模拟跟踪复盘：有效样本 <b>'+c.valid+'</b> 笔'+
+    (c.winRate!=null?(' · 胜率 <b>'+c.winRate+'%</b>（'+c.win+'胜'+c.loss+'负'+(c.expired?'·'+c.expired+'过期':'')+'）'):'')+
+    ' · 平均 <b>'+(c.avg>0?'+':'')+c.avg+'%</b>'+
+    ((c.win+c.loss)<10?'（不足10笔，仅供参考）':'')+
+    '　<button class="jrn-btn" onclick="toggleJournalDetail()">'+(jrnOpen?'收起明细':'每笔明细')+'</button>';
+  var ex=[];
+  if(c.legacy)ex.push('早期未校验 '+c.legacy+' 笔（无入场门控，不计入胜率）');
+  if(c.missed)ex.push('未触发入场 '+c.missed+' 笔（不计入胜率）');
+  var warn='<div class="jrn-warn">'+(ex.length?('⚠ '+ex.join('　·　')+'　'):'')+'<button class="jrn-btn jrn-del" onclick="confirmClearReviewData()">清空复盘数据</button></div>';
+  var rows='';
+  if(jrnOpen){
+    rows='<div class="jrn-wrap">';
+    for(var i=j.length-1;i>=0;i--){
+      var e=j[i];
+      var legacy=!!(e.shadow&&e.v!==28);
+      var rn={win:'止盈',loss:'止损',expired:'过期按现价',missed:'未触发入场'}[e.result]||(e.result||'—');
+      var flow;
+      if(legacy){
+        flow='早期样本（'+(e.openedDate||e.date||'—')+' 记录）判定依据不完整';
+      }else if(e.result==='missed'){
+        flow=(e.openedDate||e.date||'—')+' 起观察 → 未回落至入场价'+e.entry+' → 未触发入场';
+      }else{
+        var mid=e.shadow?(e.entryDate?('入场 '+e.entryDate+'@'+e.entry):'—'):('真实交易 @'+(e.entry==null?'—':e.entry));
+        flow=(e.openedDate||e.date||'—')+' 开始观察 → '+mid+' → '+rn+' '+(e.settleDate||e.date||'—')+(e.settlePrice!=null?('@'+e.settlePrice):'')+
+          (e.note?'（'+e.note+'）':'');
+      }
+      var pnlTxt=(e.pnl==null?'—':((e.pnl>0?'+':'')+e.pnl+'%'));
+      rows+='<div class="jrn-row'+(e.pnl>0?' jrn-pos':(e.pnl<0?' jrn-neg':''))+'">'+
+        '<span class="jrn-code">'+escHtmlF(String(e.code))+' '+escHtmlF(e.name||'')+(e.strategy==='tTrade'?' [做T]':'')+'</span>'+
+        '<span class="jrn-flow">'+escHtmlF(flow)+'</span>'+
+        '<span class="jrn-num">'+(legacy?'不计入':pnlTxt)+'</span></div>';
+    }
+    rows+='</div>';
+  }
+  el.innerHTML=head+warn+rows;
+}
+// v11.28:清空复盘/跟踪数据(独立于"重置本地缓存")——缓存重置不会动用户的跟踪记录,只有这里会。
+function clearReviewData(){
+  var n=getJournal().length, sm=getShadowMap();
+  var track=0; for(var k in sm){ if(sm[k]&&sm[k].enabled)track++; }
+  try{ localStorage.removeItem('atds_trade_journal'); }catch(e){}
+  try{ localStorage.removeItem('atds_shadow'); }catch(e){}
+  try{ localStorage.removeItem('atds_trade_status'); }catch(e){}
+  try{
+    var del=[];
+    for(var i=0;i<localStorage.length;i++){ var kk=localStorage.key(i); if(kk&&kk.indexOf('sim_track_')===0)del.push(kk); }
+    for(var q=0;q<del.length;q++)localStorage.removeItem(del[q]);
+  }catch(e){}
+  jrnOpen=false;
+  renderJournalStats();
+  if(typeof showToast==='function')showToast('已清空复盘数据：'+n+' 笔样本、'+track+' 只跟踪','ok');
+  updateReviewProgress();
+  setTimeout(function(){try{location.reload();}catch(e){}},900);
+}
+function confirmClearReviewData(){
+  var n=getJournal().length, sm=getShadowMap();
+  var track=0; for(var k in sm){ if(sm[k]&&sm[k].enabled)track++; }
+  var msg='⚠️ 清空复盘/跟踪数据？\n\n将删除：\n• 模拟跟踪记录（'+track+' 只正在跟踪）\n• 交易状态标记（已买入/未买入/已卖出）\n• 复盘交易日志（'+n+' 笔样本，含早期未校验样本）\n\n✅ 不影响：自选股列表、行情缓存、云端配置\n\n此操作不可撤销。';
+  if(typeof window.confirm==='function'&&!window.confirm(msg))return;
+  clearReviewData();
 }
 // 记录日内做T(方案C)盈亏,独立计入"做T胜率"样本
 function recordTTrade(btn){
@@ -4933,7 +5014,7 @@ function recordTTrade(btn){
   if(input==null)return;
   var pnl=parseFloat(String(input).replace('%',''));
   if(isNaN(pnl)){try{alert('请输入有效数字，如 +1.2 或 -0.5');}catch(e){}return;}
-  addJournalEntry({code:code,name:name,date:new Date().toISOString().slice(0,10),entry:price,stop:null,target:null,close:price,pnl:pnl,shadow:false,result:(pnl>=0?'win':'loss'),strategy:'tTrade'});
+  addJournalEntry({code:code,name:name,date:bjTodayF(),entry:price,stop:null,target:null,close:price,pnl:pnl,shadow:false,result:(pnl>=0?'win':'loss'),strategy:'tTrade'});
   updateReviewProgress();
   renderJournalStats();
   try{alert('已记录做T：'+name+'('+code+') 盈亏 '+(pnl>0?'+':'')+pnl+'%');}catch(e){}
@@ -4957,19 +5038,41 @@ function setTradeStatus(btn,status){
   var block=btn.closest('.dc-review');
   var m=getTradeStatusMap();
   var rec=m[code]||{};
+  // v11.28:再点一次同一状态 = 取消(误点可撤销)。用户反馈"不小心点了已买入再点无法取消"。
+  if(rec.status===status&&block){
+    delete rec.status;
+    if(status==='bought'){ delete rec.entry; delete rec.stop; delete rec.target; delete rec.date; delete rec.settled; }
+    if(status==='sold'&&rec.journalId){       // 撤销"已卖出":同步撤回它写入的复盘日志
+      try{
+        var jj=getJournal().filter(function(x){return String(x.jid)!==String(rec.journalId);});
+        localStorage.setItem('atds_trade_journal',JSON.stringify(jj));
+      }catch(e){}
+      delete rec.journalId; delete rec.settled;
+    }
+    if(rec.entry||rec.status||rec.name)m[code]=rec; else delete m[code];
+    setTradeStatusMap(m);
+    var bs=block.querySelectorAll('.ts-btn');
+    for(var bi=0;bi<bs.length;bi++)bs[bi].classList.remove('ts-active');
+    updateReviewProgress();
+    try{renderJournalStats();}catch(e){}
+    if(typeof showToast==='function')showToast('已取消「'+({bought:'已买入',not_bought:'未买入',sold:'已卖出'}[status]||status)+'」标记','ok');
+    return;
+  }
   rec.status=status;
   rec.name=rec.name||(block?block.getAttribute('data-name'):'')||code;
   if(status==='bought'&&block){
     rec.entry=parseFloat(block.getAttribute('data-entry'))||null;
     rec.stop=parseFloat(block.getAttribute('data-stop'))||null;
     rec.target=parseFloat(block.getAttribute('data-target'))||null;
-    rec.date=new Date().toISOString().slice(0,10);
+    rec.date=bjTodayF();
     rec.settled=false;
   }
   if(status==='sold'&&block&&rec.entry&&!rec.settled){
     var price=parseFloat(block.getAttribute('data-price'))||0;
     var pnl=price?Math.round((price-rec.entry)/rec.entry*10000)/100:null;
-    addJournalEntry({code:code,name:rec.name,date:new Date().toISOString().slice(0,10),entry:rec.entry,stop:rec.stop,target:rec.target,close:price,pnl:pnl,shadow:false,result:pnl!=null?(pnl>=0?'win':'loss'):null});
+    var jid='real_'+code+'_'+Date.now();
+    rec.journalId=jid;
+    addJournalEntry({code:code,name:rec.name,date:bjTodayF(),entry:rec.entry,stop:rec.stop,target:rec.target,close:price,pnl:pnl,shadow:false,result:pnl!=null?(pnl>=0?'win':'loss'):null,jid:jid});
     rec.settled=true;
   }
   m[code]=rec;
@@ -4996,7 +5099,7 @@ function toggleShadowTrack(cb){
   var block=cb.closest('.dc-review');
   var m=getShadowMap();
   if(cb.checked&&block){
-    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:parseFloat(block.getAttribute('data-entry'))||null,stop:parseFloat(block.getAttribute('data-stop'))||null,target:parseFloat(block.getAttribute('data-target'))||null,openedDate:new Date().toISOString().slice(0,10),settled:false};
+    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:parseFloat(block.getAttribute('data-entry'))||null,stop:parseFloat(block.getAttribute('data-stop'))||null,target:parseFloat(block.getAttribute('data-target'))||null,openedDate:bjTodayF(),settled:false};
     try{localStorage.setItem('sim_track_'+code,'true');}catch(e){}
     showToast('已加入模拟跟踪队列，开始累积样本');
   }else{
@@ -5007,8 +5110,14 @@ function toggleShadowTrack(cb){
   updateReviewProgress();
 }
 
-// v11.21:模拟跟踪结算。原实现只看"现价"是否 ≥止盈/≤止损,盘中冲高回落会被漏判;
-//        改为用当日最高/最低判定触达,并支持"持有超期未触发"按现价结算,同时记录 lastCheck 供"跟踪中"展示。
+// v11.28:模拟跟踪结算 —— 加入「入场门控」。这是本轮最关键的修正。
+// 缺陷(v11.21~v11.27):直接拿"计划止盈/止损"与当日最高/最低比对。但计划入场价本就是【回调买点位】,恒低于现价
+//   (实测 2026-09-11 的 11 只全部 entry < price),于是"当日最高已越过计划止盈位"的个股一勾选就立即评为"止盈"
+//   → 当天 3/11 只会凭空产生胜率样本,胜率虚高至 100%。用户反馈的"第一次勾选进度就有7、胜率100%"即此。
+// 现改为两阶段,且入场当日不判止盈(分钟级先后顺序不可验证,避免乐观偏差):
+//   ① 待入场:当日最低回落至计划入场价才算入场;观察满 10 日仍未触及 → 记 missed(未触发入场,不计入胜率)
+//   ② 已入场:入场次日起用当日最高/最低判定;同日双触保守计为止损;入场满 10 日未触达 → expired(按现价)
+// 记录 settlePrice/settleDate/entryDate 供明细复核(用户要求"看得到什么时候买入、什么时候卖出")。
 function settleShadowTrade(code){
   var sm=getShadowMap();
   var rec=sm[code];
@@ -5022,20 +5131,40 @@ function settleShadowTrade(code){
   if(!low)low=price;
   var entry=rec.entry,stop=rec.stop,target=rec.target;
   if(!entry||!stop||!target)return;
-  var today=new Date().toISOString().slice(0,10);
+  var today=bjTodayF();
   rec.lastCheck={date:today,price:price,high:high,low:low};
   var pct=function(v){return Math.round((v-entry)/entry*10000)/100;};
-  var doSettle=function(result,pnl,note){
-    rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=today;rec.settleNote=note||'';
-    addJournalEntry({code:code,name:rec.name||code,date:today,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',openedDate:rec.openedDate||'',strategy:'swing'});
+  var doSettle=function(result,pnl,settlePrice,note){
+    rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=today;rec.settlePrice=settlePrice;rec.settleNote=note||'';
+    addJournalEntry({code:code,name:rec.name||code,date:today,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',
+      openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:today,settlePrice:settlePrice,v:28,strategy:'swing'});
+    setShadowMap(sm);
   };
+  // 阶段1:待入场
+  if(!rec.entryHit){
+    if(low&&low<=entry){                       // 当日最低回落至计划入场价 → 视为已入场
+      rec.entryHit=true;rec.entryDate=today;rec.entryPrice=entry;
+      if(low<=stop){ doSettle('loss',pct(stop),stop,'入场当日即跌破止损'); return; }
+    } else if(rec.openedDate){
+      var wd=bjDaysBetweenF(rec.openedDate,today);
+      if(wd>=10){ doSettle('missed',0,null,'观察'+wd+'日未回落至计划入场价'+entry+'，未触发入场'); }
+    }
+    setShadowMap(sm);
+    return;
+  }
+  // 阶段2:已入场(入场当日只判止损,不判止盈)
+  if(rec.entryDate===today){
+    if(low<=stop)doSettle('loss',pct(stop),stop,'入场当日即跌破止损');
+    setShadowMap(sm);
+    return;
+  }
   var hitT=high>=target, hitS=low<=stop;
-  if(hitT&&hitS){ doSettle('loss',pct(stop),'当日最高触止盈、最低触止损，保守计为止损'); }
-  else if(hitT){ doSettle('win',pct(target),'当日最高触及止盈'); }
-  else if(hitS){ doSettle('loss',pct(stop),'当日最低触及止损'); }
+  if(hitT&&hitS){ doSettle('loss',pct(stop),stop,'当日最高触止盈、最低触止损，保守计为止损'); }
+  else if(hitT){ doSettle('win',pct(target),target,'入场后当日最高触及止盈'); }
+  else if(hitS){ doSettle('loss',pct(stop),stop,'当日最低触及止损'); }
   else if(rec.openedDate){
-    var held=Math.floor((new Date(today)-new Date(rec.openedDate))/86400000);
-    if(held>=10&&price){ doSettle('expired',pct(price),'持有'+held+'日未触及止盈/止损，按现价结算'); }
+    var held=bjDaysBetweenF(rec.entryDate||rec.openedDate,today);
+    if(held>=10&&price){ doSettle('expired',pct(price),price,'入场后持有'+held+'日未触及止盈/止损，按现价结算'); }
   }
   setShadowMap(sm);
 }
@@ -5052,46 +5181,65 @@ function restoreReviewUI(block){
   try{applyReviewState(block);}catch(e){}
   try{updateReviewProgress();}catch(e){}
 }
-// v11.21:归因文本动态化。原实现每块固定显示"待人工复盘",用户无法确认系统是否真的在跟踪。
-//        现按每只股票自己的模拟跟踪/真实交易记录生成状态;顶部进度/胜率按全部样本聚合(模拟与真实分列)。
+// v11.28:归因文本 + 统计口径统一重写(用户反馈"进度7/10、胜率100%"不可信)。
+// 旧问题:① 进度显示 j.length,把"判定依据不完整"的历史脏样本也算进去;② 胜率分母含过期/未触发;③ 无法区分"待入场"与"已入场"。
+// 新口径:有效样本 = 已结算且非历史脏样本(v<28);胜率分母 = win+loss(排除 expired/missed);历史脏样本单列、不计入。
+function reviewClassification(){
+  var j=getJournal();
+  var s={valid:0,win:0,loss:0,expired:0,missed:0,legacy:0,sum:0,avg:0,winRate:null};
+  for(var i=0;i<j.length;i++){
+    var e=j[i],p=Number(e.pnl),rs=e.result;
+    if(!rs&&!isNaN(p)&&e.pnl!=null)rs=(p>=0?'win':'loss');
+    if(e.shadow&&e.v!==28){ s.legacy++; continue; }   // v11.28 之前写入的模拟样本:无入场门控、无结算价 → 不计入
+    if(rs==='win'||rs==='loss'||rs==='expired'){
+      s.valid++;
+      if(!isNaN(p))s.sum+=p;
+      if(rs==='win')s.win++;else if(rs==='loss')s.loss++;else s.expired++;
+    } else if(rs==='missed'){ s.missed++; }
+  }
+  s.avg=s.valid?Math.round(s.sum/s.valid*100)/100:0;
+  s.winRate=(s.win+s.loss)?Math.round(s.win/(s.win+s.loss)*100):null;
+  return s;
+}
 function updateReviewProgress(){
   var j=getJournal();
   var sm=getShadowMap();
-  var wins=0,losses=0,expired=0,sum=0,settled=0;
-  for(var i=0;i<j.length;i++){
-    var p=Number(j[i].pnl);
-    var rs=j[i].result;
-    if(!rs&&!isNaN(p)&&j[i].pnl!=null)rs=(p>=0?'win':'loss');   // v11.22:兼容旧版无 result 字段的历史记录,避免"进度有数、已结算为0"的不一致
-    if(rs==='win'||rs==='loss'||rs==='expired'){
-      settled++;
-      if(!isNaN(p))sum+=p;
-      if(rs==='win')wins++;else if(rs==='loss')losses++;else expired++;
-    }
-  }
-  var avg=settled?Math.round(sum/settled*100)/100:0;
+  var c=reviewClassification();
   var openCnt=0;
-  for(var c in sm){ if(sm[c]&&sm[c].enabled&&!sm[c].settled)openCnt++; }
+  for(var cc in sm){ if(sm[cc]&&sm[cc].enabled&&!sm[cc].settled)openCnt++; }
   var blocks=document.querySelectorAll('.dc-review');
   for(var b=0;b<blocks.length;b++){
     var code=blocks[b].getAttribute('data-review-code');
     var attr=blocks[b].querySelector('.ts-attr');
     if(!attr)continue;
-    var r=sm[code];
-    var txt;
+    var r=sm[code],txt;
+    var px=Number(blocks[b].getAttribute('data-price'))||0;
     if(r&&r.enabled&&!r.settled){
-      var px=Number(blocks[b].getAttribute('data-price'))||0;
-      var gap=px&&r.target?Math.round((r.target-px)/px*10000)/100:null;
-      var held=r.openedDate?Math.floor((Date.now()-new Date(r.openedDate))/86400000):0;   // v11.23:当天应为"已0天"(原 round 会显示已1天)
-      txt='跟踪中（已'+held+'天）：现价'+px+'，距止盈'+(gap!=null?(gap>=0?'+':'')+gap+'%':'--')+'（止损'+r.stop+'），触达即自动结算';
+      var days=bjDaysBetweenF(r.openedDate,bjTodayF());
+      if(!r.entryHit){
+        var need=(px&&r.entry)?Math.round((px-r.entry)/px*10000)/100:null;
+        txt='待入场（已观察'+days+'天）：现价'+px+'，需回落至计划入场价'+r.entry+(need!=null?('（还差'+need+'%）'):'')+'；未触发入场前不计入样本';
+      }else{
+        var gap=(px&&r.target)?Math.round((r.target-px)/px*10000)/100:null;
+        txt='跟踪中（'+r.entryDate+' 入场@'+r.entry+'）：现价'+px+'，距止盈'+(gap!=null?((gap>=0?'+':'')+gap+'%'):'--')+'（止损'+r.stop+'），触达即自动结算';
+      }
     } else {
       var mine=[];
       for(var q=0;q<j.length;q++){ if(String(j[q].code)===String(code))mine.push(j[q]); }
       var last=mine.length?mine[mine.length-1]:null;
       if(last&&last.shadow){
-        var rn={win:'止盈',loss:'止损',expired:'过期未触发'}[last.result]||(last.result||'已结算');
-        txt='模拟已结算：'+rn+' '+(last.pnl>0?'+':'')+(last.pnl==null?'--':last.pnl)+'%'+(last.note?'（'+last.note+'）':'');
+        if(last.v!==28){
+          txt='早期样本（无入场门控、判定依据不完整）—— 不计入胜率，建议点上方「清空复盘数据」重新累计';
+        } else if(last.result==='missed'){
+          txt='未触发入场：观察期内未回落至计划入场价'+last.entry+'，不计入胜率样本';
+        } else {
+          var rn={win:'止盈',loss:'止损',expired:'过期按现价'}[last.result]||(last.result||'已结算');
+          txt='已结算：'+rn+' '+(last.pnl>0?'+':'')+(last.pnl==null?'--':last.pnl)+'%'+
+              '（'+((last.entryDate||last.openedDate||'—')+' 入场@'+last.entry)+' → '+(last.settleDate||'—')+' '+rn+(last.settlePrice!=null?('@'+last.settlePrice):'')+'）'+
+              (last.note?'，'+last.note:'');
+        }
       } else if(last&&!last.shadow){
-        txt='真实交易已记录：'+(last.pnl!=null?((last.pnl>0?'+':'')+last.pnl+'%'):'盈亏待补');
+        txt='真实交易已记录：'+(last.pnl!=null?((last.pnl>0?'+':'')+last.pnl+'%'):'盈亏待补')+'（'+last.date+'）';
       } else {
         txt='尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本';
       }
@@ -5099,11 +5247,12 @@ function updateReviewProgress(){
     attr.textContent=txt;
   }
   var els=document.querySelectorAll('.ts-progress');
-  for(var k=0;k<els.length;k++)els[k].textContent=j.length+'/10';
-  var wr=(wins+losses)?Math.round(wins/(wins+losses)*100):null;
-  var line=settled
-    ? (' · 已结算'+settled+'笔'+(wr!=null?('·胜率'+wr+'%'):'')+(expired?('·过期'+expired):'')+'，平均'+(avg>0?'+':'')+avg+'%'+((wins+losses+expired)<10?'（样本不足10笔，仅供参考）':''))
+  for(var k=0;k<els.length;k++)els[k].textContent=c.valid+'/10';
+  var line=c.valid
+    ? (' · 有效样本'+c.valid+'笔'+(c.winRate!=null?('·胜率'+c.winRate+'%('+c.win+'胜'+c.loss+'负)'):'')+(c.expired?('·过期'+c.expired):'')+'，平均'+(c.avg>0?'+':'')+c.avg+'%'+((c.win+c.loss)<10?'（不足10笔仅供参考）':''))
     : (' · 跟踪中'+openCnt+'笔（未结算）');
+  if(c.legacy)line+=' · 早期未校验'+c.legacy+'笔(不计入)';
+  if(c.missed)line+=' · 未触发入场'+c.missed+'笔';
   var statEls=document.querySelectorAll('.ts-winrate');
   for(var m2=0;m2<statEls.length;m2++)statEls[m2].textContent=line;
 }
@@ -5160,6 +5309,9 @@ function initReviewState(){
   settleAllShadowTrades();
 }
 window.setTradeStatus=setTradeStatus;
+window.toggleJournalDetail=toggleJournalDetail;
+window.clearReviewData=clearReviewData;
+window.confirmClearReviewData=confirmClearReviewData;
 window.toggleShadowTrack=toggleShadowTrack;
 window.togglePlanBlock=togglePlanBlock;
 if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initReviewState,500);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initReviewState,500);});}
