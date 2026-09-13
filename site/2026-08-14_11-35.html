@@ -6515,13 +6515,16 @@ async function fetchStockFundFlowF(code){
   // v11.16(与服务端 cloud_fetch.mjs writeCache 镜像同步):滚动序列累积。
   // 历史源(push2his)失败时旧实现把 d3/d5 覆盖为 null → "3日/5日缺失"。改为按交易日累积 d1 序列求和,
   // 序列不足则保留上次有效值;返回合并后的记录,避免"缓存有值但 UI 仍显示缺失"。
-  function writeCache(ff,src){
+  function isWeekendKey(k){var d=new Date(k+'T00:00:00Z').getUTCDay();return d===0||d===6;}
+  function writeCache(ff,src,seriesIn){
     try{
       var fc=JSON.parse(localStorage.getItem('atds_ff_cache')||'{}');
       var prev=fc[num]||{};
       var series=Object.assign({},prev.series||{});
       var today=new Date().toISOString().slice(0,10);
-      if(ff.d1!=null&&!isNaN(ff.d1))series[today]=ff.d1;
+      for(var kk in series)if(isWeekendKey(kk))delete series[kk];      // 清除周末键,避免同一交易日重复计数
+      if(seriesIn){for(var k2 in seriesIn){if(!isWeekendKey(k2)&&seriesIn[k2]!=null&&!isNaN(seriesIn[k2]))series[k2]=seriesIn[k2];}}
+      else if(ff.d1!=null&&!isNaN(ff.d1)&&!isWeekendKey(today))series[today]=ff.d1;
       var days=Object.keys(series).filter(function(k){return series[k]!=null&&!isNaN(series[k]);}).sort();
       var keep=days.slice(-6),trimmed={};
       for(var i=0;i<keep.length;i++)trimmed[keep[i]]=series[keep[i]];
@@ -6562,7 +6565,9 @@ async function fetchStockFundFlowF(code){
         var vals=kl.map(function(line){return parseFloat((line.split(',')[1])||0)||0;});
         function sum(k){return vals.slice(-k).reduce(function(a,b){return a+b;},0);}
         var ff={d1:yi(sum(1)),d3:yi(sum(3)),d5:yi(sum(5))};
-        return writeCache(ff,'eastmoney-push2his')||ff;
+        var seriesIn={};
+        for(var si=Math.max(0,kl.length-6);si<kl.length;si++){var sp=kl[si].split(',');seriesIn[sp[0]]=yi(parseFloat(sp[1])||0);}
+        return writeCache(ff,'eastmoney-push2his',seriesIn)||ff;
       }
     }catch(e){/* 重试 */}
   }
@@ -6573,9 +6578,11 @@ async function fetchStockFundFlowF(code){
     var j2=await res2.json();
     var kl2=(j2&&j2.data&&j2.data.klines)||[];
     if(kl2.length){
-      var d1=yi(parseFloat((kl2[kl2.length-1].split(',')[1])||0)||0);
+      var lastLine=kl2[kl2.length-1].split(',');
+      var d1=yi(parseFloat(lastLine[1]||0)||0);
       var ff2={d1:d1,d3:null,d5:null};
-      return writeCache(ff2,'eastmoney-push2')||ff2;
+      var seriesIn2={};seriesIn2[lastLine[0]]=d1;
+      return writeCache(ff2,'eastmoney-push2',seriesIn2)||ff2;
     }
   }catch(e){/* 降级2:云端 fflow_cache.json */}
   // 降级2:读云端 fflow_cache.json(国内手机IP 跨域拉 Pages,GitHub Actions 即使完全封禁也能取到)
