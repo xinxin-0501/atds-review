@@ -150,7 +150,11 @@ async function fetchZB(dateArg) {
 
 async function fetchBreadth() {
   // 东财沪深指数上涨/下跌/平盘家数(f104/f105/f106)。v11.15:改走 emFetchJson 多主机轮换
-  const url = 'https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f1,f2,f3,f104,f105,f106&secids=1.000001,0.399001,0.399006';
+  // v11.53 修复(重要):原 secids 含【创业板指 0.399006】—— 而创业板是深市的子集,
+  //   三者相加会把创业板家数重复计入。实测(2026-09-14):沪1330+深1644+创业板884=3858,
+  //   而 沪+深=2974;差值 1405 恰等于创业板家数(884+487+34) ⇒ 确认重复计算,合计 6689 也远超 A 股总数(约 5400)。
+  //   现只保留 沪(1.000001)+深(0.399001),合计 5284,与沪深 A 股总数吻合。口径:【沪深合计,不含北交所】。
+  const url = 'https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f1,f2,f3,f104,f105,f106&secids=1.000001,0.399001';
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const j = await emFetchJson(url, { 'User-Agent': 'Mozilla/5.0' }, 10000);

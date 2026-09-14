@@ -58,6 +58,25 @@ function renderHeader(report, nav) {
 }
 
 
+// v11.53:晚采提示。本地定时任务(11:35/16:20 等)会延迟触发,且无条件覆盖对应槽位的 json ——
+//   实测 2026-09-09~09-14 的「盘中快照」标称 11:35,实际 generatedAt 为 15:27~19:00(均收盘后),
+//   内容与当日收盘页完全相同。标头只写「数据时间」仍会被读成"11:35 就是这样",故当生成时刻
+//   落在该槽位应有区间之外时,显式声明"补采、非原始时点"。(不改数据,只改呈现;数据本身经独立源核对为真)
+function lateCaptureNote(m) {
+  const t = String((m && m.type) || '');
+  const genHM = (String((m && m.generatedAt) || '').match(/(\d{2}:\d{2})/) || [])[1] || '';
+  if (!genHM) return '';
+  const SPEC = {
+    midday:    { from: '09:25', to: '14:59', kind: '收盘后补采', slot: '11:35 盘中快照' },
+    premarket: { from: '08:30', to: '10:00', kind: '盘后补采',   slot: '09:45 盘前简报' },
+    close:     { from: '15:00', to: '18:30', kind: '延迟补采',   slot: '16:20 收盘快照' },
+  };
+  const s = SPEC[t];
+  if (!s) return '';
+  if (genHM >= s.from && genHM <= s.to) return '';
+  return '<div class="hero-warn">⚠️ ' + s.kind + '（实际数据时点 ' + genHM + '），非当日 ' + s.slot + '</div>';
+}
+
 function renderHero(report) {
   const m = report && report.meta || {};
   const ce = report && report.closeEmotion || {};
@@ -88,6 +107,7 @@ function renderHero(report) {
     '<div class="hero-eyebrow">A 股每日复盘 · ' + (esc(m.typeLabel || '')) + dataTimeHtml + '</div>' +
     '<h1 class="hero-title">' + (esc(m.date || '')) + ' · ' + timeHtml + '</h1>' +
     '<div class="hero-sub">' + desc + '</div>' +
+    lateCaptureNote(m) +
     '<div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div>' +
     (tempTag ? '<div class="hero-tags">' + tempTag + '</div>' : '') +
   '</div>';
@@ -133,8 +153,8 @@ function renderMarketStats(report) {
   return `<div class="card">
     <div class="card-title">市场概览</div>
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num up">${s.upCount ?? '--'}</div><div class="stat-label">上涨家数</div></div>
-      <div class="stat-card"><div class="stat-num down">${s.downCount ?? '--'}</div><div class="stat-label">下跌家数</div></div>
+      <div class="stat-card"><div class="stat-num up">${s.upCount ?? '--'}</div><div class="stat-label">上涨家数(沪深)</div></div>
+      <div class="stat-card"><div class="stat-num down">${s.downCount ?? '--'}</div><div class="stat-label">下跌家数(沪深)</div></div>
       <div class="stat-card"><div class="stat-num">${s.limitUpCount ?? '--'}</div><div class="stat-label">涨停家数</div></div>
       <div class="stat-card"><div class="stat-num down">${s.limitDownCount ?? '--'}</div><div class="stat-label">跌停家数</div></div>
       <div class="stat-card"><div class="stat-num">${s.zhaBanCount ?? '--'}</div><div class="stat-label">炸板家数</div></div>
@@ -329,6 +349,9 @@ function renderCloseEmotion(report) {
   '<div class="ce-breadth-meta">' +
     '<span>红盘率 <b>' + (ce.redRate || '--') + '%</b></span>' +
     '<span>成交额 <b>' + esc(report.marketStats && report.marketStats.totalAmount || '--') + '</b> (沪深合计)</span>' +
+    // v11.53:标注家数口径。原先 breadth 误把创业板(深市子集)重复计入 → 上涨家数虚高(3858 实为 2974);
+    //        修采集口径后此处显式说明,避免用户把"涨+跌+平=5284"与"全市场家数"混淆。
+    '<span>家数口径 <b>沪深</b>(不含北交所)</span>' +
   '</div>';
   const idxRows = indices.map(idx => {
     const cls = upDownClass(idx.changePct);
@@ -1038,7 +1061,7 @@ function renderDataAnalysis(report) {
   const m1 = `<div class="da-block">
     <div class="da-h">第一步 · 市场定调</div>
     <div class="da-line">指数：${esc(idxLine || '--')}</div>
-    <div class="da-line">涨跌家数：涨 ${ms.upCount} / 跌 ${ms.downCount} / 平 ${ms.flatCount}（红盘率 ${ratio}%）</div>
+    <div class="da-line">涨跌家数(沪深)：涨 ${ms.upCount} / 跌 ${ms.downCount} / 平 ${ms.flatCount}（红盘率 ${ratio}%）</div>
     <div class="da-line">涨停 ${ms.limitUpCount} 家 · 炸板 ${ms.zhaBanCount} 家 · 最高连板 ${ms.maxLianBan} 板（${esc(ms.maxLianBanStock || '--')}）</div>
     <div class="da-src">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score">准确性 9/10</span></div>
   </div>`;
