@@ -2093,6 +2093,18 @@ function waveScore(klines) {
   let minVol5 = Infinity;
   for (let i = n - 5; i < n; i++) if (vols[i] < minVol5) minVol5 = vols[i];
   const volTrap = avgWave > 0 ? minVol5 / avgWave : 1;
+  // 6b) 出五日量(战法⑤"止跌或量窒息,三线开花,出五日量") v11.49
+  //     含义:洗盘结束后【放量确认启动】—— 当日成交量突破前 5 日均量。
+  //     ⚠️ 盘中扫描时当日量是【未完成量】,直接比较会系统性偏低 ⇒ 必须按已交易时间进度折算(tradeProgress 已存在)。
+  let volBreak5 = false, volProj = null;
+  {
+    let s5 = 0, c5 = 0;
+    for (let i = Math.max(0, n - 6); i < n - 1; i++) { s5 += vols[i]; c5++; }
+    const avg5 = c5 ? s5 / c5 : 0;
+    const prog = tradeProgress();
+    volProj = avg5 > 0 && prog > 0 ? (vols[n - 1] / prog) / avg5 : null;
+    volBreak5 = volProj != null && volProj > 1.0;
+  }
   // 7) 止跌:最近2日收阳或未创新低
   const stabilize = (closes[n - 1] >= closes[n - 2]) || (lows[n - 1] > lows[n - 2]);
   // 8) 三线开花
@@ -2121,6 +2133,7 @@ function waveScore(klines) {
   else if (kdjGold) score += 12;
   else if (kdjDivergence) score += 8;
   // 5) 支撑/止跌/均线
+  if (volBreak5) score += 10;   // v11.49:战法⑤「出五日量」—— 必须位于 let score 之后(否则 TDZ 报错)
   // v11.48:战法④「同价位 KDJ 背离，出现金叉」是本模块【命名来源】与核心条件(《Rain班长整理的波背离》"2.波背离应用条件④"),
   //         原先只是加分项(+24/12/8) ⇒ 实测 Top20 中仅 30% 同时满足,其余 70% 名不副实。现改为硬条件。
   if (!(kdjGold && kdjDivergence)) return null;
@@ -2140,6 +2153,7 @@ function waveScore(klines) {
     adjDays,
     volRatio: Math.round(volRatio * 100) / 100,
     volTrap: Math.round(volTrap * 100) / 100,
+    volBreak5, volProj: volProj != null ? Math.round(volProj * 100) / 100 : null,   // v11.49 出五日量
     kdjGold, kdjDivergence, maAlign, notBreakSupport, stabilize,
     // v11.48:调整形态分类(题材/套利的标注由调用方 scanWaveDivergence 追加 —— themeHit 在那一层才判定)
     signalType: adjPct >= -0.05 ? '横盘强调整' : '回调弱调整',
@@ -2148,7 +2162,11 @@ function waveScore(klines) {
   };
 }
 
-async function scanWaveDivergence(themeCodes) {
+// v11.49:新增 identSet —— 来自 mainRank(板块强度榜)的【板块龙头】代码集合。
+// 战法《Rain班长整理的波背离》反复以"辨识度个股"为前提(案例:悦心健康=辅助生殖龙头 / 金种子酒=白酒板块辨识股),
+// 故用"该股是否为某板块的领涨龙头"作为识别度的可操作口径(比板块成分映射更可靠、无新增数据依赖)。
+async function scanWaveDivergence(themeCodes, identSet) {
+  const ident = identSet || { leaders: new Set(), mainLines: new Set() };
   // themeCodes: 当日强势股/超短核心命中代码集合(题材辨识交叉加分,默认空)
   // 读取全 A 列表(已剔除 ST/北交所)
   let symbols = [];
@@ -2209,8 +2227,19 @@ async function scanWaveDivergence(themeCodes) {
     const c = String(r.code || '').replace(/^(sh|sz|bj)/, '');
     if (themeSet.has(c)) { r.themeHit = true; r.score += 12; }
     else r.themeHit = false;
-    // v11.48:战法⑥"配合题材启动(最佳,否则为套利)"→ 显式标注(题材分已在上一行计入)
-    r.signalType = (r.signalType || '') + (r.themeHit ? '·题材共振' : '·套利');
+    // v11.49:辨识度(战法②"强势辨识度个股") —— 主板龙头 > 板块龙头 > 非辨识度;作为加分项(与战法一致,不设为硬门槛)
+    const isMainLine = ident.mainLines.has(c);
+    const isLead = ident.leaders.has(c);
+    r.ident = isMainLine ? '主线龙头' : (isLead ? '板块龙头' : '非辨识度');
+    if (isMainLine) r.score += 10; else if (isLead) r.score += 6;
+    // v11.49:战法三类划分(战法原文:"波背离主要分为三种:1.辨识度个股强势调整(横盘调整) 2.辨识度个股弱势调整(回调) 3.非辨识度个股强势调整(横盘调整)")
+    const strong = (r.adjPct >= -5);   // 调整幅度 ≤5% 视为"强势调整(横盘)",否则"弱势调整(回调)"
+    const shapeTxt = strong ? '横盘调整' : '回调调整';
+    r.waveType = isLead
+      ? ('类型' + (strong ? 1 : 2) + '·辨识度·' + shapeTxt)
+      : (strong ? '类型3·非辨识度·横盘调整' : '非辨识度·回调调整(战法未单列)');
+    // v11.48/11.49:战法⑥"配合题材启动(最佳,否则为套利)"→ 显式标注
+    r.signalType = r.waveType + (r.themeHit ? '·题材共振' : '·套利');
   }
   results.sort((a, b) => b.score - a.score);
   const list = results.slice(0, 20).map((x, i) => ({
@@ -2226,6 +2255,8 @@ async function scanWaveDivergence(themeCodes) {
     volRatio: x.volRatio, volTrap: x.volTrap,
     kdjGold: x.kdjGold, kdjDivergence: x.kdjDivergence, maAlign: x.maAlign,
     themeHit: !!x.themeHit,
+    ident: x.ident || '', waveType: x.waveType || '',                  // v11.49:辨识度(板块龙头)与战法三类划分
+    volBreak5: !!x.volBreak5, volProj: x.volProj != null ? x.volProj : null,   // v11.49:出五日量(盘中折算)
     signalType: x.signalType, prevHigh: x.prevHigh, support: x.support
   }));
   return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
@@ -2970,7 +3001,16 @@ async function main() {
     for (const s of (shortCore && shortCore.list) || []) themeCodes.add(String(s.code));
     for (const s of (strongStock && strongStock.list) || []) themeCodes.add(String(s.code));
     console.log('开始波背离全市场扫描(午盘,题材交叉集 '+themeCodes.size+' 个)...');
-    waveDivergence = await scanWaveDivergence(themeCodes);
+    // v11.49:从 mainRank(板块强度榜)提取板块龙头 → 作为"辨识度"的可操作口径
+    const identSet = { leaders: new Set(), mainLines: new Set() };
+    for (const sec of mainRank) {
+      const lc = String((sec && sec.leadCode) || '').trim();
+      if (!lc) continue;
+      identSet.leaders.add(lc);
+      if ((sec.rank || 99) <= 10) identSet.mainLines.add(lc);   // 前10强板块的龙头 = 主线龙头
+    }
+    console.log('辨识度集合: 板块龙头', identSet.leaders.size, '只 / 其中主线龙头', identSet.mainLines.size, '只');
+    waveDivergence = await scanWaveDivergence(themeCodes, identSet);
     console.log('波背离扫描完成:', waveDivergence ? waveDivergence.list.length : 0, '只');
   }
 
