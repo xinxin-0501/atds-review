@@ -2005,7 +2005,8 @@ async function fetchAllMarket() {
   // 统一字段为 f12/f14/f3/f8/f20/f6,兼容 scanMarketPatterns
   const norm = cands.map(x => ({
     f12: x.code, f14: x.name, f3: Number(x.pct) || 0,
-    f8: Number(x.pct) > 3 ? 2 : 1.2, f20: Number(x.turnover) || 0,
+    turn: Number(x.turnover) || 0,   // v11.43:真实换手率(原 f8 = pct>3?2:1.2 是"造"出来的常量,被展示成"量比2.0"属伪数据)
+    f20: Number(x.turnover) || 0,
     f6: Number(x.amountWan) * 10000 || 0
   }));
   return { total: all.length, candidates: norm };
@@ -2207,7 +2208,7 @@ async function scanWaveDivergence(themeCodes) {
     pct: x.pct,
     amount: fmtAmount(x.amountWan),
     turnover: x.turnover,
-    score: x.score,
+    score: Math.min(100, Math.round(x.score)),
     waveGain: x.waveGain, adjPct: x.adjPct, adjDays: x.adjDays,
     volRatio: x.volRatio, volTrap: x.volTrap,
     kdjGold: x.kdjGold, kdjDivergence: x.kdjDivergence, maAlign: x.maAlign,
@@ -2336,7 +2337,7 @@ async function scanShortCore() {
     pct: x.pct,
     amount: fmtAmount(x.amountWan),
     turnover: x.turnover,
-    score: x.score,
+    score: Math.min(100, Math.round(x.score)),
     ztCount: x.ztCount, lianban: x.lianban, volRatio: x.volRatio,
     maAlign: x.maAlign, newHigh: x.newHigh, gain20: x.gain20,
     signalType: x.lianban >= 2 ? (x.lianban + '连板') : (x.ztCount >= 2 ? '多涨停' : '强势涨停')
@@ -2516,7 +2517,7 @@ async function scanStrongStock() {
     pct: x.pct,
     amount: fmtAmount(x.amountWan),
     turnover: x.turnover,
-    score: x.score,
+    score: Math.min(100, Math.round(x.score)),
     gapFound: x.gapFound, gapDays: x.gapDays, ztCount: x.ztCount,
     wave2: x.wave2, adjDays: x.adjDays, adjRatio: x.adjRatio,
     kdjGold: x.kdjGold, breakout: x.breakout, volRatio: x.volRatio, maAlign: x.maAlign,
@@ -2568,7 +2569,7 @@ async function scanMarketPatterns(ztPool) {
   try { mkt = await fetchAllMarket(); } catch (e) { mkt = null; }
   let cands = (mkt && mkt.candidates) || [];
   if (!cands.length && Array.isArray(ztPool) && ztPool.length) {
-    cands = ztPool.map(s => ({ f12: s.code, f14: s.name, f3: s.pct, f8: s.pct > 3 ? 2 : 1.2, f20: s.pct > 3 ? 5 : 2, f6: (s.sealWan || 0) * 10000 }));
+    cands = ztPool.map(s => ({ f12: s.code, f14: s.name, f3: s.pct, turn: null, f20: s.pct > 3 ? 5 : 2, f6: (s.sealWan || 0) * 10000 }));   // v11.43:降级路径无换手率,置 null 不编造
     source = '降级:当日涨停池';
   }
   const picks = [];
@@ -2591,7 +2592,7 @@ async function scanMarketPatterns(ztPool) {
       picks.push({
         code, name: s.f14 || code, pct: Math.round((Number(s.f3) || 0) * 100) / 100,
         patterns: det.patterns, score,
-        reason: det.patterns.join('+') + '·量比' + (Number(s.f8) || 1).toFixed(1) + '·5日涨' + det.pct5.toFixed(1) + '%'
+        reason: det.patterns.join('+') + (s.turn != null ? ('·换手' + Number(s.turn).toFixed(1) + '%') : '') + '·5日涨' + det.pct5.toFixed(1) + '%'
       });
     } catch (e) { /* skip */ }
   }

@@ -847,40 +847,81 @@ function renderBehaviorReviewEntry() {
   </div>`;
 }
 
+// v11.43 闸门统一判定
+// 背景:① 阈值 29650 亿是"全天口径"的极端天量,却与"盘中累计值"比较 → 盘中结构性永远红,结论误导;
+//          ② 页面规则写"连续 2 日达标",而旧代码只判当日 → 规则与实现不一致。
+// 处置:盘中不判定(中性显示,标注待收盘确认);收盘按"当日 + 上一交易日"双日判定;取不到上一交易日则降级为仅当日并如实标注。
+function prevCloseAmount(curDate) {
+  try {
+    const dir = path.join(ROOT, 'data', 'reviews');
+    const days = fs.readdirSync(dir)
+      .filter(f => /^\d{4}-\d{2}-\d{2}_16-20\.json$/.test(f))
+      .map(f => f.slice(0, 10))
+      .filter(d => d < curDate)
+      .sort();
+    if (!days.length) return null;
+    const last = days[days.length - 1];
+    const j = JSON.parse(fs.readFileSync(path.join(dir, last + '_16-20.json'), 'utf8'));
+    const v = Number((j.marketStats || {}).totalAmount);
+    return isFinite(v) && v > 0 ? { date: last, amount: v } : null;
+  } catch (e) { return null; }
+}
+const GATE_TA = 29650, GATE_NH = 100;
+function gateState(report) {
+  const m = (report && report.meta) || {};
+  const g = (report && report.regimeGate) || {};
+  const ta = Number(g.totalAmount) || 0, nh = Number(g.newHighCount) || 0;
+  const isMid = m.type === 'midday';
+  const prev = isMid ? null : prevCloseAmount(m.date);
+  const taOk = ta >= GATE_TA, nhOk = nh >= GATE_NH;
+  const contOk = prev ? (prev.amount >= GATE_TA && taOk) : null;      // null = 前一日数据缺失
+  const amountOk = contOk === null ? taOk : contOk;
+  return { ta, nh, isMid, prev, taOk, nhOk, contOk, amountOk, open: !isMid && amountOk && nhOk };
+}
+
 function renderRegimeGate(report) {
   const gate = report.regimeGate || {};
-  const ta = gate.totalAmount || 0;
-  const nh = gate.newHighCount || 0;
   const totalZ = gate.totalZhengZhang || 0;
-  const taOk = ta >= 29650;
-  const nhOk = nh >= 100;
-  const gateOpen = taOk && nhOk;
-  const taPct = ta ? ((29650 - ta) / 29650 * 100).toFixed(1) : '--';
-  const nhPct = nh ? ((100 - nh) / 100 * 100).toFixed(0) : '--';
-  const taDiff = ta ? (ta - 29650).toFixed(0) : '--';
-  const nhDiff = nh - 100;
-  const status = gateOpen ? 'OPEN' : 'CLOSE';
-  const cls = gateOpen ? 'gate-open' : 'gate-close';
+  const S = gateState(report);
+  const ta = S.ta, nh = S.nh, isMid = S.isMid, taOk = S.taOk, nhOk = S.nhOk, gateOpen = S.open;
+  // 盘中:①②不做达标判定(口径不可比),用中性色;收盘:按实际达标着色
+  const taCls = isMid ? 'neu' : (taOk ? 'ok' : 'red');
+  const nhCls = isMid ? 'neu' : (nhOk ? 'ok' : 'red');
+  const taPct = ta ? ((GATE_TA - ta) / GATE_TA * 100).toFixed(1) : '--';
+  const nhPct = nh ? ((GATE_NH - nh) / GATE_NH * 100).toFixed(0) : '--';
+  const taDiff = ta ? (ta - GATE_TA).toFixed(0) : '--';
+  const nhDiff = nh - GATE_NH;
+  const status = isMid ? 'PENDING' : (gateOpen ? 'OPEN' : 'CLOSE');
+  const cls = isMid ? 'gate-pending' : (gateOpen ? 'gate-open' : 'gate-close');
+  const statusTxt = isMid
+    ? '⏳ 盘中不判定 · 待收盘确认（①为全天口径阈值，盘中累计值不可直接比较）'
+    : (gateOpen ? '✓ 绿 放行 · 允许开新仓' : '✗ 红 禁开 · 仅允许执行预检埋伏名单(估值+硬止损+仓位上限已定)');
+  const taDiffHtml = !ta ? '数据获取中'
+    : isMid ? ('盘中累计 ' + ta.toFixed(0) + ' 亿 · 占阈值 ' + (ta / GATE_TA * 100).toFixed(1) + '%，待收盘确认')
+      : (S.amountOk ? '✓ 双日达标 · 超 ' + taDiff + ' 亿' : '✗ 差 ' + (GATE_TA - ta).toFixed(0) + ' 亿 (' + taPct + '%)');
+  const contHint = isMid ? ''
+    : S.prev ? ('连续 2 日：前一交易日 ' + S.prev.amount.toFixed(0) + ' 亿（' + S.prev.date + '）' + (S.prev.amount >= GATE_TA ? ' ✓ 达标' : ' ✗ 未达标'))
+      : '连续 2 日：前一交易日数据缺失，本次仅按当日判定';
   return `<div class="card gate-card">
     <div class="card-title">反转闸门 · 温故知「加锁权」</div>
-    <div class="gate-note">核心规则:① AND ② 同时满足 → 闸门开(允许新仓);任一项未达标 → 闸门红(禁开新仓,埋伏名单豁免)</div>
+    <div class="gate-note">核心规则:① AND ② 同时满足 → 闸门开(允许新仓);任一项未达标 → 闸门红(禁开新仓,埋伏名单豁免)。<br><span class="gate-when">判定时点：盘中不判定（①按全天口径）· 收盘后确认</span></div>
     <div class="gate-grid">
       <div class="gate-block">
         <div class="gate-h">① 成交额(沪深合计)</div>
-        <div class="gate-value ${taOk ? 'ok' : 'red'}">${ta ? ta.toFixed(0) + ' 亿' : '--'}</div>
-        <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标</div>
-        <div class="gate-diff ${taOk ? 'ok' : 'red'}">${ta ? (taOk ? '✓ 超过 ' + taDiff + ' 亿' : '✗ 差 ' + (29650 - ta).toFixed(0) + ' 亿 (' + taPct + '%)') : '数据获取中'}</div>
+        <div class="gate-value ${taCls}">${ta ? ta.toFixed(0) + ' 亿' : '--'}</div>
+        <div class="gate-th">阈值 ≥ 29650 亿 · 连续 2 日达标${contHint ? ' · ' + contHint : ''}</div>
+        <div class="gate-diff ${isMid ? 'neu' : (S.amountOk ? 'ok' : 'red')}">${taDiffHtml}</div>
       </div>
       <div class="gate-block gate-click" onclick="openRegimeNHList()">
         <div class="gate-h">② 60日新高个股数 <span class="gate-link">📋 点击查看</span></div>
-        <div class="gate-value ${nhOk ? 'ok' : 'red'}">${nh} 只</div>
+        <div class="gate-value ${nhCls}">${nh} 只</div>
         <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
-        <div class="gate-diff ${nhOk ? 'ok' : 'red'}">${nh ? (nhOk ? '✓ 超过 ' + nhDiff + ' 只' : '✗ 差 ' + (-nhDiff) + ' 只 (' + nhPct + '%)') : '--'}</div>
+        <div class="gate-diff ${nhCls}">${nh ? (nhOk ? '✓ 超过 ' + nhDiff + ' 只' : '✗ 差 ' + (-nhDiff) + ' 只 (' + nhPct + '%)') : '--'}</div>
       </div>
     </div>
     <div class="gate-status ${cls}">
       <span class="gate-status-label">闸门状态：</span>
-      <span class="gate-status-text">${status === 'OPEN' ? '✓ 绿 放行 · 允许开新仓' : '✗ 红 禁开 · 仅允许执行预检埋伏名单(估值+硬止损+仓位上限已定)'}</span>
+      <span class="gate-status-text">${statusTxt}</span>
     </div>
     <div class="gate-src">数据源:①成交额(东财沪深接口/降级时显示--)/ ②60日新高(东财涨停池代理,基于1板+涨幅≥5%数量 = ${nh}只/总涨停${totalZ}只,真实接口数据更准)
       <span class="da-score">准确性 6/10(代理指标)</span>
@@ -933,8 +974,9 @@ function renderRegimeNHModal(report) {
 function renderMarketScan(report) {
   const ms = report.marketScan || {};
   const picks = ms.picks || [];
-  const gate = report.regimeGate || {};
-  const gateOpen = (gate.totalAmount || 0) >= 29650 && (gate.newHighCount || 0) >= 100;
+  // v11.43:复用统一判定(盘中不判定,避免把全天口径阈值当盘中结论)
+  const _gs = gateState(report);
+  const gateOpen = _gs.open;
   const rows = picks.map((p, i) => `
     <div class="ms-row">
       <span class="ms-rank">${i + 1}</span>
