@@ -1889,7 +1889,7 @@ function renderWaveDivergence(report) {
   const card = `<div class="card wave-card">
     <div class="wave-header">
       <div class="wave-title">🌊 波背离选股 TOP20</div>
-      <div class="wave-sub">前期强势一波 → 缩量调整 → KDJ背离金叉 · 盘中扫描全A剔除ST</div>
+      <div class="wave-sub">前期强势一波 → 缩量调整 → <b>同价位 KDJ 背离+金叉</b> → 不破大阳支撑 · 盘中扫描全A剔除ST<br><span class="ss-note">按战法硬条件筛选：<b>必须同时满足</b>「KDJ 背离+金叉」与「不破大阳线支撑」；量窒息、题材共振参与评分（无题材为套利）</span></div>
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(w.source || '全A扫描')}</span>

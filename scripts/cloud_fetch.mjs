@@ -2121,9 +2121,17 @@ function waveScore(klines) {
   else if (kdjGold) score += 12;
   else if (kdjDivergence) score += 8;
   // 5) 支撑/止跌/均线
+  // v11.48:战法④「同价位 KDJ 背离，出现金叉」是本模块【命名来源】与核心条件(《Rain班长整理的波背离》"2.波背离应用条件④"),
+  //         原先只是加分项(+24/12/8) ⇒ 实测 Top20 中仅 30% 同时满足,其余 70% 名不副实。现改为硬条件。
+  if (!(kdjGold && kdjDivergence)) return null;
   if (notBreakSupport) score += 8;
   if (stabilize) score += 4;
   if (maAlign) score += 6;
+  // v11.48:战法③「不破大阳线支撑」—— 战法原话"否则就为弱",故同为硬条件。
+  //         (原先仅 +8 分,导致已跌破大阳支撑的标的也能入榜)
+  if (!notBreakSupport) return null;
+  // v11.48:战法⑤「量窒息」与⑥「配合题材启动(最佳,否则为套利)」—— 这两项此前【算了字段但未进评分】,现纳入。
+  if (volTrap <= 0.5) score += 10; else if (volTrap <= 0.7) score += 6;   // 量窒息(近5日最低量/上涨段均量)
   if (score < 55) return null;
   return {
     score,
@@ -2133,6 +2141,7 @@ function waveScore(klines) {
     volRatio: Math.round(volRatio * 100) / 100,
     volTrap: Math.round(volTrap * 100) / 100,
     kdjGold, kdjDivergence, maAlign, notBreakSupport, stabilize,
+    // v11.48:调整形态分类(题材/套利的标注由调用方 scanWaveDivergence 追加 —— themeHit 在那一层才判定)
     signalType: adjPct >= -0.05 ? '横盘强调整' : '回调弱调整',
     prevHigh: closes[peakIdx],
     support: Math.round(support * 100) / 100
@@ -2200,6 +2209,8 @@ async function scanWaveDivergence(themeCodes) {
     const c = String(r.code || '').replace(/^(sh|sz|bj)/, '');
     if (themeSet.has(c)) { r.themeHit = true; r.score += 12; }
     else r.themeHit = false;
+    // v11.48:战法⑥"配合题材启动(最佳,否则为套利)"→ 显式标注(题材分已在上一行计入)
+    r.signalType = (r.signalType || '') + (r.themeHit ? '·题材共振' : '·套利');
   }
   results.sort((a, b) => b.score - a.score);
   const list = results.slice(0, 20).map((x, i) => ({
