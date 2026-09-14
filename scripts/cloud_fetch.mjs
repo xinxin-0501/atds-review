@@ -2264,7 +2264,8 @@ async function scanWaveDivergence(themeCodes, identSet) {
 
 /* ==================== 超短核心选股(基于超短核心战法: 确定开什么仓) ==================== */
 // klines: [[date, open, close, high, low, vol], ...], quote: 腾讯行情 {pct, turnover, amountWan}
-function shortCoreScore(klines, quote) {
+function shortCoreScore(klines, quote, ctx) {
+  const C = ctx || {};
   if (!Array.isArray(klines) || klines.length < 40) return null;
   const closes = klines.map(k => parseFloat(k[2])).filter(n => !isNaN(n));
   const vols = klines.map(k => parseFloat(k[5]) || 0);
@@ -2310,16 +2311,32 @@ function shortCoreScore(klines, quote) {
   if (maAlign) score += 10;
   if (newHigh) score += 10;
   if (gain20 >= 15) score += 10;
+  // v11.50:战法维度(三份《超短核心》文档的核心)"竞价最强 / 封单最强 / 叠加板块"
+  if (C.openPct != null) {                                  // 竞价强度:开盘涨幅(竞价最强)
+    if (C.openPct >= 5) score += 15; else if (C.openPct >= 3) score += 12;
+    else if (C.openPct >= 1) score += 6; else if (C.openPct < 0) score -= 5;   // 低开=竞价弱,扣分
+  }
+  if (C.sealYi != null) {                                   // 封单额:战法"通过封单,确定谁最强"
+    if (C.sealYi >= 10) score += 15; else if (C.sealYi >= 5) score += 10;
+    else if (C.sealYi >= 2) score += 5;
+  }
+  if (C.mainLine) score += 12; else if (C.ident) score += 8; // 战法"个股叠加板块是加分项"
   // 超短核心必须有涨停基因/连板(强势属性),否则不算核心
   if (ztCount === 0 && lianban === 0) return null;
   return {
     score, ztCount, lianban, volRatio: Math.round(volRatio * 100) / 100,
     maAlign, newHigh, gain20: Math.round(gain20 * 10) / 10,
-    turnover, pct
+    turnover, pct,
+    openPct: C.openPct != null ? Math.round(C.openPct * 100) / 100 : null,   // v11.50
+    sealYi: C.sealYi != null ? C.sealYi : null,
+    ident: C.ident || ''
   };
 }
 
-async function scanShortCore() {
+// v11.50:超短核心补入战法维度 —— 《超短核心1/2》要求"竞价最强(隔夜单/竞价涨幅)、封单最强(通过封单确定谁最强)、
+//         个股叠加板块是加分项"。其中【隔夜单(9:15-9:25 委托)】与【竞价换手】无可用接口,当前不可得(已在界面注明);
+//         可得的三个维度:①开盘竞价涨幅(open/prevClose) ②封单额(涨停池 sealWan) ③板块龙头(mainRank 领涨股)
+async function scanShortCore(ztList, identSet) {
   // 读取全 A 列表(已剔除 ST/北交所)
   let symbols = [];
   try {
@@ -2343,8 +2360,18 @@ async function scanShortCore() {
     const pct = Number(x.pct) || 0;
     const turn = Number(x.turnover) || 0;
     const amt = Number(x.amountWan) || 0;
-    return pct > -3 && pct < 9.8 && turn >= 0.8 && turn <= 40 && amt >= 8000;
+    // v11.50:原条件 pct<9.8 会把【涨停股全部排除】⇒ 实测入榜 20 只里连板最多只有 1,
+    //        与战法《超短核心》"做最强的/做不到最强的做第二强的套利"直接冲突。改为允许涨停(上限 20.5% 兼容 20cm 板)。
+    return pct > -3 && pct <= 20.5 && turn >= 0.8 && turn <= 40 && amt >= 8000;
   });
+  // v11.50:构建战法维度上下文
+  const sealMap = new Map();                       // 封单额(亿元):涨停池 sealWan 单位万元
+  for (const it of (ztList || [])) {
+    const c = String((it && it.code) || '').trim();
+    if (!c) continue;
+    sealMap.set(c, Math.round(((Number(it.sealWan) || 0) / 10000) * 100) / 100);
+  }
+  const ident2 = identSet || { leaders: new Set(), mainLines: new Set() };
   // 2) 并发拉 K 线(60日)扫描超短核心
   const results = [];
   const CONC = 16;
@@ -2363,7 +2390,18 @@ async function scanShortCore() {
       try {
         const kl = await fetchKline(fullCode(x.code), 60);
         if (!kl || kl.length < 40) return null;
-        const sc = shortCoreScore(kl, x);
+        // v11.50:先把战法维度算好再传入(避免在 shortCoreScore 内跨作用域引用)
+        const rawCode = String(x.code || '');
+        const openPct = (Number(x.prevClose) > 0 && Number(x.open) > 0) ? (Number(x.open) / Number(x.prevClose) - 1) * 100 : null;
+        const isMainLine = ident2.mainLines.has(rawCode);
+        const isLead = ident2.leaders.has(rawCode);
+        const ctx = {
+          openPct,
+          sealYi: sealMap.has(rawCode) ? sealMap.get(rawCode) : null,
+          ident: isMainLine ? '主线龙头' : (isLead ? '板块龙头' : ''),
+          mainLine: isMainLine
+        };
+        const sc = shortCoreScore(kl, x, ctx);
         if (!sc || sc.score < 55) return null;
         return { ...x, ...sc };
       } catch (e) { return null; }
@@ -2579,7 +2617,9 @@ async function scanStrongStock() {
     const pct = Number(x.pct) || 0;
     const turn = Number(x.turnover) || 0;
     const amt = Number(x.amountWan) || 0;
-    return pct > -4 && pct < 9.8 && turn >= 0.5 && turn <= 40 && amt >= 8000;
+    // v11.50:同 scanShortCore —— 原 pct<9.8 排除涨停股,但强势股的【黄金坑=首板涨停】【突破新高】都可能在涨停日成立,
+  //         且 ztCount(近20日涨停次数)不应因当日涨停而漏计。放开上限至 20.5%(兼容20cm板)。
+  return pct > -4 && pct <= 20.5 && turn >= 0.5 && turn <= 40 && amt >= 8000;
   });
   const results = [];
   const CONC = 16;
@@ -2622,6 +2662,7 @@ async function scanStrongStock() {
     ztCount: x.ztCount,
     wave2: x.wave2, adjDays: x.adjDays, adjRatio: x.adjRatio,
     kdjGold: x.kdjGold, breakout: x.breakout, volRatio: x.volRatio, maAlign: x.maAlign,
+    openPct: x.openPct, sealYi: x.sealYi, ident: x.ident,     // v11.50:竞价强度/封单额/板块辨识度
     signalType: x.signalType
   }));
   return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
@@ -2687,8 +2728,11 @@ async function scanMarketPatterns(ztPool) {
       klineOk++;
       const det = detectPatterns(arr);
       if (!det || !det.patterns.length) continue;
+      // v11.50 修复:v11.46 已把伪量比字段 f8 改为真实换手率字段 turn,但此处评分仍在读 s.f8
+      //          → Number(undefined)||0 = 0,换手率项【恒为 0】(原先伪值 f8=2/1.2 时该项恒为 6/3.6,同样是虚设)。
+      //          现改用真实换手率,设 10% 上限(与候选池 1.5~20% 的筛选口径匹配),避免高换手垃圾股主导。
       const score = Math.min(100, Math.round(
-        Math.min(det.pct5, 12) * 3 + (Number(s.f8) || 0) * 3 + Math.min(det.patterns.length * 8, 24)
+        Math.min(det.pct5, 12) * 3 + Math.min(Number(s.turn) || 0, 10) * 3 + Math.min(det.patterns.length * 8, 24)
       ));
       picks.push({
         code, name: s.f14 || code, pct: Math.round((Number(s.f3) || 0) * 100) / 100,
@@ -2991,7 +3035,7 @@ async function main() {
   let strongStock = null;
   if (type === 'midday') {
     console.log('开始超短核心全市场扫描(午盘)...');
-    shortCore = await scanShortCore();
+    shortCore = await scanShortCore(zt.list, identSet);   // v11.50:传入涨停池(封单额)与辨识度集合
     console.log('超短核心扫描完成:', shortCore ? shortCore.list.length : 0, '只');
     console.log('开始强势股全市场扫描(午盘)...');
     strongStock = await scanStrongStock();

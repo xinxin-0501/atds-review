@@ -1937,11 +1937,15 @@ function renderShortCore(report) {
         <span class="sc-pct ${cls}">${fmtPct(x.pct)}</span>
         <span class="sc-score">${x.score}</span>
         <span class="sc-sig sig sig-${sigTone}">${esc(sigText)}</span>
+        ${Number(x.pct) >= 9.8 ? '<span class="sc-limit">涨停(可能无法成交)</span>' : ''}
       </div>
       <div class="sc-meta">
         <span>涨停 <b>${x.ztCount}次</b></span>
         <span>连板 <b>${x.lianban}</b></span>
         <span>量比 <b>${x.volRatio}</b></span>
+        <span>竞价 <b class="${x.openPct != null && x.openPct >= 1 ? 'ok' : 'no'}">${x.openPct != null ? (x.openPct > 0 ? '+' : '') + x.openPct + '%' : '—'}</b></span>
+        <span>封单 <b class="${x.sealYi != null && x.sealYi >= 2 ? 'ok' : 'no'}">${x.sealYi != null ? x.sealYi + '亿' : '—'}</b></span>
+        <span>辨识度 <b class="${x.ident ? 'ok' : 'no'}">${esc(x.ident || '非辨识度')}</b></span>
         <span>20日 <b class="${x.gain20 >= 15 ? 'ok' : 'no'}">+${x.gain20}%</b></span>
         <span>突破 <b class="${x.newHigh ? 'ok' : 'no'}">${x.newHigh ? '✓' : '✗'}</b></span>
         <span>均线多头 <b class="${x.maAlign ? 'ok' : 'no'}">${x.maAlign ? '✓' : '✗'}</b></span>
@@ -1951,7 +1955,7 @@ function renderShortCore(report) {
   const card = `<div class="card sc-card">
     <div class="wave-header">
       <div class="wave-title">⚡ 超短核心 TOP20</div>
-      <div class="wave-sub">竞价最强 · 开盘换手 · 连板梯度 · 量价共振 · 盘中扫描全A剔除ST</div>
+      <div class="wave-sub">涨停基因 · 连板梯度 · 量价共振 · <b>竞价强度(开盘涨幅)</b> · <b>封单额</b> · <b>板块龙头共振</b> · 盘中扫描全A剔除ST<br><span class="ss-note">⚠ 战法《超短核心1/2》要求的「隔夜单(9:15-9:25 委托)」与「竞价换手」暂无可用数据接口，未接入；指数择时与情绪风标见上方「反转闸门」「收盘情绪」</span></div>
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(sc.source || '全A扫描')}</span>
