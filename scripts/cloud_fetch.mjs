@@ -2007,10 +2007,23 @@ async function fetchAllMarket() {
   const norm = cands.map(x => ({
     f12: x.code, f14: x.name, f3: Number(x.pct) || 0,
     turn: Number(x.turnover) || 0,   // v11.43:真实换手率(原 f8 = pct>3?2:1.2 是"造"出来的常量,被展示成"量比2.0"属伪数据)
+    volRatio: Number(x.volRatio) || 0,                                       // v11.51:腾讯 f49 真实量比(供竞价/开盘强度快照)
+    openPct: (Number(x.prevClose) > 0 && Number(x.open) > 0) ? Math.round((Number(x.open) / Number(x.prevClose) - 1) * 10000) / 100 : null,   // v11.51:开盘(竞价)涨幅
     f20: Number(x.turnover) || 0,
     f6: Number(x.amountWan) * 10000 || 0
   }));
-  return { total: all.length, candidates: norm };
+  // v11.51:额外返回【全市场】开盘强度映射(openPct/volRatio)。
+  //   注意:不能只用上面的 norm(已筛成66只且限涨幅1~8%),否则超短核心要找的涨停/连板股不在其中,快照形同虚设。
+  const openMap = {};
+  for (const x of all) {
+    const c = String(x.code || '').trim();
+    if (!c) continue;
+    openMap[c] = {
+      openPct: (Number(x.prevClose) > 0 && Number(x.open) > 0) ? Math.round((Number(x.open) / Number(x.prevClose) - 1) * 10000) / 100 : null,
+      volRatio: Number(x.volRatio) || 0
+    };
+  }
+  return { total: all.length, candidates: norm, openMap };
 }
 
 /* ============ 波背离选股(盘中扫描全A,剔除ST,TOP30) ============ */
@@ -2321,6 +2334,10 @@ function shortCoreScore(klines, quote, ctx) {
     else if (C.sealYi >= 2) score += 5;
   }
   if (C.mainLine) score += 12; else if (C.ident) score += 8; // 战法"个股叠加板块是加分项"
+  // v11.51:盘前(竞价/开盘)资金强度 —— 战法"竞价一:开盘换手前排""竞价二:板块领涨"的可操作代理
+  if (C.aucVol != null) {
+    if (C.aucVol >= 3) score += 12; else if (C.aucVol >= 1.5) score += 8; else if (C.aucVol >= 0.8) score += 4;
+  }
   // 超短核心必须有涨停基因/连板(强势属性),否则不算核心
   if (ztCount === 0 && lianban === 0) return null;
   return {
@@ -2328,6 +2345,8 @@ function shortCoreScore(klines, quote, ctx) {
     maAlign, newHigh, gain20: Math.round(gain20 * 10) / 10,
     turnover, pct,
     openPct: C.openPct != null ? Math.round(C.openPct * 100) / 100 : null,   // v11.50
+    aucVol: C.aucVol != null ? Math.round(C.aucVol * 100) / 100 : null,      // v11.51:盘前量比
+    fromAuction: !!C.fromAuction,                                            // v11.51:是否来自盘前快照
     sealYi: C.sealYi != null ? C.sealYi : null,
     ident: C.ident || ''
   };
@@ -2336,7 +2355,7 @@ function shortCoreScore(klines, quote, ctx) {
 // v11.50:超短核心补入战法维度 —— 《超短核心1/2》要求"竞价最强(隔夜单/竞价涨幅)、封单最强(通过封单确定谁最强)、
 //         个股叠加板块是加分项"。其中【隔夜单(9:15-9:25 委托)】与【竞价换手】无可用接口,当前不可得(已在界面注明);
 //         可得的三个维度:①开盘竞价涨幅(open/prevClose) ②封单额(涨停池 sealWan) ③板块龙头(mainRank 领涨股)
-async function scanShortCore(ztList, identSet) {
+async function scanShortCore(ztList, identSet, auctionMap) {
   // 读取全 A 列表(已剔除 ST/北交所)
   let symbols = [];
   try {
@@ -2395,8 +2414,17 @@ async function scanShortCore(ztList, identSet) {
         const openPct = (Number(x.prevClose) > 0 && Number(x.open) > 0) ? (Number(x.open) / Number(x.prevClose) - 1) * 100 : null;
         const isMainLine = ident2.mainLines.has(rawCode);
         const isLead = ident2.leaders.has(rawCode);
+        // v11.51:优先用【盘前快照】的开盘涨幅/量比(更贴近战法"竞价定方向"的时点);无快照则退回盘中实时开盘涨幅
+        let aucPct = null, aucVol = null;
+        if (auctionMap && auctionMap[rawCode]) {
+          const a = auctionMap[rawCode];
+          if (a.openPct != null) aucPct = Number(a.openPct);
+          if (a.volRatio) aucVol = Number(a.volRatio);
+        }
         const ctx = {
-          openPct,
+          openPct: aucPct != null ? aucPct : openPct,
+          aucVol,
+          fromAuction: aucPct != null,
           sealYi: sealMap.has(rawCode) ? sealMap.get(rawCode) : null,
           ident: isMainLine ? '主线龙头' : (isLead ? '板块龙头' : ''),
           mainLine: isMainLine
@@ -2662,7 +2690,7 @@ async function scanStrongStock() {
     ztCount: x.ztCount,
     wave2: x.wave2, adjDays: x.adjDays, adjRatio: x.adjRatio,
     kdjGold: x.kdjGold, breakout: x.breakout, volRatio: x.volRatio, maAlign: x.maAlign,
-    openPct: x.openPct, sealYi: x.sealYi, ident: x.ident,     // v11.50:竞价强度/封单额/板块辨识度
+    openPct: x.openPct, aucVol: x.aucVol, fromAuction: x.fromAuction, sealYi: x.sealYi, ident: x.ident,   // v11.50/11.51
     signalType: x.signalType
   }));
   return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
@@ -2742,7 +2770,8 @@ async function scanMarketPatterns(ztPool) {
     } catch (e) { /* skip */ }
   }
   picks.sort((a, b) => b.score - a.score);
-  return { scanned: (mkt && mkt.total) || cands.length, candidates: cands.length, source, klineOk, klineFail, picks: picks.slice(0, 20) };
+  return { scanned: (mkt && mkt.total) || cands.length, candidates: cands.length, source, klineOk, klineFail, picks: picks.slice(0, 20),
+    openMap: (mkt && mkt.openMap) || null };   // v11.51:全市场开盘强度映射(供竞价快照,不参与渲染)
 }
 
 
@@ -2798,6 +2827,30 @@ async function main() {
   const zt = await fetchZT(todayCompact);
   // 全市场形态扫描(启动/老鸭头/拉升)
   const marketScan = await scanMarketPatterns(zt.list);
+  // v11.51:【竞价/开盘强度快照】
+  // 战法《超短核心》"竞价开盘完即判断强弱、隔夜单定方向"要求的是【开盘附近】的强度;
+  // 而本系统在盘中(11:30/14:40)才扫描 ⇒ 用盘中实时值判断会偏离战法时点。
+  // 方案:盘前那次运行(premarket, 实际约 9:43 采集)本就会抓全市场行情(见上 scanMarketPatterns→fetchAllMarket),
+  //       顺手把当时的【开盘涨幅 + 量比(f49, 已按时间进度折算)】存成当日快照;盘中运行时读取该快照。
+  // 说明:①「隔夜单(9:15-9:25 委托)」公开接口不可得;②「竞价换手」需 9:25-9:30 纯净竞价量,
+  //       而本采集在 9:43 已含 13 分钟连续竞价 ⇒ 均以「开盘涨幅 + 开盘后量比」作可操作代理,并在界面注明。
+  const AUCTION_PATH = path.join(ROOT, 'data', 'auction_cache.json');
+  let auctionMap = null;
+  if (isPre) {
+    try {
+      const m = (marketScan && marketScan.openMap) || {};   // v11.51:全市场(约5000只)
+      if (Object.keys(m).length) {
+        fs.writeFileSync(AUCTION_PATH, JSON.stringify({ date, time: typeConf.time, savedAt: generatedAt, map: m }), 'utf8');
+        console.log('竞价/开盘强度快照已保存:', Object.keys(m).length, '只 →', AUCTION_PATH);
+      }
+    } catch (e) { console.warn('竞价快照保存失败(不影响主流程):', e.message); }
+  } else {
+    try {
+      const j = JSON.parse(fs.readFileSync(AUCTION_PATH, 'utf8'));
+      if (j && j.date === date && j.map) { auctionMap = j.map; console.log('已载入竞价/开盘强度快照:', Object.keys(j.map).length, '只(采集于', j.savedAt, ')'); }
+      else console.log('竞价快照日期不符(' + (j && j.date) + '≠' + date + '),本次不使用');
+    } catch (e) { console.log('无竞价快照(降级:使用盘中实时开盘涨幅)'); }
+  }
   const qdateRaw = String(zt.qdate || '');
   const qdate = qdateRaw.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
   // 数据接口正常且明确为非交易日时才跳过;接口失败(qdate 为空)时降级继续,保证 workflow 不中断
@@ -3035,7 +3088,7 @@ async function main() {
   let strongStock = null;
   if (type === 'midday') {
     console.log('开始超短核心全市场扫描(午盘)...');
-    shortCore = await scanShortCore(zt.list, identSet);   // v11.50:传入涨停池(封单额)与辨识度集合
+    shortCore = await scanShortCore(zt.list, identSet, auctionMap);   // v11.51:再传盘前竞价/开盘强度快照
     console.log('超短核心扫描完成:', shortCore ? shortCore.list.length : 0, '只');
     console.log('开始强势股全市场扫描(午盘)...');
     strongStock = await scanStrongStock();

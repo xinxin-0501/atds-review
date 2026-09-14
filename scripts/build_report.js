@@ -1001,7 +1001,7 @@ function renderMarketScan(report) {
       <span class="wave-scan-info">${esc(ms.source || '--')} + 腾讯/东财K线 形态识别</span>
       <button id="ms-open-btn" class="wl-btn wl-btn-primary" onclick="openMarketScanModal()">📋 打开形态扫描名单</button>
     </div>
-    <div class="sc-hint">点击上方按钮弹出弹窗，查看完整形态个股名单 · 支持刷新重扫与一键全部加入观察池</div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看完整形态个股名单 · 支持刷新重扫与一键全部加入观察池<br><span class="ss-note">⚠ 形态在<b>预筛候选池</b>内判定（全市场 → 涨幅 1~8% + 换手 1.5~20% + 成交额≥1.5亿，取前 66 只），因此榜内个股普遍同时具备「拉升」特征 —— 区分度请看<b>分数</b>（=5日涨幅×3 + 换手×3 + 形态数×8），而非形态标签数量</span></div>
   </div>`;
   const modal = `<div class="modal-mask" id="market-scan-modal" onclick="if(event.target===this)closeMarketScanModal()">
     <div class="modal" onclick="event.stopPropagation()">
@@ -1943,7 +1943,8 @@ function renderShortCore(report) {
         <span>涨停 <b>${x.ztCount}次</b></span>
         <span>连板 <b>${x.lianban}</b></span>
         <span>量比 <b>${x.volRatio}</b></span>
-        <span>竞价 <b class="${x.openPct != null && x.openPct >= 1 ? 'ok' : 'no'}">${x.openPct != null ? (x.openPct > 0 ? '+' : '') + x.openPct + '%' : '—'}</b></span>
+        <span>竞价 <b class="${x.openPct != null && x.openPct >= 1 ? 'ok' : 'no'}">${x.openPct != null ? (x.openPct > 0 ? '+' : '') + x.openPct + '%' : '—'}</b>${x.fromAuction ? '<i class="sc-pre">盘前</i>' : ''}</span>
+        <span>盘前量比 <b class="${x.aucVol != null && x.aucVol >= 1.5 ? 'ok' : 'no'}">${x.aucVol != null ? x.aucVol : '—'}</b></span>
         <span>封单 <b class="${x.sealYi != null && x.sealYi >= 2 ? 'ok' : 'no'}">${x.sealYi != null ? x.sealYi + '亿' : '—'}</b></span>
         <span>辨识度 <b class="${x.ident ? 'ok' : 'no'}">${esc(x.ident || '非辨识度')}</b></span>
         <span>20日 <b class="${x.gain20 >= 15 ? 'ok' : 'no'}">+${x.gain20}%</b></span>
@@ -1955,7 +1956,7 @@ function renderShortCore(report) {
   const card = `<div class="card sc-card">
     <div class="wave-header">
       <div class="wave-title">⚡ 超短核心 TOP20</div>
-      <div class="wave-sub">涨停基因 · 连板梯度 · 量价共振 · <b>竞价强度(开盘涨幅)</b> · <b>封单额</b> · <b>板块龙头共振</b> · 盘中扫描全A剔除ST<br><span class="ss-note">⚠ 战法《超短核心1/2》要求的「隔夜单(9:15-9:25 委托)」与「竞价换手」暂无可用数据接口，未接入；指数择时与情绪风标见上方「反转闸门」「收盘情绪」</span></div>
+      <div class="wave-sub">涨停基因 · 连板梯度 · 量价共振 · <b>竞价强度(开盘涨幅)</b> · <b>封单额</b> · <b>板块龙头共振</b> · 盘中扫描全A剔除ST<br><span class="ss-note">⚠ 战法《超短核心1/2》要求的「隔夜单(9:15-9:25 委托)」与「竞价换手」暂无可用数据接口，未接入；<b>此处以「盘前快照(约09:43)的开盘涨幅+量比」作开盘强度代理</b>（标注「盘前」者即为快照值）；指数择时与情绪风标见上方「反转闸门」「收盘情绪」</span></div>
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(sc.source || '全A扫描')}</span>
