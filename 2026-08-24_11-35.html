@@ -5444,7 +5444,7 @@ function buildDecisionCardHtml(s){
       '<div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤'+mr.capPct+'%（'+escHtmlF(mr.label)+'市）· 单笔风险0.5%-1%</div>'+
       '<div class="dc-line">置信度构成：趋势'+trendScore+'/30 + 资金'+fundScore+'/25 + 题材'+themeScore+'/20 + 关键位'+keyScore+'/15 + 盈亏比'+rrScore+'/10</div>'+
     '</div>'+
-    '<div class="dc-block dc-review" data-review-code="'+escHtmlF(s.code)+'" data-name="'+escHtmlF(s.name)+'" data-price="'+price+'" data-high="'+(Number(s.high)||price)+'" data-low="'+(Number(s.low)||price)+'" data-entry="'+p.entry+'" data-stop="'+p.stop+'" data-target="'+p.target+'"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
+    '<div class="dc-block dc-review" data-review-code="'+escHtmlF(s.code)+'" data-name="'+escHtmlF(s.name)+'" data-price="'+price+'" data-high="'+(Number(s.high)||price)+'" data-low="'+(Number(s.low)||price)+'" data-entry="'+Number(p.entry).toFixed(2)+'" data-stop="'+Number(p.stop).toFixed(2)+'" data-target="'+Number(p.target).toFixed(2)+'"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
       '<div class="dc-line">关键位验证：'+keyVerify+'</div>'+patternHtml+
       '<div class="dc-line">资金验证：'+fundVerify+'</div>'+
       '<div class="dc-line dc-trade-status">交易状态：'+
@@ -7175,6 +7175,7 @@ function startRefreshCountdown(){
 /* 复盘交易日志(localStorage):统计胜率/平均盈亏/连续亏损 */
 // v11.28:统一北京日期。原用 toISOString() 取 UTC 日期:用户在 08:00 前打开(盘前高频场景)
 //        会把当天记成昨天,且时间差算出负数(出现"已观察-1天")。A 股工具一律以北京日期记账。
+function r2fF(v){var n=parseFloat(v);return isNaN(n)?null:(Math.round(n*100)/100);}
 function bjTodayF(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); }
 function bjDaysBetweenF(from,to){
   if(!from||!to)return 0;
@@ -7371,7 +7372,7 @@ function toggleShadowTrack(cb){
   var block=cb.closest('.dc-review');
   var m=getShadowMap();
   if(cb.checked&&block){
-    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:parseFloat(block.getAttribute('data-entry'))||null,stop:parseFloat(block.getAttribute('data-stop'))||null,target:parseFloat(block.getAttribute('data-target'))||null,openedDate:bjTodayF(),settled:false};
+    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:r2fF(block.getAttribute('data-entry')),stop:r2fF(block.getAttribute('data-stop')),target:r2fF(block.getAttribute('data-target')),openedDate:bjTodayF(),settled:false};
     try{localStorage.setItem('sim_track_'+code,'true');}catch(e){}
     showToast('已加入模拟跟踪队列，开始累积样本');
   }else{
