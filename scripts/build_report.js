@@ -1708,7 +1708,7 @@ function buildStockRow(s, i, report) {
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤${s.marketRegime ? s.marketRegime.capPct : 50}%（${s.marketRegime ? esc(s.marketRegime.label) : '震荡'}市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势${conf.trendScore}/30 + 资金${conf.fundScore}/25 + 题材${conf.themeScore}/20 + 关键位${conf.keyScore}/15 + 盈亏比${conf.rrScore}/10</div>
     </div>
-    <div class="dc-block dc-review" data-review-code="${esc(code)}" data-name="${esc(s.name)}" data-price="${price}" data-high="${Number(s.high) || price}" data-low="${Number(s.low) || price}" data-entry="${p.entry}" data-stop="${p.stop}" data-target="${p.target}"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="${esc(code)}" data-name="${esc(s.name)}" data-price="${price}" data-high="${Number(s.high) || price}" data-low="${Number(s.low) || price}" data-entry="${Number(p.entry).toFixed(2)}" data-stop="${Number(p.stop).toFixed(2)}" data-target="${Number(p.target).toFixed(2)}"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高${f2(s.high)} ${(preStrong && s.high >= preStrong.price) ? '触及压力' + f2(preStrong.price) : '未触及压力'} · 最低${f2(s.low)} ${(supStrong && s.low <= supStrong.price) ? '触及支撑' + f2(supStrong.price) : '未触及支撑'}</div>
       ${patternHtml}
       <div class="dc-line">资金验证：${fundVerify}</div>
