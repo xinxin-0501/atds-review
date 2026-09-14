@@ -577,6 +577,13 @@
 .tr-d{flex:0 0 auto;font-weight:700;color:#8a6d3b}
 .tr-hl{flex:0 0 auto;color:#999}
 .tr-ev{flex:1 1 130px;min-width:0;overflow-wrap:anywhere;color:#3f3a2a}
+/* v11.35:入场方式分组统计 + 样本备份/恢复 */
+.jrn-types{margin-top:3px;color:#6b5b2e}
+.jrn-types b{color:#8a6d3b}
+.jrn-bk{margin-top:4px;padding-top:4px;border-top:1px dashed #ecdca8}
+.jrn-bk-hint{color:#8a7a4e;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+.jrn-ta{width:100%;box-sizing:border-box;height:64px;margin-top:3px;font-size:9px;line-height:1.4;color:#555;background:#fff;border:1px solid #e6d3a3;border-radius:5px;padding:4px 6px;resize:vertical;font-family:monospace;overflow-wrap:anywhere}
+.jrn-bk-btns{margin-top:3px;display:flex;gap:6px;flex-wrap:wrap}
 /* 手动标签编辑器 */
 .dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
 .dc-te-label{color:#999;font-weight:600}
@@ -4943,12 +4950,28 @@ function renderJournalStats(){
     (c.winRate!=null?(' · 胜率 <b>'+c.winRate+'%</b>（'+c.win+'胜'+c.loss+'负'+(c.expired?'·'+c.expired+'过期':'')+'）'):'')+
     ' · 平均 <b>'+(c.avg>0?'+':'')+c.avg+'%</b>'+
     ((c.win+c.loss)<10?'　<span class="jrn-warn-chip">⚠ 样本不足10笔，统计偶发性大，不构成投资参考</span>':'')+
-    '　<button class="jrn-btn" onclick="toggleJournalDetail()">'+(jrnOpen?'收起明细':'每笔明细')+'</button>';
+    '　<button class="jrn-btn" onclick="toggleJournalDetail()">'+(jrnOpen?'收起明细':'每笔明细')+'</button>'+
+    // v11.35:按入场方式分组(每类满 3 笔才显示,避免小样本误导)
+    (function(){
+      function rt(x){ return (x&&(x.w+x.l)>=3)?(Math.round(x.w/(x.w+x.l)*100)+'%('+(x.w+x.l)+'笔·'+x.w+'胜)'):null; }
+      var a=rt(c.byType&&c.byType.pullback), b=rt(c.byType&&c.byType.current);
+      if(!a&&!b)return '';
+      return '<div class="jrn-types">入场方式胜率：回踩支撑 <b>'+(a||'样本不足3笔')+'</b> ｜ 现价入场 <b>'+(b||'样本不足3笔')+'</b></div>';
+    })();
   var ex=[];
   if(c.legacy)ex.push('早期未校验 '+c.legacy+' 笔（无入场门控，不计入胜率）');
   if(c.missed)ex.push('未触发入场 '+c.missed+' 笔（不计入胜率）');
   if(c.invalid)ex.push('计划失效 '+c.invalid+' 笔（起点已破位，不计入胜率）');
-  var warn='<div class="jrn-warn">'+(ex.length?('⚠ '+ex.join('　·　')+'　'):'')+'<button class="jrn-btn jrn-del" onclick="confirmClearReviewData()">清空复盘数据</button></div>';
+  var warn='<div class="jrn-warn">'+(ex.length?('⚠ '+ex.join('　·　')+'　'):'')+
+    '<button class="jrn-btn" onclick="toggleBackupPanel()">'+(backupOpen?'收起备份':'备份/恢复')+'</button>'+
+    '<button class="jrn-btn jrn-del" onclick="confirmClearReviewData()">清空复盘数据</button></div>'+
+    (backupOpen?('<div class="jrn-bk">'+
+      '<div class="jrn-bk-hint">① 点「复制」保存这段文本（可存微信/备忘录）；② 换机后在下方粘贴，点「恢复」合并（<b>只增不覆盖</b>，按计划+结算日去重）。</div>'+
+      '<textarea class="jrn-ta" spellcheck="false" placeholder="粘贴备份内容后点「恢复合并」"></textarea>'+
+      '<div class="jrn-bk-btns">'+
+      '<button class="jrn-btn" onclick="exportReviewData()">⬇ 复制备份到剪贴板</button>'+
+      '<button class="jrn-btn" onclick="importReviewData()">⬆ 恢复合并</button>'+
+      '</div></div>'):'');
   var rows='';
   if(jrnOpen){
     rows='<div class="jrn-wrap">';
@@ -4977,9 +5000,44 @@ function renderJournalStats(){
     }
     rows+='</div>';
     // v11.29:口径声明 —— 把理想化假设显式写出来,比假装数据精确更可信。
-    rows+='<div class="jrn-disc">口径说明：用<b>当日最高/最低</b>判定（日线，无法还原日内先后顺序，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率。<b>同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
+    rows+='<div class="jrn-disc">口径说明：用<b>当日最高/最低</b>判定（日线，无法还原日内先后顺序，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率。<b>入场方式按"勾选时入场价相对现价"划分（回踩支撑=需回落才入场；现价入场=勾选价即入场价）；同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
   }
   el.innerHTML=head+warn+rows;
+}
+// v11.35:样本备份/恢复 —— 样本是唯一不可重建的资产(换机/清浏览器数据即永久丢失)。
+var backupOpen=false;
+function toggleBackupPanel(){ backupOpen=!backupOpen; renderJournalStats(); }
+function exportReviewData(){
+  var payload={v:1,exportedAt:new Date().toISOString(),shadow:getShadowMap(),journal:getJournal(),tradeStatus:getTradeStatusMap()};
+  var txt=JSON.stringify(payload);
+  var ta=document.querySelector('.jrn-ta');
+  if(ta)ta.value=txt;
+  var ok=false;
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt),ok=true; }catch(e){}
+  if(typeof showToast==='function')showToast(ok?('已复制备份到剪贴板（'+getJournal().length+' 笔样本）'):'剪贴板不可用 —— 请手动长按上方文本全选复制','ok');
+}
+function importReviewData(){
+  var ta=document.querySelector('.jrn-ta');
+  if(!ta||!ta.value.trim()){ if(typeof showToast==='function')showToast('请先把备份内容粘贴到文本框'); return; }
+  var obj=null;
+  try{ obj=JSON.parse(ta.value); }catch(e){ if(typeof showToast==='function')showToast('内容不是有效 JSON，请确认整段完整粘贴'); return; }
+  if(!obj||typeof obj!=='object'||(!obj.journal&&!obj.shadow)){ if(typeof showToast==='function')showToast('内容缺少 journal/shadow，无法恢复'); return; }
+  function keyOf(e,i){
+    if(e&&e.planKey)return 'p:'+e.planKey;
+    if(e&&e.jid)return 'j:'+e.jid;
+    return 'k:'+(e&&e.code)+'_'+(e&&e.date)+'_'+(e&&e.result)+'_'+(e&&e.pnl)+'_'+i;
+  }
+  var cur=getJournal(),seen={},merged=[];
+  for(var i=0;i<cur.length;i++){ var k=keyOf(cur[i],i); if(!seen[k]){seen[k]=1;merged.push(cur[i]);} }
+  var inc=(obj.journal&&obj.journal.length)?obj.journal:[],add=0;
+  for(var j2=0;j2<inc.length;j2++){ var kk=keyOf(inc[j2],'in'+j2); if(!seen[kk]){seen[kk]=1;merged.push(inc[j2]);add++;} }
+  try{ localStorage.setItem('atds_trade_journal',JSON.stringify(merged)); }catch(e){}
+  var sc=getShadowMap(),sIn=obj.shadow||{},addS=0;
+  for(var c2 in sIn){ if(!sc[c2]){ sc[c2]=sIn[c2]; addS++; } }
+  setShadowMap(sc);
+  if(obj.tradeStatus){ var ts=getTradeStatusMap(); for(var c3 in obj.tradeStatus){ if(!ts[c3])ts[c3]=obj.tradeStatus[c3]; } setTradeStatusMap(ts); }
+  renderJournalStats(); updateReviewProgress();
+  if(typeof showToast==='function')showToast('已合并：新增 '+add+' 笔样本、'+addS+' 只跟踪（去重后，本地已有数据未被覆盖）','ok');
 }
 // v11.28:清空复盘/跟踪数据(独立于"重置本地缓存")——缓存重置不会动用户的跟踪记录,只有这里会。
 function clearReviewData(){
@@ -5102,9 +5160,13 @@ function toggleShadowTrack(cb){
   var block=cb.closest('.dc-review');
   var m=getShadowMap();
   if(cb.checked&&block){
-    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:r2fF(block.getAttribute('data-entry')),stop:r2fF(block.getAttribute('data-stop')),target:r2fF(block.getAttribute('data-target')),openedDate:bjTodayF(),settled:false};
+    var _en=r2fF(block.getAttribute('data-entry')), _px=r2fF(block.getAttribute('data-price'));
+    // v11.35:入场方式标注(勾选时一次性判定,之后价格变化无法回溯)。
+    // 计划入场价 = (支撑位<现价 ? 支撑位 : 现价),故天然分两类:pullback=需回踩支撑才入场 / current=现价即为入场价。
+    var _et=(_en&&_px&&_en<_px*0.999)?'pullback':'current';
+    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:_en,stop:r2fF(block.getAttribute('data-stop')),target:r2fF(block.getAttribute('data-target')),openedDate:bjTodayF(),settled:false,entryType:_et,refPrice:_px};
     try{localStorage.setItem('sim_track_'+code,'true');}catch(e){}
-    showToast('已加入模拟跟踪队列，开始累积样本');
+    showToast('已加入模拟跟踪队列（'+( _et==='pullback'?'需回踩':'现价入场')+'），开始累积样本');
   }else{
     if(m[code])delete m[code];
     try{localStorage.removeItem('sim_track_'+code);}catch(e){}
@@ -5198,7 +5260,7 @@ function settleShadowTrade(code,klines){
     rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=sd;rec.settlePrice=settlePrice;rec.settleNote=note||'';
     if(!dup){
       addJournalEntry({code:code,name:rec.name||code,date:sd,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',
-        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing'});
+        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing',entryType:rec.entryType||''});
     }
     setShadowMap(sm);
   };
@@ -5323,7 +5385,7 @@ function renderShadowTrace(blockEl,code,rec){
 // 新口径:有效样本 = 已结算且非历史脏样本(v<28);胜率分母 = win+loss(排除 expired/missed);历史脏样本单列、不计入。
 function reviewClassification(){
   var j=getJournal();
-  var s={valid:0,win:0,loss:0,expired:0,missed:0,invalid:0,legacy:0,sum:0,avg:0,winRate:null};
+  var s={valid:0,win:0,loss:0,expired:0,missed:0,invalid:0,legacy:0,sum:0,avg:0,winRate:null,byType:{}};
   for(var i=0;i<j.length;i++){
     var e=j[i],p=Number(e.pnl),rs=e.result;
     if(!rs&&!isNaN(p)&&e.pnl!=null)rs=(p>=0?'win':'loss');
@@ -5332,6 +5394,12 @@ function reviewClassification(){
       s.valid++;
       if(!isNaN(p))s.sum+=p;
       if(rs==='win')s.win++;else if(rs==='loss')s.loss++;else s.expired++;
+      // v11.35:按"入场方式"分组(仅 win/loss 计入,过期/未触发/失效不进)
+      if(rs==='win'||rs==='loss'){
+        var et=e.entryType||'unknown';
+        if(!s.byType[et])s.byType[et]={w:0,l:0};
+        if(rs==='win')s.byType[et].w++;else s.byType[et].l++;
+      }
     } else if(rs==='missed'){ s.missed++; }
     else if(rs==='invalid'){ s.invalid++; }   // v11.29:观察起点已破位的作废样本,不计入胜率
   }
@@ -5455,6 +5523,9 @@ function initReviewState(){
 window.setTradeStatus=setTradeStatus;
 window.toggleJournalDetail=toggleJournalDetail;
 window.toggleTrace=toggleTrace;
+window.toggleBackupPanel=toggleBackupPanel;
+window.exportReviewData=exportReviewData;
+window.importReviewData=importReviewData;
 window.clearReviewData=clearReviewData;
 window.confirmClearReviewData=confirmClearReviewData;
 window.toggleShadowTrack=toggleShadowTrack;
