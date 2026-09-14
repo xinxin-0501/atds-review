@@ -7380,7 +7380,48 @@ function toggleShadowTrack(cb){
 //   ① 待入场:当日最低回落至计划入场价才算入场;观察满 10 日仍未触及 → 记 missed(未触发入场,不计入胜率)
 //   ② 已入场:入场次日起用当日最高/最低判定;同日双触保守计为止损;入场满 10 日未触达 → expired(按现价)
 // 记录 settlePrice/settleDate/entryDate 供明细复核(用户要求"看得到什么时候买入、什么时候卖出")。
-function settleShadowTrade(code){
+// v11.31:把"仅用打开页面当天的高低"升级为"用日K线逐交易日回补判定"。
+//   原缺陷:未打开页面的交易日完全跳过 → 可能整体错过入场时机或止盈/止损触发,样本量与结果都被扭曲。
+//   新做法:取该股日K(腾讯前复权),从观察起点次日起按时间顺序逐根判定 —— 先触者生效,同日双触保守计止损。
+//   基准一致性:仅当"最后一根K线收盘价"与"实时价"偏差 ≤5% 时才采用(防止前复权基准漂移/除权造成误判)。
+function klineFullF(code){
+  var n=String(code||'').replace(/\D/g,'');
+  if(/^(4|8|92)/.test(n))return 'bj'+n;
+  return (n.charAt(0)==='6'||n.charAt(0)==='9')?('sh'+n):('sz'+n);
+}
+function shadowJudgeKlinesF(rec,klines,today){
+  var entry=rec.entry,stop=rec.stop,target=rec.target;
+  var from=rec.entryHit?(rec.entryDate||rec.openedDate):rec.openedDate;
+  if(!from)return null;
+  var seq=[];
+  for(var i=0;i<klines.length;i++){
+    var k=klines[i];
+    if(!k)continue;
+    var d=String(k[0]||'').slice(0,10);
+    var hi=parseFloat(k[3]),lo=parseFloat(k[4]);
+    if(!d||!(hi>0)||!(lo>0))continue;
+    if(d>from&&d<=today)seq.push({d:d,hi:hi,lo:lo});
+  }
+  if(!seq.length)return null;
+  var entered=!!rec.entryHit,entryDate=rec.entryDate||null,out=null;
+  for(var j=0;j<seq.length;j++){
+    var s=seq[j];
+    if(!entered){
+      if(s.lo<=entry){
+        entered=true;entryDate=s.d;
+        if(s.lo<=stop){ out={result:'loss',date:s.d,price:stop,note:'入场当日即跌破止损（日K回补）'}; break; }
+      }
+      continue;                                   // 入场当日不判止盈
+    }
+    if(s.d===entryDate)continue;
+    var hitT=s.hi>=target, hitS=s.lo<=stop;
+    if(hitT&&hitS){ out={result:'loss',date:s.d,price:stop,note:'当日最高触止盈、最低触止损，保守计为止损（日K回补）'}; break; }
+    if(hitT){ out={result:'win',date:s.d,price:target,note:'日K回补：'+s.d+' 最高'+s.hi+' 触及止盈'}; break; }
+    if(hitS){ out={result:'loss',date:s.d,price:stop,note:'日K回补：'+s.d+' 最低'+s.lo+' 触及止损'}; break; }
+  }
+  return {entered:entered,entryDate:entryDate,settle:out,lastDate:seq[seq.length-1].d};
+}
+function settleShadowTrade(code,klines){
   var sm=getShadowMap();
   var rec=sm[code];
   if(!rec||!rec.enabled||rec.settled)return;
@@ -7392,64 +7433,87 @@ function settleShadowTrade(code){
   if(!high)high=price;
   if(!low)low=price;
   var entry=rec.entry,stop=rec.stop,target=rec.target;
-  // v11.29 防御1:计划参数必须合法(止盈>入场>止损)。非法计划一律不参与判定,避免脏计划产出结论。
+  // 防御1:计划参数必须合法(止盈>入场>止损)。非法计划一律不参与判定。
   if(!entry||!stop||!target||!(target>entry&&entry>stop))return;
-  // v11.29 防御2:价格数据必须为正且区间自洽。
-  if(!(price>0&&high>0&&low>0&&high>=low))return;
+  if(!(price>0))return;
   var today=bjTodayF();
-  // v11.29 防御3:振幅异常(>50%)视为数据异常或疑似除权(主板最大振幅约20%、双创约40%)→ 本次不判定,只记录。
-  if((high-low)/low>0.5){
-    rec.lastCheck={date:today,price:price,high:high,low:low,skip:'振幅异常('+Math.round((high-low)/low*100)+'%)，疑似数据异常/除权，本次不判定'};
-    setShadowMap(sm);
-    return;
-  }
-  rec.lastCheck={date:today,price:price,high:high,low:low};
   var pct=function(v){return Math.round((v-entry)/entry*10000)/100;};
-  var doSettle=function(result,pnl,settlePrice,note){
-    rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=today;rec.settlePrice=settlePrice;rec.settleNote=note||'';
-    addJournalEntry({code:code,name:rec.name||code,date:today,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',
-      openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:today,settlePrice:settlePrice,v:28,strategy:'swing'});
+  var doSettle=function(result,pnl,settlePrice,note,settleDate){
+    var sd=settleDate||today;
+    // v11.31 去重:同一股票+同一计划+同一结算日只记一次(防止取消勾选后重勾产生重复样本)
+    var planKey=[code,entry,stop,target,sd].join('|'),dup=false;
+    try{ dup=getJournal().some(function(x){return x.planKey===planKey;}); }catch(e){}
+    rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=sd;rec.settlePrice=settlePrice;rec.settleNote=note||'';
+    if(!dup){
+      addJournalEntry({code:code,name:rec.name||code,date:sd,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',
+        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing'});
+    }
     setShadowMap(sm);
   };
-  // v11.29 防御4:观察起点作废。首个有效检查日若现价已在【计划止损位之下】,说明勾选时计划已被击穿,
-  //   现实中不会按该计划入场(否则等于"明知破位还照价买")。此类记为 invalid(计划失效),不计入胜率。
-  //   注意:只筛"起点已破位"这一情形,不影响"入场后正常止损"的亏损样本(那类必须保留,否则又会系统性虚高胜率)。
+  // 防御4:观察起点作废(仅首个有效检查日判定一次)
   if(!rec.entryHit&&!rec.firstCheck){
     rec.firstCheck=today;
     if(price<=stop){ doSettle('invalid',0,null,'观察起点现价'+price+'已低于计划止损位'+stop+'，计划已失效，未入场'); return; }
   }
-  // 阶段1:待入场
-  if(!rec.entryHit){
-    if(low&&low<=entry){                       // 当日最低回落至计划入场价 → 视为已入场
-      rec.entryHit=true;rec.entryDate=today;rec.entryPrice=entry;
-      if(low<=stop){ doSettle('loss',pct(stop),stop,'入场当日即跌破止损'); return; }
-    } else if(rec.openedDate){
-      var wd=bjDaysBetweenF(rec.openedDate,today);
-      if(wd>=10){ doSettle('missed',0,null,'观察'+wd+'日未回落至计划入场价'+entry+'，未触发入场'); }
+  // ① 优先:日K线逐日回补判定
+  var kUsed=false;
+  if(klines&&klines.length){
+    var last=klines[klines.length-1],lastClose=last?parseFloat(last[2])||0:0;
+    if(lastClose>0&&Math.abs(lastClose-price)/price<=0.05){
+      var v=shadowJudgeKlinesF(rec,klines,today);
+      if(v){
+        kUsed=true;
+        if(v.entered&&!rec.entryHit){ rec.entryHit=true;rec.entryDate=v.entryDate;rec.entryPrice=entry; }
+        rec.lastCheck={date:today,price:price,high:high,low:low,src:'kline',bar:v.lastDate};
+        if(v.settle&&v.settle.result){ doSettle(v.settle.result,pct(v.settle.price),v.settle.price,v.settle.note,v.settle.date); return; }
+      }
     }
-    setShadowMap(sm);
-    return;
   }
-  // 阶段2:已入场(入场当日只判止损,不判止盈)
-  if(rec.entryDate===today){
-    if(low<=stop)doSettle('loss',pct(stop),stop,'入场当日即跌破止损');
-    setShadowMap(sm);
-    return;
+  // ② 回退:用实时当天最高/最低判定
+  if(!kUsed){
+    if(!(high>0&&low>0&&high>=low))return;
+    if((high-low)/low>0.5){
+      rec.lastCheck={date:today,price:price,high:high,low:low,skip:'振幅异常('+Math.round((high-low)/low*100)+'%)，疑似数据异常/除权，本次不判定'};
+      setShadowMap(sm);
+      return;
+    }
+    rec.lastCheck={date:today,price:price,high:high,low:low};
+    if(!rec.entryHit){
+      if(low<=entry){
+        rec.entryHit=true;rec.entryDate=today;rec.entryPrice=entry;
+        if(low<=stop){ doSettle('loss',pct(stop),stop,'入场当日即跌破止损'); return; }
+      }
+    } else if(rec.entryDate!==today){
+      var hitT=high>=target,hitS=low<=stop;
+      if(hitT&&hitS){ doSettle('loss',pct(stop),stop,'当日最高触止盈、最低触止损，保守计为止损'); return; }
+      if(hitT){ doSettle('win',pct(target),target,'入场后当日最高触及止盈'); return; }
+      if(hitS){ doSettle('loss',pct(stop),stop,'当日最低触及止损'); return; }
+    }
   }
-  var hitT=high>=target, hitS=low<=stop;
-  if(hitT&&hitS){ doSettle('loss',pct(stop),stop,'当日最高触止盈、最低触止损，保守计为止损'); }
-  else if(hitT){ doSettle('win',pct(target),target,'入场后当日最高触及止盈'); }
-  else if(hitS){ doSettle('loss',pct(stop),stop,'当日最低触及止损'); }
-  else if(rec.openedDate){
+  // ③ 超期出口
+  if(!rec.entryHit){
+    var wd=bjDaysBetweenF(rec.openedDate,today);
+    if(wd>=10)doSettle('missed',0,null,'观察'+wd+'日未回落至计划入场价'+entry+'，未触发入场');
+  } else {
     var held=bjDaysBetweenF(rec.entryDate||rec.openedDate,today);
-    if(held>=10&&price){ doSettle('expired',pct(price),price,'入场后持有'+held+'日未触及止盈/止损，按现价结算'); }
+    if(held>=10)doSettle('expired',pct(price),price,'入场后持有'+held+'日未触及止盈/止损，按现价结算');
   }
   setShadowMap(sm);
 }
 
-function settleAllShadowTrades(){
+// v11.31:改为异步 —— 先并行取各跟踪个股日K,再逐只判定(未打开页面的交易日由日K回补)
+async function settleAllShadowTrades(){
   var sm=getShadowMap();
-  for(var code in sm){ if(sm[code]&&sm[code].enabled&&!sm[code].settled)settleShadowTrade(code); }
+  var codes=[];
+  for(var c in sm){ if(sm[c]&&sm[c].enabled&&!sm[c].settled)codes.push(c); }
+  if(!codes.length){ updateReviewProgress(); return; }
+  var kls={};
+  for(var i=0;i<codes.length;i++){
+    try{ kls[codes[i]]=await fetchKlineF(klineFullF(codes[i]),70); }catch(e){ kls[codes[i]]=[]; }
+  }
+  for(var j=0;j<codes.length;j++){
+    try{ settleShadowTrade(codes[j],kls[codes[j]]); }catch(e){ console.warn('[settleShadowTrade]',codes[j],e.message); }
+  }
   updateReviewProgress();
 }
 
