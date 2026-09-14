@@ -670,6 +670,10 @@
 
 /* v11.37:龙虎榜为事件驱动数据,超期(>20个交易日未上榜)时的降级提示 */
 .lhb-stale{display:block;margin-top:2px;color:#a0866a;font-size:9px;line-height:1.5;background:#fdf7ec;border-left:2px solid #e6d3a3;padding:2px 5px;overflow-wrap:anywhere}
+
+/* v11.39:区分「槽位时间」与「本机当前时间」,避免把跳动时钟误读为数据时间 */
+.hero-clock{margin-left:8px;font-size:11px;font-weight:600;color:#8a6d3b;background:#fff7e6;border:1px solid #f0d68a;border-radius:8px;padding:1px 6px;white-space:nowrap}
+.hero-clock b{color:#a05a00}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
