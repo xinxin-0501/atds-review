@@ -159,18 +159,13 @@ jobs:
         run: |
           TYPE="${{ steps.type.outputs.type }}"
           DATE_ARG="${{ github.event.inputs.date }}"
-          if [ "$TYPE" = "midday" ]; then
-            HOUR=$(TZ='Asia/Shanghai' date +%H%M)
-            HOUR=$((10#$HOUR))
-            if [ "$HOUR" -le 1005 ]; then SLOT="10:00";
-            elif [ "$HOUR" -le 1140 ]; then SLOT="11:30";
-            elif [ "$HOUR" -le 1340 ]; then SLOT="13:30";
-            else SLOT="14:40"; fi
-            echo "盘中时点: $SLOT"
-            node --dns-result-order=ipv4first scripts/cloud_fetch.mjs "$SLOT" $DATE_ARG
-          else
-            node --dns-result-order=ipv4first scripts/cloud_fetch.mjs "$TYPE" $DATE_ARG
-          fi
+          # v11.54:盘中一律写规范槽位 midday(= 11:35),不再按当前时刻生成
+          #   10:00/11:30/13:30/14:40 四个**不同文件名** —— 那与"每日三槽位(盘前/盘中/收盘)"的
+          #   导航不一致,还会每天多留 4 个 json + 4 个 html 在仓库里(此前只因被本地全量推送
+          #   误删才没被发现)。实际数据时点由 meta.generatedAt 记录并在页面标头显示,
+          #   不需要靠文件名区分;盘中四次触发依然是四次刷新,只是覆盖同一个文件。
+          echo "采集类型: $TYPE @ $(TZ='Asia/Shanghai' date +%H:%M) 北京"
+          node --dns-result-order=ipv4first scripts/cloud_fetch.mjs "$TYPE" $DATE_ARG
 
       - name: Build report HTML
         if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && steps.type.outputs.type != 'auction'

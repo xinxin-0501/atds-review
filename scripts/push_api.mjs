@@ -18,6 +18,9 @@ const TOKEN = (() => {
   return m[1].trim();
 })();
 const MESSAGE = process.argv[2] || 'ATDS auto premarket report';
+// ATDS_DRYRUN=1:只做校验不真正提交。用于验证"tree 是否还会丢文件"这类逻辑,
+//   它会跳过全部 blob 上传(用远程已有 sha 占位),因此零副作用、几十秒内跑完。
+const DRYRUN = process.env.ATDS_DRYRUN === '1';
 
 const API = `https://api.github.com/repos/${OWNER}/${REPO}`;
 const H = { Authorization: `token ${TOKEN}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json', 'User-Agent': 'atds-auto' };
@@ -59,10 +62,14 @@ const headTree = headCommit.tree.sha;
 console.log('remote head:', headSha.slice(0, 7), '| tree:', headTree.slice(0, 7));
 
 let remotePaths = new Map();
+const remoteTrees = new Map();
 try {
   const t = await req('GET', `${API}/git/trees/${headTree}?recursive=1`);
-  for (const e of t.tree) if (e.type === 'blob') remotePaths.set(e.path, e.sha);
-  console.log('remote blobs:', remotePaths.size);
+  for (const e of t.tree) {
+    if (e.type === 'blob') remotePaths.set(e.path, e.sha);
+    else if (e.type === 'tree') remoteTrees.set(e.path, e.sha);   // v11.54:子目录也要 base_tree
+  }
+  console.log('remote blobs:', remotePaths.size, '| remote trees:', remoteTrees.size);
 } catch (e) {
   console.log('recursive tree fetch failed, treat as empty base:', e.message);
 }
@@ -84,10 +91,14 @@ for (const f of files) {
 }
 console.log(`diff blobs to upload: ${needUpload.length}/${files.length}`);
 
-// 2. 并发上传差异 blob
+// 2. 并发上传差异 blob (dry-run 时跳过:用远程 sha 占位,只关心路径集合是否有丢失)
 const blobSha = new Map(localSha);
 let done = 0;
 const CONC = 5;
+if (DRYRUN) {
+  console.log(`dry-run:跳过上传 ${needUpload.length} 个 blob`);
+  for (const { p, rp } of needUpload) blobSha.set(p, remotePaths.get(rp) || localSha.get(p));
+} else {
 for (let i = 0; i < needUpload.length; i += CONC) {
   await Promise.all(needUpload.slice(i, i + CONC).map(async ({ p, buf, rp }) => {
     const j = await req('POST', `${API}/git/blobs`, { content: buf.toString('base64'), encoding: 'base64' });
@@ -96,8 +107,14 @@ for (let i = 0; i < needUpload.length; i += CONC) {
     console.log(`  blob ${done}/${needUpload.length}: ${rp}`);
   }));
 }
+}
 
 // 3. 自底向上构建嵌套 tree (await 递归,保证子树先建)
+// v11.54 修(严重):原实现**只给根目录**带 base_tree,子目录 tree 全是从本地文件重建的 →
+//   远程独有的子目录文件被静默删除。实证:2026-09-14 18:02 的提交删掉了
+//   data/reviews/2026-09-14_{11-30,13-30,14-40}.json、site/2026-09-14_{11-30,13-30,14-40}.html、
+//   scripts/{hero_mobile.css,modal_css.txt} 共 8 个文件(全是"本地没有、远程有"的文件)。
+//   现在每一层都带 base_tree ⇒ 推送只增/改,不删。
 async function buildTree(dir) {
   const children = new Map();
   for (const f of files) {
@@ -114,8 +131,10 @@ async function buildTree(dir) {
     if (c.type === 'blob') entries.push({ path: name, mode: '100644', type: 'blob', sha: blobSha.get(c.path) });
     else entries.push({ path: name, mode: '040000', type: 'tree', sha: await buildTree(c.path) });
   }
-  const body = dir === '' ? { tree: entries, base_tree: headTree } : { tree: entries };
-  console.log('POST tree:', dir === '' ? `(root, base_tree=${headTree.slice(0, 7)})` : dir);
+  const dirPosix = dir.split(path.sep).join('/');
+  const base = dirPosix === '' ? headTree : remoteTrees.get(dirPosix);
+  const body = base ? { tree: entries, base_tree: base } : { tree: entries };
+  console.log('POST tree:', dirPosix || '(root)', base ? 'base_tree=' + base.slice(0, 7) : '⚠ 无 base_tree(远程无此目录)');
   const j = await req('POST', `${API}/git/trees`, body);
   return j.sha;
 }
@@ -124,7 +143,30 @@ console.log('构建 tree...');
 const rootTreeSha = await buildTree('');
 console.log('root tree:', rootTreeSha.slice(0, 7));
 
-// 4. 创建 commit (parent = 远程 head)
+// 4. 安全闸:新 tree 相对远程不得丢失任何文件(除非显式 ATDS_ALLOW_DELETE=1)
+//    这是对"子目录漏 base_tree ⇒ 静默删文件"这类事故的兜底:任何一次误删都会在此处中止,
+//    而不是等到几天后发现历史报告不见了。
+try {
+  const nt = await req('GET', `${API}/git/trees/${rootTreeSha}?recursive=1`);
+  const newPaths = new Set(nt.tree.filter(e => e.type === 'blob').map(e => e.path));
+  const lost = [...remotePaths.keys()].filter(p => !newPaths.has(p));
+  if (lost.length) {
+    const allow = process.env.ATDS_ALLOW_DELETE === '1';
+    console.error(`${allow ? '显式允许删除' : '⚠️ 检测到将删除'} ${lost.length} 个远程文件${allow ? '' : ',已中止 push(确需删除请设 ATDS_ALLOW_DELETE=1)'}`);
+    lost.slice(0, 20).forEach(p => console.error('  - ' + p));
+    if (!allow) process.exit(2);
+  } else {
+    console.log('安全闸:无文件丢失 ✓');
+  }
+} catch (e) {
+  console.log('安全闸跳过(无法取回新 tree):', e.message);
+}
+
+// 5. 创建 commit (parent = 远程 head)
+if (DRYRUN) {
+  console.log('dry-run:不创建 commit、不动 ref。tree 校验通过即代表推送不会丢文件。');
+  process.exit(0);
+}
 const commit = await req('POST', `${API}/git/commits`, {
   message: MESSAGE,
   tree: rootTreeSha,

@@ -30,6 +30,37 @@ function shanghaiNow() {
   return new Date(utc + 8 * 3600000);
 }
 
+function bjHM(d) {
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+// ===== v11.54 时刻守卫 =====
+// 背景(实测):本机定时任务会大幅延迟触发(14:00 的任务 20:06 才跑、13:30 的任务 20:22 才跑),
+//   而采集脚本原先**没有任何时刻校验**,于是把"收盘数据"无条件写进「盘中快照」槽位 ——
+//   2026-09-09~09-14 连续 4 个交易日的 data/reviews/*_11-35.json 装的都是收盘数据
+//   (generatedAt 15:27~19:00,且与同日 *_16-20.json 的指数/成交额完全相同)。
+// 规则:
+//   ① 目标日期 != 北京今天 → 一律放行(历史补跑是合法需求);
+//   ② 落在该槽位应有时段内 → 放行;
+//   ③ 超时且当日槽位**已有数据** → 拒绝(保住槽位里原有的真实数据,这是主要目的);
+//   ④ 超时但当日槽位**尚无数据** → 放行(迟到总比没有好;页面会按 generatedAt 显示"补采"告警);
+//   ⑤ auction 例外:集合竞价只在 09:20~09:35 有采集意义,超时一律拒绝(否则会把全天口径写成竞价数据)。
+// 注意:close 不设守卫 —— 15:00 之后收盘数据的语义不再随时点变化,拦它只会让某天彻底没有收盘报告。
+const SLOT_WINDOWS = { premarket: ['08:30', '10:00'], midday: ['09:25', '14:59'], auction: ['09:20', '09:35'] };
+function slotGuardF(type, targetDate, todayBj, nowHM, slotExists) {
+  const w = SLOT_WINDOWS[type];
+  if (!w) return { ok: true, warn: '' };                    // close / 未知类型:不设守卫
+  if (!targetDate || targetDate !== todayBj) return { ok: true, warn: '' };
+  if (nowHM >= w[0] && nowHM <= w[1]) return { ok: true, warn: '' };
+  if (type === 'auction') {
+    return { ok: false, reason: '集合竞价仅在 ' + w[0] + '~' + w[1] + ' 有采集意义,当前 ' + nowHM + ' 拒绝写入(否则会把全天口径写成竞价数据)' };
+  }
+  if (slotExists) {
+    return { ok: false, reason: '当日 ' + type + ' 槽位已有数据,当前 ' + nowHM + ' 超出应有时段 ' + w[0] + '~' + w[1] + ' → 拒绝覆盖(否则会把后续时段数据写进该槽位)' };
+  }
+  return { ok: true, warn: '当前 ' + nowHM + ' 超出 ' + type + ' 应有时段 ' + w[0] + '~' + w[1] + ',但当日槽位尚无数据 → 放行补采(页面会显示"补采"告警)' };
+}
+
 async function fetchTencent(codes) {
   try {
     const url = `https://qt.gtimg.cn/q=${codes.join(',')}`;
@@ -2839,6 +2870,21 @@ async function runAuctionSnapshot() {
 
 async function main() {
   const now = shanghaiNow();
+  // v11.54:时刻守卫(必须在任何落盘之前;auction 分支也要经过它)
+  {
+    const _ex = process.argv[3] || '';
+    const _tgt = _ex ? _ex.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : fmtDate(now);
+    const _slots = new Set([typeConf.time.replace(':', '-')]);
+    if (timeOverride) _slots.add(argv2.replace(':', '-'));
+    const _exists = [..._slots].some(s => fs.existsSync(path.join(DATA_DIR, _tgt + '_' + s + '.json')))
+      || fs.existsSync(path.join(DATA_DIR, _tgt + '_' + (type === 'premarket' ? '09-45' : type === 'midday' ? '11-35' : '16-20') + '.json'));
+    const g = slotGuardF(type, _tgt, fmtDate(now), bjHM(now), _exists);
+    if (!g.ok) {
+      console.error('[时刻守卫] ' + g.reason);
+      process.exit(3);
+    }
+    if (g.warn) console.warn('[时刻守卫] ' + g.warn);
+  }
   // v11.52:集合竞价快照模式(轻量,不生成报告)
   if (type === "auction") { await runAuctionSnapshot(); return; }
   const explicitArg = process.argv[3] || '';
