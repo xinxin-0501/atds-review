@@ -283,6 +283,9 @@ function markKlineDirty() {
   if (_klineFlushTimer && typeof _klineFlushTimer.unref === 'function') _klineFlushTimer.unref();
 }
 function saveKlineCache(force) {
+  // v11.52 守卫(严重):若本进程从未加载过缓存(_klineCache 为 null),【绝不能落盘】——
+  //   否则会把云端 kline_cache.json 覆盖成字符串 "null"(auction 轻量模式不取K线,即属此情形)。
+  if (_klineCache == null || typeof _klineCache !== 'object') { console.warn("[kline_cache] 未加载缓存,跳过落盘(防止覆盖)"); return false; }
   if (!_klineDirty && !force) return false;
   try {
     const p = path.join(ROOT, 'data', 'kline_cache.json');
@@ -2336,7 +2339,12 @@ function shortCoreScore(klines, quote, ctx) {
   if (C.mainLine) score += 12; else if (C.ident) score += 8; // 战法"个股叠加板块是加分项"
   // v11.51:盘前(竞价/开盘)资金强度 —— 战法"竞价一:开盘换手前排""竞价二:板块领涨"的可操作代理
   if (C.aucVol != null) {
-    if (C.aucVol >= 3) score += 12; else if (C.aucVol >= 1.5) score += 8; else if (C.aucVol >= 0.8) score += 4;
+    // v11.52:竞价量比 —— 战法《超短核心2》"竞价量比符合 5-80(底部分时量比越大越容易拉伸)"
+    if (C.aucVol >= 5) score += 15; else if (C.aucVol >= 3) score += 12;
+    else if (C.aucVol >= 1.5) score += 8; else if (C.aucVol >= 0.8) score += 4;
+  }
+  if (C.aucTurn != null) {   // 竞价换手 —— 战法"竞价一:开盘换手前排"
+    if (C.aucTurn >= 3) score += 10; else if (C.aucTurn >= 1.5) score += 6; else if (C.aucTurn >= 0.5) score += 3;
   }
   // 超短核心必须有涨停基因/连板(强势属性),否则不算核心
   if (ztCount === 0 && lianban === 0) return null;
@@ -2345,7 +2353,8 @@ function shortCoreScore(klines, quote, ctx) {
     maAlign, newHigh, gain20: Math.round(gain20 * 10) / 10,
     turnover, pct,
     openPct: C.openPct != null ? Math.round(C.openPct * 100) / 100 : null,   // v11.50
-    aucVol: C.aucVol != null ? Math.round(C.aucVol * 100) / 100 : null,      // v11.51:盘前量比
+    aucVol: C.aucVol != null ? Math.round(C.aucVol * 100) / 100 : null,      // v11.52:竞价量比
+    aucTurn: C.aucTurn != null ? Math.round(C.aucTurn * 100) / 100 : null,   // v11.52:竞价换手
     fromAuction: !!C.fromAuction,                                            // v11.51:是否来自盘前快照
     sealYi: C.sealYi != null ? C.sealYi : null,
     ident: C.ident || ''
@@ -2415,15 +2424,18 @@ async function scanShortCore(ztList, identSet, auctionMap) {
         const isMainLine = ident2.mainLines.has(rawCode);
         const isLead = ident2.leaders.has(rawCode);
         // v11.51:优先用【盘前快照】的开盘涨幅/量比(更贴近战法"竞价定方向"的时点);无快照则退回盘中实时开盘涨幅
-        let aucPct = null, aucVol = null;
+        let aucPct = null, aucVol = null, aucTurn = null;
         if (auctionMap && auctionMap[rawCode]) {
           const a = auctionMap[rawCode];
           if (a.openPct != null) aucPct = Number(a.openPct);
-          if (a.volRatio) aucVol = Number(a.volRatio);
+          // v11.52:优先用竞价口径(09:30 快照的换手/量比);兼容 v11.51 的 volRatio
+          if (a.auctionVolRatio) aucVol = Number(a.auctionVolRatio);
+          else if (a.volRatio) aucVol = Number(a.volRatio);
+          if (a.auctionTurnover) aucTurn = Number(a.auctionTurnover);
         }
         const ctx = {
           openPct: aucPct != null ? aucPct : openPct,
-          aucVol,
+          aucVol, aucTurn,
           fromAuction: aucPct != null,
           sealYi: sealMap.has(rawCode) ? sealMap.get(rawCode) : null,
           ident: isMainLine ? '主线龙头' : (isLead ? '板块龙头' : ''),
@@ -2690,7 +2702,7 @@ async function scanStrongStock() {
     ztCount: x.ztCount,
     wave2: x.wave2, adjDays: x.adjDays, adjRatio: x.adjRatio,
     kdjGold: x.kdjGold, breakout: x.breakout, volRatio: x.volRatio, maAlign: x.maAlign,
-    openPct: x.openPct, aucVol: x.aucVol, fromAuction: x.fromAuction, sealYi: x.sealYi, ident: x.ident,   // v11.50/11.51
+    openPct: x.openPct, aucVol: x.aucVol, aucTurn: x.aucTurn, fromAuction: x.fromAuction, sealYi: x.sealYi, ident: x.ident,   // v11.50-52
     signalType: x.signalType
   }));
   return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
@@ -2775,8 +2787,56 @@ async function scanMarketPatterns(ztPool) {
 }
 
 
+// v11.52:【集合竞价快照】轻量模式 —— 只抓全市场行情并落盘,不生成任何报告。
+// 为什么单独设时点:战法《超短核心1/2》的"竞价一/竞价三"要看【竞价换手】与【竞价量比】,
+//   二者只在【集合竞价刚结束、连续竞价尚未累积】时纯净;原盘前采集在 09:43(已含 13 分钟连续竞价)。
+// 依据:腾讯 f38=换手率、f49=量比 均为"当日累计/前5日同期"口径 => 09:30 附近抓取时即【竞价换手/竞价量比】;
+//   f5/f4 得到【竞价开盘涨幅】。一次抓取覆盖战法"竞价一/竞价三"三项。
+// 定时:GitHub cron 为 */10(:00/:10/:20/:30),9:26 无触发点 => 用 09:30 的 run(含开场首分钟,误差约 2~5%)。
+const AUCTION_SNAPSHOT_PATH = path.join(ROOT, "data", "auction_cache.json");
+async function runAuctionSnapshot() {
+  const now = shanghaiNow();
+  const date = fmtDate(now);
+  let symbols = [];
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(ROOT, "data/stock_list.json"), "utf8"));
+    symbols = Array.isArray(j.symbols) ? j.symbols : [];
+  } catch (e) { symbols = []; }
+  if (!symbols.length) { console.error("[auction] 无股票列表,退出"); return; }
+  const all = [];
+  const BATCH = 80;
+  for (let i = 0; i < symbols.length; i += BATCH) {
+    try {
+      const data = await fetchTencent(symbols.slice(i, i + BATCH));
+      if (data && data.length) all.push(...data);
+    } catch (e) { /* skip batch */ }
+    if (i + BATCH < symbols.length) await new Promise(r => setTimeout(r, 80));
+  }
+  const m = {};
+  for (const x of all) {
+    const c = String(x.code || "").trim();
+    if (!c) continue;
+    m[c] = {
+      openPct: (Number(x.prevClose) > 0 && Number(x.open) > 0) ? Math.round((Number(x.open) / Number(x.prevClose) - 1) * 10000) / 100 : null,
+      auctionTurnover: Number(x.turnover) || 0,
+      auctionVolRatio: Number(x.volRatio) || 0,
+      amountWan: Number(x.amountWan) || 0
+    };
+  }
+  const hh = String(now.getHours()).padStart(2, "0"), mm = String(now.getMinutes()).padStart(2, "0"), ss = String(now.getSeconds()).padStart(2, "0");
+  const out = { date: date, capturedAt: date + " " + hh + ":" + mm + ":" + ss, count: Object.keys(m).length, map: m };
+  fs.mkdirSync(path.dirname(AUCTION_SNAPSHOT_PATH), { recursive: true });
+  fs.writeFileSync(AUCTION_SNAPSHOT_PATH, JSON.stringify(out), "utf8");
+  console.log("[auction] 竞价快照已保存:", out.count, "只 @", out.capturedAt);
+  const sm = ["600487", "000001", "300750", "600108"].filter(c => m[c]).map(c => c + ":" + JSON.stringify(m[c]));
+  if (sm.length) console.log("[auction] 样例:", sm.join(" | "));
+  console.log(JSON.stringify({ mode: "auction", date: date, count: out.count }));
+}
+
 async function main() {
   const now = shanghaiNow();
+  // v11.52:集合竞价快照模式(轻量,不生成报告)
+  if (type === "auction") { await runAuctionSnapshot(); return; }
   const explicitArg = process.argv[3] || '';
   // 支持显式传入目标日期 YYYYMMDD（用于补生成历史日期），否则用当前日期
   const date = explicitArg ? explicitArg.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : fmtDate(now);
@@ -2834,9 +2894,9 @@ async function main() {
   //       顺手把当时的【开盘涨幅 + 量比(f49, 已按时间进度折算)】存成当日快照;盘中运行时读取该快照。
   // 说明:①「隔夜单(9:15-9:25 委托)」公开接口不可得;②「竞价换手」需 9:25-9:30 纯净竞价量,
   //       而本采集在 9:43 已含 13 分钟连续竞价 ⇒ 均以「开盘涨幅 + 开盘后量比」作可操作代理,并在界面注明。
-  const AUCTION_PATH = path.join(ROOT, 'data', 'auction_cache.json');
+  const AUCTION_PATH = AUCTION_SNAPSHOT_PATH;
   let auctionMap = null;
-  if (isPre) {
+  if (false) {   // v11.52:快照改由 auction 模式(09:30)生成,盘前不再覆盖(否则13分钟口径会盖掉纯竞价口径)
     try {
       const m = (marketScan && marketScan.openMap) || {};   // v11.51:全市场(约5000只)
       if (Object.keys(m).length) {
