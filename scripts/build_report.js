@@ -1499,8 +1499,20 @@ function buildStockRow(s, i, report) {
     : '<span>封单 <b>非涨停</b></span>';
   // 龙虎榜(真实:机构/游资/北向净买聚合,未上榜显示"近期未上榜")
   const lhb = s.lhb || null;
-  const lhbHtml = lhb
-    ? `龙虎榜(${esc(lhb.date)})：机构 <b class="${lhb.inst >= 0 ? 'up' : 'down'}">${lhb.inst >= 0 ? '+' : ''}${lhb.inst.toFixed(2)}亿</b> · 游资 <b class="${lhb.youzi >= 0 ? 'up' : 'down'}">${lhb.youzi >= 0 ? '+' : ''}${lhb.youzi.toFixed(2)}亿</b> · 北向 <b class="${lhb.north >= 0 ? 'up' : 'down'}">${lhb.north >= 0 ? '+' : ''}${lhb.north.toFixed(2)}亿</b>${lhb.fundAttr ? ' · 属性 <b>' + esc(lhb.fundAttr) + '</b>' : ''}${lhb.famousSeats && lhb.famousSeats.length ? '<br>知名席位：' + esc(lhb.famousSeats.slice(0, 2).join('、')) : ''}<br>${esc(lhb.explain)}`
+  // v11.37:同客户端 —— 龙虎榜为事件驱动数据,补"距今约N个交易日"并对超期数据降级。
+function tradingDaysBetweenF(from, to) {
+  if (!from || !to) return 0;
+  const a = Date.parse(String(from).slice(0, 10) + 'T00:00:00Z'), bb = Date.parse(String(to).slice(0, 10) + 'T00:00:00Z');
+  if (isNaN(a) || isNaN(bb) || bb <= a) return 0;
+  let n = 0;
+  for (let t = a + 86400000; t <= bb; t += 86400000) { const w = new Date(t).getUTCDay(); if (w !== 0 && w !== 6) n++; }
+  return n;
+}
+function bjTodaySF() { return new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10); }
+function lhbAgoTxtS(d) { const k = tradingDaysBetweenF(d, bjTodaySF()); return k > 0 ? ('，约' + k + '个交易日前') : '（今日）'; }
+function lhbStaleS(d) { return tradingDaysBetweenF(d, bjTodaySF()) > 20; }
+const lhbHtml = lhb
+    ? `龙虎榜（最近上榜 ${esc(lhb.date)}${lhbAgoTxtS(lhb.date)}）：机构 <b class="${lhb.inst >= 0 ? 'up' : 'down'}">${lhb.inst >= 0 ? '+' : ''}${lhb.inst.toFixed(2)}亿</b> · 游资 <b class="${lhb.youzi >= 0 ? 'up' : 'down'}">${lhb.youzi >= 0 ? '+' : ''}${lhb.youzi.toFixed(2)}亿</b> · 北向 <b class="${lhb.north >= 0 ? 'up' : 'down'}">${lhb.north >= 0 ? '+' : ''}${lhb.north.toFixed(2)}亿</b>${lhb.fundAttr ? ' · 属性 <b>' + esc(lhb.fundAttr) + '</b>' : ''}${lhb.famousSeats && lhb.famousSeats.length ? '<br>知名席位：' + esc(lhb.famousSeats.slice(0, 2).join('、')) : ''}<br>${esc(lhb.explain)}${lhbStaleS(lhb.date) ? `<span class="lhb-stale">⚠ 龙虎榜为事件驱动数据（仅个股达标当日公布）：该股已约${tradingDaysBetweenF(lhb.date, bjTodaySF())}个交易日未再上榜，以下为历史席位数据，仅供参考</span>` : ''}`
     : '龙虎榜：近期未上榜';
   // 60/15分钟趋势(真实)
   const m60 = (s.minTrend && s.minTrend.m60) || null;
@@ -1657,7 +1669,7 @@ function buildStockRow(s, i, report) {
   const diMissing = [];
   if (d1Missing) diMissing.push('资金');
   if (!t.ma5) diMissing.push('关键位');
-  if (!s.lhb) diMissing.push('龙虎榜');
+  if (!s.lhb) diMissing.push('龙虎榜'); else if (lhbStaleS(s.lhb.date)) diMissing.push('龙虎榜(偏旧)');
   if (s.minTrend && ((s.minTrend.m60 && s.minTrend.m60.approx) || (s.minTrend.m15 && s.minTrend.m15.approx))) diMissing.push('分钟线');
   const dataIntegrity = { complete: diMissing.length === 0, missing: diMissing };
   const integrityBadge = dataIntegrity.complete
