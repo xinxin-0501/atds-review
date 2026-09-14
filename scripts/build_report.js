@@ -65,13 +65,27 @@ function renderHero(report) {
   const desc = m.type === 'premarket'
     ? '开盘后实时数据 · 今日盘前参考 · 非买卖建议'
     : m.type === 'midday'
-      ? '实时盘中数据 · 每 60 秒自动刷新'
+      ? '指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化'
       : '收盘静态快照 · 数据截至 ' + ((config.reportTypes.close && config.reportTypes.close.time) || '15:20');
+  // v11.39:把「真实数据时间」显式写出来。原 midday 页把 H1 的时间元素每秒覆盖成本机当前时间,
+  // 用户会把跳动的时钟读成"数据是此刻的",而静态部分其实来自快照时刻(实测标称 11:35 实际 10:07)。
+  const genAt = String(m.generatedAt || '');
+  const genHM = (genAt.match(/(\d{2}:\d{2})/) || [])[1] || '';
+  let lagTxt = '';
+  if (genHM) {
+    const nowMin = (() => { const d = new Date(Date.now() + 8 * 3600 * 1000); return d.getUTCHours() * 60 + d.getUTCMinutes(); })();
+    const g = genHM.split(':');
+    let lag = nowMin - (parseInt(g[0], 10) * 60 + parseInt(g[1], 10));
+    if (lag < 0) lag += 24 * 60;                       // 跨零点兜底
+    if (lag >= 1) lagTxt = '（约 ' + lag + ' 分钟前）';
+  }
+  const dataTimeHtml = genHM ? (' · <b>数据时间 ' + genHM + '</b>' + lagTxt) : '';
+  const nowHM = (() => { const d = new Date(Date.now() + 8 * 3600 * 1000); return d.toISOString().slice(11, 16); })();
   const timeHtml = m.type === 'midday'
-    ? '<span class="hero-time" id="rt-hero-time">' + (esc(m.time || '')) + '</span>'
+    ? '<span class="hero-time">' + (esc(m.time || '')) + '</span><span class="hero-clock">现在 <b id="rt-hero-time">' + nowHM + '</b></span>'
     : '<span class="hero-time">' + (esc(m.time || '')) + '</span>';
   return '<div class="hero">' +
-    '<div class="hero-eyebrow">A 股每日复盘 · ' + (esc(m.typeLabel || '')) + '</div>' +
+    '<div class="hero-eyebrow">A 股每日复盘 · ' + (esc(m.typeLabel || '')) + dataTimeHtml + '</div>' +
     '<h1 class="hero-title">' + (esc(m.date || '')) + ' · ' + timeHtml + '</h1>' +
     '<div class="hero-sub">' + desc + '</div>' +
     '<div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div>' +
