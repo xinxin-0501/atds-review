@@ -2263,7 +2263,7 @@
       <a href="index.html">首页</a><a href="2026-08-17_08-30.html" class="active">盘前</a><a href="2026-08-17_11-35.html">盘中</a><a href="2026-08-17_16-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 13:00</b>（约 303 分钟前）</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 83°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 13:00</b>（约 312 分钟前）</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 83°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-17 13:00:38</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -3425,7 +3425,7 @@ function buildDecisionCardHtml(s){
         '<button class="ts-btn ts-t-btn" data-code="'+escHtmlF(s.code)+'" onclick="recordTTrade(this)">记做T</button>'+
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
-      '<div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
+      '<div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场当日不判止损 —— 当日最低可能出现在入场之前(实测:当日早盘探底后拉升),故入场当日改用 15 分钟K判定「入场之后」的路径,取不到分钟K则当日不判定、改为次日起按日K判定;次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-trace" data-trace-code="'+escHtmlF(s.code)+'"></div>'+
       '<div class="dc-line dc-next-day">🎯 明日核心观察点：'+nextDayFocus+'</div>'+
     '</div>';
@@ -5166,6 +5166,56 @@ function tradingDaysBetweenF(from,to){
   for(var t=a+86400000;t<=b;t+=86400000){ var w=new Date(t).getUTCDay(); if(w!==0&&w!==6)n++; }
   return n;
 }
+// v11.44:取带时间戳的分钟K(默认15分钟)。
+// 为什么必须用它:入场当日的"日K最低价"可能发生在**入场时点之前**(实测 002289 当日最低 34.14 @09:31,
+// 而用户 10:22 才入场),用它判"入场当日破止损"必然误判。分钟K有时点,才能只统计入场之后的路径。
+async function fetchMinuteBarsF(code,klt,n){
+  var num=String(code).replace(/^(sh|sz|bj)/,'');
+  var full=/^(4|8|92)/.test(num)?('bj'+num):(num.charAt(0)==='6'||num.charAt(0)==='9'?('sh'+num):('sz'+num));
+  var out=[];
+  try{
+    var url='https://ifzq.gtimg.cn/appstock/app/kline/mkline?param='+full+','+klt+',,'+(n||320);
+    var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://gu.qq.com/'}});
+    var j=await res.json();
+    var arr=((j&&j.data&&j.data[full])||{})[klt]||[];
+    for(var i=0;i<arr.length;i++){
+      var k=arr[i]; if(!k)continue;
+      var ts=String(k[0]||'');                       // 形如 202609141030
+      if(ts.length<12)continue;
+      var d=ts.slice(0,4)+'-'+ts.slice(4,6)+'-'+ts.slice(6,8), t=ts.slice(8,10)+':'+ts.slice(10,12);
+      var hi=parseFloat(k[3]),lo=parseFloat(k[4]),cl=parseFloat(k[2]);
+      if(!(hi>0)||!(lo>0))continue;
+      out.push({d:d,t:t,h:hi,l:lo,c:cl});
+    }
+  }catch(e){/* 失败返回空,交由调用方走"不判定"兜底 */}
+  return out;
+}
+// 只统计"入场时点之后"的分钟K,逐根判定止盈/止损(同根双触保守计止损)
+function shadowJudgeEntryDayF(rec,bars,entryDate,entryTime){
+  var stop=rec.stop,target=rec.target;
+  if(!entryDate||!bars||!bars.length)return null;
+  var seq=[];
+  for(var i=0;i<bars.length;i++){
+    var b=bars[i]; if(!b)continue;
+    if(b.d!==entryDate)continue;
+    if(entryTime&&b.t&&b.t<=entryTime)continue;      // 入场前(含入场那一根)不计
+    seq.push(b);
+  }
+  if(!seq.length)return null;
+  seq.sort(function(a,b){return String(a.t)<String(b.t)?-1:1;});
+  var afterHi=-Infinity,afterLo=Infinity,settle=null;
+  for(var j=0;j<seq.length;j++){
+    var x=seq[j];
+    if(x.h>afterHi)afterHi=x.h;
+    if(x.l<afterLo)afterLo=x.l;
+    if(settle)continue;
+    var hitT=x.h>=target,hitS=x.l<=stop;
+    if(hitT&&hitS)settle={result:'loss',price:stop,t:x.t,note:'入场当日 '+x.t+' 同一15分钟K内触止盈与止损,保守计为止损'};
+    else if(hitS)settle={result:'loss',price:stop,t:x.t,note:'入场当日 '+x.t+' 触及止损(已排除入场前价格)'};
+    else if(hitT)settle={result:'win',price:target,t:x.t,note:'入场当日 '+x.t+' 触及止盈(已排除入场前价格)'};
+  }
+  return {settle:settle,hi:afterHi,lo:afterLo,firstT:seq[0].t,lastT:seq[seq.length-1].t};
+}
 function lhbAgoTxtF(d){
   var k=tradingDaysBetweenF(d,bjTodayF());
   return k>0?('，约'+k+'个交易日前'):'（今日）';
@@ -5432,7 +5482,7 @@ function toggleShadowTrack(cb){
     // v11.35:入场方式标注(勾选时一次性判定,之后价格变化无法回溯)。
     // 计划入场价 = (支撑位<现价 ? 支撑位 : 现价),故天然分两类:pullback=需回踩支撑才入场 / current=现价即为入场价。
     var _et=(_en&&_px&&_en<_px*0.999)?'pullback':'current';
-    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:_en,stop:r2fF(block.getAttribute('data-stop')),target:r2fF(block.getAttribute('data-target')),openedDate:bjTodayF(),settled:false,entryType:_et,refPrice:_px};
+    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:_en,stop:r2fF(block.getAttribute('data-stop')),target:r2fF(block.getAttribute('data-target')),openedDate:bjTodayF(),settled:false,entryType:_et,refPrice:_px,entryTime:bjTimeF()};
     try{localStorage.setItem('sim_track_'+code,'true');}catch(e){}
     showToast('已加入模拟跟踪队列（'+( _et==='pullback'?'需回踩':'现价入场')+'），开始累积样本');
   }else{
@@ -5483,11 +5533,8 @@ function shadowJudgeKlinesF(rec,klines,today){
     if(!entered){
       if(s.lo<=entry){
         entered=true;entryDate=s.d;
-        if(s.lo<=stop){
-          trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'enter-stop'});
-          out={result:'loss',date:s.d,price:stop,note:'入场当日即跌破止损（日K回补）'};
-          break;
-        }
+        // v11.44:入场当日【不得】用当日最低判止损 —— 入场时点未知,当日最低可能早于入场。
+        //         实测 002289:当日最低 34.14@09:31,用户 10:22 才入场 → 旧逻辑误判"入场当日即破止损 -4.85%"。
         trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'enter',px:entry});
       } else {
         trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'wait',px:entry});
@@ -5503,7 +5550,7 @@ function shadowJudgeKlinesF(rec,klines,today){
   }
   return {entered:entered,entryDate:entryDate,settle:out,lastDate:seq[seq.length-1].d,trace:trace.slice(-12)};
 }
-function settleShadowTrade(code,klines){
+function settleShadowTrade(code,klines,minBars){
   var sm=getShadowMap();
   var rec=sm[code];
   if(!rec||!rec.enabled||rec.settled)return;
@@ -5565,7 +5612,7 @@ function settleShadowTrade(code,klines){
     if(!rec.entryHit){
       if(low<=entry){
         rec.entryHit=true;rec.entryDate=today;rec.entryPrice=entry;
-        ev=(low<=stop)?'enter-stop':'enter';
+        ev='enter';   // v11.44:当天入场不判止损(同一原因:low 可能是入场前的价格)
       } else ev='wait';
     } else if(rec.entryDate!==today){
       var hitT=high>=target,hitS=low<=stop;
@@ -5578,10 +5625,32 @@ function settleShadowTrade(code,klines){
       kept.push({d:today,hi:high,lo:low,ev:ev,px:(ev==='enter'?entry:(ev==='win'?target:((ev==='loss'||ev==='both-stop'||ev==='enter-stop')?stop:null))),gapT:(ev==='hold'?Math.round((target-high)/high*10000)/100:null)});
       rec.trace=kept.slice(-12);
     }
-    if(ev==='enter-stop'){ doSettle('loss',pct(stop),stop,'入场当日即跌破止损'); return; }
     if(ev==='both-stop'){ doSettle('loss',pct(stop),stop,'当日最高触止盈、最低触止损，保守计为止损'); return; }
     if(ev==='win'){ doSettle('win',pct(target),target,'入场后当日最高触及止盈'); return; }
     if(ev==='loss'){ doSettle('loss',pct(stop),stop,'当日最低触及止损'); return; }
+  }
+  // ①-b v11.44:【入场当日】路径判定 —— 只用带时间戳的 15 分钟K,只统计「入场之后」的分钟。
+  //   为什么不能退回用日K的当日高低:当日最低可能发生在入场之前(实测 002289 当日最低 34.14@09:31,
+  //   而用户 10:22 才入场)→ 旧逻辑据此判"入场当日即破止损 -4.85%"属必然误判。
+  //   取不到分钟K时【保持不判定】(次日走日K路径),绝不退回用当日最低。
+  if(!rec.settled&&rec.entryHit&&rec.entryDate===today){
+    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.entryTime||null);
+    if(mj){
+      if(mj.settle&&mj.settle.result){
+        if(!rec.trace||!rec.trace.length)rec.trace=[];
+        var k2=[];for(var t2=0;t2<rec.trace.length;t2++){if(rec.trace[t2].d!==today)k2.push(rec.trace[t2]);}
+        k2.push({d:today,hi:Math.round(mj.hi*100)/100,lo:Math.round(mj.lo*100)/100,ev:(mj.settle.result==='win'?'win':'loss'),px:mj.settle.price,at:mj.settle.t});
+        rec.trace=k2.slice(-12);
+        doSettle(mj.settle.result,pct(mj.settle.price),mj.settle.price,mj.settle.note,today);
+        return;
+      }
+      // 有分钟K且入场后未触达 → 轨迹记为"入场后持有中"(用入场后区间,不用全天高低)
+      if(!rec.trace||!rec.trace.length)rec.trace=[];
+      var k3=[];for(var t3=0;t3<rec.trace.length;t3++){if(rec.trace[t3].d!==today)k3.push(rec.trace[t3]);}
+      k3.push({d:today,hi:Math.round(mj.hi*100)/100,lo:Math.round(mj.lo*100)/100,ev:'hold',gapT:(mj.hi>0?Math.round((target-mj.hi)/mj.hi*10000)/100:null),afterEntry:true});
+      rec.trace=k3.slice(-12);
+      rec.lastCheck={date:today,price:price,high:mj.hi,low:mj.lo,src:'m15',afterEntry:true};
+    }
   }
   // ③ 超期出口
   if(!rec.entryHit){
@@ -5600,12 +5669,14 @@ async function settleAllShadowTrades(){
   var codes=[];
   for(var c in sm){ if(sm[c]&&sm[c].enabled&&!sm[c].settled)codes.push(c); }
   if(!codes.length){ updateReviewProgress(); return; }
-  var kls={};
+  var kls={},mbs={};
   for(var i=0;i<codes.length;i++){
     try{ kls[codes[i]]=await fetchKlineF(klineFullF(codes[i]),70); }catch(e){ kls[codes[i]]=[]; }
+    // v11.44:同时取 15 分钟K,用于判定"入场当日、入场之后"的路径(日K无时点,不能用于入场日)
+    try{ mbs[codes[i]]=await fetchMinuteBarsF(codes[i],'m15',320); }catch(e){ mbs[codes[i]]=[]; }
   }
   for(var j=0;j<codes.length;j++){
-    try{ settleShadowTrade(codes[j],kls[codes[j]]); }catch(e){ console.warn('[settleShadowTrade]',codes[j],e.message); }
+    try{ await settleShadowTrade(codes[j],kls[codes[j]],mbs[codes[j]]); }catch(e){ console.warn('[settleShadowTrade]',codes[j],e.message); }
   }
   updateReviewProgress();
 }
@@ -5637,9 +5708,12 @@ function renderShadowTrace(blockEl,code,rec){
     for(var i=tr.length-1;i>=0;i--){
       var x=tr[i],note=TRACE_EV[x.ev]||x.ev;
       if(x.ev==='wait')note+='（需回落至 '+rec.entry+'，当日最低 '+x.lo+'）';
-      else if(x.ev==='hold')note+='（当日最高 '+x.hi+'，距止盈 '+((x.gapT!=null&&x.gapT>=0)?(x.gapT+'%'):'已越过')+'）';
+      else if(x.ev==='hold')note+=x.afterEntry
+        ? ('（入场后 高'+x.hi+' / 低'+x.lo+'，距止盈 '+((x.gapT!=null&&x.gapT>=0)?(x.gapT+'%'):'已越过')+'）')
+        : ('（当日最高 '+x.hi+'，距止盈 '+((x.gapT!=null&&x.gapT>=0)?(x.gapT+'%'):'已越过')+'）');
       else if(x.ev==='enter')note+=' @'+rec.entry;
       else if(x.px!=null)note+=' @'+x.px;
+      if(x.at)note+=' · '+x.at+' 触及';   // v11.44:分钟K判定的触及时刻
       h+='<div class="tr-row"><span class="tr-d">'+escHtmlF(String(x.d))+'</span>'+
          '<span class="tr-hl">高 '+escHtmlF(String(x.hi))+' / 低 '+escHtmlF(String(x.lo))+'</span>'+
          '<span class="tr-ev">'+escHtmlF(note)+'</span></div>';
