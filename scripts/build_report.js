@@ -1997,7 +1997,8 @@ function renderStrongStock(report) {
       </div>
       <div class="ss-meta">
         <span>信号 <b class="ok">${esc(x.signalType)}</b></span>
-        <span>缺口 <b class="${x.gapFound ? 'ok' : 'no'}">${x.gapFound ? '✓' + (x.gapDays || '') + '日' : '✗'}</b></span>
+        <span>缺口 <b class="${x.gapFound ? 'ok' : 'no'}">${x.gapFound ? '✓' + (x.gapDays || '') + '日' + (x.gapVolOK ? '缩' : '') : '✗'}</b></span>
+        <span>黄金坑 <b class="${x.goldPit ? 'ok' : 'no'}">${x.goldPit ? ('✓' + (x.pitLow != null ? x.pitLow : '') + (x.pitVolOK ? '缩' : '')) : '✗'}</b></span>
         <span>二波 <b class="${x.wave2 ? 'ok' : 'no'}">${x.wave2 ? '✓' : '✗'}</b></span>
         <span>突破 <b class="${x.breakout ? 'ok' : 'no'}">${x.breakout ? '✓' : '✗'}</b></span>
         <span>KDJ <b class="${x.kdjGold ? 'ok' : 'no'}">${x.kdjGold ? '金叉' : '--'}</b></span>
@@ -2009,7 +2010,7 @@ function renderStrongStock(report) {
   const card = `<div class="card ss-card">
     <div class="wave-header">
       <div class="wave-title">🔥 强势股选股 TOP20</div>
-      <div class="wave-sub">缺口不回补 · 二波启动 · 突破起爆点 · KDJ(8,2,2)金叉 · 盘中扫描全A剔除ST<br><span class="ss-note">⚠ 按<b>形态强度</b>排序，非当日涨幅：形态成立但当日平盘/回调的个股也会入榜</span></div>
+      <div class="wave-sub">缺口不回补 · 二波启动 · 黄金坑(首板支撑) · 突破起爆点 · KDJ(8,2,2)金叉 · 盘中扫描全A剔除ST<br><span class="ss-note">⚠ 按<b>形态强度</b>排序，非当日涨幅：形态成立但当日平盘/回调的个股也会入榜</span></div>
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(ss.source || '全A扫描')}</span>

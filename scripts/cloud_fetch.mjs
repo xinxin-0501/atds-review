@@ -1046,15 +1046,16 @@ function calcTechFromKline(arr) {
   const last5v = vols.slice(-5).reduce((a, b) => a + b, 0) / 5;
   const prev15v = vols.slice(-20, -5).reduce((a, b) => a + b, 0) / 15;
   const volRatio = prev15v > 0 ? last5v / prev15v : null;
-  // KDJ(9,3,3):最后一根是否金叉
+  // v11.47:统一为战法口径 KDJ(8,2,2)(《强势股战法》"指标:应用KDJ参数设定日线822")。
+  //        原为 (9,3,3) —— 与强势股/波背离模块(已统一为822)对同一只股票会给出相反的金叉结论,故一并统一。
   let k = 50, d = 50, prevK = null, prevD = null;
   let kdjGold = false;
   for (let i = 0; i < n; i++) {
-    const seg = closes.slice(Math.max(0, i - 8), i + 1);
+    const seg = closes.slice(Math.max(0, i - 7), i + 1);   // v11.47:RSV 窗口 9→8 日
     const hi = Math.max(...seg), lo = Math.min(...seg);
     const rsv = hi > lo ? (closes[i] - lo) / (hi - lo) * 100 : 50;
-    k = 2 / 3 * k + 1 / 3 * rsv;
-    d = 2 / 3 * d + 1 / 3 * k;
+    k = 1 / 2 * k + 1 / 2 * rsv;   // v11.47:参数 3→2(平滑 1/2)
+    d = 1 / 2 * d + 1 / 2 * k;   // v11.47:参数 3→2(D 平滑 1/2)
     if (i === n - 1 && prevK != null && prevK <= prevD && k > d) kdjGold = true;
     prevK = k; prevD = d;
   }
@@ -2027,13 +2028,13 @@ function waveScore(klines) {
   let K = 50, D = 50, J = 50;
   const kArr = [], dArr = [], jArr = [];
   for (let i = 0; i < n; i++) {
-    const s = Math.max(0, i - 8);
+    const s = Math.max(0, i - 7);   // v11.47:RSV 窗口 9→8 日(KDJ 8,2,2)
     let hh = -Infinity, ll = Infinity;
     for (let j = s; j <= i; j++) { if (highs[j] > hh) hh = highs[j]; if (lows[j] < ll) ll = lows[j]; }
     const rsv = (hh - ll) > 0 ? (closes[i] - ll) / (hh - ll) * 100 : 50;
     // v11.46:统一为战法口径 KDJ(8,2,2)(参数 2 → 平滑系数 1/2)。原 2/3+1/3 相当于 (8,3,3),金叉更滞后。
     K = 1 / 2 * K + 1 / 2 * rsv;
-    D = 2 / 3 * D + 1 / 3 * K;
+    D = 1 / 2 * D + 1 / 2 * K;
     J = 3 * K - 2 * D;
     kArr.push(K); dArr.push(D); jArr.push(J);
   }
@@ -2417,6 +2418,43 @@ function strongStockScore(klines, quote) {
       }
     }
   }
+  // 3b) 黄金坑(战法类型二·首板支撑) v11.47 新增 —— 此前完全缺失
+  //   战法原文:①个股以【第一个涨停板】开始 ②第二天【跳空高开】一波拉升 ③见顶回落后价格【打在第一个涨停板位置】,最好不补缺
+  //   可操作口径:首板实体下沿 = 涨停日开盘价(涨停日 open<=close);"打在首板位置"= 之后有交易日最低触及该下沿±2%;
+  //   "不破"= 最新收盘仍高于该下沿(破位即形态失效,对应战法第④条止损)。
+  let goldPit = false, pitLow = null, pitDays = null, pitVolOK = false;
+  {
+    const LIMIT = 0.095;
+    const lookBack = Math.min(30, n - 25);
+    for (let b = n - lookBack; b < n - 1; b++) {
+      if (b < 21) continue;
+      const prev = closes[b - 1];
+      if (!(prev > 0 && (closes[b] - prev) / prev >= LIMIT)) continue;      // b 日涨停
+      let priorZT = false;                                                  // 需是"第一个"涨停:之前 20 日内无涨停
+      for (let k = Math.max(1, b - 20); k < b; k++) {
+        const p0 = closes[k - 1];
+        if (p0 > 0 && (closes[k] - p0) / p0 >= LIMIT) { priorZT = true; break; }
+      }
+      if (priorZT) continue;
+      const gapUp = b + 1 < n && highs[b] > 0 && opens[b + 1] > highs[b];   // 次日跳空高开(严格:开盘高于首板最高)
+      if (!gapUp) continue;
+      const bodyLow = Math.min(opens[b], closes[b]);                        // 首板实体下沿
+      let touched = false, brokeClosed = false;
+      for (let k = b + 2; k < n; k++) { if (lows[k] > 0 && lows[k] <= bodyLow * 1.02) touched = true; }
+      if (closes[n - 1] <= bodyLow) brokeClosed = true;                     // 最新收盘已破实体下沿
+      if (touched && !brokeClosed) {
+        goldPit = true; pitLow = Math.round(bodyLow * 100) / 100; pitDays = n - 1 - b;
+        // 回落段是否缩量(战法"量缩洗盘优先")
+        let s1 = 0, c1 = 0;
+        for (let k = b + 2; k < n; k++) { s1 += vols[k]; c1++; }
+        let s0 = 0, c0 = 0;
+        for (let k = Math.max(0, b - 4); k <= b; k++) { s0 += vols[k]; c0++; }
+        const post = c1 ? s1 / c1 : 0, pre = c0 ? s0 / c0 : 0;
+        pitVolOK = pre > 0 && post > 0 && post < pre;
+        break;
+      }
+    }
+  }
   // 4) KDJ(8,2,2) 金叉
   let K = 50, D = 50;
   const kArr = [], dArr = [];
@@ -2451,6 +2489,7 @@ function strongStockScore(klines, quote) {
   // 评分
   let score = 0;
   if (gapFound && gapVolOK) score += 25; else if (gapFound || ztCount > 0) score += 10;   // v11.46:缺口须"缩量回调"才给满分
+  if (goldPit) score += (pitVolOK ? 25 : 20);                                            // v11.47:黄金坑(缩量洗盘优先)
   if (ztCount >= 3) score += 15; else if (ztCount >= 2) score += 10; else if (ztCount === 1) score += 5;
   if (wave2) score += 20; else if (adjRatio <= 0.7 && adjDays > 0) score += 10;
   if (kdjGold) score += 15;
@@ -2460,16 +2499,17 @@ function strongStockScore(klines, quote) {
   if (maAlign) score += 10;
   if (pct >= 3) score += 5; else if (pct > 0) score += 2;
   // 必须有强势属性:缺口 或 二波 或 突破 至少一个
-  if (!gapFound && !wave2 && !breakout) return null;
+  if (!gapFound && !wave2 && !breakout && !goldPit) return null;   // v11.47:黄金坑同为"强势属性"
   const sigs = [];
   if (gapFound && gapVolOK) sigs.push('缺口未回补+缩量回调');
   else if (gapFound) sigs.push('缺口未回补(未缩量)');
   if (wave2) sigs.push('二波启动');
   if (breakout) sigs.push('突破20日收盘高');   // v11.46:明确是"收盘价"口径(可能出现当日收阴但仍高于前20日最高收盘)
+  if (goldPit) sigs.push('黄金坑(首板支撑' + (pitVolOK ? '+缩量' : '') + ')');
   if (kdjGold) sigs.push('KDJ金叉');
   if (!sigs.length) sigs.push('强势股');
   return {
-    score, gapFound, gapVolOK, gapDays, ztCount, wave2, adjDays, adjRatio: Math.round(adjRatio * 100) / 100,
+    score, gapFound, gapVolOK, gapDays, goldPit, pitLow, pitDays, pitVolOK, ztCount, wave2, adjDays, adjRatio: Math.round(adjRatio * 100) / 100,
     kdjGold, breakout, volRatio: Math.round(volRatio * 100) / 100, maAlign,
     signalType: sigs.join('·')
   };
@@ -2535,7 +2575,9 @@ async function scanStrongStock() {
     amount: fmtAmount(x.amountWan),
     turnover: x.turnover,
     score: Math.min(100, Math.round(x.score)),
-    gapFound: x.gapFound, gapDays: x.gapDays, ztCount: x.ztCount,
+    gapFound: x.gapFound, gapVolOK: x.gapVolOK, gapDays: x.gapDays,
+    goldPit: x.goldPit, pitLow: x.pitLow, pitDays: x.pitDays, pitVolOK: x.pitVolOK,
+    ztCount: x.ztCount,
     wave2: x.wave2, adjDays: x.adjDays, adjRatio: x.adjRatio,
     kdjGold: x.kdjGold, breakout: x.breakout, volRatio: x.volRatio, maAlign: x.maAlign,
     signalType: x.signalType
