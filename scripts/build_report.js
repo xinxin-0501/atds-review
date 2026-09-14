@@ -52,7 +52,7 @@ function renderHeader(report, nav) {
       </div>
     </div>
     <div class="time-nav">
-      <a href="${nav.home}">盘前</a><a href="${nav.midday}"${m.type === 'midday' ? ' class="active"' : ''}>盘中</a><a href="${nav.close}"${m.type === 'close' ? ' class="active"' : ''}>收盘</a><a href="${nav.latest}">复盘</a>
+      <a href="${nav.home}">首页</a><a href="${nav.premarket || 'index.html'}"${m.type === 'premarket' ? ' class="active"' : ''}>盘前</a><a href="${nav.midday}"${m.type === 'midday' ? ' class="active"' : ''}>盘中</a><a href="${nav.close}"${m.type === 'close' ? ' class="active"' : ''}>收盘</a>
     </div>
   </div>`;
 }
@@ -2852,6 +2852,8 @@ function build() {
     const sameDay = byDate[m.date] || {};
     const nav = {
       home: 'index.html',
+      // v11.41:补盘前链接(原先"盘前"指向 index.html 总览页,而"复盘"指向当前页自身,语义错乱)
+      premarket: stripReviews(sameDay.premarket) || latestOfType('premarket') || 'index.html',
       midday: stripReviews(sameDay.midday) || latestOfType('midday') || '../index.html',
       close: stripReviews(sameDay.close) || latestOfType('close') || '../index.html',
       latest: stripReviews(latest)
@@ -2868,6 +2870,7 @@ function build() {
   if (rankReport) {
     const rankNav = {
       home: 'index.html',
+      premarket: stripReviews(byDate[rankReport.meta.date] && byDate[rankReport.meta.date].premarket) || stripReviews(latestOfType('premarket')) || 'index.html',
       midday: stripReviews(byDate[rankReport.meta.date] && byDate[rankReport.meta.date].midday) || stripReviews(latestOfType('midday')) || 'index.html',
       close: stripReviews(byDate[rankReport.meta.date] && byDate[rankReport.meta.date].close) || stripReviews(latestOfType('close')) || 'index.html',
       latest: stripReviews(latest) || 'index.html'
