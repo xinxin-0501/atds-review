@@ -2263,7 +2263,7 @@
       <a href="index.html">首页</a><a href="2026-08-24_08-30.html" class="active">盘前</a><a href="2026-08-24_11-35.html">盘中</a><a href="2026-08-24_16-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:49</b>（约 1343 分钟前）</div><h1 class="hero-title">2026-08-24 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 74°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:49</b>（约 1347 分钟前）</div><h1 class="hero-title">2026-08-24 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 74°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-24 19:49:26</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -5770,6 +5770,9 @@ async function fetchMinuteBarsF(code,klt,n){
 function shadowJudgeEntryDayF(rec,bars,entryDate,entryTime){
   var stop=rec.stop,target=rec.target;
   if(!entryDate||!bars||!bars.length)return null;
+  // v11.44 安全闸:没有入场时点(v11.44 之前勾选的旧记录)时【一律不判定】。
+  // 否则无法区分"入场前/入场后",又会把入场前的低点当止损 —— 即本次要修的同一个误判。
+  if(!entryTime)return null;
   var seq=[];
   for(var i=0;i<bars.length;i++){
     var b=bars[i]; if(!b)continue;
@@ -5885,7 +5888,7 @@ function renderJournalStats(){
     }
     rows+='</div>';
     // v11.29:口径声明 —— 把理想化假设显式写出来,比假装数据精确更可信。
-    rows+='<div class="jrn-disc">口径说明：用<b>当日最高/最低</b>判定（日线，无法还原日内先后顺序，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率。<b>入场方式按"勾选时入场价相对现价"划分（回踩支撑=需回落才入场；现价入场=勾选价即入场价）；同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
+    rows+='<div class="jrn-disc">口径说明：<b>入场当日</b>按 15 分钟K判定「<b>入场之后</b>」的路径（当日最低可能出现在入场之前，故不得用日K当日最低判入场日；取不到分钟K则当日不判定、次日起再判）；<b>次日起</b>用<b>当日最高/最低</b>判定（日线无法还原日内先后，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率。<b>入场方式按"勾选时入场价相对现价"划分（回踩支撑=需回落才入场；现价入场=勾选价即入场价）；同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
   }
   el.innerHTML=head+warn+rows;
 }
