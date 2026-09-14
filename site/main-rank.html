@@ -5011,10 +5011,19 @@ function exportReviewData(){
   var payload={v:1,exportedAt:new Date().toISOString(),shadow:getShadowMap(),journal:getJournal(),tradeStatus:getTradeStatusMap()};
   var txt=JSON.stringify(payload);
   var ta=document.querySelector('.jrn-ta');
-  if(ta)ta.value=txt;
-  var ok=false;
-  try{ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt),ok=true; }catch(e){}
-  if(typeof showToast==='function')showToast(ok?('已复制备份到剪贴板（'+getJournal().length+' 笔样本）'):'剪贴板不可用 —— 请手动长按上方文本全选复制','ok');
+  if(ta){ ta.value=txt; try{ta.focus();ta.select();}catch(e){} }   // 同时填框并全选,复制失败时用户可直接长按复制
+  var done=function(okFlag){
+    if(typeof showToast==='function')showToast(okFlag?('已复制备份到剪贴板（'+getJournal().length+' 笔样本）'):'自动复制不可用 —— 已填入文本框,请长按全选后复制','ok');
+  };
+  // v11.36:writeText 返回 Promise,同步 try/catch 捕不到它的 rejection(剪贴板权限被拒时手机端常见)
+  //        旧写法无论如何都设 ok=true → 会谎报"已复制",用户以为备份成功而实际没有。必须用 then/catch 判定。
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){done(true);},function(){done(false);});
+      return;
+    }
+  }catch(e){}
+  done(false);
 }
 function importReviewData(){
   var ta=document.querySelector('.jrn-ta');
