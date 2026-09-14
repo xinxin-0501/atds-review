@@ -558,6 +558,15 @@
 .jrn-disc b{color:#7a6a3e}
 /* v11.30:样本不足警示(醒目黄底) */
 .jrn-warn-chip{display:inline-block;background:#fff3cd;color:#8a6d3b;border:1px solid #f0d68a;border-radius:8px;padding:2px 6px;font-weight:600;line-height:1.5}
+/* v11.32:跟踪轨迹(逐交易日判定记录) */
+.dc-trace{margin-top:-2px}
+.tr-btn{font-size:9px;padding:3px 8px;min-height:24px;margin-left:0}
+.tr-wrap{margin-top:3px;border-left:2px solid #e6d3a3;padding-left:6px}
+.tr-row{display:flex;flex-wrap:wrap;gap:2px 6px;font-size:9px;line-height:1.5;padding:1px 0;color:#6b5b2e;border-bottom:1px dashed #f5eddb}
+.tr-row:last-child{border-bottom:0}
+.tr-d{flex:0 0 auto;font-weight:700;color:#8a6d3b}
+.tr-hl{flex:0 0 auto;color:#999}
+.tr-ev{flex:1 1 130px;min-width:0;overflow-wrap:anywhere;color:#3f3a2a}
 /* 手动标签编辑器 */
 .dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
 .dc-te-label{color:#999;font-weight:600}
