@@ -1612,7 +1612,8 @@ function bulkAddStrongStockToWatchlist(){
 function pad2F(n){return (n<10?'0':'')+n;}
 function bjTimeF(d){d=d||new Date();return pad2F(d.getHours())+':'+pad2F(d.getMinutes());}
 async function refreshCoreQuotes(){
-  var items=document.querySelectorAll('.index-item[data-code]');
+  // v11.40:同时支持两套标记 —— .index-item(旧) 与 .ce-idx-row(盘中/收盘页实际使用)
+  var items=document.querySelectorAll('.index-item[data-code], .ce-idx-row[data-code]');
   if(!items.length)return;
   var codes=[];var map={};
   items.forEach(function(it){
@@ -1635,6 +1636,15 @@ async function refreshCoreQuotes(){
       if(vEl){vEl.className='index-value '+cls;vEl.textContent=price.toFixed(2);}
       var cEl=it.querySelector('.index-change');
       if(cEl){cEl.className='index-change '+cls;cEl.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';}
+      // v11.40:.ce-idx-row 结构更新(涨跌幅文本/颜色、价格、幅度条)
+      var cv=it.querySelector('.ce-idx-val');
+      if(cv){cv.className='ce-idx-val '+cls;cv.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';}
+      var cp=it.querySelector('.ce-idx-price');
+      if(cp&&price)cp.textContent=price.toFixed(2);
+      var cf=it.querySelector('.ce-idx-bar-fill');
+      if(cf){cf.className='ce-idx-bar-fill '+cls;cf.style.width=Math.min(100,Math.abs(pct)*30)+'%';}
+      var ud=it.querySelector('.ce-idx-name');
+      if(ud)ud.title='数据刷新于 '+new Date().toLocaleTimeString('zh-CN',{hour12:false});
     });
   }catch(e){}
 }
@@ -1645,13 +1655,13 @@ function initRealtimeClock(){
 function initRealtimeRefresh(){
   initRealtimeClock();
   // 午盘/收盘页面每 60 秒刷新核心指数
-  if(document.querySelector('.index-item[data-code]')){
+  if(document.querySelector('.index-item[data-code], .ce-idx-row[data-code]')){   // v11.40:盘中页用 .ce-idx-row
     setTimeout(refreshCoreQuotes,800);
     setInterval(refreshCoreQuotes,60000);
   }
 }
 (function(){
-  if(document.querySelector('#rt-hero-time')||document.querySelector('.index-item[data-code]')){
+  if(document.querySelector('#rt-hero-time')||document.querySelector('.index-item[data-code]')||document.querySelector('.ce-idx-row[data-code]')){
     if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initRealtimeRefresh,300);}
     else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initRealtimeRefresh,300);});}
   }

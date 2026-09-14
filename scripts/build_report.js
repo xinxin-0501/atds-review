@@ -332,7 +332,11 @@ function renderCloseEmotion(report) {
   '</div>';
   const idxRows = indices.map(idx => {
     const cls = upDownClass(idx.changePct);
-    return '<div class="ce-idx-row"><span class="ce-idx-name">' + esc(idx.name) + '</span><span class="ce-idx-val ' + cls + '">' + fmtPct(idx.changePct) + '</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill ' + cls + '" style="width:' + Math.min(100, Math.abs(idx.changePct || 0) * 30) + '%"></div></div></div>';
+    // v11.40:补 data-code/data-prefix(客户端 refreshCoreQuotes 只认带 data-code 的元素 —— 原先它找 .index-item[data-code],
+    //         而本页指数用的是 .ce-idx-row,导致"每 60 秒刷新指数"从未启动),并输出 .ce-idx-price 供刷新时更新。
+    const _code = String(idx.code || '');
+    const _pfx = /^399/.test(_code) ? 'sz' : 'sh';
+    return '<div class="ce-idx-row" data-code="' + esc(_code) + '" data-prefix="' + _pfx + '"><span class="ce-idx-name">' + esc(idx.name) + '</span><span class="ce-idx-val ' + cls + '">' + fmtPct(idx.changePct) + '</span><span class="ce-idx-price">' + (idx.price != null ? esc(String(idx.price)) : '--') + '</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill ' + cls + '" style="width:' + Math.min(100, Math.abs(idx.changePct || 0) * 30) + '%"></div></div></div>';
   }).join('');
   const indexHtml = '<div class="ce-index-block"><div class="ce-block-h">指数表现</div>' + idxRows +
     '<div class="ce-block-hint">' + (function(){
