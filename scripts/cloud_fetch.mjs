@@ -2031,7 +2031,8 @@ function waveScore(klines) {
     let hh = -Infinity, ll = Infinity;
     for (let j = s; j <= i; j++) { if (highs[j] > hh) hh = highs[j]; if (lows[j] < ll) ll = lows[j]; }
     const rsv = (hh - ll) > 0 ? (closes[i] - ll) / (hh - ll) * 100 : 50;
-    K = 2 / 3 * K + 1 / 3 * rsv;
+    // v11.46:统一为战法口径 KDJ(8,2,2)(参数 2 → 平滑系数 1/2)。原 2/3+1/3 相当于 (8,3,3),金叉更滞后。
+    K = 1 / 2 * K + 1 / 2 * rsv;
     D = 2 / 3 * D + 1 / 3 * K;
     J = 3 * K - 2 * D;
     kArr.push(K); dArr.push(D); jArr.push(J);
@@ -2357,7 +2358,7 @@ function strongStockScore(klines, quote) {
   const n = closes.length;
   if (n < 50) return null;
   // 1) 缺口战法:近30日内向上跳空缺口(low[i]>high[i-1] 且幅度>=1%),且之后始终未回补(之后所有 low > 缺口下沿)
-  let gapFound = false, gapDays = 0;
+  let gapFound = false, gapDays = 0, gapIdx = -1;
   const wStart = Math.max(1, n - 30);
   for (let i = wStart; i < n; i++) {
     const prevHigh = highs[i - 1];
@@ -2366,8 +2367,20 @@ function strongStockScore(klines, quote) {
       for (let j = i + 1; j < n; j++) {
         if (lows[j] <= prevHigh) { notFilled = false; break; }
       }
-      if (notFilled) { gapFound = true; gapDays = n - 1 - i; break; }
+      if (notFilled) { gapFound = true; gapDays = n - 1 - i; gapIdx = i; break; }
     }
+  }
+  // v11.46:战法要求缺口形态必须"缩量回调洗盘"(《强势股战法》缺口类型:①跳空缺口②缩量、回调不回补③量能回升再加仓)。
+  //         原实现只校验"未回补",放量回落但不补缺的票也会计入缺口形态。此处补"回调段均量 < 缺口前上涨段均量"。
+  let gapVolOK = false;
+  if (gapFound && gapIdx > 0) {
+    let preSum = 0, preCnt = 0;
+    for (let k = Math.max(0, gapIdx - 5); k < gapIdx; k++) { preSum += vols[k]; preCnt++; }
+    const preAvg = preCnt ? preSum / preCnt : 0;
+    let postSum = 0, postCnt = 0;
+    for (let k = gapIdx + 1; k < n; k++) { postSum += vols[k]; postCnt++; }
+    const postAvg = postCnt ? postSum / postCnt : 0;
+    gapVolOK = preAvg > 0 && postCnt > 0 && postAvg < preAvg;
   }
   // 2) 涨停基因:近20日涨停次数; 首板基因:近20日有涨停且近60日该股前期弱(首个涨停)
   let ztCount = 0;
@@ -2412,7 +2425,10 @@ function strongStockScore(klines, quote) {
     let hh = -Infinity, ll = Infinity;
     for (let j = s; j <= i; j++) { if (highs[j] > hh) hh = highs[j]; if (lows[j] < ll) ll = lows[j]; }
     const rsv = (hh - ll) > 0 ? (closes[i] - ll) / (hh - ll) * 100 : 50;
-    K = 2 / 3 * K + 1 / 3 * rsv; D = 2 / 3 * D + 1 / 3 * K;
+    // v11.46:平滑系数改为 1/2 —— 战法《强势股战法》与页面文案均写 KDJ(8,2,2):
+    //         参数(M1,M2)=2 → K=(M1-1)/M1*K'+1/M1*RSV=1/2*K'+1/2*RSV;D 同理。
+    //         原实现用 2/3+1/3 相当于 (8,3,3),信号比战法更平滑、金叉时点滞后 —— 属实现与既定口径不一致。
+    K = 1 / 2 * K + 1 / 2 * rsv; D = 1 / 2 * D + 1 / 2 * K;
     kArr.push(K); dArr.push(D);
   }
   let kdjGold = false;
@@ -2434,25 +2450,26 @@ function strongStockScore(klines, quote) {
   const turnover = Number(quote && quote.turnover) || 0;
   // 评分
   let score = 0;
-  if (gapFound) score += 25; else if (ztCount > 0) score += 10;
+  if (gapFound && gapVolOK) score += 25; else if (gapFound || ztCount > 0) score += 10;   // v11.46:缺口须"缩量回调"才给满分
   if (ztCount >= 3) score += 15; else if (ztCount >= 2) score += 10; else if (ztCount === 1) score += 5;
   if (wave2) score += 20; else if (adjRatio <= 0.7 && adjDays > 0) score += 10;
   if (kdjGold) score += 15;
   if (breakout) score += 15;
-  if (adjRatio <= 0.7 && adjDays > 0) score += 10;
+  // v11.46:删除此处重复的"缩量调整 +10"(上一段 else-if 已计过一次) —— 实测 300850 因此多得 10 分、排名由第 4 提前到第 2。
   if (volRatio >= 1.2) score += 10;
   if (maAlign) score += 10;
   if (pct >= 3) score += 5; else if (pct > 0) score += 2;
   // 必须有强势属性:缺口 或 二波 或 突破 至少一个
   if (!gapFound && !wave2 && !breakout) return null;
   const sigs = [];
-  if (gapFound) sigs.push('缺口未回补');
+  if (gapFound && gapVolOK) sigs.push('缺口未回补+缩量回调');
+  else if (gapFound) sigs.push('缺口未回补(未缩量)');
   if (wave2) sigs.push('二波启动');
-  if (breakout) sigs.push('突破新高');
+  if (breakout) sigs.push('突破20日收盘高');   // v11.46:明确是"收盘价"口径(可能出现当日收阴但仍高于前20日最高收盘)
   if (kdjGold) sigs.push('KDJ金叉');
   if (!sigs.length) sigs.push('强势股');
   return {
-    score, gapFound, gapDays, ztCount, wave2, adjDays, adjRatio: Math.round(adjRatio * 100) / 100,
+    score, gapFound, gapVolOK, gapDays, ztCount, wave2, adjDays, adjRatio: Math.round(adjRatio * 100) / 100,
     kdjGold, breakout, volRatio: Math.round(volRatio * 100) / 100, maAlign,
     signalType: sigs.join('·')
   };

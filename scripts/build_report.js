@@ -2009,7 +2009,7 @@ function renderStrongStock(report) {
   const card = `<div class="card ss-card">
     <div class="wave-header">
       <div class="wave-title">🔥 强势股选股 TOP20</div>
-      <div class="wave-sub">缺口不回补 · 二波启动 · 突破起爆点 · KDJ(8,2,2)金叉 · 盘中扫描全A剔除ST</div>
+      <div class="wave-sub">缺口不回补 · 二波启动 · 突破起爆点 · KDJ(8,2,2)金叉 · 盘中扫描全A剔除ST<br><span class="ss-note">⚠ 按<b>形态强度</b>排序，非当日涨幅：形态成立但当日平盘/回调的个股也会入榜</span></div>
     </div>
     <div class="wave-tools">
       <span class="wave-scan-info">${esc(ss.source || '全A扫描')}</span>
