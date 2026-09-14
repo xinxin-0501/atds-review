@@ -7,7 +7,7 @@
 .dp-meta-date{font-size:14px;font-weight:700;color:#c33}
 .dp-meta-refresh{font-size:10px;color:#999}
 .dp-meta-action{font-size:11px;color:#c33;padding:4px 10px;border-radius:14px;background:#fff;border:1px solid #c33}
-.dp-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.dp-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .dp-kpi{padding:12px 8px;text-align:center;background:#fff;border-radius:14px;border:1px solid #f0f0f0}
 .dp-kpi-label{font-size:10px;color:#999;margin-bottom:6px}
 .dp-kpi-value{font-size:22px;font-weight:700;line-height:1.1}
@@ -62,7 +62,7 @@
 .dp-rules-card{padding:14px}
 .dp-rules-h{font-size:13px;font-weight:700;margin-bottom:4px}
 .dp-rules-sub{font-size:10px;color:#999;margin-bottom:12px;line-height:1.5}
-.dp-rules-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.dp-rules-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .dp-rule{background:#fafafa;border-radius:10px;padding:10px 8px}
 .dp-rule-id{font-size:10px;color:#c33;font-weight:700}
 .dp-rule-name{font-size:11px;color:#333;margin:4px 0;line-height:1.3}

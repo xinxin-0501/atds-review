@@ -2,8 +2,8 @@
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
 .intl-title{font-size:16px;font-weight:700}
-.intl-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.intl-card{background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 8px;text-align:center}
+.intl-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.intl-card{min-width:0;overflow-wrap:anywhere;background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 8px;text-align:center}
 .intl-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:10px;color:#666}
 .intl-name{font-weight:700;color:#333}
 .intl-unit{color:#999;font-size:9px}
@@ -24,3 +24,6 @@
 .intl-dt-time{font-size:10px;color:#999}
 .intl-dt-src{font-size:10px;color:#999}
 .intl-dt-note{font-size:10px;color:#666;line-height:1.5;background:#fafcff}
+/* v11.40:手机端国际市场改 2 列(原 4 列在 409px 下每列约 89px,长数字撑破网格导致整页横向溢出 95px) */
+@media (max-width:560px){.intl-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.intl-name,.intl-unit,.intl-price{overflow-wrap:anywhere}

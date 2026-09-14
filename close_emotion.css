@@ -14,7 +14,7 @@
 .ce-stat-val{font-weight:700;color:#c33;font-size:13px}
 .ce-top-desc{margin-top:6px;font-size:11px;color:#7a3333;font-weight:700}
 
-.ce-emotion-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.ce-emotion-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:6px}
 .ce-emotion-card{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:8px;text-align:center}
 .ce-emo-num{font-size:18px;font-weight:800;color:#c33;line-height:1.1}
 .ce-emo-label{font-size:10px;color:#888;margin-top:2px}

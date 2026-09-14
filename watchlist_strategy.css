@@ -199,7 +199,7 @@
 }
 .wl-st-head {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,minmax(0,1fr));
   background: rgba(245, 158, 11, 0.06);
   font-size: 11px;
   font-weight: 700;
@@ -544,7 +544,7 @@
 }
 .top5-stats-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5,minmax(0,1fr));
   gap: 6px;
   margin-top: 6px;
 }
@@ -754,7 +754,7 @@
 @media (max-width: 720px) {
   .tb-card { width: 178px; padding: 8px; }
   .tb-pct { font-size: 16px; }
-  .top5-stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .top5-stats-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }
 
 /* 回测表:日期列 + 时段徽标 */
