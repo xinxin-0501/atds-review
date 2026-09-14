@@ -657,3 +657,6 @@
 }
 /* 事件风险数据源受限提示 */
 .dc-src-note{font-size:8px;color:#b0b0b0;line-height:1.4;margin-top:2px}
+
+/* v11.37:龙虎榜为事件驱动数据,超期(>20个交易日未上榜)时的降级提示 */
+.lhb-stale{display:block;margin-top:2px;color:#a0866a;font-size:9px;line-height:1.5;background:#fdf7ec;border-left:2px solid #e6d3a3;padding:2px 5px;overflow-wrap:anywhere}

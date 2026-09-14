@@ -667,6 +667,9 @@
 }
 /* 事件风险数据源受限提示 */
 .dc-src-note{font-size:8px;color:#b0b0b0;line-height:1.4;margin-top:2px}
+
+/* v11.37:龙虎榜为事件驱动数据,超期(>20个交易日未上榜)时的降级提示 */
+.lhb-stale{display:block;margin-top:2px;color:#a0866a;font-size:9px;line-height:1.5;background:#fdf7ec;border-left:2px solid #e6d3a3;padding:2px 5px;overflow-wrap:anywhere}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
@@ -3188,7 +3191,7 @@ function buildDecisionCardHtml(s){
   // 龙虎榜(真实:机构/游资/北向净买)
   var lhb=s.lhb||null;
   var lhbHtml=lhb
-    ?'龙虎榜('+escHtmlF(lhb.date)+')：机构 <b class="'+((lhb.inst||0)>=0?'up':'down')+'">'+((lhb.inst||0)>=0?'+':'')+((lhb.inst!=null?lhb.inst:0).toFixed(2))+'亿</b> · 游资 <b class="'+((lhb.youzi||0)>=0?'up':'down')+'">'+((lhb.youzi||0)>=0?'+':'')+((lhb.youzi!=null?lhb.youzi:0).toFixed(2))+'亿</b> · 北向 <b class="'+((lhb.north||0)>=0?'up':'down')+'">'+((lhb.north||0)>=0?'+':'')+((lhb.north!=null?lhb.north:0).toFixed(2))+'亿</b>'+(lhb.fundAttr?' · 属性 <b>'+escHtmlF(lhb.fundAttr)+'</b>':'')+(lhb.famousSeats&&lhb.famousSeats.length?'<br>知名席位：'+escHtmlF(lhb.famousSeats.slice(0,2).join('、')):'')+'<br>'+escHtmlF(lhb.explain)
+    ?'龙虎榜（最近上榜 '+escHtmlF(lhb.date)+lhbAgoTxtF(lhb.date)+'）：机构 <b class="'+((lhb.inst||0)>=0?'up':'down')+'">'+((lhb.inst||0)>=0?'+':'')+((lhb.inst!=null?lhb.inst:0).toFixed(2))+'亿</b> · 游资 <b class="'+((lhb.youzi||0)>=0?'up':'down')+'">'+((lhb.youzi||0)>=0?'+':'')+((lhb.youzi!=null?lhb.youzi:0).toFixed(2))+'亿</b> · 北向 <b class="'+((lhb.north||0)>=0?'up':'down')+'">'+((lhb.north||0)>=0?'+':'')+((lhb.north!=null?lhb.north:0).toFixed(2))+'亿</b>'+(lhb.fundAttr?' · 属性 <b>'+escHtmlF(lhb.fundAttr)+'</b>':'')+(lhb.famousSeats&&lhb.famousSeats.length?'<br>知名席位：'+escHtmlF(lhb.famousSeats.slice(0,2).join('、')):'')+'<br>'+escHtmlF(lhb.explain)+(lhbStaleF(lhb.date)?'<span class="lhb-stale">⚠ 龙虎榜为事件驱动数据（仅个股达标当日公布）：该股已约'+tradingDaysBetweenF(lhb.date,bjTodayF())+'个交易日未再上榜，以下为历史席位数据，仅供参考</span>':'')
     :'龙虎榜：近期未上榜';
   // 60/15分钟趋势(真实,含MA10/MA5具体价位)
   var m60=(s.minTrend&&s.minTrend.m60)||null;
@@ -3321,7 +3324,7 @@ function buildDecisionCardHtml(s){
   var diMissing=[];
   if(d1Missing)diMissing.push('资金');
   if(!t.ma5)diMissing.push('关键位');
-  if(!s.lhb)diMissing.push('龙虎榜');
+  if(!s.lhb)diMissing.push('龙虎榜'); else if(lhbStaleF(s.lhb.date))diMissing.push('龙虎榜(偏旧)');
   if(s.minTrend&&((s.minTrend.m60&&s.minTrend.m60.approx)||(s.minTrend.m15&&s.minTrend.m15.approx)))diMissing.push('分钟线');
   var integrityBadge=diMissing.length===0
     ?'<span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>'
@@ -5098,6 +5101,21 @@ function startRefreshCountdown(){
 /* 复盘交易日志(localStorage):统计胜率/平均盈亏/连续亏损 */
 // v11.28:统一北京日期。原用 toISOString() 取 UTC 日期:用户在 08:00 前打开(盘前高频场景)
 //        会把当天记成昨天,且时间差算出负数(出现"已观察-1天")。A 股工具一律以北京日期记账。
+// v11.37:龙虎榜是【事件驱动】数据(仅个股达标当日公布),不是每日更新。原 UI 只显示日期,
+// 用户会把"2026-08-25"读成"数据没更新"。现补"最近上榜 + 距今约N个交易日",并对超期数据降级。
+function tradingDaysBetweenF(from,to){
+  if(!from||!to)return 0;
+  var a=Date.parse(String(from).slice(0,10)+'T00:00:00Z'), b=Date.parse(String(to).slice(0,10)+'T00:00:00Z');
+  if(isNaN(a)||isNaN(b)||b<=a)return 0;
+  var n=0;
+  for(var t=a+86400000;t<=b;t+=86400000){ var w=new Date(t).getUTCDay(); if(w!==0&&w!==6)n++; }
+  return n;
+}
+function lhbAgoTxtF(d){
+  var k=tradingDaysBetweenF(d,bjTodayF());
+  return k>0?('，约'+k+'个交易日前'):'（今日）';
+}
+function lhbStaleF(d){ return tradingDaysBetweenF(d,bjTodayF())>20; }
 function r2fF(v){var n=parseFloat(v);return isNaN(n)?null:(Math.round(n*100)/100);}
 function bjTodayF(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); }
 function bjDaysBetweenF(from,to){
