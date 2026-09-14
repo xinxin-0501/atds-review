@@ -567,6 +567,13 @@
 .tr-d{flex:0 0 auto;font-weight:700;color:#8a6d3b}
 .tr-hl{flex:0 0 auto;color:#999}
 .tr-ev{flex:1 1 130px;min-width:0;overflow-wrap:anywhere;color:#3f3a2a}
+/* v11.35:入场方式分组统计 + 样本备份/恢复 */
+.jrn-types{margin-top:3px;color:#6b5b2e}
+.jrn-types b{color:#8a6d3b}
+.jrn-bk{margin-top:4px;padding-top:4px;border-top:1px dashed #ecdca8}
+.jrn-bk-hint{color:#8a7a4e;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+.jrn-ta{width:100%;box-sizing:border-box;height:64px;margin-top:3px;font-size:9px;line-height:1.4;color:#555;background:#fff;border:1px solid #e6d3a3;border-radius:5px;padding:4px 6px;resize:vertical;font-family:monospace;overflow-wrap:anywhere}
+.jrn-bk-btns{margin-top:3px;display:flex;gap:6px;flex-wrap:wrap}
 /* 手动标签编辑器 */
 .dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
 .dc-te-label{color:#999;font-weight:600}
