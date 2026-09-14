@@ -674,6 +674,12 @@
 /* v11.39:区分「槽位时间」与「本机当前时间」,避免把跳动时钟误读为数据时间 */
 .hero-clock{margin-left:8px;font-size:11px;font-weight:600;color:#8a6d3b;background:#fff7e6;border:1px solid #f0d68a;border-radius:8px;padding:1px 6px;white-space:nowrap}
 .hero-clock b{color:#a05a00}
+
+/* v11.43:闸门"盘中不判定"中性态(原盘中恒红,属口径错配) */
+.gate-status.gate-pending{background:#fff8e6;border-color:#f0d68a;color:#8a6d3b}
+.gate-value.neu{color:#8a6d3b}
+.gate-diff.neu{color:#a0866a}
+.gate-when{color:#a0866a;font-size:9px}
 .dragon-pool{margin:14px 16px}
 .dp-header{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1px solid #ffe6e6;border-radius:16px;padding:18px 18px 20px;margin-bottom:12px}
 .dp-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;margin-bottom:4px}
