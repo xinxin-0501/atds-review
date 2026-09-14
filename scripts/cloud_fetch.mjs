@@ -1198,8 +1198,35 @@ function calcTechFromKline(arr) {
     kdjGold,
     bias10: ma10 ? Math.round((last / ma10 - 1) * 1000) / 10 : null,
     bias20: ma20 ? Math.round((last / ma20 - 1) * 1000) / 10 : null,
-    range60: Math.round(range60), pct5: Math.round(pct5 * 100) / 100
+    range60: Math.round(range60), pct5: Math.round(pct5 * 100) / 100,
+    // v11.55:个股 K 线"时刻守卫"戳 —— 技术画像的关键价位(支撑/压力/止损)与 KDJ 都基于这根末K,
+    //   必须让消费方知道它属于哪个交易日、是否含"当日未完成K线"。
+    //   此前客户端 5 条个股数据源里只有 K 线没有任何时点披露(资金/龙虎榜/分时/事件都有)。
+    klineStamp: klineStampS(arr, fmtDate(shanghaiNow()), bjHM(shanghaiNow()))
   };
+}
+// v11.55 个股K线时刻守卫(服务端;客户端镜像 klineStampF,两端行为必须一致)
+//   规则与报告槽位的守卫同构:先看数据"代表哪个交易日",再看它是否完整。
+function klineStampS(series, todayBj, nowHM) {
+  const out = { tradeDate: '', capturedAt: nowHM || '', staleTDays: null, partial: false };
+  if (!Array.isArray(series) || !series.length) return out;
+  const last = series[series.length - 1];
+  out.tradeDate = String((last && last[0]) || '');
+  if (!out.tradeDate) return out;
+  out.staleTDays = tradingDaysBetweenS(out.tradeDate, todayBj);
+  // 盘中(09:30~15:00)抓到的、末根就是今天的 K 线 = 当日未完成K线(15:00 后才算完整)
+  out.partial = (out.tradeDate === todayBj) && (nowHM >= '09:30' && nowHM < '15:00');
+  return out;
+}
+// 交易日差(仅算工作日,与客户端 tradingDaysBetweenF 同口径;不含节假日,与龙虎榜陈旧判定一致)
+function tradingDaysBetweenS(from, to) {
+  if (!from || !to) return 0;
+  const a = Date.parse(String(from).slice(0, 10) + 'T00:00:00Z');
+  const b = Date.parse(String(to).slice(0, 10) + 'T00:00:00Z');
+  if (isNaN(a) || isNaN(b) || b <= a) return 0;
+  let n = 0;
+  for (let t = a + 86400000; t <= b; t += 86400000) { const w = new Date(t).getUTCDay(); if (w !== 0 && w !== 6) n++; }
+  return n;
 }
 // 个股主力资金流缓存(独立文件,保存最近一次成功抓取的 d1/d3/d5,东财接口抽风/限流/超时的终极兜底)
 let _fflowCache = null;

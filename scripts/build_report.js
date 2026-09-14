@@ -1759,12 +1759,24 @@ const lhbHtml = lhb
   const diMissing = [];
   if (d1Missing) diMissing.push('资金');
   if (!t.ma5) diMissing.push('关键位');
+  // v11.55:技术画像所用K线不是最近交易日 → 关键价位(支撑/压力/止损)可能已失效(客户端镜像同段)
+  const ks = t.klineStamp;
+  if (ks && ks.tradeDate && ks.staleTDays > 0) diMissing.push('K线旧(' + String(ks.tradeDate).slice(5) + ')');
   if (!s.lhb) diMissing.push('龙虎榜'); else if (lhbStaleS(s.lhb.date)) diMissing.push('龙虎榜(偏旧)');
   if (s.minTrend && ((s.minTrend.m60 && s.minTrend.m60.approx) || (s.minTrend.m15 && s.minTrend.m15.approx))) diMissing.push('分钟线');
   const dataIntegrity = { complete: diMissing.length === 0, missing: diMissing };
   const integrityBadge = dataIntegrity.complete
     ? '<span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>'
     : '<span class="dc-integrity warn" title="缺失:' + diMissing.join('、') + ' · 决策受限,谨慎交易">⚠ 数据暂缺·' + diMissing.join('/') + '</span>';
+  // v11.55:K线时点披露(与客户端同名同结构,保证两端卡片一致)
+  let klineNote = '';
+  if (ks && ks.tradeDate) {
+    if (ks.staleTDays > 0) {
+      klineNote = '<div class="dc-kline-src warn">⚠ 技术画像基于 ' + esc(String(ks.tradeDate).slice(5)) + ' 的K线（约 ' + ks.staleTDays + ' 个交易日前），支撑/压力/止损位可能已失效</div>';
+    } else if (ks.partial) {
+      klineNote = '<div class="dc-kline-src">技术画像含今日未完成K线（' + esc(ks.capturedAt || '') + ' 抓取），盘中关键位会随价格变动</div>';
+    }
+  }
 
   const detail = `<div class="wl-detail" data-detail-code="${esc(code)}">
     <div class="dc-head">
@@ -1775,7 +1787,7 @@ const lhbHtml = lhb
       <span class="dc-conf${rrActionable ? '' : ' dc-conf-down'}">置信度 ${conf.total}</span>
       <span class="dc-rr ${rrHeadCls}"${rrHeadTitle}>盈亏比 ${p.rr.toFixed(2)}</span>
       <span class="dc-time">${esc(report.meta && report.meta.generatedAt || '')}</span>
-    </div>${summaryHtml}
+    </div>${summaryHtml}${klineNote}
     <div class="dc-tags">${s.category ? '<span class="dc-tag">' + esc(s.category) + '</span>' : ''}${(s.tags || []).map(t => '<span class="dc-tag">' + esc(t) + '</span>').join('')}<span class="dc-tag">催化:${esc(_catalyst(s))}</span><span class="dc-tag">时效:${esc(_catalystTime(s))}</span><span class="dc-tag">阶段:${esc(_ferment(s))}</span><span class="dc-tag">情绪:${esc(emotionCycle)}</span><span class="dc-tag">地位:${esc(_boardStatus(s))}</span><span class="dc-tag">${esc(_tolerance(s))}</span></div>
     ${s.logic ? '<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">' + esc(s.logic) + '</div></div>' : ''}
     <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
