@@ -5232,6 +5232,8 @@ function toggleShadowTrack(cb){
   }
   setShadowMap(m);
   updateReviewProgress();
+  // v11.33:勾选后立即评估一次 —— 否则要等下一次 60s 限频刷新才产生 lastCheck/轨迹,用户勾完看不到反馈。
+  if(cb.checked){ try{ settleAllShadowTrades(); }catch(e){} }
 }
 
 // v11.28:模拟跟踪结算 —— 加入「入场门控」。这是本轮最关键的修正。
@@ -5341,7 +5343,7 @@ function settleShadowTrade(code,klines){
       }
     }
   }
-  // ② 回退:用实时当天最高/最低判定
+  // ② 回退:用实时当天最高/最低判定(同时把当日判定写入轨迹,保证"当天勾选就能看到")
   if(!kUsed){
     if(!(high>0&&low>0&&high>=low))return;
     if((high-low)/low>0.5){
@@ -5350,17 +5352,27 @@ function settleShadowTrade(code,klines){
       return;
     }
     rec.lastCheck={date:today,price:price,high:high,low:low};
+    var ev=null;
     if(!rec.entryHit){
       if(low<=entry){
         rec.entryHit=true;rec.entryDate=today;rec.entryPrice=entry;
-        if(low<=stop){ doSettle('loss',pct(stop),stop,'入场当日即跌破止损'); return; }
-      }
+        ev=(low<=stop)?'enter-stop':'enter';
+      } else ev='wait';
     } else if(rec.entryDate!==today){
       var hitT=high>=target,hitS=low<=stop;
-      if(hitT&&hitS){ doSettle('loss',pct(stop),stop,'当日最高触止盈、最低触止损，保守计为止损'); return; }
-      if(hitT){ doSettle('win',pct(target),target,'入场后当日最高触及止盈'); return; }
-      if(hitS){ doSettle('loss',pct(stop),stop,'当日最低触及止损'); return; }
+      ev=(hitT&&hitS)?'both-stop':(hitT?'win':(hitS?'loss':'hold'));
     }
+    if(ev){
+      if(!rec.trace||!rec.trace.length)rec.trace=[];
+      var kept=[];
+      for(var tq=0;tq<rec.trace.length;tq++){ if(rec.trace[tq].d!==today)kept.push(rec.trace[tq]); }
+      kept.push({d:today,hi:high,lo:low,ev:ev,px:(ev==='enter'?entry:(ev==='win'?target:((ev==='loss'||ev==='both-stop'||ev==='enter-stop')?stop:null))),gapT:(ev==='hold'?Math.round((target-high)/high*10000)/100:null)});
+      rec.trace=kept.slice(-12);
+    }
+    if(ev==='enter-stop'){ doSettle('loss',pct(stop),stop,'入场当日即跌破止损'); return; }
+    if(ev==='both-stop'){ doSettle('loss',pct(stop),stop,'当日最高触止盈、最低触止损，保守计为止损'); return; }
+    if(ev==='win'){ doSettle('win',pct(target),target,'入场后当日最高触及止盈'); return; }
+    if(ev==='loss'){ doSettle('loss',pct(stop),stop,'当日最低触及止损'); return; }
   }
   // ③ 超期出口
   if(!rec.entryHit){
