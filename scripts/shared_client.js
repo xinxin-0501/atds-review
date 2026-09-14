@@ -2625,7 +2625,7 @@ function renderJournalStats(){
   var head='📒 模拟跟踪复盘：有效样本 <b>'+c.valid+'</b> 笔'+
     (c.winRate!=null?(' · 胜率 <b>'+c.winRate+'%</b>（'+c.win+'胜'+c.loss+'负'+(c.expired?'·'+c.expired+'过期':'')+'）'):'')+
     ' · 平均 <b>'+(c.avg>0?'+':'')+c.avg+'%</b>'+
-    ((c.win+c.loss)<10?'（不足10笔，仅供参考）':'')+
+    ((c.win+c.loss)<10?'　<span class="jrn-warn-chip">⚠ 样本不足10笔，统计偶发性大，不构成投资参考</span>':'')+
     '　<button class="jrn-btn" onclick="toggleJournalDetail()">'+(jrnOpen?'收起明细':'每笔明细')+'</button>';
   var ex=[];
   if(c.legacy)ex.push('早期未校验 '+c.legacy+' 笔（无入场门控，不计入胜率）');
@@ -2947,7 +2947,7 @@ function updateReviewProgress(){
       } else if(last&&!last.shadow){
         txt='真实交易已记录：'+(last.pnl!=null?((last.pnl>0?'+':'')+last.pnl+'%'):'盈亏待补')+'（'+last.date+'）';
       } else {
-        txt='尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本';
+        txt='未激活 —— 勾选"系统模拟跟踪"后开始累计样本（全池累计样本见上方汇总，不计入本股）';
       }
     }
     attr.textContent=txt;
