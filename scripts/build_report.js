@@ -862,7 +862,9 @@ function prevCloseAmount(curDate) {
     if (!days.length) return null;
     const last = days[days.length - 1];
     const j = JSON.parse(fs.readFileSync(path.join(dir, last + '_16-20.json'), 'utf8'));
-    const v = Number((j.marketStats || {}).totalAmount);
+    // v11.43d:marketStats.totalAmount 是带单位的字符串(如 "19719亿"),Number() 会得 NaN → 曾误判为"数据缺失"
+    const rawAmt = (j.marketStats || {}).totalAmount;
+    const v = parseFloat(String(rawAmt == null ? "" : rawAmt).replace(/[^0-9.]/g, ""));
     return isFinite(v) && v > 0 ? { date: last, amount: v } : null;
   } catch (e) { return null; }
 }
