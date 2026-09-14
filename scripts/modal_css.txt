@@ -24,7 +24,7 @@
 .modal-score-num{font-size:32px;font-weight:700;color:#c33;line-height:1}
 .modal-score-label{font-size:9px;color:#999}
 .modal-score-stars{font-size:14px;color:#c33;margin-top:2px}
-.modal-val-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+.modal-val-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:8px}
 .modal-val-cell{background:#fafafa;border-radius:8px;padding:8px 4px;text-align:center}
 .modal-val-label{font-size:9px;color:#999}
 .modal-val-value{font-size:13px;font-weight:700;margin-top:2px}
@@ -130,7 +130,7 @@
 .wl-cell-risk,.wl-cell-horizon,.wl-cell-advice{min-width:140px;max-width:160px}
 .wl-detail-row{background:#fafafa}
 .wl-detail-row td{padding:0 8px 10px 8px !important;border-bottom:1px solid #f0f0f0}
-.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 0 4px 0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px 0 4px 0}
 @media (max-width:380px){.detail-grid{grid-template-columns:1fr}}
 .detail-block{background:#fff;border-radius:8px;padding:8px 10px;font-size:10px;color:#444;line-height:1.5;border:1px solid #f0f0f0}
 .detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -145,7 +145,7 @@
 .detail-line b{color:#7b1fa2;margin-right:4px;font-weight:600}
 .wl-detail-row{background:#fafafa}
 .wl-detail-row td{padding:0 8px 10px 8px !important;border-bottom:1px solid #f0f0f0}
-.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 0 4px 0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px 0 4px 0}
 @media (max-width:380px){.detail-grid{grid-template-columns:1fr}}
 .detail-block{background:#fff;border-radius:8px;padding:8px 10px;font-size:10px;color:#444;line-height:1.5;border:1px solid #f0f0f0}
 .detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -429,7 +429,7 @@
 .sr-reason{font-size:9px;color:#888;margin-top:2px}
 .sr-pct{font-size:11px;font-weight:700;flex-shrink:0}
 /* v17b: 盘前驾驶舱 + 策略状态数据化 */
-.cp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .cp-item{background:#fafafa;border-radius:8px;padding:8px}
 .cp-k{font-size:9px;color:#888;margin-bottom:2px}
 .cp-v{font-size:11px;font-weight:700;color:#333}

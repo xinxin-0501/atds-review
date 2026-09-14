@@ -30,7 +30,7 @@
 .modal-score-num{font-size:32px;font-weight:700;color:#c33;line-height:1}
 .modal-score-label{font-size:9px;color:#999}
 .modal-score-stars{font-size:14px;color:#c33;margin-top:2px}
-.modal-val-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+.modal-val-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:8px}
 .modal-val-cell{background:#fafafa;border-radius:8px;padding:8px 4px;text-align:center}
 .modal-val-label{font-size:9px;color:#999}
 .modal-val-value{font-size:13px;font-weight:700;margin-top:2px}
@@ -136,7 +136,7 @@
 .wl-cell-risk,.wl-cell-horizon,.wl-cell-advice{min-width:140px;max-width:160px}
 .wl-detail-row{background:#fafafa}
 .wl-detail-row td{padding:0 8px 10px 8px !important;border-bottom:1px solid #f0f0f0}
-.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 0 4px 0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px 0 4px 0}
 @media (max-width:380px){.detail-grid{grid-template-columns:1fr}}
 .detail-block{background:#fff;border-radius:8px;padding:8px 10px;font-size:10px;color:#444;line-height:1.5;border:1px solid #f0f0f0}
 .detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -151,7 +151,7 @@
 .detail-line b{color:#7b1fa2;margin-right:4px;font-weight:600}
 .wl-detail-row{background:#fafafa}
 .wl-detail-row td{padding:0 8px 10px 8px !important;border-bottom:1px solid #f0f0f0}
-.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px 0 4px 0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px 0 4px 0}
 @media (max-width:380px){.detail-grid{grid-template-columns:1fr}}
 .detail-block{background:#fff;border-radius:8px;padding:8px 10px;font-size:10px;color:#444;line-height:1.5;border:1px solid #f0f0f0}
 .detail-h{font-weight:700;color:#333;font-size:10px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -435,7 +435,7 @@
 .sr-reason{font-size:9px;color:#888;margin-top:2px}
 .sr-pct{font-size:11px;font-weight:700;flex-shrink:0}
 /* v17b: 盘前驾驶舱 + 策略状态数据化 */
-.cp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .cp-item{background:#fafafa;border-radius:8px;padding:8px}
 .cp-k{font-size:9px;color:#888;margin-bottom:2px}
 .cp-v{font-size:11px;font-weight:700;color:#333}
@@ -679,7 +679,7 @@
 .dp-meta-date{font-size:14px;font-weight:700;color:#c33}
 .dp-meta-refresh{font-size:10px;color:#999}
 .dp-meta-action{font-size:11px;color:#c33;padding:4px 10px;border-radius:14px;background:#fff;border:1px solid #c33}
-.dp-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.dp-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .dp-kpi{padding:12px 8px;text-align:center;background:#fff;border-radius:14px;border:1px solid #f0f0f0}
 .dp-kpi-label{font-size:10px;color:#999;margin-bottom:6px}
 .dp-kpi-value{font-size:22px;font-weight:700;line-height:1.1}
@@ -734,7 +734,7 @@
 .dp-rules-card{padding:14px}
 .dp-rules-h{font-size:13px;font-weight:700;margin-bottom:4px}
 .dp-rules-sub{font-size:10px;color:#999;margin-bottom:12px;line-height:1.5}
-.dp-rules-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.dp-rules-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .dp-rule{background:#fafafa;border-radius:10px;padding:10px 8px}
 .dp-rule-id{font-size:10px;color:#c33;font-weight:700}
 .dp-rule-name{font-size:11px;color:#333;margin:4px 0;line-height:1.3}
@@ -752,8 +752,8 @@
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
 .intl-title{font-size:16px;font-weight:700}
-.intl-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.intl-card{background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 8px;text-align:center}
+.intl-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.intl-card{min-width:0;overflow-wrap:anywhere;background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:12px 8px;text-align:center}
 .intl-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:10px;color:#666}
 .intl-name{font-weight:700;color:#333}
 .intl-unit{color:#999;font-size:9px}
@@ -774,6 +774,9 @@
 .intl-dt-time{font-size:10px;color:#999}
 .intl-dt-src{font-size:10px;color:#999}
 .intl-dt-note{font-size:10px;color:#666;line-height:1.5;background:#fafcff}
+/* v11.40:手机端国际市场改 2 列(原 4 列在 409px 下每列约 89px,长数字撑破网格导致整页横向溢出 95px) */
+@media (max-width:560px){.intl-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.intl-name,.intl-unit,.intl-price{overflow-wrap:anywhere}
 /* Hero 头部区 */
 .hero{background:linear-gradient(135deg,#fff8f5 0%,#fef3ed 50%,#fff 100%);padding:18px 16px 16px;border-radius:0 0 14px 14px;margin-bottom:8px;border-bottom:1px solid #f5e6dc}
 .hero-eyebrow{font-size:10px;color:#c33;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
@@ -862,7 +865,7 @@
 .ce-stat-val{font-weight:700;color:#c33;font-size:13px}
 .ce-top-desc{margin-top:6px;font-size:11px;color:#7a3333;font-weight:700}
 
-.ce-emotion-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.ce-emotion-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:6px}
 .ce-emotion-card{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:8px;text-align:center}
 .ce-emo-num{font-size:18px;font-weight:800;color:#c33;line-height:1.1}
 .ce-emo-label{font-size:10px;color:#888;margin-top:2px}
@@ -1174,7 +1177,7 @@
 }
 .wl-st-head {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,minmax(0,1fr));
   background: rgba(245, 158, 11, 0.06);
   font-size: 11px;
   font-weight: 700;
@@ -1519,7 +1522,7 @@
 }
 .top5-stats-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5,minmax(0,1fr));
   gap: 6px;
   margin-top: 6px;
 }
@@ -1729,7 +1732,7 @@
 @media (max-width: 720px) {
   .tb-card { width: 178px; padding: 8px; }
   .tb-pct { font-size: 16px; }
-  .top5-stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .top5-stats-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }
 
 /* 回测表:日期列 + 时段徽标 */
@@ -2254,7 +2257,7 @@
       <a href="index.html">盘前</a><a href="2026-08-17_11-35.html">盘中</a><a href="2026-08-17_16-20.html">收盘</a><a href="2026-09-14_11-35.html">复盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 13:00</b>（约 1359 分钟前）</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 83°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 13:00</b>（约 1360 分钟前）</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 83°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-17 13:00:38</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
