@@ -645,6 +645,9 @@
 .dc-integrity.ok{color:#2e7d32;background:#e8f5e9;border:1px solid #c8e6c9}
 .dc-integrity.warn{color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0}
 .dc-integrity.loading{color:#1a5c8a;background:#e3f2fd;border:1px solid #90caf9;animation:dc-pulse 1.6s ease-in-out infinite}
+/* v11.55:个股K线时点披露(关键价位由这根末K算出,必须让用户知道它属于哪一天) */
+.dc-kline-src{font-size:10px;line-height:1.5;color:#1a5c8a;background:#eef6fd;border-left:3px solid #90caf9;border-radius:0 5px 5px 0;padding:5px 8px;margin:6px 0 2px}
+.dc-kline-src.warn{color:#8a5a00;background:#fff8e1;border-left-color:#ffca28}
 /* 资金流数据暂缺/缓存标记(d1/d3/d5 为 null → 显示"数据暂缺"而非 --亿) */
 .ff-missing{font-style:normal;font-weight:600;color:#b8860b;background:#fff8e1;border-radius:3px;padding:0 4px;margin-left:2px;font-size:10px}
 .ff-cache{font-style:normal;font-weight:600;color:#1a5c8a;background:#e3f2fd;border-radius:3px;padding:0 4px;margin-left:3px;font-size:10px}
@@ -2279,7 +2282,7 @@
       <a href="index.html">首页</a><a href="2026-08-18_08-30.html">盘前</a><a href="2026-08-18_11-35.html" class="active">盘中</a><a href="2026-08-18_15-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照 · <b>数据时间 18:37</b>（约 161 分钟前）</div><h1 class="hero-title">2026-08-18 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">21:18</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 18:37），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 85°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照 · <b>数据时间 18:37</b>（约 190 分钟前）</div><h1 class="hero-title">2026-08-18 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">21:47</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 18:37），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 85°</span></div></div>
 <div class="section">
 <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-18 午盘快照 · 实时更新中</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">85°</div><div class="ce-stage">过热区 · 情绪极度亢奋</div><div class="ce-fact">主特征: 谨防高潮后分歧</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">34%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">79</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">79</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈77%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">4板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">32%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">2279</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">4257</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">147</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:2279"></div><div class="ce-bar-flat" style="flex:147"></div><div class="ce-bar-down" style="flex:4257"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>34%</b></span><span>成交额 <b>24008亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row" data-code="000001" data-prefix="sh"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val up">+0.19%</span><span class="ce-idx-price">3990.3</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:5.7%"></div></div></div><div class="ce-idx-row" data-code="399001" data-prefix="sz"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val down">-0.56%</span><span class="ce-idx-price">14622.5</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:16.8%"></div></div></div><div class="ce-idx-row" data-code="399006" data-prefix="sz"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-0.93%</span><span class="ce-idx-price">3705.56</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:27.900000000000002%"></div></div></div><div class="ce-block-hint">量能维持在 2 万亿上方 (24008 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">种植业</span><span class="ce-ml-val up">+9.1%</span></div><div class="ce-ml-row"><span class="ce-ml-name">化学制药</span><span class="ce-ml-val up">+7.7%</span></div><div class="ce-ml-row"><span class="ce-ml-name">养殖业</span><span class="ce-ml-val up">+6.1%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">种植业</span><span class="ce-mi-val up">+9.1亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制药</span><span class="ce-mi-val up">+7.7亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">养殖业</span><span class="ce-mi-val up">+6.1亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制品</span><span class="ce-mi-val up">+6.1亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card bt-card-outer"><div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换<span class="bt-time">· 11:35</span></div><div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div><div class="bt-row"><div class="bt-card bt-4"><div class="bt-lv">4板</div><div class="bt-name">神奇制药</div><div class="bt-sub">四板高度</div></div><div class="bt-card bt-3"><div class="bt-lv">3板</div><div class="bt-name">桂发祥</div><div class="bt-sub">三板高度</div></div><div class="bt-card bt-2"><div class="bt-lv">2板</div><div class="bt-name">哈森股份</div><div class="bt-sub">二板</div></div><div class="bt-card bt-1"><div class="bt-lv">1板</div><div class="bt-name">丰原药业</div><div class="bt-sub">首板</div></div><div class="bt-card bt-new"><div class="bt-lv">断板</div><div class="bt-name">--</div><div class="bt-sub">断板</div></div></div><div class="bt-struct-note"><b>结构辨证</b>:化学制药 今日最高 4板(龙头 神奇制药),板块 +10.0% / 资金 +0.0亿;种植业 +12.0% 居次,休闲食品 +10.0% 第三,汽车零部 +10.0%。梯队高度 4板,情绪 85°(过热区),注意高位分歧与一致兑现风险。</div><div class="vt-section"><div class="vt-h">② 主线研判</div><div class="vt-line"><span class="vt-rank">①</span><b>化学制药</b> — 穿越板块总龙头(<b class="up">神奇制药 4板</b>)<div class="vt-desc">板块 +10.03%、资金 +0.0亿,0家涨停,龙头 神奇制药 领涨,是当前情绪总龙头,注意高位分歧。</div></div><div class="vt-line"><span class="vt-rank">②</span><b>种植业</b> — 今日次强爆发(<b class="up">农发种业</b>)<div class="vt-desc">板块 +11.99%、资金 +0.0亿,0家涨停,龙头 农发种业 领涨,为二线主线。</div></div><div class="vt-line"><span class="vt-rank">③</span><b>休闲食品</b> — 梯队成形<div class="vt-desc">板块 +10.04%、资金 +0.0亿,0家涨停,龙头 桂发祥。</div></div><div class="vt-line"><span class="vt-rank">④</span><b>汽车零部</b> — 资金主节奏<div class="vt-desc">板块 +9.99%、资金 +0.0亿,0家涨停,关注承接力度。</div></div></div><div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors"><li><span class="vt-tag">神奇制药 4板</span>化学制药 板块 +10.0% 领涨,龙头 神奇制药 表态,关注能否延续 4 板穿越</li><li><span class="vt-tag">农发种业</span>种植业 今日次强,龙头 农发种业 领涨,观察明日能否接力</li><li><span class="vt-tag">桂发祥</span>休闲食品 梯队成形,资金 净流入 0.0亿,关注持续性</li><li><span class="vt-tag">正裕工业</span>汽车零部 板块 +10.0%,资金 净流入 0.0亿,高位注意回撤</li><li><span class="vt-tag">炸板监控</span>今日炸板 23家,炸板率超 40% 需警惕情绪退潮</li><li><span class="vt-tag">量能验证</span>成交额 24008亿,关注量能能否维持</li></ul></div><div class="bd-section"><div class="bd-h">④ 板块强弱 · 3最强 · 3分歧 · 3流出</div><table class="bd-tbl"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>方向</th></tr></thead><tbody><tr class="bd-seg-h bd-seg-1"><td colspan="5"><span class="bd-seg-num">1</span><b>最强</b> · 一字带动 · 龙头确立</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">电子化学</td><td class="up">+20.00%</td><td class="up">+12.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">通用设备</td><td class="up">+16.67%</td><td class="up">+10.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">养殖业</td><td class="up">+13.38%</td><td class="up">+8.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr class="bd-seg-h bd-seg-2"><td colspan="5"><span class="bd-seg-num">2</span><b>分歧</b> · 资金流入但涨幅收敛</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">光学光电</td><td class="up">+13.34%</td><td class="up">+8.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">种植业</td><td class="up">+11.99%</td><td class="up">+7.2亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">专业工程</td><td class="up">+10.10%</td><td class="up">+6.1亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr class="bd-seg-h bd-seg-3"><td colspan="5"><span class="bd-seg-num">3</span><b>流出</b> · 退潮 / 资金撤离</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">休闲食品</td><td class="up">+10.04%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">化学制药</td><td class="up">+10.03%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">化学制品</td><td class="up">+10.02%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr></tbody></table></div><div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div><div class="msw-row"><span class="msw-tag msw-tag-def">防御</span><div class="msw-vals"><span class="up">+0.00%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-row"><span class="msw-tag msw-tag-ag">种植业</span><div class="msw-vals"><span class="up">+11.99%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-note">今日主力净流入最强:化学制药 +0.0亿;资金承接方向切换至 种植业 / 防御</div><div class="msw-nums"><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">化学制药</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">种植业</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">休闲食品</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">汽车零部</div></div></div><div class="msw-foot">主力净流入(亿元)按板块封单+成交额汇总:化学制药、种植业、休闲食品、汽车零部 领涨;防御(防御)与农业(种植业)为资金切换承接方向,谨防一致兑现。</div></div><div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
     
@@ -5449,14 +5452,36 @@ async function fetchKlineF(code, count) {
     const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
     if (Array.isArray(series) && series.length) {
       // 写入浏览器本地缓存(供 CORS/网络失败时兜底)
-      try { var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); kc[code]={date:bjTodayF(),series:series.slice(-120)}; localStorage.setItem('atds_kline_cache',JSON.stringify(kc)); } catch(e2) {}
+      // v11.55:①记下这根末K代表的交易日(tradeDate),不再只写"抓取日"(那个字段以前没人读,是死字段);
+      //        ②拒绝写入:数据源抽风可能返回**比缓存更旧**的序列 → 保留新的,不用旧的覆盖。
+      try {
+        var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}');
+        var st=klineStampF(series,bjTodayF(),bjNowHM());
+        if(klineShouldOverwriteF(kc[code],series)){
+          kc[code]={date:bjTodayF(),tradeDate:st.tradeDate,capturedAt:st.capturedAt,partial:st.partial,series:series.slice(-120)};
+          localStorage.setItem('atds_kline_cache',JSON.stringify(kc));
+        }else{
+          console.warn('[kline] 拒绝写入: 新数据末根 '+st.tradeDate+' 早于缓存 '+(kc[code]&&kc[code].tradeDate));
+        }
+      } catch(e2) {}
       return series;
     }
   } catch (e) {}
   // 失败兜底:浏览器本地缓存 → 仓库 data/kline_cache.json(GitHub Pages 同源)
-  try { var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); if(kc[code]&&kc[code].series&&kc[code].series.length) return kc[code].series; } catch(e) {}
-  try { var r=await fetch('data/kline_cache.json',{cache:'no-store'}); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return jc[code].series;} } catch(e) {}
+  // v11.55:兜底路径必须说明"这是哪天的K线",否则卡片会拿几天前的K线算"当前关键位"却不自知。
+  try { var kc2=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
+  try { var r=await fetch('data/kline_cache.json',{cache:'no-store'}); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
   return [];
+}
+// 给兜底K线打上"来源"标记(非枚举属性,不会被 JSON.stringify 带进缓存/属性,避免体积膨胀)
+function tagKlineSourceF(series, meta){
+  try{
+    if(Array.isArray(series)){
+      var st=klineStampF(series,bjTodayF(),bjNowHM());
+      Object.defineProperty(series,'__k',{value:{src:(meta&&meta.src)||'live',tradeDate:st.tradeDate,capturedAt:st.capturedAt,staleTDays:st.staleTDays,partial:st.partial},enumerable:false,configurable:true});
+    }
+  }catch(e){}
+  return series;
 }
 function detectPatternsF(klines) {
   if (!Array.isArray(klines) || klines.length < 65) return null;
@@ -6107,11 +6132,23 @@ function buildDecisionCardHtml(s){
   var diMissing=[];
   if(d1Missing)diMissing.push('资金');
   if(!t.ma5)diMissing.push('关键位');
+  // v11.55:技术画像所用K线不是最近交易日 → 关键价位(支撑/压力/止损)可能已失效,必须计入"数据不完整"
+  var ks=t.klineStamp;
+  if(ks&&ks.tradeDate&&ks.staleTDays>0)diMissing.push('K线旧('+String(ks.tradeDate).slice(5)+')');
   if(!s.lhb)diMissing.push('龙虎榜'); else if(lhbStaleF(s.lhb.date))diMissing.push('龙虎榜(偏旧)');
   if(s.minTrend&&((s.minTrend.m60&&s.minTrend.m60.approx)||(s.minTrend.m15&&s.minTrend.m15.approx)))diMissing.push('分钟线');
   var integrityBadge=diMissing.length===0
     ?'<span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>'
     :'<span class="dc-integrity warn" title="缺失:'+diMissing.join('、')+' · 决策受限,谨慎交易">⚠ 数据暂缺·'+diMissing.join('/')+'</span>';
+  // v11.55:K线时点披露(关键价位直接由这根末K算出,用户必须知道它属于哪一天)
+  var klineNote='';
+  if(ks&&ks.tradeDate){
+    if(ks.staleTDays>0){
+      klineNote='<div class="dc-kline-src warn">⚠ 技术画像基于 '+escHtmlF(String(ks.tradeDate).slice(5))+' 的K线（约 '+ks.staleTDays+' 个交易日前），支撑/压力/止损位可能已失效</div>';
+    }else if(ks.partial){
+      klineNote='<div class="dc-kline-src">技术画像含今日未完成K线（'+escHtmlF(ks.capturedAt||'')+' 抓取），盘中关键位会随价格变动</div>';
+    }
+  }
 
   return '<div class="dc-head">'+
     '<span class="dc-pri">'+priority+'</span>'+
@@ -6121,7 +6158,7 @@ function buildDecisionCardHtml(s){
     '<span class="dc-conf'+(rrActionable?'':' dc-conf-down')+'">置信度 '+confTotal+'</span>'+
     '<span class="dc-rr '+rrHeadCls+'"'+rrHeadTitle+'>盈亏比 '+p.rr.toFixed(2)+'</span>'+
     '<span class="dc-time">'+new Date().toLocaleString('zh-CN',{hour12:false})+'</span>'+
-    '</div>'+summaryHtml+
+    '</div>'+summaryHtml+klineNote+
     '<div class="dc-tags">'+(s.category?'<span class="dc-tag">'+escHtmlF(s.category)+'</span>':'')+tagsArr.map(function(x){return '<span class="dc-tag">'+escHtmlF(x)+'</span>';}).join('')+'<span class="dc-tag">催化:'+escHtmlF(catalyst)+'</span><span class="dc-tag">时效:'+escHtmlF(catalystTime)+'</span><span class="dc-tag">阶段:'+escHtmlF(ferment)+'</span><span class="dc-tag">情绪:'+escHtmlF(emotionCycle)+'</span><span class="dc-tag">地位:'+escHtmlF(boardStatus)+'</span><span class="dc-tag">'+escHtmlF(tolerance)+'</span></div>'+
     (s.logic?'<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">'+escHtmlF(s.logic)+'</div></div>':'')+
     '<div class="dc-block"><div class="dc-h">💰 资金与量能</div>'+
@@ -7028,6 +7065,32 @@ function tradeProgressF(){
   return Math.min(1,Math.max(0,traded/240));
 }
 /* 交易决策技术画像:镜像云端 calcTechFromKline(ATR14/支撑压力/缺口/多周期),真实K线计算 */
+/* v11.55 个股K线时刻守卫(客户端;服务端镜像 klineStampS,两端行为必须一致)
+   为什么需要:手动添加个股的"关键价位(支撑/压力/止损/止盈)"与 autoGenStrategy 都是**客户端**
+   用实时K线算出来的(见本文件 buildDecisionCardHtml / autoGenStrategy),而 5 条个股数据源里
+   只有 K 线没有任何时点披露 —— 网络抽风回退本地缓存时,可能用几天前的K线算出"当前"关键位,
+   且卡片上还显示"✓ 数据完整"。这条守卫把"数据代表哪个交易日/是否完整"显式暴露出来。 */
+function klineStampF(series, todayBj, nowHM) {
+  var out={tradeDate:'',capturedAt:nowHM||'',staleTDays:null,partial:false};
+  if(!Array.isArray(series)||!series.length)return out;
+  var last=series[series.length-1];
+  out.tradeDate=String((last&&last[0])||'');
+  if(!out.tradeDate)return out;
+  out.staleTDays=tradingDaysBetweenF(out.tradeDate,todayBj);
+  // 盘中(09:30~15:00)抓到的、末根就是今天的K线 = 当日未完成K线(15:00 后才完整)
+  out.partial=(out.tradeDate===todayBj)&&(nowHM>='09:30'&&nowHM<'15:00');
+  return out;
+}
+// 拒绝写入:数据源抽风可能返回"比缓存更旧"的序列 → 保留新的,不用旧的覆盖
+function klineShouldOverwriteF(prevEntry,newSeries){
+  try{
+    if(!prevEntry||!prevEntry.tradeDate)return true;
+    if(!Array.isArray(newSeries)||!newSeries.length)return false;
+    var nd=String((newSeries[newSeries.length-1]||[])[0]||'');
+    if(!nd)return false;
+    return String(nd)>=String(prevEntry.tradeDate);   // 同日或更新才允许覆盖
+  }catch(e){return true;}
+}
 function calcDecisionTech(klines){
   if(!Array.isArray(klines)||klines.length<30)return null;
   var closes=klines.map(function(k){return parseFloat(k[2]);}).filter(function(n){return !isNaN(n);});
@@ -7100,7 +7163,9 @@ function calcDecisionTech(klines){
     atr14:r2(atr14),high60:r2(high60),low60:r2(low60),gapUp:gapUp,gapDown:gapDown,supports:supports,pressures:pressures,
     weeklyTrend:weeklyTrend,volRatio:volRatio!=null?Math.round(volRatio*100)/100:null,
     volChgPct:volChgPct,volToday:volToday,volYesterday:volYesterday,
-    bias20:ma20?Math.round((last/ma20-1)*1000)/10:null};
+    bias20:ma20?Math.round((last/ma20-1)*1000)/10:null,
+    // v11.55:把"这根末K属于哪个交易日/是否当日未完成"钉在画像上,供卡片披露(镜像云端 klineStampS)
+    klineStamp:klineStampF(klines,bjTodayF(),bjNowHM())};
 }
 /* v11.19:个股画像(东财 f127 行业名 / f58 名称)。仅用于把行业名映射成 business-driven 逻辑文案,
    不参与任何交易判断。实测 push2 stock/get 对本站点返回 Access-Control-Allow-Origin,客户端可直连。
@@ -7991,6 +8056,7 @@ function lhbAgoTxtF(d){
 function lhbStaleF(d){ return tradingDaysBetweenF(d,bjTodayF())>20; }
 function r2fF(v){var n=parseFloat(v);return isNaN(n)?null:(Math.round(n*100)/100);}
 function bjTodayF(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); }
+function bjNowHM(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(11,16); }
 function bjDaysBetweenF(from,to){
   if(!from||!to)return 0;
   var a=Date.parse(String(from).slice(0,10)+'T00:00:00Z'), b=Date.parse(String(to).slice(0,10)+'T00:00:00Z');

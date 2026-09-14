@@ -641,6 +641,9 @@
 .dc-integrity.ok{color:#2e7d32;background:#e8f5e9;border:1px solid #c8e6c9}
 .dc-integrity.warn{color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0}
 .dc-integrity.loading{color:#1a5c8a;background:#e3f2fd;border:1px solid #90caf9;animation:dc-pulse 1.6s ease-in-out infinite}
+/* v11.55:个股K线时点披露(关键价位由这根末K算出,必须让用户知道它属于哪一天) */
+.dc-kline-src{font-size:10px;line-height:1.5;color:#1a5c8a;background:#eef6fd;border-left:3px solid #90caf9;border-radius:0 5px 5px 0;padding:5px 8px;margin:6px 0 2px}
+.dc-kline-src.warn{color:#8a5a00;background:#fff8e1;border-left-color:#ffca28}
 /* 资金流数据暂缺/缓存标记(d1/d3/d5 为 null → 显示"数据暂缺"而非 --亿) */
 .ff-missing{font-style:normal;font-weight:600;color:#b8860b;background:#fff8e1;border-radius:3px;padding:0 4px;margin-left:2px;font-size:10px}
 .ff-cache{font-style:normal;font-weight:600;color:#1a5c8a;background:#e3f2fd;border-radius:3px;padding:0 4px;margin-left:3px;font-size:10px}
@@ -2275,7 +2278,7 @@
       <a href="index.html">首页</a><a href="2026-09-09_09-40.html" class="active">盘前</a><a href="2026-09-09_11-35.html">盘中</a><a href="2026-09-09_16-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:20</b>（约 118 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:20），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 79°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:20</b>（约 147 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:20），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 79°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-09 19:20:47</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -3683,14 +3686,36 @@ async function fetchKlineF(code, count) {
     const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
     if (Array.isArray(series) && series.length) {
       // 写入浏览器本地缓存(供 CORS/网络失败时兜底)
-      try { var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); kc[code]={date:bjTodayF(),series:series.slice(-120)}; localStorage.setItem('atds_kline_cache',JSON.stringify(kc)); } catch(e2) {}
+      // v11.55:①记下这根末K代表的交易日(tradeDate),不再只写"抓取日"(那个字段以前没人读,是死字段);
+      //        ②拒绝写入:数据源抽风可能返回**比缓存更旧**的序列 → 保留新的,不用旧的覆盖。
+      try {
+        var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}');
+        var st=klineStampF(series,bjTodayF(),bjNowHM());
+        if(klineShouldOverwriteF(kc[code],series)){
+          kc[code]={date:bjTodayF(),tradeDate:st.tradeDate,capturedAt:st.capturedAt,partial:st.partial,series:series.slice(-120)};
+          localStorage.setItem('atds_kline_cache',JSON.stringify(kc));
+        }else{
+          console.warn('[kline] 拒绝写入: 新数据末根 '+st.tradeDate+' 早于缓存 '+(kc[code]&&kc[code].tradeDate));
+        }
+      } catch(e2) {}
       return series;
     }
   } catch (e) {}
   // 失败兜底:浏览器本地缓存 → 仓库 data/kline_cache.json(GitHub Pages 同源)
-  try { var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); if(kc[code]&&kc[code].series&&kc[code].series.length) return kc[code].series; } catch(e) {}
-  try { var r=await fetch('data/kline_cache.json',{cache:'no-store'}); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return jc[code].series;} } catch(e) {}
+  // v11.55:兜底路径必须说明"这是哪天的K线",否则卡片会拿几天前的K线算"当前关键位"却不自知。
+  try { var kc2=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
+  try { var r=await fetch('data/kline_cache.json',{cache:'no-store'}); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
   return [];
+}
+// 给兜底K线打上"来源"标记(非枚举属性,不会被 JSON.stringify 带进缓存/属性,避免体积膨胀)
+function tagKlineSourceF(series, meta){
+  try{
+    if(Array.isArray(series)){
+      var st=klineStampF(series,bjTodayF(),bjNowHM());
+      Object.defineProperty(series,'__k',{value:{src:(meta&&meta.src)||'live',tradeDate:st.tradeDate,capturedAt:st.capturedAt,staleTDays:st.staleTDays,partial:st.partial},enumerable:false,configurable:true});
+    }
+  }catch(e){}
+  return series;
 }
 function detectPatternsF(klines) {
   if (!Array.isArray(klines) || klines.length < 65) return null;
@@ -4341,11 +4366,23 @@ function buildDecisionCardHtml(s){
   var diMissing=[];
   if(d1Missing)diMissing.push('资金');
   if(!t.ma5)diMissing.push('关键位');
+  // v11.55:技术画像所用K线不是最近交易日 → 关键价位(支撑/压力/止损)可能已失效,必须计入"数据不完整"
+  var ks=t.klineStamp;
+  if(ks&&ks.tradeDate&&ks.staleTDays>0)diMissing.push('K线旧('+String(ks.tradeDate).slice(5)+')');
   if(!s.lhb)diMissing.push('龙虎榜'); else if(lhbStaleF(s.lhb.date))diMissing.push('龙虎榜(偏旧)');
   if(s.minTrend&&((s.minTrend.m60&&s.minTrend.m60.approx)||(s.minTrend.m15&&s.minTrend.m15.approx)))diMissing.push('分钟线');
   var integrityBadge=diMissing.length===0
     ?'<span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>'
     :'<span class="dc-integrity warn" title="缺失:'+diMissing.join('、')+' · 决策受限,谨慎交易">⚠ 数据暂缺·'+diMissing.join('/')+'</span>';
+  // v11.55:K线时点披露(关键价位直接由这根末K算出,用户必须知道它属于哪一天)
+  var klineNote='';
+  if(ks&&ks.tradeDate){
+    if(ks.staleTDays>0){
+      klineNote='<div class="dc-kline-src warn">⚠ 技术画像基于 '+escHtmlF(String(ks.tradeDate).slice(5))+' 的K线（约 '+ks.staleTDays+' 个交易日前），支撑/压力/止损位可能已失效</div>';
+    }else if(ks.partial){
+      klineNote='<div class="dc-kline-src">技术画像含今日未完成K线（'+escHtmlF(ks.capturedAt||'')+' 抓取），盘中关键位会随价格变动</div>';
+    }
+  }
 
   return '<div class="dc-head">'+
     '<span class="dc-pri">'+priority+'</span>'+
@@ -4355,7 +4392,7 @@ function buildDecisionCardHtml(s){
     '<span class="dc-conf'+(rrActionable?'':' dc-conf-down')+'">置信度 '+confTotal+'</span>'+
     '<span class="dc-rr '+rrHeadCls+'"'+rrHeadTitle+'>盈亏比 '+p.rr.toFixed(2)+'</span>'+
     '<span class="dc-time">'+new Date().toLocaleString('zh-CN',{hour12:false})+'</span>'+
-    '</div>'+summaryHtml+
+    '</div>'+summaryHtml+klineNote+
     '<div class="dc-tags">'+(s.category?'<span class="dc-tag">'+escHtmlF(s.category)+'</span>':'')+tagsArr.map(function(x){return '<span class="dc-tag">'+escHtmlF(x)+'</span>';}).join('')+'<span class="dc-tag">催化:'+escHtmlF(catalyst)+'</span><span class="dc-tag">时效:'+escHtmlF(catalystTime)+'</span><span class="dc-tag">阶段:'+escHtmlF(ferment)+'</span><span class="dc-tag">情绪:'+escHtmlF(emotionCycle)+'</span><span class="dc-tag">地位:'+escHtmlF(boardStatus)+'</span><span class="dc-tag">'+escHtmlF(tolerance)+'</span></div>'+
     (s.logic?'<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">'+escHtmlF(s.logic)+'</div></div>':'')+
     '<div class="dc-block"><div class="dc-h">💰 资金与量能</div>'+
@@ -5262,6 +5299,32 @@ function tradeProgressF(){
   return Math.min(1,Math.max(0,traded/240));
 }
 /* 交易决策技术画像:镜像云端 calcTechFromKline(ATR14/支撑压力/缺口/多周期),真实K线计算 */
+/* v11.55 个股K线时刻守卫(客户端;服务端镜像 klineStampS,两端行为必须一致)
+   为什么需要:手动添加个股的"关键价位(支撑/压力/止损/止盈)"与 autoGenStrategy 都是**客户端**
+   用实时K线算出来的(见本文件 buildDecisionCardHtml / autoGenStrategy),而 5 条个股数据源里
+   只有 K 线没有任何时点披露 —— 网络抽风回退本地缓存时,可能用几天前的K线算出"当前"关键位,
+   且卡片上还显示"✓ 数据完整"。这条守卫把"数据代表哪个交易日/是否完整"显式暴露出来。 */
+function klineStampF(series, todayBj, nowHM) {
+  var out={tradeDate:'',capturedAt:nowHM||'',staleTDays:null,partial:false};
+  if(!Array.isArray(series)||!series.length)return out;
+  var last=series[series.length-1];
+  out.tradeDate=String((last&&last[0])||'');
+  if(!out.tradeDate)return out;
+  out.staleTDays=tradingDaysBetweenF(out.tradeDate,todayBj);
+  // 盘中(09:30~15:00)抓到的、末根就是今天的K线 = 当日未完成K线(15:00 后才完整)
+  out.partial=(out.tradeDate===todayBj)&&(nowHM>='09:30'&&nowHM<'15:00');
+  return out;
+}
+// 拒绝写入:数据源抽风可能返回"比缓存更旧"的序列 → 保留新的,不用旧的覆盖
+function klineShouldOverwriteF(prevEntry,newSeries){
+  try{
+    if(!prevEntry||!prevEntry.tradeDate)return true;
+    if(!Array.isArray(newSeries)||!newSeries.length)return false;
+    var nd=String((newSeries[newSeries.length-1]||[])[0]||'');
+    if(!nd)return false;
+    return String(nd)>=String(prevEntry.tradeDate);   // 同日或更新才允许覆盖
+  }catch(e){return true;}
+}
 function calcDecisionTech(klines){
   if(!Array.isArray(klines)||klines.length<30)return null;
   var closes=klines.map(function(k){return parseFloat(k[2]);}).filter(function(n){return !isNaN(n);});
@@ -5334,7 +5397,9 @@ function calcDecisionTech(klines){
     atr14:r2(atr14),high60:r2(high60),low60:r2(low60),gapUp:gapUp,gapDown:gapDown,supports:supports,pressures:pressures,
     weeklyTrend:weeklyTrend,volRatio:volRatio!=null?Math.round(volRatio*100)/100:null,
     volChgPct:volChgPct,volToday:volToday,volYesterday:volYesterday,
-    bias20:ma20?Math.round((last/ma20-1)*1000)/10:null};
+    bias20:ma20?Math.round((last/ma20-1)*1000)/10:null,
+    // v11.55:把"这根末K属于哪个交易日/是否当日未完成"钉在画像上,供卡片披露(镜像云端 klineStampS)
+    klineStamp:klineStampF(klines,bjTodayF(),bjNowHM())};
 }
 /* v11.19:个股画像(东财 f127 行业名 / f58 名称)。仅用于把行业名映射成 business-driven 逻辑文案,
    不参与任何交易判断。实测 push2 stock/get 对本站点返回 Access-Control-Allow-Origin,客户端可直连。
@@ -6225,6 +6290,7 @@ function lhbAgoTxtF(d){
 function lhbStaleF(d){ return tradingDaysBetweenF(d,bjTodayF())>20; }
 function r2fF(v){var n=parseFloat(v);return isNaN(n)?null:(Math.round(n*100)/100);}
 function bjTodayF(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); }
+function bjNowHM(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(11,16); }
 function bjDaysBetweenF(from,to){
   if(!from||!to)return 0;
   var a=Date.parse(String(from).slice(0,10)+'T00:00:00Z'), b=Date.parse(String(to).slice(0,10)+'T00:00:00Z');

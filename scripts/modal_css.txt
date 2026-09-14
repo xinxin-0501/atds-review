@@ -635,6 +635,9 @@
 .dc-integrity.ok{color:#2e7d32;background:#e8f5e9;border:1px solid #c8e6c9}
 .dc-integrity.warn{color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0}
 .dc-integrity.loading{color:#1a5c8a;background:#e3f2fd;border:1px solid #90caf9;animation:dc-pulse 1.6s ease-in-out infinite}
+/* v11.55:个股K线时点披露(关键价位由这根末K算出,必须让用户知道它属于哪一天) */
+.dc-kline-src{font-size:10px;line-height:1.5;color:#1a5c8a;background:#eef6fd;border-left:3px solid #90caf9;border-radius:0 5px 5px 0;padding:5px 8px;margin:6px 0 2px}
+.dc-kline-src.warn{color:#8a5a00;background:#fff8e1;border-left-color:#ffca28}
 /* 资金流数据暂缺/缓存标记(d1/d3/d5 为 null → 显示"数据暂缺"而非 --亿) */
 .ff-missing{font-style:normal;font-weight:600;color:#b8860b;background:#fff8e1;border-radius:3px;padding:0 4px;margin-left:2px;font-size:10px}
 .ff-cache{font-style:normal;font-weight:600;color:#1a5c8a;background:#e3f2fd;border-radius:3px;padding:0 4px;margin-left:3px;font-size:10px}
