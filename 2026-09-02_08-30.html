@@ -2254,7 +2254,7 @@
       <a href="index.html">盘前</a><a href="2026-09-02_11-35.html">盘中</a><a href="2026-09-02_16-20.html">收盘</a><a href="2026-09-14_11-35.html">复盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 11:37</b>（约 1436 分钟前）</div><h1 class="hero-title">2026-09-02 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 72°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 11:37</b>（约 2 分钟前）</div><h1 class="hero-title">2026-09-02 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 72°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-02 11:37:58</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -5119,7 +5119,8 @@ function bulkAddStrongStockToWatchlist(){
 function pad2F(n){return (n<10?'0':'')+n;}
 function bjTimeF(d){d=d||new Date();return pad2F(d.getHours())+':'+pad2F(d.getMinutes());}
 async function refreshCoreQuotes(){
-  var items=document.querySelectorAll('.index-item[data-code]');
+  // v11.40:同时支持两套标记 —— .index-item(旧) 与 .ce-idx-row(盘中/收盘页实际使用)
+  var items=document.querySelectorAll('.index-item[data-code], .ce-idx-row[data-code]');
   if(!items.length)return;
   var codes=[];var map={};
   items.forEach(function(it){
@@ -5142,6 +5143,15 @@ async function refreshCoreQuotes(){
       if(vEl){vEl.className='index-value '+cls;vEl.textContent=price.toFixed(2);}
       var cEl=it.querySelector('.index-change');
       if(cEl){cEl.className='index-change '+cls;cEl.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';}
+      // v11.40:.ce-idx-row 结构更新(涨跌幅文本/颜色、价格、幅度条)
+      var cv=it.querySelector('.ce-idx-val');
+      if(cv){cv.className='ce-idx-val '+cls;cv.textContent=(pct>0?'+':'')+pct.toFixed(2)+'%';}
+      var cp=it.querySelector('.ce-idx-price');
+      if(cp&&price)cp.textContent=price.toFixed(2);
+      var cf=it.querySelector('.ce-idx-bar-fill');
+      if(cf){cf.className='ce-idx-bar-fill '+cls;cf.style.width=Math.min(100,Math.abs(pct)*30)+'%';}
+      var ud=it.querySelector('.ce-idx-name');
+      if(ud)ud.title='数据刷新于 '+new Date().toLocaleTimeString('zh-CN',{hour12:false});
     });
   }catch(e){}
 }
@@ -5152,13 +5162,13 @@ function initRealtimeClock(){
 function initRealtimeRefresh(){
   initRealtimeClock();
   // 午盘/收盘页面每 60 秒刷新核心指数
-  if(document.querySelector('.index-item[data-code]')){
+  if(document.querySelector('.index-item[data-code], .ce-idx-row[data-code]')){   // v11.40:盘中页用 .ce-idx-row
     setTimeout(refreshCoreQuotes,800);
     setInterval(refreshCoreQuotes,60000);
   }
 }
 (function(){
-  if(document.querySelector('#rt-hero-time')||document.querySelector('.index-item[data-code]')){
+  if(document.querySelector('#rt-hero-time')||document.querySelector('.index-item[data-code]')||document.querySelector('.ce-idx-row[data-code]')){
     if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initRealtimeRefresh,300);}
     else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initRealtimeRefresh,300);});}
   }
