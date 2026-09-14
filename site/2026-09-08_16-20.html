@@ -3361,7 +3361,7 @@ function buildDecisionCardHtml(s){
         '<button class="ts-btn ts-t-btn" data-code="'+escHtmlF(s.code)+'" onclick="recordTTrade(this)">记做T</button>'+
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
-      '<div class="dc-line">策略执行/归因：<span class="ts-attr">尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
+      '<div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-next-day">🎯 明日核心观察点：'+nextDayFocus+'</div>'+
     '</div>';
 }
