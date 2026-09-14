@@ -153,8 +153,8 @@ function renderMarketStats(report) {
   return `<div class="card">
     <div class="card-title">市场概览</div>
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-num up">${s.upCount ?? '--'}</div><div class="stat-label">上涨家数(沪深)</div></div>
-      <div class="stat-card"><div class="stat-num down">${s.downCount ?? '--'}</div><div class="stat-label">下跌家数(沪深)</div></div>
+      <div class="stat-card"><div class="stat-num up">${s.upCount ?? '--'}</div><div class="stat-label">上涨家数${s.breadthScope ? '(' + esc(s.breadthScope) + ')' : ''}</div></div>
+      <div class="stat-card"><div class="stat-num down">${s.downCount ?? '--'}</div><div class="stat-label">下跌家数${s.breadthScope ? '(' + esc(s.breadthScope) + ')' : ''}</div></div>
       <div class="stat-card"><div class="stat-num">${s.limitUpCount ?? '--'}</div><div class="stat-label">涨停家数</div></div>
       <div class="stat-card"><div class="stat-num down">${s.limitDownCount ?? '--'}</div><div class="stat-label">跌停家数</div></div>
       <div class="stat-card"><div class="stat-num">${s.zhaBanCount ?? '--'}</div><div class="stat-label">炸板家数</div></div>
@@ -349,9 +349,11 @@ function renderCloseEmotion(report) {
   '<div class="ce-breadth-meta">' +
     '<span>红盘率 <b>' + (ce.redRate || '--') + '%</b></span>' +
     '<span>成交额 <b>' + esc(report.marketStats && report.marketStats.totalAmount || '--') + '</b> (沪深合计)</span>' +
-    // v11.53:标注家数口径。原先 breadth 误把创业板(深市子集)重复计入 → 上涨家数虚高(3858 实为 2974);
-    //        修采集口径后此处显式说明,避免用户把"涨+跌+平=5284"与"全市场家数"混淆。
-    '<span>家数口径 <b>沪深</b>(不含北交所)</span>' +
+    // v11.53:标注家数口径。v11.53 之前采集的 json 把创业板(深市子集)重复计入(涨3858 实为 2974),
+    //        且历史文件无法追溯修正 —— 故只在 json 自带 breadthScope 时才声明口径,旧文件不冒充。
+    (report.marketStats && report.marketStats.breadthScope
+      ? '<span>家数口径 <b>' + esc(report.marketStats.breadthScope) + '</b>(不含北交所)</span>'
+      : '') +
   '</div>';
   const idxRows = indices.map(idx => {
     const cls = upDownClass(idx.changePct);
@@ -1061,7 +1063,7 @@ function renderDataAnalysis(report) {
   const m1 = `<div class="da-block">
     <div class="da-h">第一步 · 市场定调</div>
     <div class="da-line">指数：${esc(idxLine || '--')}</div>
-    <div class="da-line">涨跌家数(沪深)：涨 ${ms.upCount} / 跌 ${ms.downCount} / 平 ${ms.flatCount}（红盘率 ${ratio}%）</div>
+    <div class="da-line">涨跌家数${ms.breadthScope ? '(' + esc(ms.breadthScope) + ')' : ''}：涨 ${ms.upCount} / 跌 ${ms.downCount} / 平 ${ms.flatCount}（红盘率 ${ratio}%）</div>
     <div class="da-line">涨停 ${ms.limitUpCount} 家 · 炸板 ${ms.zhaBanCount} 家 · 最高连板 ${ms.maxLianBan} 板（${esc(ms.maxLianBanStock || '--')}）</div>
     <div class="da-src">数据源：腾讯行情 + 东方财富涨停池（官方接口）<span class="da-score">准确性 9/10</span></div>
   </div>`;

@@ -3185,6 +3185,9 @@ async function main() {
     indices,
     marketStats: {
       upCount: breadth.up, downCount: breadth.down, flatCount: breadth.flat,
+      // v11.53:口径随数据一并落盘 —— v11.53 之前采集的文件里,创业板(深市子集)被重复计入,
+      //   历史 json 无法追溯修正。标注"由数据自述",避免界面给旧文件贴上错误的口径说明。
+      breadthScope: '沪深',
       limitUpCount: zt.total, limitDownCount: 0, zhaBanCount: zbCount,
       maxLianBan: dragonPool.maxLianBan || '--', maxLianBanStock: (dragonPool.consecutiveBoards && dragonPool.consecutiveBoards[0]) ? dragonPool.consecutiveBoards[0].name : '--',
       totalAmount: totalAmountYi ? totalAmountYi.toFixed(0) + '亿' : '--'
