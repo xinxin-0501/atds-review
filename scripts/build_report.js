@@ -2720,7 +2720,7 @@ ${renderHero(report)}
 <div class="section">
 ${renderCloseEmotion(report)}
     ${report.meta && (report.meta.type === 'midday' || report.meta.type === 'close') ? renderTopBoardPicks(report) : ''}
-    ${report.meta && report.meta.type === 'close' ? '' : renderRegimeGate(report)}
+    ${renderRegimeGate(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
   ${report.meta && report.meta.type === 'midday' ? renderShortCore(report) : ''}
