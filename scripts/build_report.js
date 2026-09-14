@@ -899,6 +899,9 @@ function renderRegimeGate(report) {
   const taDiffHtml = !ta ? '数据获取中'
     : isMid ? ('盘中累计 ' + ta.toFixed(0) + ' 亿 · 占阈值 ' + (ta / GATE_TA * 100).toFixed(1) + '%，待收盘确认')
       : (S.amountOk ? '✓ 双日达标 · 超 ' + taDiff + ' 亿' : '✗ 差 ' + (GATE_TA - ta).toFixed(0) + ' 亿 (' + taPct + '%)');
+  const nhDiffHtml = !nh ? '--'
+    : isMid ? ('盘中 ' + nh + ' 只 · 占阈值 ' + (nh / GATE_NH * 100).toFixed(0) + '%，待收盘确认')
+      : (nhOk ? '✓ 超过 ' + nhDiff + ' 只' : '✗ 差 ' + (-nhDiff) + ' 只 (' + nhPct + '%)');
   const contHint = isMid ? ''
     : S.prev ? ('连续 2 日：前一交易日 ' + S.prev.amount.toFixed(0) + ' 亿（' + S.prev.date + '）' + (S.prev.amount >= GATE_TA ? ' ✓ 达标' : ' ✗ 未达标'))
       : '连续 2 日：前一交易日数据缺失，本次仅按当日判定';
@@ -916,7 +919,7 @@ function renderRegimeGate(report) {
         <div class="gate-h">② 60日新高个股数 <span class="gate-link">📋 点击查看</span></div>
         <div class="gate-value ${nhCls}">${nh} 只</div>
         <div class="gate-th">阈值 ≥ 100 只 · 群众基础确认</div>
-        <div class="gate-diff ${nhCls}">${nh ? (nhOk ? '✓ 超过 ' + nhDiff + ' 只' : '✗ 差 ' + (-nhDiff) + ' 只 (' + nhPct + '%)') : '--'}</div>
+        <div class="gate-diff ${nhCls}">${nhDiffHtml}</div>
       </div>
     </div>
     <div class="gate-status ${cls}">
