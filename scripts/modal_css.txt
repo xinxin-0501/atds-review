@@ -553,6 +553,9 @@
 .jrn-num{flex:0 0 auto;font-weight:700;text-align:right}
 .jrn-pos .jrn-num{color:#c33}
 .jrn-neg .jrn-num{color:#2e7d32}
+/* v11.29:口径声明(把理想化假设写在界面上,不假装精确) */
+.jrn-disc{margin-top:4px;padding-top:4px;border-top:1px dashed #ecdca8;color:#8a7a4e;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+.jrn-disc b{color:#7a6a3e}
 /* 手动标签编辑器 */
 .dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
 .dc-te-label{color:#999;font-weight:600}

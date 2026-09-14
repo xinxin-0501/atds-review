@@ -563,6 +563,9 @@
 .jrn-num{flex:0 0 auto;font-weight:700;text-align:right}
 .jrn-pos .jrn-num{color:#c33}
 .jrn-neg .jrn-num{color:#2e7d32}
+/* v11.29:口径声明(把理想化假设写在界面上,不假装精确) */
+.jrn-disc{margin-top:4px;padding-top:4px;border-top:1px dashed #ecdca8;color:#8a7a4e;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+.jrn-disc b{color:#7a6a3e}
 /* 手动标签编辑器 */
 .dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
 .dc-te-label{color:#999;font-weight:600}
@@ -5440,7 +5443,7 @@ function buildDecisionCardHtml(s){
         '<button class="ts-btn ts-t-btn" data-code="'+escHtmlF(s.code)+'" onclick="recordTTrade(this)">记做T</button>'+
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
-      '<div class="dc-line">策略执行/归因：<span class="ts-attr">尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（未触发入场不计入样本）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
+      '<div class="dc-line">策略执行/归因：<span class="ts-attr">尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-next-day">🎯 明日核心观察点：'+nextDayFocus+'</div>'+
     '</div>';
 }
@@ -7201,6 +7204,7 @@ function renderJournalStats(){
   var ex=[];
   if(c.legacy)ex.push('早期未校验 '+c.legacy+' 笔（无入场门控，不计入胜率）');
   if(c.missed)ex.push('未触发入场 '+c.missed+' 笔（不计入胜率）');
+  if(c.invalid)ex.push('计划失效 '+c.invalid+' 笔（起点已破位，不计入胜率）');
   var warn='<div class="jrn-warn">'+(ex.length?('⚠ '+ex.join('　·　')+'　'):'')+'<button class="jrn-btn jrn-del" onclick="confirmClearReviewData()">清空复盘数据</button></div>';
   var rows='';
   if(jrnOpen){
@@ -7208,24 +7212,29 @@ function renderJournalStats(){
     for(var i=j.length-1;i>=0;i--){
       var e=j[i];
       var legacy=!!(e.shadow&&e.v!==28);
-      var rn={win:'止盈',loss:'止损',expired:'过期按现价',missed:'未触发入场'}[e.result]||(e.result||'—');
+      var excluded=legacy||e.result==='missed'||e.result==='invalid';
+      var rn={win:'止盈',loss:'止损',expired:'过期按现价',missed:'未触发入场',invalid:'计划失效'}[e.result]||(e.result||'—');
       var flow;
       if(legacy){
         flow='早期样本（'+(e.openedDate||e.date||'—')+' 记录）判定依据不完整';
       }else if(e.result==='missed'){
         flow=(e.openedDate||e.date||'—')+' 起观察 → 未回落至入场价'+e.entry+' → 未触发入场';
+      }else if(e.result==='invalid'){
+        flow=(e.openedDate||e.date||'—')+' 起观察 → 起点现价已低于计划止损位'+e.stop+' → 计划失效，未入场';
       }else{
         var mid=e.shadow?(e.entryDate?('入场 '+e.entryDate+'@'+e.entry):'—'):('真实交易 @'+(e.entry==null?'—':e.entry));
         flow=(e.openedDate||e.date||'—')+' 开始观察 → '+mid+' → '+rn+' '+(e.settleDate||e.date||'—')+(e.settlePrice!=null?('@'+e.settlePrice):'')+
           (e.note?'（'+e.note+'）':'');
       }
       var pnlTxt=(e.pnl==null?'—':((e.pnl>0?'+':'')+e.pnl+'%'));
-      rows+='<div class="jrn-row'+(e.pnl>0?' jrn-pos':(e.pnl<0?' jrn-neg':''))+'">'+
+      rows+='<div class="jrn-row'+(excluded?'':(e.pnl>0?' jrn-pos':(e.pnl<0?' jrn-neg':'')))+'">'+
         '<span class="jrn-code">'+escHtmlF(String(e.code))+' '+escHtmlF(e.name||'')+(e.strategy==='tTrade'?' [做T]':'')+'</span>'+
         '<span class="jrn-flow">'+escHtmlF(flow)+'</span>'+
-        '<span class="jrn-num">'+(legacy?'不计入':pnlTxt)+'</span></div>';
+        '<span class="jrn-num">'+(excluded?'不计入':pnlTxt)+'</span></div>';
     }
     rows+='</div>';
+    // v11.29:口径声明 —— 把理想化假设显式写出来,比假装数据精确更可信。
+    rows+='<div class="jrn-disc">口径说明：用<b>当日最高/最低</b>判定（日线，无法还原日内先后顺序，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率。<b>同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
   }
   el.innerHTML=head+warn+rows;
 }
@@ -7381,8 +7390,17 @@ function settleShadowTrade(code){
   if(!high)high=price;
   if(!low)low=price;
   var entry=rec.entry,stop=rec.stop,target=rec.target;
-  if(!entry||!stop||!target)return;
+  // v11.29 防御1:计划参数必须合法(止盈>入场>止损)。非法计划一律不参与判定,避免脏计划产出结论。
+  if(!entry||!stop||!target||!(target>entry&&entry>stop))return;
+  // v11.29 防御2:价格数据必须为正且区间自洽。
+  if(!(price>0&&high>0&&low>0&&high>=low))return;
   var today=bjTodayF();
+  // v11.29 防御3:振幅异常(>50%)视为数据异常或疑似除权(主板最大振幅约20%、双创约40%)→ 本次不判定,只记录。
+  if((high-low)/low>0.5){
+    rec.lastCheck={date:today,price:price,high:high,low:low,skip:'振幅异常('+Math.round((high-low)/low*100)+'%)，疑似数据异常/除权，本次不判定'};
+    setShadowMap(sm);
+    return;
+  }
   rec.lastCheck={date:today,price:price,high:high,low:low};
   var pct=function(v){return Math.round((v-entry)/entry*10000)/100;};
   var doSettle=function(result,pnl,settlePrice,note){
@@ -7391,6 +7409,13 @@ function settleShadowTrade(code){
       openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:today,settlePrice:settlePrice,v:28,strategy:'swing'});
     setShadowMap(sm);
   };
+  // v11.29 防御4:观察起点作废。首个有效检查日若现价已在【计划止损位之下】,说明勾选时计划已被击穿,
+  //   现实中不会按该计划入场(否则等于"明知破位还照价买")。此类记为 invalid(计划失效),不计入胜率。
+  //   注意:只筛"起点已破位"这一情形,不影响"入场后正常止损"的亏损样本(那类必须保留,否则又会系统性虚高胜率)。
+  if(!rec.entryHit&&!rec.firstCheck){
+    rec.firstCheck=today;
+    if(price<=stop){ doSettle('invalid',0,null,'观察起点现价'+price+'已低于计划止损位'+stop+'，计划已失效，未入场'); return; }
+  }
   // 阶段1:待入场
   if(!rec.entryHit){
     if(low&&low<=entry){                       // 当日最低回落至计划入场价 → 视为已入场
@@ -7437,7 +7462,7 @@ function restoreReviewUI(block){
 // 新口径:有效样本 = 已结算且非历史脏样本(v<28);胜率分母 = win+loss(排除 expired/missed);历史脏样本单列、不计入。
 function reviewClassification(){
   var j=getJournal();
-  var s={valid:0,win:0,loss:0,expired:0,missed:0,legacy:0,sum:0,avg:0,winRate:null};
+  var s={valid:0,win:0,loss:0,expired:0,missed:0,invalid:0,legacy:0,sum:0,avg:0,winRate:null};
   for(var i=0;i<j.length;i++){
     var e=j[i],p=Number(e.pnl),rs=e.result;
     if(!rs&&!isNaN(p)&&e.pnl!=null)rs=(p>=0?'win':'loss');
@@ -7447,6 +7472,7 @@ function reviewClassification(){
       if(!isNaN(p))s.sum+=p;
       if(rs==='win')s.win++;else if(rs==='loss')s.loss++;else s.expired++;
     } else if(rs==='missed'){ s.missed++; }
+    else if(rs==='invalid'){ s.invalid++; }   // v11.29:观察起点已破位的作废样本,不计入胜率
   }
   s.avg=s.valid?Math.round(s.sum/s.valid*100)/100:0;
   s.winRate=(s.win+s.loss)?Math.round(s.win/(s.win+s.loss)*100):null;
@@ -7472,7 +7498,8 @@ function updateReviewProgress(){
         txt='待入场（已观察'+days+'天）：现价'+px+'，需回落至计划入场价'+r.entry+(need!=null?('（还差'+need+'%）'):'')+'；未触发入场前不计入样本';
       }else{
         var gap=(px&&r.target)?Math.round((r.target-px)/px*10000)/100:null;
-        txt='跟踪中（'+r.entryDate+' 入场@'+r.entry+'）：现价'+px+'，距止盈'+(gap!=null?((gap>=0?'+':'')+gap+'%'):'--')+'（止损'+r.stop+'），触达即自动结算';
+        var fl=(px&&r.entry)?Math.round((px-r.entry)/r.entry*10000)/100:null;   // v11.29:实时浮动,让"跟踪中"可衡量
+        txt='跟踪中（'+r.entryDate+' 入场@'+r.entry+'）：现价'+px+'，浮动'+(fl!=null?((fl>=0?'+':'')+fl+'%'):'--')+'，距止盈'+(gap!=null?((gap>=0?'+':'')+gap+'%'):'--')+'（止损'+r.stop+'），触达即自动结算';
       }
     } else {
       var mine=[];
@@ -7483,8 +7510,10 @@ function updateReviewProgress(){
           txt='早期样本（无入场门控、判定依据不完整）—— 不计入胜率，建议点上方「清空复盘数据」重新累计';
         } else if(last.result==='missed'){
           txt='未触发入场：观察期内未回落至计划入场价'+last.entry+'，不计入胜率样本';
+        } else if(last.result==='invalid'){
+          txt='计划失效：观察起点现价已低于计划止损位'+last.stop+'，未按计划入场 —— 不计入胜率样本';
         } else {
-          var rn={win:'止盈',loss:'止损',expired:'过期按现价'}[last.result]||(last.result||'已结算');
+          var rn={win:'止盈',loss:'止损',expired:'过期按现价',invalid:'计划失效'}[last.result]||(last.result||'已结算');
           txt='已结算：'+rn+' '+(last.pnl>0?'+':'')+(last.pnl==null?'--':last.pnl)+'%'+
               '（'+((last.entryDate||last.openedDate||'—')+' 入场@'+last.entry)+' → '+(last.settleDate||'—')+' '+rn+(last.settlePrice!=null?('@'+last.settlePrice):'')+'）'+
               (last.note?'，'+last.note:'');
@@ -7504,6 +7533,7 @@ function updateReviewProgress(){
     : (' · 跟踪中'+openCnt+'笔（未结算）');
   if(c.legacy)line+=' · 早期未校验'+c.legacy+'笔(不计入)';
   if(c.missed)line+=' · 未触发入场'+c.missed+'笔';
+  if(c.invalid)line+=' · 计划失效'+c.invalid+'笔';
   var statEls=document.querySelectorAll('.ts-winrate');
   for(var m2=0;m2<statEls.length;m2++)statEls[m2].textContent=line;
 }
