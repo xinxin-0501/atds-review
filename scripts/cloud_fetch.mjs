@@ -260,6 +260,12 @@ async function fetchIntlMkt() {
 
 // ============ K线/分钟趋势本地缓存(过去交易日,云端源不可用时兜底,坚决不显示--) ============
 let _klineCache = null;
+// v11.38 性能修复:saveKlineCache 原为"每次 fetchKline 成功即全量重写 37MB 缩进 JSON",
+// 而它位于 CONC=16 的批量扫描循环内 → O(n²) 落盘(实测午盘采集 49min vs 正常 16min)。
+// 现改为:写入只标脏 + 最多 30s 落盘一次,扫描结束/进程退出再强制 flush 一次;并去掉缩进(体积减半)。
+let _klineDirty = false;
+let _klineFlushTimer = null;
+const KLINE_FLUSH_MS = 30000;
 function loadKlineCache() {
   if (_klineCache) return _klineCache;
   try {
@@ -269,12 +275,24 @@ function loadKlineCache() {
   if (!_klineCache || typeof _klineCache !== 'object') _klineCache = {};
   return _klineCache;
 }
-function saveKlineCache() {
+// 标脏 + 节流落盘(默认 30s 一次);force=true 时立即落盘(扫描结束/进程退出用)
+function markKlineDirty() {
+  _klineDirty = true;
+  if (_klineFlushTimer) return;
+  _klineFlushTimer = setTimeout(() => { _klineFlushTimer = null; saveKlineCache(); }, KLINE_FLUSH_MS);
+  if (_klineFlushTimer && typeof _klineFlushTimer.unref === 'function') _klineFlushTimer.unref();
+}
+function saveKlineCache(force) {
+  if (!_klineDirty && !force) return false;
   try {
     const p = path.join(ROOT, 'data', 'kline_cache.json');
     fs.mkdirSync(path.dirname(p), { recursive: true });
-    fs.writeFileSync(p, JSON.stringify(_klineCache, null, 2), 'utf8');
-  } catch (e) { console.error('saveKlineCache 失败:', e.message); }
+    const body = JSON.stringify(_klineCache);   // v11.38 去掉缩进:37MB → 约 18MB,写盘更快
+    fs.writeFileSync(p, body, 'utf8');
+    _klineDirty = false;
+    if (force) console.log('[kline_cache] 已落盘', Object.keys(_klineCache || {}).length, '只 /', (body.length / 1048576).toFixed(1), 'MB');
+    return true;
+  } catch (e) { console.error('saveKlineCache 失败:', e.message); return false; }
 }
 // 分钟趋势缓存(独立文件,保存最近一次真实抓取的 m60/m15 具体价位)
 let _minTrendCache = null;
@@ -369,7 +387,7 @@ async function fetchKline(code, count = 250) {
     try {
       const c = loadKlineCache();
       c[code] = { date: bjToday(), series: series.slice(-120) };
-      saveKlineCache();
+      markKlineDirty();   // v11.38:只标脏(最多 30s 落一次),不再逐股全量重写 37MB
     } catch (e) { /* 缓存写入失败不影响主流程 */ }
     return series;
   }
@@ -2967,4 +2985,8 @@ async function main() {
   console.log(JSON.stringify({ date, type, indices, limitUpCount: zt.total, zbCount, up: breadth.up, down: breadth.down, maxLB: maxLB.name }, null, 2));
 }
 
-main().catch(e => { console.error('采集失败:', e.message); process.exit(1); });
+// v11.38:进程退出兜底(同步落盘,保证 build_report 等后续步骤读到完整缓存)
+process.on('exit', () => { try { saveKlineCache(true); } catch (e) { /* 忽略 */ } });
+main()
+  .then(() => { saveKlineCache(true); })            // 正常结束:强制落盘一次
+  .catch(e => { console.error('采集失败:', e.message); try { saveKlineCache(true); } catch (e2) { } process.exit(1); });
