@@ -60,6 +60,9 @@
 .wl-title{font-size:13px;font-weight:700;color:#333}
 .wl-time{font-size:10px;color:#999;font-weight:400;margin-left:6px}
 .wl-time::before{content:'●';color:#c33;margin-right:3px}
+/* v11.56:行情刷新失败必须可见(原来是静默 catch{}) —— 旧价不能被当成当前价 */
+.wl-time.fail{color:#b71c1c;font-weight:700}
+.wl-time.fail::before{content:'●';color:#b71c1c}
 .wl-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .wl-search-input{font-size:11px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:14px;width:120px;outline:none;background:#fafafa}
 .wl-tool{font-size:10px;padding:4px 10px;border:1px solid #e0e0e0;border-radius:14px;background:#fff;color:#555;cursor:pointer;white-space:nowrap}
@@ -481,6 +484,8 @@
 .dc-conf-down{color:#bbb;text-decoration:line-through}
 .dc-rr{font-size:9px;font-weight:700}
 .dc-time{margin-left:auto;font-size:9px;color:#999}
+/* v11.56:卡片上的时间=行情快照抓取时刻;跨日快照要一眼看出来(原先是渲染时刻,会冒充"现在") */
+.dc-time-stale{color:#8a5a00;background:#fff8e1;border:1px solid #ffca28;border-radius:4px;padding:0 4px;font-weight:700}
 .dc-tags{display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;border-bottom:1px dashed #f5f5f5}
 .dc-tag{background:#f5f5f7;color:#555;font-size:9px;padding:2px 7px;border-radius:4px}
 .dc-block{padding:8px 10px;border-top:1px solid #f5f5f5}
@@ -2278,7 +2283,7 @@
       <a href="index.html">首页</a><a href="2026-09-11_09-45.html" class="active">盘前</a><a href="2026-09-11_11-35.html">盘中</a><a href="2026-09-11_16-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:47</b>（约 720 分钟前）</div><h1 class="hero-title">2026-09-11 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 60°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:47</b>（约 750 分钟前）</div><h1 class="hero-title">2026-09-11 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 60°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-11 09:47:00</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -4384,6 +4389,16 @@ function buildDecisionCardHtml(s){
     }
   }
 
+  // v11.56:卡片上的"时间"必须是【这份行情快照的抓取时刻】,不能是渲染时刻。
+  //   首屏用缓存渲染 → 显示缓存抓取时刻(跨日则标 ⚠ 快照 + 黄底);刷新成功 → 由 refreshWatchlistQuotes 覆盖成刷新时刻。
+  var _ct=String(s.capturedAt||''),_hm=_ct.slice(11,16),_day=_ct.slice(0,10);
+  var _timeLabel,_timeCls='',_timeTitle='';
+  if(_ct&&/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(_ct)){
+    if(_day!==bjTodayF()){_timeLabel='⚠ 快照 '+_ct.slice(5,16);_timeCls=' dc-time-stale';_timeTitle='该卡行情快照抓取于 '+_ct+'，不是当前时刻';}
+    else{_timeLabel='数据 '+_hm;_timeTitle='该卡行情数据抓取于 '+_ct;}
+  }else{
+    _timeLabel=new Date().toLocaleString('zh-CN',{hour12:false});_timeTitle='未记录数据抓取时刻（旧版缓存）';
+  }
   return '<div class="dc-head">'+
     '<span class="dc-pri">'+priority+'</span>'+
     '<span class="dc-name">'+escHtmlF(s.name)+' <i>'+escHtmlF(s.code)+'</i></span>'+
@@ -4391,7 +4406,7 @@ function buildDecisionCardHtml(s){
     integrityBadge+
     '<span class="dc-conf'+(rrActionable?'':' dc-conf-down')+'">置信度 '+confTotal+'</span>'+
     '<span class="dc-rr '+rrHeadCls+'"'+rrHeadTitle+'>盈亏比 '+p.rr.toFixed(2)+'</span>'+
-    '<span class="dc-time">'+new Date().toLocaleString('zh-CN',{hour12:false})+'</span>'+
+    '<span class="dc-time'+_timeCls+'" title="'+escHtmlF(_timeTitle)+'">'+escHtmlF(_timeLabel)+'</span>'+
     '</div>'+summaryHtml+klineNote+
     '<div class="dc-tags">'+(s.category?'<span class="dc-tag">'+escHtmlF(s.category)+'</span>':'')+tagsArr.map(function(x){return '<span class="dc-tag">'+escHtmlF(x)+'</span>';}).join('')+'<span class="dc-tag">催化:'+escHtmlF(catalyst)+'</span><span class="dc-tag">时效:'+escHtmlF(catalystTime)+'</span><span class="dc-tag">阶段:'+escHtmlF(ferment)+'</span><span class="dc-tag">情绪:'+escHtmlF(emotionCycle)+'</span><span class="dc-tag">地位:'+escHtmlF(boardStatus)+'</span><span class="dc-tag">'+escHtmlF(tolerance)+'</span></div>'+
     (s.logic?'<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">'+escHtmlF(s.logic)+'</div></div>':'')+
@@ -4576,7 +4591,15 @@ function confirmResetCache(){
   if(confirm(msg)){resetLocalCache();}
 }
 // 保存单只股票的全量数据(供退出重登时立即渲染,不依赖网络)
-function saveWatchlistStockData(code,data){try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');wd[code]=data;localStorage.setItem('atds_watchlist_data',JSON.stringify(wd));}catch(e){}}
+function saveWatchlistStockData(code,data){
+  try{
+    var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');
+    // v11.56:写入时钉上抓取时刻 —— 首屏(600ms)会直接用这份缓存渲染决策卡,
+    //   卡上的时间必须显示"这份快照是什么时候抓的",而不是"现在"。
+    var rec=Object.assign({},data||{},{capturedAt:bjNowStrF(),tradeDate:bjTodayF()});
+    wd[code]=rec;localStorage.setItem('atds_watchlist_data',JSON.stringify(wd));
+  }catch(e){}
+}
 // 读取缓存的全量数据(供 restoreSavedWatchlist 立即渲染)
 function loadWatchlistStockData(code){try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');return wd[code]||null;}catch(e){return null;}}
 /* v11.11:把服务端渲染的配置股完整数据(data-stock)播种到 localStorage,供 9:30 后实时 rebuild 合并。
@@ -4847,7 +4870,9 @@ async function refreshWatchlistQuotes(){
       var d=document.querySelector('.wl-detail[data-detail-code="'+code+'"]');
       if(d){
         var fullData=loadWatchlistStockData(code)||{};
-        var sObj=Object.assign({},fullData,{code:code,name:f[1]||fullData.name,price:price,pct:pct,amount:amount,turnover:turnover,prevClose:prevClose,open:open,high:high,low:low,amplitude:amplitude,volRatio:volRatio,tech:tech||fullData.tech||null,fundFlow:ff||fullData.fundFlow||null});
+        var sObj=Object.assign({},fullData,{code:code,name:f[1]||fullData.name,price:price,pct:pct,amount:amount,turnover:turnover,prevClose:prevClose,open:open,high:high,low:low,amplitude:amplitude,volRatio:volRatio,tech:tech||fullData.tech||null,fundFlow:ff||fullData.fundFlow||null,
+          // v11.56:价格/涨跌是刚拿到的 → 这一版卡片的数据时刻就是"现在";不覆盖的话会拿实时价配旧快照时间
+          capturedAt:bjNowStrF(),tradeDate:bjTodayF()});
         var bd=dcBadges(sObj);
         var confEl=r.querySelector('.wl-cell-atds .conf');
         if(confEl){confEl.className='conf conf-'+bd.confTone;confEl.textContent=bd.confTotal;}
@@ -4874,14 +4899,22 @@ async function refreshWatchlistQuotes(){
       }
     });
     var timeEl=document.querySelector('.wl-time');
-    if(timeEl)timeEl.textContent='● '+new Date().toLocaleString('zh-CN',{hour12:false});
+    if(timeEl){timeEl.textContent='行情 '+bjNowStrF();timeEl.className='wl-time';timeEl.title='最近一次行情刷新成功时刻';}
+    window.__atdsLastQuoteOk=bjNowStrF();
     // v11.21:行情刷新后评估模拟跟踪(当日最高/最低触达止盈/止损即自动结算),60s 限频防抖动
     var nowS=Date.now();
     if(nowS-Number(window.__atdsSettleTs||0)>60000){
       window.__atdsSettleTs=nowS;
       try{settleAllShadowTrades();}catch(e){}
     }
-  }catch(e){}
+  }catch(e){
+    // v11.56:刷新失败绝不能静默 —— 否则页面上的旧价会被当成当前价(用户无法察觉)。
+    var _lt=window.__atdsLastQuoteOk||'';
+    var _t=document.querySelector('.wl-time');
+    if(_t){_t.className='wl-time fail';_t.textContent='刷新失败'+(_lt?'（仍在显示 '+_lt+' 的数据）':'');_t.title='行情源不可达:'+(e&&e.message||'');}
+    if(typeof showToast==='function'){try{showToast('行情刷新失败'+(e&&e.message?'：'+e.message:'')+(_lt?'，当前显示的是 '+_lt+' 的数据':'')+';点「↻ 刷新」可重试','warn');}catch(e2){}}
+    console.warn('[refreshWatchlistQuotes]',e&&e.message);
+  }
   if(btn){btn.disabled=false;btn.textContent='↻ 刷新';}
   // 异步补丁:对没有 tech 数据的手动行补拉 K 线 → 写入 data-tech/data-ff → 重建决策卡
   try{
@@ -6291,6 +6324,9 @@ function lhbStaleF(d){ return tradingDaysBetweenF(d,bjTodayF())>20; }
 function r2fF(v){var n=parseFloat(v);return isNaN(n)?null:(Math.round(n*100)/100);}
 function bjTodayF(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); }
 function bjNowHM(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(11,16); }
+// v11.56:快照必须自述时点 —— 决策卡上的"时间"以前是**渲染时刻**,离线/弱网首屏用缓存渲染时,
+//   会把几天前的价格配上一个"现在"的时间(与 v11.39 修报告标头、v11.55 修K线同一类错误)。
+function bjNowStrF(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,16).replace('T',' '); }
 function bjDaysBetweenF(from,to){
   if(!from||!to)return 0;
   var a=Date.parse(String(from).slice(0,10)+'T00:00:00Z'), b=Date.parse(String(to).slice(0,10)+'T00:00:00Z');
