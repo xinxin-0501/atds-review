@@ -54,6 +54,9 @@
 .wl-title{font-size:13px;font-weight:700;color:#333}
 .wl-time{font-size:10px;color:#999;font-weight:400;margin-left:6px}
 .wl-time::before{content:'●';color:#c33;margin-right:3px}
+/* v11.56:行情刷新失败必须可见(原来是静默 catch{}) —— 旧价不能被当成当前价 */
+.wl-time.fail{color:#b71c1c;font-weight:700}
+.wl-time.fail::before{content:'●';color:#b71c1c}
 .wl-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .wl-search-input{font-size:11px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:14px;width:120px;outline:none;background:#fafafa}
 .wl-tool{font-size:10px;padding:4px 10px;border:1px solid #e0e0e0;border-radius:14px;background:#fff;color:#555;cursor:pointer;white-space:nowrap}
@@ -475,6 +478,8 @@
 .dc-conf-down{color:#bbb;text-decoration:line-through}
 .dc-rr{font-size:9px;font-weight:700}
 .dc-time{margin-left:auto;font-size:9px;color:#999}
+/* v11.56:卡片上的时间=行情快照抓取时刻;跨日快照要一眼看出来(原先是渲染时刻,会冒充"现在") */
+.dc-time-stale{color:#8a5a00;background:#fff8e1;border:1px solid #ffca28;border-radius:4px;padding:0 4px;font-weight:700}
 .dc-tags{display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;border-bottom:1px dashed #f5f5f5}
 .dc-tag{background:#f5f5f7;color:#555;font-size:9px;padding:2px 7px;border-radius:4px}
 .dc-block{padding:8px 10px;border-top:1px solid #f5f5f5}
