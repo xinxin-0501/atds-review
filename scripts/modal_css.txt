@@ -556,6 +556,8 @@
 /* v11.29:口径声明(把理想化假设写在界面上,不假装精确) */
 .jrn-disc{margin-top:4px;padding-top:4px;border-top:1px dashed #ecdca8;color:#8a7a4e;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
 .jrn-disc b{color:#7a6a3e}
+/* v11.30:样本不足警示(醒目黄底) */
+.jrn-warn-chip{display:inline-block;background:#fff3cd;color:#8a6d3b;border:1px solid #f0d68a;border-radius:8px;padding:2px 6px;font-weight:600;line-height:1.5}
 /* 手动标签编辑器 */
 .dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
 .dc-te-label{color:#999;font-weight:600}

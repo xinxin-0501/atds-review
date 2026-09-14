@@ -566,6 +566,8 @@
 /* v11.29:口径声明(把理想化假设写在界面上,不假装精确) */
 .jrn-disc{margin-top:4px;padding-top:4px;border-top:1px dashed #ecdca8;color:#8a7a4e;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
 .jrn-disc b{color:#7a6a3e}
+/* v11.30:样本不足警示(醒目黄底) */
+.jrn-warn-chip{display:inline-block;background:#fff3cd;color:#8a6d3b;border:1px solid #f0d68a;border-radius:8px;padding:2px 6px;font-weight:600;line-height:1.5}
 /* 手动标签编辑器 */
 .dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
 .dc-te-label{color:#999;font-weight:600}
@@ -7663,7 +7665,7 @@ function renderJournalStats(){
   var head='📒 模拟跟踪复盘：有效样本 <b>'+c.valid+'</b> 笔'+
     (c.winRate!=null?(' · 胜率 <b>'+c.winRate+'%</b>（'+c.win+'胜'+c.loss+'负'+(c.expired?'·'+c.expired+'过期':'')+'）'):'')+
     ' · 平均 <b>'+(c.avg>0?'+':'')+c.avg+'%</b>'+
-    ((c.win+c.loss)<10?'（不足10笔，仅供参考）':'')+
+    ((c.win+c.loss)<10?'　<span class="jrn-warn-chip">⚠ 样本不足10笔，统计偶发性大，不构成投资参考</span>':'')+
     '　<button class="jrn-btn" onclick="toggleJournalDetail()">'+(jrnOpen?'收起明细':'每笔明细')+'</button>';
   var ex=[];
   if(c.legacy)ex.push('早期未校验 '+c.legacy+' 笔（无入场门控，不计入胜率）');
@@ -7985,7 +7987,7 @@ function updateReviewProgress(){
       } else if(last&&!last.shadow){
         txt='真实交易已记录：'+(last.pnl!=null?((last.pnl>0?'+':'')+last.pnl+'%'):'盈亏待补')+'（'+last.date+'）';
       } else {
-        txt='尚未跟踪 —— 勾选"系统模拟跟踪"后开始累计样本';
+        txt='未激活 —— 勾选"系统模拟跟踪"后开始累计样本（全池累计样本见上方汇总，不计入本股）';
       }
     }
     attr.textContent=txt;
