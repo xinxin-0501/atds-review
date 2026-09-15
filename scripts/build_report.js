@@ -1965,7 +1965,11 @@ function renderWaveDivergence(report) {
 function renderShortCore(report) {
   const sc = report.shortCore;
   if (!sc || !Array.isArray(sc.list) || !sc.list.length) return '';
-  const list = sc.list;
+  // v11.59:渲染端同样排除涨停(对历史 json 也立即生效);若剔完为空则回退原列表,避免整块消失
+  const _lu = sc.list.filter(x => Number(x.pct) >= 9.8).length;
+  const _buyable = sc.list.filter(x => !(Number(x.pct) >= 9.8));
+  const list = _buyable.length ? _buyable : sc.list;
+  const _scopeText = sc.source + (_lu && _buyable.length ? '（已排除涨停 ' + _lu + ' 只·当日无法成交）' : (_lu ? '（全部为涨停，仅作观察）' : ''));
   const rows = list.map(x => {
     const cls = upDownClass(x.pct);
     const sigTone = x.lianban >= 2 ? 'break' : (x.ztCount >= 2 ? 'strong' : 'up');
@@ -2000,7 +2004,7 @@ function renderShortCore(report) {
       <div class="wave-sub">涨停基因 · 连板梯度 · 量价共振 · <b>竞价强度(开盘涨幅)</b> · <b>封单额</b> · <b>板块龙头共振</b> · 盘中扫描全A剔除ST<br><span class="ss-note">⚠ 战法《超短核心1/2》要求的「隔夜单(9:15-9:25 委托)」与「竞价换手」暂无可用数据接口，未接入；<b>此处以「盘前快照(约09:43)的开盘涨幅+量比」作开盘强度代理</b>（标注「盘前」者即为快照值）；指数择时与情绪风标见上方「反转闸门」「收盘情绪」</span></div>
     </div>
     <div class="wave-tools">
-      <span class="wave-scan-info">${esc(sc.source || '全A扫描')}</span>
+      <span class="wave-scan-info">${esc(_scopeText || '全A扫描')}</span>
       <button id="sc-open-btn" class="wl-btn wl-btn-primary" onclick="openShortCoreModal()">📋 打开超短核心名单</button>
     </div>
     <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 20 个超短核心股票 · 支持刷新行情与一键全部加入观察池</div>
@@ -2012,7 +2016,7 @@ function renderShortCore(report) {
         <span class="modal-close" onclick="closeShortCoreModal()">×</span>
       </div>
       <div class="modal-body">
-        <div class="nh-summary sc-summary">扫描范围：${esc(sc.source || '全A剔除ST')}</div>
+        <div class="nh-summary sc-summary">扫描范围：${esc(_scopeText || '全A剔除ST')}</div>
         <div class="sc-tools">
           <button class="wl-btn wl-btn-primary" onclick="bulkAddShortCoreToWatchlist()">⚡ 一键全部加入观察池</button>
           <button class="wl-btn" id="sc-refresh-btn" onclick="refreshShortCoreQuotes()">↻ 刷新行情</button>

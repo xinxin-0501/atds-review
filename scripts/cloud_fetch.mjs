@@ -2512,8 +2512,12 @@ async function scanShortCore(ztList, identSet, auctionMap) {
     done += slice.length;
     if (done % 300 === 0) console.log(`  超短核心扫描进度: ${done}/${cands.length}, 命中 ${results.length}`);
   }
-  results.sort((a, b) => b.score - a.score);
-  const list = results.slice(0, 20).map((x, i) => ({
+  // v11.59:涨停股当日无法成交(封板/一字),用户要求"排除涨停后优先排序前20" → 取 TOP20 前先剔除。
+  //   判据 pct>=9.8 覆盖主板 10% 与创业板/科创 20%,与卡片"涨停(可能无法成交)"标记同口径。
+  const _limitUp = results.filter((x) => Number(x.pct) >= 9.8).length;
+  const buyable = results.filter((x) => !(Number(x.pct) >= 9.8));
+  buyable.sort((a, b) => b.score - a.score);
+  const list = buyable.slice(0, 20).map((x, i) => ({
     rank: i + 1,
     code: x.code.replace(/^(sh|sz|bj)/, ''),
     name: x.name,
@@ -2526,7 +2530,8 @@ async function scanShortCore(ztList, identSet, auctionMap) {
     maAlign: x.maAlign, newHigh: x.newHigh, gain20: x.gain20,
     signalType: x.lianban >= 2 ? (x.lianban + '连板') : (x.ztCount >= 2 ? '多涨停' : '强势涨停')
   }));
-  return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
+  return { total: quotes.length, scanned: cands.length, list, limitUpExcluded: _limitUp,
+    source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' + (_limitUp ? '，已排除涨停 ' + _limitUp + ' 只（当日无法成交）' : '') };
 }
 
 /* ==================== 强势股选股(基于强势股战法: 缺口/支撑/波段背离/突破起爆点) ==================== */
