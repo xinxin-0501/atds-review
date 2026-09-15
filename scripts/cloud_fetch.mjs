@@ -2478,11 +2478,20 @@ async function scanShortCore(ztList, identSet, auctionMap) {
     return pct > -3 && pct <= 20.5 && turn >= 0.8 && turn <= 40 && amt >= 8000;
   });
   // v11.50:构建战法维度上下文
+  // v11.61 修:原 sealMap 键 = zt.list[].code(东财 c 字段,纯6位如 002912),
+  //   而查询处用的 x.code 来自腾讯 f[2](带前缀如 sz002912)⇒ **永远查不中**,sealYi 恒为 undefined
+  //   (实证 2026-09-15 11-35.json 的 shortCore 全部 20 只 sealYi=undefined,卡片"封单"列一直显示「—」)。
+  //   现统一按"剥前缀后的6位"建键,并在查询侧同样归一化。
+  const norm6 = (c) => String(c || '').trim().replace(/^(sh|sz|bj)/i, '').replace(/[^0-9]/g, '');
   const sealMap = new Map();                       // 封单额(亿元):涨停池 sealWan 单位万元
+  const kaibanMap = new Map();                     // v11.61:炸板次数(0 = 一直封死,>0 = 涨停后开过板)
+  const lianbanMap = new Map();
   for (const it of (ztList || [])) {
-    const c = String((it && it.code) || '').trim();
+    const c = norm6(it && it.code);
     if (!c) continue;
     sealMap.set(c, Math.round(((Number(it.sealWan) || 0) / 10000) * 100) / 100);
+    kaibanMap.set(c, Number(it.kaiban) || 0);
+    lianbanMap.set(c, Number(it.lianban) || 1);
   }
   const ident2 = identSet || { leaders: new Set(), mainLines: new Set() };
   // 2) 并发拉 K 线(60日)扫描超短核心
@@ -2505,6 +2514,7 @@ async function scanShortCore(ztList, identSet, auctionMap) {
         if (!kl || kl.length < 40) return null;
         // v11.50:先把战法维度算好再传入(避免在 shortCoreScore 内跨作用域引用)
         const rawCode = String(x.code || '');
+        const key6 = norm6(rawCode);                        // v11.61:与 sealMap/kaibanMap 的键格式对齐
         const openPct = (Number(x.prevClose) > 0 && Number(x.open) > 0) ? (Number(x.open) / Number(x.prevClose) - 1) * 100 : null;
         const isMainLine = ident2.mainLines.has(rawCode);
         const isLead = ident2.leaders.has(rawCode);
@@ -2522,7 +2532,9 @@ async function scanShortCore(ztList, identSet, auctionMap) {
           openPct: aucPct != null ? aucPct : openPct,
           aucVol, aucTurn,
           fromAuction: aucPct != null,
-          sealYi: sealMap.has(rawCode) ? sealMap.get(rawCode) : null,
+          sealYi: sealMap.has(key6) ? sealMap.get(key6) : null,   // v11.61:用归一化键,修"永远查不中"
+          kaiban: kaibanMap.has(key6) ? kaibanMap.get(key6) : null, // v11.61:炸板次数(0=封死)
+          ztLianban: lianbanMap.has(key6) ? lianbanMap.get(key6) : null,
           ident: isMainLine ? '主线龙头' : (isLead ? '板块龙头' : ''),
           mainLine: isMainLine
         };
@@ -2535,11 +2547,26 @@ async function scanShortCore(ztList, identSet, auctionMap) {
     done += slice.length;
     if (done % 300 === 0) console.log(`  超短核心扫描进度: ${done}/${cands.length}, 命中 ${results.length}`);
   }
-  // v11.59:涨停股当日无法成交(封板/一字),用户要求"排除涨停后优先排序前20" → 取 TOP20 前先剔除。
-  //   判据 pct>=9.8 覆盖主板 10% 与创业板/科创 20%,与卡片"涨停(可能无法成交)"标记同口径。
-  const _limitUp = results.filter((x) => Number(x.pct) >= 9.8).length;
-  const buyable = results.filter((x) => !(Number(x.pct) >= 9.8));
-  buyable.sort((a, b) => b.score - a.score);
+  // v11.61 改为"只排除【仍封死】的涨停",而非一律排除所有涨停 ——
+  //   用户诉求是"排除涨停后优先排序前 20",但 v11.59 的严格口径(一律剔除 pct>=9.8)把当日
+  //   全部涨停股都拿掉,实测 20 只名额只剩 3 只(可交易的标的被削掉 85%,列表几乎空)。
+  //   战法原意是"剔除当日【买不到】的标的":一直封死(kaiban=0)确实买不到;
+  //   但**涨停后炸板/开板过**(kaiban>0)的标的盘中是能成交的,属于战法里"强势股回封"机会,应保留。
+  //   判据优先级:①用涨停池的 kaiban(炸板次数)—— 最准;②涨停池未命中(降级)时退回 pct>=9.8 且无封单数据 → 保守剔除。
+  const _sealedSet = new Set();
+  const _stillSealed = results.filter((x) => {
+    const pct = Number(x.pct) || 0;
+    if (pct < 9.8) return false;                       // 非涨停:一律不是"封死"
+    const sealed = (x.kaiban == null) ? true : (Number(x.kaiban) === 0);   // 拿不到炸板数据 → 保守当封死
+    if (sealed) _sealedSet.add(x);
+    return sealed;
+  });
+  const buyable = results.filter((x) => !_sealedSet.has(x));
+  const _limitUp = _stillSealed.length;
+  // 排序:score 优先(用户明确要求"优先排序前20"),同分时用封单额/连板数做稳定次级键
+  buyable.sort((a, b) => (b.score - a.score)
+    || ((Number(b.sealYi) || 0) - (Number(a.sealYi) || 0))
+    || ((Number(b.lianban) || 0) - (Number(a.lianban) || 0)));
   const list = buyable.slice(0, 20).map((x, i) => ({
     rank: i + 1,
     code: x.code.replace(/^(sh|sz|bj)/, ''),
@@ -2559,11 +2586,14 @@ async function scanShortCore(ztList, identSet, auctionMap) {
     aucTurn: x.aucTurn != null ? x.aucTurn : null,
     fromAuction: !!x.fromAuction,
     sealYi: x.sealYi != null ? x.sealYi : null,
+    kaiban: x.kaiban != null ? Number(x.kaiban) : null,   // v11.61:炸板次数(卡片标注"炸板N次"),也是入选依据
     ident: x.ident || '',
     signalType: x.lianban >= 2 ? (x.lianban + '连板') : (x.ztCount >= 2 ? '多涨停' : '强势涨停')
   }));
   return { total: quotes.length, scanned: cands.length, list, limitUpExcluded: _limitUp,
-    source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' + (_limitUp ? '，已排除涨停 ' + _limitUp + ' 只（当日无法成交）' : '') };
+    source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只'
+      + (_limitUp ? '，已排除【一直封死】的涨停 ' + _limitUp + ' 只（盘中买不到）' : '')
+      + '，按 score 优先取前 ' + list.length + ' 只' };
 }
 
 /* ==================== 强势股选股(基于强势股战法: 缺口/支撑/波段背离/突破起爆点) ==================== */
@@ -3262,7 +3292,10 @@ async function main() {
   let shortCore = null;
   // 强势股选股(仅午盘):全A扫描剔除ST,优先排序TOP30
   let strongStock = null;
-  if (type === 'midday') {
+  if (type === 'midday' || type === 'close') {
+    // v11.61:盘中槽位停用("盘中可以全部转移收盘") —— 原只在 midday 采集的
+    //   「超短核心 / 强势股 / 波背离」改为 midday + close 都采集,使其在收盘页可见。
+    //   历史 midday 文件不受影响(条件仍含 midday)。
     // v11.49:从 mainRank(板块强度榜)提取板块龙头 → 作为"辨识度"的可操作口径
     // (fix 2026-09-15: 原 v11.51 在 scanShortCore 之后才声明 identSet,TDZ 崩溃 "Cannot access 'identSet' before initialization")
     const identSet = { leaders: new Set(), mainLines: new Set() };
@@ -3273,17 +3306,17 @@ async function main() {
       if ((sec.rank || 99) <= 10) identSet.mainLines.add(lc);   // 前10强板块的龙头 = 主线龙头
     }
     console.log('辨识度集合: 板块龙头', identSet.leaders.size, '只 / 其中主线龙头', identSet.mainLines.size, '只');
-    console.log('开始超短核心全市场扫描(午盘)...');
+    console.log('开始超短核心全市场扫描(' + type + ')...');
     shortCore = await scanShortCore(zt.list, identSet, auctionMap);   // v11.51:再传盘前竞价/开盘强度快照
     console.log('超短核心扫描完成:', shortCore ? shortCore.list.length : 0, '只');
-    console.log('开始强势股全市场扫描(午盘)...');
+    console.log('开始强势股全市场扫描(' + type + ')...');
     strongStock = await scanStrongStock();
     console.log('强势股扫描完成:', strongStock ? strongStock.list.length : 0, '只');
     // 题材辨识交叉集合:强势股+超短核心命中代码(战法加权用,避免波背离只出纯形态套利)
     const themeCodes = new Set();
     for (const s of (shortCore && shortCore.list) || []) themeCodes.add(String(s.code));
     for (const s of (strongStock && strongStock.list) || []) themeCodes.add(String(s.code));
-    console.log('开始波背离全市场扫描(午盘,题材交叉集 '+themeCodes.size+' 个)...');
+    console.log('开始波背离全市场扫描(' + type + ',题材交叉集 '+themeCodes.size+' 个)...');
     waveDivergence = await scanWaveDivergence(themeCodes, identSet);
     console.log('波背离扫描完成:', waveDivergence ? waveDivergence.list.length : 0, '只');
   }

@@ -41,8 +41,12 @@ function fmtAmount(wan) {
   return v.toFixed(0) + '万';
 }
 
+// v11.61:盘中槽位已停用(用户决策"盘中可以全部转移收盘")。
+//   导航栏不再提供"盘中"入口 —— 但**历史 midday 页面仍可直接访问**(nav.midday 指向文件),
+//   且若当前页就是历史 midday(直接打开旧链接),导航里补一个"盘中(已停)"标记,避免用户以为是当天数据。
 function renderHeader(report, nav) {
   const m = report.meta || {};
+  const isMid = m.type === 'midday';
   return `<div class="header">
     <div class="brand">
       <div class="logo">A</div>
@@ -52,7 +56,7 @@ function renderHeader(report, nav) {
       </div>
     </div>
     <div class="time-nav">
-      <a href="${nav.home}">首页</a><a href="${nav.premarket || 'index.html'}"${m.type === 'premarket' ? ' class="active"' : ''}>盘前</a><a href="${nav.midday}"${m.type === 'midday' ? ' class="active"' : ''}>盘中</a><a href="${nav.close}"${m.type === 'close' ? ' class="active"' : ''}>收盘</a>
+      <a href="${nav.home}">首页</a><a href="${nav.premarket || 'index.html'}"${m.type === 'premarket' ? ' class="active"' : ''}>盘前</a>${isMid ? '<a href="' + nav.midday + '" class="active">盘中<i class="nav-retired">已停</i></a>' : ''}<a href="${nav.close}"${m.type === 'close' ? ' class="active"' : ''}>收盘</a>
     </div>
   </div>`;
 }
@@ -1975,11 +1979,21 @@ function renderWaveDivergence(report) {
 function renderShortCore(report) {
   const sc = report.shortCore;
   if (!sc || !Array.isArray(sc.list) || !sc.list.length) return '';
-  // v11.59:渲染端同样排除涨停(对历史 json 也立即生效);若剔完为空则回退原列表,避免整块消失
-  const _lu = sc.list.filter(x => Number(x.pct) >= 9.8).length;
-  const _buyable = sc.list.filter(x => !(Number(x.pct) >= 9.8));
+  // v11.61:渲染端与采集端同口径 —— 只排除【一直封死】(kaiban=0)的涨停,保留炸板/开板过的。
+  //   v11.59 的严格口径(一律剔除 pct>=9.8)把可交易标的削掉 85%(实测 20 只只剩 3 只)。
+  //   对历史 json(无 kaiban 字段)退回 v11.59 严格口径,保证旧页面行为不突变。
+  const _hasKaiban = sc.list.some(x => x.kaiban != null);
+  const _sealed = (x) => {
+    if (Number(x.pct) < 9.8) return false;
+    if (!_hasKaiban) return true;                       // 旧 json:无炸板数据 → 保守当封死
+    return Number(x.kaiban) === 0;
+  };
+  const _lu = sc.list.filter(_sealed).length;
+  const _buyable = sc.list.filter(x => !_sealed(x));
   const list = _buyable.length ? _buyable : sc.list;
-  const _scopeText = sc.source + (_lu && _buyable.length ? '（已排除涨停 ' + _lu + ' 只·当日无法成交）' : (_lu ? '（全部为涨停，仅作观察）' : ''));
+  const _scopeText = sc.source + (_lu && _buyable.length
+    ? '（已排除一直封死的涨停 ' + _lu + ' 只·盘中买不到）'
+    : (_lu ? '（全部为涨停，仅作观察）' : ''));
   const rows = list.map(x => {
     const cls = upDownClass(x.pct);
     const sigTone = x.lianban >= 2 ? 'break' : (x.ztCount >= 2 ? 'strong' : 'up');
@@ -1992,7 +2006,11 @@ function renderShortCore(report) {
         <span class="sc-pct ${cls}">${fmtPct(x.pct)}</span>
         <span class="sc-score">${x.score}</span>
         <span class="sc-sig sig sig-${sigTone}">${esc(sigText)}</span>
-        ${Number(x.pct) >= 9.8 ? '<span class="sc-limit">涨停(可能无法成交)</span>' : ''}
+        ${Number(x.pct) >= 9.8
+          ? (_sealed(x)
+            ? '<span class="sc-limit">涨停(一直封死)</span>'
+            : '<span class="sc-limit sc-limit-zb">涨停(炸板' + (x.kaiban || '') + '次·可成交)</span>')
+          : ''}
       </div>
       <div class="sc-meta">
         <span>涨停 <b>${x.ztCount}次</b></span>
@@ -2001,6 +2019,7 @@ function renderShortCore(report) {
         <span>竞价 <b class="${x.openPct != null && x.openPct >= 1 ? 'ok' : 'no'}">${x.openPct != null ? (x.openPct > 0 ? '+' : '') + x.openPct + '%' : '—'}</b>${x.fromAuction ? '<i class="sc-pre">盘前</i>' : ''}</span>
         <span>盘前量比 <b class="${x.aucVol != null && x.aucVol >= 1.5 ? 'ok' : 'no'}">${x.aucVol != null ? x.aucVol : '—'}</b></span>
         <span>封单 <b class="${x.sealYi != null && x.sealYi >= 2 ? 'ok' : 'no'}">${x.sealYi != null ? x.sealYi + '亿' : '—'}</b></span>
+        <span>炸板 <b class="${x.kaiban > 0 ? 'ok' : 'no'}">${x.kaiban != null ? (x.kaiban === 0 ? '未开板' : x.kaiban + '次') : '—'}</b></span>
         <span>辨识度 <b class="${x.ident ? 'ok' : 'no'}">${esc(x.ident || '非辨识度')}</b></span>
         <span>20日 <b class="${x.gain20 >= 15 ? 'ok' : 'no'}">${x.gain20 >= 0 ? '+' : ''}${x.gain20}%</b></span>
         <span>突破 <b class="${x.newHigh ? 'ok' : 'no'}">${x.newHigh ? '✓' : '✗'}</b></span>
@@ -2765,7 +2784,13 @@ function renderTopBoardBacktest(report) {
     '</div>';
 }
 
+// v11.61:盘中槽位停用(用户决策"盘中可以全部转移收盘"),盘中数据全部由收盘页承载。
+//   「波背离/形态扫描」「超短核心」「强势股」原先只(或主要)在 midday 页渲染 → 放开到 close 页。
+//   历史 midday 页面行为不变(条件仍含 midday),已归档页面不受影响。
 function renderReport(report, nav) {
+  const _isCloseR = !!(report.meta && report.meta.type === 'close');
+  const _isMidR = !!(report.meta && report.meta.type === 'midday');
+  const _carryOver = _isCloseR || _isMidR;   // 这些块由"盘中"迁移到"盘中+收盘"
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -2783,12 +2808,12 @@ ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
 ${renderCloseEmotion(report)}
-    ${report.meta && (report.meta.type === 'midday' || report.meta.type === 'close') ? renderTopBoardPicks(report) : ''}
+    ${_carryOver ? renderTopBoardPicks(report) : ''}
     ${renderRegimeGate(report)}
-  ${report.meta && report.meta.type === 'close' ? '' : renderMarketScan(report)}
-  ${report.meta && report.meta.type === 'close' ? '' : renderWaveDivergence(report)}
-  ${report.meta && report.meta.type === 'midday' ? renderShortCore(report) : ''}
-  ${report.meta && report.meta.type === 'midday' ? renderStrongStock(report) : ''}
+  ${_isMidR ? '' : renderMarketScan(report)}
+  ${_isMidR ? '' : renderWaveDivergence(report)}
+  ${_carryOver ? renderShortCore(report) : ''}
+  ${_carryOver ? renderStrongStock(report) : ''}
   ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderIntlMkt(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderTechAnalysis(report)}
@@ -2874,6 +2899,11 @@ function renderIndex(reports) {
   const preLabel = pre ? `${pre.meta.date} ${preT} 简报` : '暂无盘前数据';
   const midLabel = mid ? `${mid.meta.date} ${midT} 快照` : '暂无盘中数据';
   const cloLabel = clo ? `${clo.meta.date} ${cloT} 复盘` : '暂无收盘数据';
+  // v11.61:盘中槽位已停用 —— 首页不再提供"盘中快照"入口(历史 midday 页面仍可按 URL 直接访问)。
+  //   若还有历史 midday 数据,降级为一条次要链接,并显式标注"已停用",避免被误认为当天数据。
+  const midEntry = mid
+    ? `<a class="tool-btn tool-btn-retired" href="${midUrl}">盘中快照(已停用) · ${mid.meta.date}</a>`
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -2899,12 +2929,12 @@ function renderIndex(reports) {
 </div>
 <div class="hero">
   <div class="hero-title">A股每日复盘工作台</div>
-  <div class="hero-sub">盘中 10:00 / 11:30 / 13:30 / 14:40 · 收盘 ${cloT} 自动采集</div>
+  <div class="hero-sub">盘前 ${preT} / 竞价 09:30 / 收盘 ${cloT} 自动采集（盘中快照已停用，盘中数据由收盘页承载）</div>
 </div>
 <div class="section">
   <div class="tools">
     <a class="tool-btn" href="${preUrl}">盘前 ${preT} 简报 · ${pre ? pre.meta.date : ''}</a>
-    <a class="tool-btn" href="${midUrl}">盘中快照 · ${mid ? mid.meta.date : ''}</a>
+    ${midEntry}
     <a class="tool-btn" href="${cloUrl}">收盘 ${cloT} 复盘 · ${clo ? clo.meta.date : ''}</a>
     <a class="tool-btn" href="main-rank.html">主线实时校准</a>
     <button class="tool-btn qr-btn" onclick="showQr()">手机扫码打开</button>
