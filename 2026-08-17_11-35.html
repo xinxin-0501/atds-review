@@ -353,18 +353,15 @@
 .wave-list{display:flex;flex-direction:column;gap:6px}
 .wave-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:6px 8px;cursor:pointer}
 .wave-item:active{background:#f5f0ff}
-/* v11.59 修"数字压字"(真机实测 409px:固定宽列+长标签放不下 → 股名列被 flex 压到 9px,
-   nowrap 的股名溢出压到数字列上):①数字/评分/标签列 flex:0 0 <w> 不许收缩 ②股名列设 72px 下限 + 省略号
-   ③行允许换行(flex-wrap) —— 实在放不下就换行,绝不压字 */
-.wave-row{display:flex;align-items:center;gap:4px;font-size:11px;flex-wrap:wrap;row-gap:3px}
+.wave-row{display:flex;align-items:center;gap:4px;font-size:11px}
 .wave-row>span{white-space:nowrap}
-.wave-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#7b1fa2;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex:0 0 22px}
-.wave-name{flex:1 1 auto;min-width:72px;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis}
-.wave-name small{display:block;font-size:9px;color:#999;font-weight:400;overflow:hidden;text-overflow:ellipsis}
-.wave-price{flex:0 0 52px;text-align:right;font-weight:700}
-.wave-pct{flex:0 0 54px;text-align:right;font-weight:700}
-.wave-score{flex:0 0 28px;text-align:center;font-weight:700;color:#7b1fa2;background:#f3e8ff;border-radius:4px;padding:1px 0}
-.wave-sig{flex:0 0 auto;font-size:9px;padding:2px 5px;border-radius:4px}
+.wave-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#7b1fa2;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0}
+.wave-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
+.wave-name small{font-size:9px;color:#999;font-weight:400}
+.wave-price{width:56px;text-align:right;font-weight:700}
+.wave-pct{width:58px;text-align:right;font-weight:700}
+.wave-score{width:30px;text-align:center;font-weight:700;color:#7b1fa2;background:#f3e8ff;border-radius:4px;padding:1px 0}
+.wave-sig{font-size:9px;padding:2px 5px;border-radius:4px}
 .wave-row.wave-head{font-size:9px;color:#999;font-weight:600}
 .wave-row.wave-head .wave-rank{background:#ddd;color:#666}
 .wave-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:4px;padding-left:26px}
@@ -381,16 +378,15 @@
 .sc-list{display:flex;flex-direction:column;gap:6px}
 .sc-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:6px 8px;cursor:pointer}
 .sc-item:active{background:#fff8f8}
-/* v11.59 同上:超短核心行(实测 17/20 行股名被压到 20px) */
-.sc-row{display:flex;align-items:center;gap:4px;font-size:11px;flex-wrap:wrap;row-gap:3px}
+.sc-row{display:flex;align-items:center;gap:4px;font-size:11px}
 .sc-row>span{white-space:nowrap}
-.sc-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#c33;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex:0 0 22px}
-.sc-name{flex:1 1 auto;min-width:72px;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis}
-.sc-name small{display:block;font-size:9px;color:#999;font-weight:400;overflow:hidden;text-overflow:ellipsis}
-.sc-price{flex:0 0 52px;text-align:right;font-weight:700}
-.sc-pct{flex:0 0 54px;text-align:right;font-weight:700}
-.sc-score{flex:0 0 28px;text-align:center;font-weight:700;color:#c33;background:#ffecec;border-radius:4px;padding:1px 0}
-.sc-sig{flex:0 0 auto;font-size:9px;padding:2px 5px;border-radius:4px}
+.sc-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#c33;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0}
+.sc-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
+.sc-name small{font-size:9px;color:#999;font-weight:400}
+.sc-price{width:56px;text-align:right;font-weight:700}
+.sc-pct{width:58px;text-align:right;font-weight:700}
+.sc-score{width:30px;text-align:center;font-weight:700;color:#c33;background:#ffecec;border-radius:4px;padding:1px 0}
+.sc-sig{font-size:9px;padding:2px 5px;border-radius:4px}
 .sc-row.sc-head{font-size:9px;color:#999;font-weight:600}
 .sc-row.sc-head .sc-rank{background:#ddd;color:#666}
 .sc-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:4px;padding-left:26px}
@@ -699,8 +695,6 @@
 
 /* v11.50:涨停标的可能无法成交(战法"做不到最强的做第二强的套利") */
 .sc-limit{display:inline-block;margin-left:4px;font-size:8px;color:#a05a00;background:#fff3cd;border:1px solid #f0d68a;border-radius:6px;padding:1px 4px;white-space:nowrap}
-/* v11.61:炸板过的涨停 = 盘中可成交,与"一直封死"区分开(前者是机会,后者只是观察)。 */
-.sc-limit-zb{color:#0a6b3d;background:#e8f7ee;border-color:#a8ddc0}
 
 /* v11.51:超短核心——该值来自盘前快照(约09:43)而非盘中实时 */
 .sc-pre{display:inline-block;margin-left:3px;font-size:8px;font-style:normal;color:#185FA5;background:#eef4ff;border:1px solid #cddffb;border-radius:5px;padding:0 3px;vertical-align:middle}
@@ -819,10 +813,6 @@
 .hero-sub{font-size:11px;color:#888;margin-top:6px;line-height:1.5}
 /* v11.53:晚采提示(槽位被延迟任务覆盖时显式声明,避免把收盘数据读成盘中快照) */
 .hero-warn{font-size:11px;color:#a15c00;background:#fff8e6;border:1px solid #ffe0a3;border-radius:6px;padding:5px 8px;margin-top:8px;line-height:1.5;text-align:left}
-/* v11.60(B):服务端显式标记的补采(meta.lateCapture)—— 比"时间偏晚"更严重:
-   内容是别的时段的盘面,用户若据此判断盘中信号会被误导,故用红底强告警并加粗关键信息。 */
-.hero-warn-late{color:#b3261e;background:#fdecea;border-color:#f5b5ae;font-weight:500}
-.hero-warn-late b{font-weight:800}
 .hero-tags{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
 .hero-temp-tag{font-size:10px;padding:3px 8px;border-radius:10px;background:#fff0f0;color:#c33;border:1px solid #fcc;font-weight:600}
 
@@ -2294,10 +2284,10 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">首页</a><a href="2026-08-17_08-30.html">盘前</a><a href="2026-08-17_11-35.html" class="active">盘中<i class="nav-retired">已停</i></a><a href="2026-08-17_16-20.html">收盘</a>
+      <a href="index.html">首页</a><a href="2026-08-17_08-30.html">盘前</a><a href="2026-08-17_11-35.html" class="active">盘中</a><a href="2026-08-17_16-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照 · <b>数据时间 20:42</b>（约 117 分钟前）</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">22:39</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 20:42），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 100°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照 · <b>数据时间 20:42</b>（约 1328 分钟前）</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">18:50</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 20:42），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 100°</span></div></div>
 <div class="section">
 <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-17 午盘快照 · 实时更新中</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">100°</div><div class="ce-stage">过热区 · 情绪极度亢奋</div><div class="ce-fact">主特征: 谨防高潮后分歧</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">78%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">106</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">106</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈90%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">4板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">28%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">5233</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">1281</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">168</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:5233"></div><div class="ce-bar-flat" style="flex:168"></div><div class="ce-bar-down" style="flex:1281"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>78%</b></span><span>成交额 <b>23875亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row" data-code="000001" data-prefix="sh"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val up">+1.41%</span><span class="ce-idx-price">3982.65</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:42.3%"></div></div></div><div class="ce-idx-row" data-code="399001" data-prefix="sz"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val up">+2.44%</span><span class="ce-idx-price">14704.27</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:73.2%"></div></div></div><div class="ce-idx-row" data-code="399006" data-prefix="sz"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val up">+3.14%</span><span class="ce-idx-price">3740.16</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:94.2%"></div></div></div><div class="ce-block-hint">量能维持在 2 万亿上方 (23875 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">化学制品</span><span class="ce-ml-val up">+7.6%</span></div><div class="ce-ml-row"><span class="ce-ml-name">塑料</span><span class="ce-ml-val up">+7.7%</span></div><div class="ce-ml-row"><span class="ce-ml-name">化学制药</span><span class="ce-ml-val up">+6.9%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">化学制品</span><span class="ce-mi-val up">+7.6亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">塑料</span><span class="ce-mi-val up">+7.7亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制药</span><span class="ce-mi-val up">+6.9亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">专用设备</span><span class="ce-mi-val up">+6.1亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card bt-card-outer"><div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换<span class="bt-time">· 11:35</span></div><div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div><div class="bt-row"><div class="bt-card bt-4"><div class="bt-lv">4板</div><div class="bt-name">天洋新材</div><div class="bt-sub">四板高度</div></div><div class="bt-card bt-3"><div class="bt-lv">3板</div><div class="bt-name">共进股份</div><div class="bt-sub">三板高度</div></div><div class="bt-card bt-2"><div class="bt-lv">2板</div><div class="bt-name">桂发祥</div><div class="bt-sub">二板</div></div><div class="bt-card bt-1"><div class="bt-lv">1板</div><div class="bt-name">金健米业</div><div class="bt-sub">首板</div></div><div class="bt-card bt-new"><div class="bt-lv">断板</div><div class="bt-name">--</div><div class="bt-sub">断板</div></div></div><div class="bt-struct-note"><b>结构辨证</b>:塑料 今日最高 4板(龙头 天洋新材),板块 +10.0% / 资金 +0.0亿;化学制药 +10.0% 居次,装修装饰 +10.0% 第三,医疗服务 +9.9%。梯队高度 4板,情绪 100°(过热区),注意高位分歧与一致兑现风险。</div><div class="vt-section"><div class="vt-h">② 主线研判</div><div class="vt-line"><span class="vt-rank">①</span><b>塑料</b> — 穿越板块总龙头(<b class="up">天洋新材 4板</b>)<div class="vt-desc">板块 +10.00%、资金 +0.0亿,0家涨停,龙头 天洋新材 领涨,是当前情绪总龙头,注意高位分歧。</div></div><div class="vt-line"><span class="vt-rank">②</span><b>化学制药</b> — 今日次强爆发(<b class="up">神奇制药</b>)<div class="vt-desc">板块 +9.99%、资金 +0.0亿,0家涨停,龙头 神奇制药 领涨,为二线主线。</div></div><div class="vt-line"><span class="vt-rank">③</span><b>装修装饰</b> — 梯队成形<div class="vt-desc">板块 +10.02%、资金 +0.0亿,0家涨停,龙头 金 螳 螂。</div></div><div class="vt-line"><span class="vt-rank">④</span><b>医疗服务</b> — 资金主节奏<div class="vt-desc">板块 +9.91%、资金 +0.0亿,0家涨停,关注承接力度。</div></div></div><div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors"><li><span class="vt-tag">天洋新材 4板</span>塑料 板块 +10.0% 领涨,龙头 天洋新材 表态,关注能否延续 4 板穿越</li><li><span class="vt-tag">神奇制药</span>化学制药 今日次强,龙头 神奇制药 领涨,观察明日能否接力</li><li><span class="vt-tag">金 螳 螂</span>装修装饰 梯队成形,资金 净流入 0.0亿,关注持续性</li><li><span class="vt-tag">澳洋健康</span>医疗服务 板块 +9.9%,资金 净流入 0.0亿,高位注意回撤</li><li><span class="vt-tag">炸板监控</span>今日炸板 12家,炸板率超 40% 需警惕情绪退潮</li><li><span class="vt-tag">量能验证</span>成交额 23875亿,关注量能能否维持</li></ul></div><div class="bd-section"><div class="bd-h">④ 板块强弱 · 3最强 · 3分歧 · 3流出</div><table class="bd-tbl"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>方向</th></tr></thead><tbody><tr class="bd-seg-h bd-seg-1"><td colspan="5"><span class="bd-seg-num">1</span><b>最强</b> · 一字带动 · 龙头确立</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">医疗器械</td><td class="up">+20.03%</td><td class="up">+12.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">环境治理</td><td class="up">+19.97%</td><td class="up">+12.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">电子化学</td><td class="up">+15.01%</td><td class="up">+9.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr class="bd-seg-h bd-seg-2"><td colspan="5"><span class="bd-seg-num">2</span><b>分歧</b> · 资金流入但涨幅收敛</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">养殖业</td><td class="up">+15.00%</td><td class="up">+9.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">服装家纺</td><td class="up">+10.03%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">IT服务Ⅱ</td><td class="up">+10.03%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr class="bd-seg-h bd-seg-3"><td colspan="5"><span class="bd-seg-num">3</span><b>流出</b> · 退潮 / 资金撤离</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">装修装饰</td><td class="up">+10.02%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">通信设备</td><td class="up">+10.02%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">农产品加</td><td class="up">+10.02%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr></tbody></table></div><div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div><div class="msw-row"><span class="msw-tag msw-tag-def">防御</span><div class="msw-vals"><span class="up">+0.00%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-row"><span class="msw-tag msw-tag-ag">农产品加</span><div class="msw-vals"><span class="up">+10.02%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-note">今日主力净流入最强:塑料 +0.0亿;资金承接方向切换至 农产品加 / 防御</div><div class="msw-nums"><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">塑料</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">化学制药</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">装修装饰</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">医疗服务</div></div></div><div class="msw-foot">主力净流入(亿元)按板块封单+成交额汇总:塑料、化学制药、装修装饰、医疗服务 领涨;防御(防御)与农业(农产品加)为资金切换承接方向,谨防一致兑现。</div></div><div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
     
@@ -3525,8 +3515,716 @@
       </div>
     </div>
   </div>
-  
-  
+  <div class="card ms-card">
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+    <div class="ms-note">扫描范围：全市场 5004 只 → 精准筛选 66 只(优先排序)（66 只候选，剔除 ST/新股）→ 识别 16 只形态启动个股</div>
+    <div class="ms-gate red">反转闸门：红 · 禁开新仓（埋伏名单豁免） → 仅埋伏名单可操作，新仓需谨慎</div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">全市场 5004 只 → 精准筛选 66 只(优先排序) + 腾讯/东财K线 形态识别</span>
+      <button id="ms-open-btn" class="wl-btn wl-btn-primary" onclick="openMarketScanModal()">📋 打开形态扫描名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看完整形态个股名单 · 支持刷新重扫与一键全部加入观察池<br><span class="ss-note">⚠ 形态在<b>预筛候选池</b>内判定（全市场 → 涨幅 1~8% + 换手 1.5~20% + 成交额≥1.5亿，取前 66 只），因此榜内个股普遍同时具备「拉升」特征 —— 区分度请看<b>分数</b>（=5日涨幅×3 + 换手×3 + 形态数×8），而非形态标签数量</span></div>
+  </div><div class="modal-mask" id="market-scan-modal" onclick="if(event.target===this)closeMarketScanModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+        <span class="modal-close" onclick="closeMarketScanModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：全市场 5004 只 → 精准筛选 66 只(优先排序)（66 只候选，剔除 ST/新股）→ 识别 16 只形态启动个股</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="bulkAddAllPicks()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="ms-refresh-btn" onclick="refreshMarketScan()">🔄 刷新重扫</button>
+        </div>
+        <div class="ms-list" id="ms-list">
+    <div class="ms-row">
+      <span class="ms-rank">1</span>
+      <a class="da-stock ms-name" data-code="601609" onclick="openStockResearch(this.dataset.code)">金田股份</a>
+      <span class="ms-code">601609</span>
+      <span class="ms-pct up">+6.94%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">58</span>
+      <button class="wl-btn ms-add" data-code="601609" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">2</span>
+      <a class="da-stock ms-name" data-code="688167" onclick="openStockResearch(this.dataset.code)">炬光科技</a>
+      <span class="ms-code">688167</span>
+      <span class="ms-pct up">+7.47%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="688167" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">3</span>
+      <a class="da-stock ms-name" data-code="301047" onclick="openStockResearch(this.dataset.code)">义翘神州</a>
+      <span class="ms-code">301047</span>
+      <span class="ms-pct up">+7.18%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="301047" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">4</span>
+      <a class="da-stock ms-name" data-code="301080" onclick="openStockResearch(this.dataset.code)">百普赛斯</a>
+      <span class="ms-code">301080</span>
+      <span class="ms-pct up">+6.29%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="301080" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">5</span>
+      <a class="da-stock ms-name" data-code="603738" onclick="openStockResearch(this.dataset.code)">泰晶科技</a>
+      <span class="ms-code">603738</span>
+      <span class="ms-pct up">+6.24%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="603738" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">6</span>
+      <a class="da-stock ms-name" data-code="688305" onclick="openStockResearch(this.dataset.code)">科德数控</a>
+      <span class="ms-code">688305</span>
+      <span class="ms-pct up">+7.62%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="688305" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">7</span>
+      <a class="da-stock ms-name" data-code="300607" onclick="openStockResearch(this.dataset.code)">拓斯达</a>
+      <span class="ms-code">300607</span>
+      <span class="ms-pct up">+5.13%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="300607" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">8</span>
+      <a class="da-stock ms-name" data-code="000880" onclick="openStockResearch(this.dataset.code)">潍柴重机</a>
+      <span class="ms-code">000880</span>
+      <span class="ms-pct up">+5.95%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">49</span>
+      <button class="wl-btn ms-add" data-code="000880" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">9</span>
+      <a class="da-stock ms-name" data-code="603663" onclick="openStockResearch(this.dataset.code)">三祥新材</a>
+      <span class="ms-code">603663</span>
+      <span class="ms-pct up">+6.13%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">43</span>
+      <button class="wl-btn ms-add" data-code="603663" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">10</span>
+      <a class="da-stock ms-name" data-code="000678" onclick="openStockResearch(this.dataset.code)">襄阳轴承</a>
+      <span class="ms-code">000678</span>
+      <span class="ms-pct up">+6.82%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">42</span>
+      <button class="wl-btn ms-add" data-code="000678" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">11</span>
+      <a class="da-stock ms-name" data-code="300302" onclick="openStockResearch(this.dataset.code)">同有科技</a>
+      <span class="ms-code">300302</span>
+      <span class="ms-pct up">+6.86%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span></span>
+      <span class="ms-score">40</span>
+      <button class="wl-btn ms-add" data-code="300302" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">12</span>
+      <a class="da-stock ms-name" data-code="002428" onclick="openStockResearch(this.dataset.code)">云南锗业</a>
+      <span class="ms-code">002428</span>
+      <span class="ms-pct up">+7.93%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">35</span>
+      <button class="wl-btn ms-add" data-code="002428" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">13</span>
+      <a class="da-stock ms-name" data-code="301026" onclick="openStockResearch(this.dataset.code)">浩通科技</a>
+      <span class="ms-code">301026</span>
+      <span class="ms-pct up">+7.96%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">30</span>
+      <button class="wl-btn ms-add" data-code="301026" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">14</span>
+      <a class="da-stock ms-name" data-code="300102" onclick="openStockResearch(this.dataset.code)">乾照光电</a>
+      <span class="ms-code">300102</span>
+      <span class="ms-pct up">+6.89%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">29</span>
+      <button class="wl-btn ms-add" data-code="300102" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">15</span>
+      <a class="da-stock ms-name" data-code="300505" onclick="openStockResearch(this.dataset.code)">川金诺</a>
+      <span class="ms-code">300505</span>
+      <span class="ms-pct up">+6.62%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span></span>
+      <span class="ms-score">20</span>
+      <button class="wl-btn ms-add" data-code="300505" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">16</span>
+      <a class="da-stock ms-name" data-code="600141" onclick="openStockResearch(this.dataset.code)">兴发集团</a>
+      <span class="ms-code">600141</span>
+      <span class="ms-pct up">+7.17%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span></span>
+      <span class="ms-score">14</span>
+      <button class="wl-btn ms-add" data-code="600141" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div></div>
+        <div class="sc-hint">点击股票名称可查看深度分析 · 形态识别（启动/老鸭头/拉升）准确性 7/10</div>
+      </div>
+    </div>
+  </div>
+  <div class="card wave-card">
+    <div class="wave-header">
+      <div class="wave-title">🌊 波背离选股 TOP20</div>
+      <div class="wave-sub">前期强势一波 → 缩量调整 → <b>同价位 KDJ 背离+金叉</b> → 不破大阳支撑 · 盘中扫描全A剔除ST<br><span class="ss-note">按战法硬条件筛选：<b>必须同时满足</b>「KDJ 背离+金叉」与「不破大阳线支撑」；评分含 量窒息 / 出五日量（盘中按时间进度折算）/ 辨识度（板块龙头）/ 题材共振（无题材为套利）</span></div>
+    </div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">全A 5004 只剔除ST → 活跃候选 2331 只</span>
+      <button id="wave-open-btn" class="wl-btn wl-btn-primary" onclick="openWaveDivergenceModal()">📋 打开波背离名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看优先排序前 20 只波背离股票 · 支持刷新行情与一键加入观察池</div>
+  </div><div class="modal-mask" id="wave-divergence-modal" onclick="if(event.target===this)closeWaveDivergenceModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">🌊 波背离选股 TOP20 · 全A剔除ST</div>
+        <span class="modal-close" onclick="closeWaveDivergenceModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：全A 5004 只剔除ST → 活跃候选 2331 只</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="bulkAddWaveToWatchlist()">⚡ 一键加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="wave-refresh-btn" onclick="refreshWaveQuotes()">↻ 刷新行情</button>
+        </div>
+        <div class="wave-list">
+          <div class="wave-row wave-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span><span>信号</span></div>
+          <div class="wave-item" data-code="601162" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">1</span>
+        <span class="wave-name">天风证券<small>601162</small></span>
+        <span class="wave-price flat">3.73</span>
+        <span class="wave-pct flat">0.00%</span>
+        <span class="wave-score">100</span>
+        <span class="wave-sig sig sig-wait">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>28.1%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>23日 -4.8%</b></span>
+        <span>量比 <b>0.59</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>3.71</b></span>
+      </div>
+    </div><div class="wave-item" data-code="002038" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">2</span>
+        <span class="wave-name">双鹭药业<small>002038</small></span>
+        <span class="wave-price up">6.17</span>
+        <span class="wave-pct up">+2.15%</span>
+        <span class="wave-score">95</span>
+        <span class="wave-sig sig sig-strong">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>40.2%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>24日 -12.5%</b></span>
+        <span>量比 <b>0.7</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>5.58</b></span>
+      </div>
+    </div><div class="wave-item" data-code="603338" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">3</span>
+        <span class="wave-name">浙江鼎力<small>603338</small></span>
+        <span class="wave-price up">55.90</span>
+        <span class="wave-pct up">+0.54%</span>
+        <span class="wave-score">90</span>
+        <span class="wave-sig sig sig-up">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>42.3%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>13日 -7.6%</b></span>
+        <span>量比 <b>0.67</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>51.67</b></span>
+      </div>
+    </div><div class="wave-item" data-code="002083" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">4</span>
+        <span class="wave-name">孚日股份<small>002083</small></span>
+        <span class="wave-price up">12.04</span>
+        <span class="wave-pct up">+2.12%</span>
+        <span class="wave-score">90</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>34.7%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>5日 -0.7%</b></span>
+        <span>量比 <b>0.77</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>11.52</b></span>
+      </div>
+    </div><div class="wave-item" data-code="002550" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">5</span>
+        <span class="wave-name">千红制药<small>002550</small></span>
+        <span class="wave-price down">7.16</span>
+        <span class="wave-pct down">-0.56%</span>
+        <span class="wave-score">90</span>
+        <span class="wave-sig sig sig-wait">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>24.9%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>23日 -0.8%</b></span>
+        <span>量比 <b>0.82</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>6.51</b></span>
+      </div>
+    </div><div class="wave-item" data-code="002582" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">6</span>
+        <span class="wave-name">好想你<small>002582</small></span>
+        <span class="wave-price up">11.11</span>
+        <span class="wave-pct up">+0.54%</span>
+        <span class="wave-score">90</span>
+        <span class="wave-sig sig sig-up">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>33.9%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>2日 -3.4%</b></span>
+        <span>量比 <b>1.38</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>11.15</b></span>
+      </div>
+    </div><div class="wave-item" data-code="002966" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">7</span>
+        <span class="wave-name">苏州银行<small>002966</small></span>
+        <span class="wave-price up">8.53</span>
+        <span class="wave-pct up">+0.71%</span>
+        <span class="wave-score">90</span>
+        <span class="wave-sig sig sig-up">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>23.3%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>12日 -0.6%</b></span>
+        <span>量比 <b>0.78</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>7.77</b></span>
+      </div>
+    </div><div class="wave-item" data-code="301345" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">8</span>
+        <span class="wave-name">涛涛车业<small>301345</small></span>
+        <span class="wave-price up">270.99</span>
+        <span class="wave-pct up">+6.45%</span>
+        <span class="wave-score">90</span>
+        <span class="wave-sig sig sig-break">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>39.2%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>27日 -0.3%</b></span>
+        <span>量比 <b>0.88</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>258.02</b></span>
+      </div>
+    </div><div class="wave-item" data-code="301584" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">9</span>
+        <span class="wave-name">建发致新<small>301584</small></span>
+        <span class="wave-price down">24.20</span>
+        <span class="wave-pct down">-1.22%</span>
+        <span class="wave-score">90</span>
+        <span class="wave-sig sig sig-press">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>22.9%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>24日 -1.2%</b></span>
+        <span>量比 <b>1.48</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>24.5</b></span>
+      </div>
+    </div><div class="wave-item" data-code="600409" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">10</span>
+        <span class="wave-name">三友化工<small>600409</small></span>
+        <span class="wave-price up">6.79</span>
+        <span class="wave-pct up">+3.03%</span>
+        <span class="wave-score">85</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>25.8%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>5日 -2%</b></span>
+        <span>量比 <b>0.56</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>6.58</b></span>
+      </div>
+    </div><div class="wave-item" data-code="600428" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">11</span>
+        <span class="wave-name">中远海特<small>600428</small></span>
+        <span class="wave-price up">11.82</span>
+        <span class="wave-pct up">+0.08%</span>
+        <span class="wave-score">85</span>
+        <span class="wave-sig sig sig-wait">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>47.6%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>3日 -2%</b></span>
+        <span>量比 <b>0.53</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>8.99</b></span>
+      </div>
+    </div><div class="wave-item" data-code="601058" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">12</span>
+        <span class="wave-name">赛轮轮胎<small>601058</small></span>
+        <span class="wave-price up">13.97</span>
+        <span class="wave-pct up">+3.10%</span>
+        <span class="wave-score">85</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>25.4%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>12日 -2.5%</b></span>
+        <span>量比 <b>0.56</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
+        <span>支撑 <b>12.95</b></span>
+      </div>
+    </div><div class="wave-item" data-code="688207" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">13</span>
+        <span class="wave-name">格灵深瞳<small>688207</small></span>
+        <span class="wave-price up">21.60</span>
+        <span class="wave-pct up">+7.36%</span>
+        <span class="wave-score">85</span>
+        <span class="wave-sig sig sig-break">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>60.1%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>27日 -6.3%</b></span>
+        <span>量比 <b>0.61</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
+        <span>支撑 <b>17.44</b></span>
+      </div>
+    </div><div class="wave-item" data-code="688617" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">14</span>
+        <span class="wave-name">惠泰医疗<small>688617</small></span>
+        <span class="wave-price down">215.13</span>
+        <span class="wave-pct down">-1.23%</span>
+        <span class="wave-score">85</span>
+        <span class="wave-sig sig sig-press">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>25.4%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>11日 -5.4%</b></span>
+        <span>量比 <b>0.69</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>220.22</b></span>
+      </div>
+    </div><div class="wave-item" data-code="603661" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">15</span>
+        <span class="wave-name">恒林股份<small>603661</small></span>
+        <span class="wave-price up">33.06</span>
+        <span class="wave-pct up">+3.70%</span>
+        <span class="wave-score">83</span>
+        <span class="wave-sig sig sig-strong">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>31.4%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>28日 -22.5%</b></span>
+        <span>量比 <b>0.4</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>35.73</b></span>
+      </div>
+    </div><div class="wave-item" data-code="600201" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">16</span>
+        <span class="wave-name">生物股份<small>600201</small></span>
+        <span class="wave-price down">13.51</span>
+        <span class="wave-pct down">-0.15%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-wait">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>25.4%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>5日 -3.3%</b></span>
+        <span>量比 <b>0.73</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>12.64</b></span>
+      </div>
+    </div><div class="wave-item" data-code="601766" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">17</span>
+        <span class="wave-name">中国中车<small>601766</small></span>
+        <span class="wave-price up">5.97</span>
+        <span class="wave-pct up">+1.53%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-up">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>21.7%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>12日 -5.7%</b></span>
+        <span>量比 <b>0.78</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>6.03</b></span>
+      </div>
+    </div><div class="wave-item" data-code="603766" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">18</span>
+        <span class="wave-name">隆鑫通用<small>603766</small></span>
+        <span class="wave-price up">13.79</span>
+        <span class="wave-pct up">+5.35%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-break">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>27.2%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>12日 -7.6%</b></span>
+        <span>量比 <b>0.87</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>12.8</b></span>
+      </div>
+    </div><div class="wave-item" data-code="000661" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">19</span>
+        <span class="wave-name">长春高新<small>000661</small></span>
+        <span class="wave-price down">84.53</span>
+        <span class="wave-pct down">-0.07%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-wait">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>32.6%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>4日 -2.6%</b></span>
+        <span>量比 <b>0.7</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>80.51</b></span>
+      </div>
+    </div><div class="wave-item" data-code="002546" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">20</span>
+        <span class="wave-name">新联电子<small>002546</small></span>
+        <span class="wave-price up">8.62</span>
+        <span class="wave-pct up">+2.25%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>34.6%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>8日 -4%</b></span>
+        <span>量比 <b>0.58</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>7.34</b></span>
+      </div>
+    </div><div class="wave-item" data-code="002653" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">21</span>
+        <span class="wave-name">海思科<small>002653</small></span>
+        <span class="wave-price up">70.11</span>
+        <span class="wave-pct up">+1.05%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-up">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>65.7%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>22日 -11.5%</b></span>
+        <span>量比 <b>0.66</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>61.06</b></span>
+      </div>
+    </div><div class="wave-item" data-code="002728" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">22</span>
+        <span class="wave-name">特一药业<small>002728</small></span>
+        <span class="wave-price up">9.56</span>
+        <span class="wave-pct up">+1.70%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-up">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>28.4%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>22日 -6.9%</b></span>
+        <span>量比 <b>0.6</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>8.8</b></span>
+      </div>
+    </div><div class="wave-item" data-code="002841" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">23</span>
+        <span class="wave-name">视源股份<small>002841</small></span>
+        <span class="wave-price up">51.12</span>
+        <span class="wave-pct up">+2.80%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>62.5%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>26日 -2.5%</b></span>
+        <span>量比 <b>0.92</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
+        <span>支撑 <b>43.08</b></span>
+      </div>
+    </div><div class="wave-item" data-code="003032" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">24</span>
+        <span class="wave-name">传智教育<small>003032</small></span>
+        <span class="wave-price up">12.51</span>
+        <span class="wave-pct up">+2.04%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>159.2%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>3日 -3.1%</b></span>
+        <span>量比 <b>2.22</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
+        <span>支撑 <b>6.02</b></span>
+      </div>
+    </div><div class="wave-item" data-code="300039" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">25</span>
+        <span class="wave-name">上海凯宝<small>300039</small></span>
+        <span class="wave-price up">6.16</span>
+        <span class="wave-pct up">+2.16%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>41.5%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>2日 -0.8%</b></span>
+        <span>量比 <b>0.93</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
+        <span>支撑 <b>5.2</b></span>
+      </div>
+    </div><div class="wave-item" data-code="300676" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">26</span>
+        <span class="wave-name">华大基因<small>300676</small></span>
+        <span class="wave-price down">39.78</span>
+        <span class="wave-pct down">-2.12%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-press">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>20.7%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>2日 -5.2%</b></span>
+        <span>量比 <b>1.04</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>39.96</b></span>
+      </div>
+    </div><div class="wave-item" data-code="301381" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">27</span>
+        <span class="wave-name">赛维时代<small>301381</small></span>
+        <span class="wave-price up">23.18</span>
+        <span class="wave-pct up">+2.61%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>30.9%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>9日 -1.9%</b></span>
+        <span>量比 <b>0.54</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>21.5</b></span>
+      </div>
+    </div><div class="wave-item" data-code="301602" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">28</span>
+        <span class="wave-name">超研股份<small>301602</small></span>
+        <span class="wave-price down">18.85</span>
+        <span class="wave-pct down">-0.26%</span>
+        <span class="wave-score">80</span>
+        <span class="wave-sig sig sig-wait">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>49.7%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>2日 -7.6%</b></span>
+        <span>量比 <b>3.54</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>18.38</b></span>
+      </div>
+    </div><div class="wave-item" data-code="600129" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">29</span>
+        <span class="wave-name">太极集团<small>600129</small></span>
+        <span class="wave-price down">16.96</span>
+        <span class="wave-pct down">-0.35%</span>
+        <span class="wave-score">75</span>
+        <span class="wave-sig sig sig-wait">回调弱调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>51.6%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>23日 -5.7%</b></span>
+        <span>量比 <b>1</b></span>
+        <span>KDJ 金叉 <b class="ok">✓</b> 背离 <b class="no">✗</b></span>
+        <span>支撑 <b>13.05</b></span>
+      </div>
+    </div><div class="wave-item" data-code="600547" onclick="openStockResearch(this.dataset.code)">
+      <div class="wave-row">
+        <span class="wave-rank">30</span>
+        <span class="wave-name">山东黄金<small>600547</small></span>
+        <span class="wave-price up">30.10</span>
+        <span class="wave-pct up">+2.59%</span>
+        <span class="wave-score">75</span>
+        <span class="wave-sig sig sig-strong">横盘强调整</span>
+      </div>
+      <div class="wave-meta">
+        <span>一波 <b>32.4%</b></span>
+        <span>辨识度 <b class="no">—</b></span>
+        <span>调整 <b>5日 -4.4%</b></span>
+        <span>量比 <b>0.98</b></span>
+        <span>KDJ 金叉 <b class="no">✗</b> 背离 <b class="ok">✓</b></span>
+        <span>支撑 <b>28.95</b></span>
+      </div>
+    </div>
+        </div>
+        <div class="sc-hint">点击个股行可查看深度分析 · 评分=一波涨幅/调整缩量/KDJ金叉背离/支撑/止跌/均线综合</div>
+      </div>
+    </div>
+  </div>
   <div class="card sc-card">
     <div class="wave-header">
       <div class="wave-title">⚡ 超短核心 TOP20</div>
@@ -3568,7 +4266,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+52%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3591,7 +4288,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+41%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3614,7 +4310,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+55.6%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3637,7 +4332,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+17.6%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3660,7 +4354,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+31.5%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3683,7 +4376,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+16.3%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3706,7 +4398,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+15.7%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3729,7 +4420,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+61.3%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3752,7 +4442,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+60.2%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3775,7 +4464,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+26.2%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3798,7 +4486,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+29%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3821,7 +4508,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+50%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3844,7 +4530,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+24.2%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3867,7 +4552,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+33.5%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3890,7 +4574,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+62.3%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3913,7 +4596,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+28.1%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3936,7 +4618,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+42.6%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3959,7 +4640,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+26.2%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -3982,7 +4662,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+30%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4005,7 +4684,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+21.6%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4028,7 +4706,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+23.7%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4051,7 +4728,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+51.7%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4074,7 +4750,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+32.9%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4097,7 +4772,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+54.1%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4120,7 +4794,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+35.6%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4143,7 +4816,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+24.2%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4166,7 +4838,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+49.6%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4189,7 +4860,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+15.9%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4212,7 +4882,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+36.9%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -4235,7 +4904,6 @@
         <span>竞价 <b class="no">—</b></span>
         <span>盘前量比 <b class="no">—</b></span>
         <span>封单 <b class="no">—</b></span>
-        <span>炸板 <b class="no">—</b></span>
         <span>辨识度 <b class="no">非辨识度</b></span>
         <span>20日 <b class="ok">+29.4%</b></span>
         <span>突破 <b class="ok">✓</b></span>
@@ -5591,13 +6259,7 @@ function buildDecisionCardHtml(s){
   var tRR=1;
   var tRRBad=tRR<1.5;
   var tRRHide=tRR<=1.0;
-  // v11.58 修(用户实测):触发判定原用【现价】比计划价位 —— 盘中一旦回踩到位后又拉回,就永远显示"未触发",
-  //   且与模拟跟踪的口径不一致(跟踪是按日K逐根 low≤入场价 判定)。改为【当日已发生的触达事实】优先、现价兜底:
-  //   方案A 触达 = 当日最低曾 ≤ 入场价;方案B 触达 = 当日最高曾 ≥ 突破价。
-  var dLow=Number(s.low)||0, dHigh=Number(s.high)||0;
-  var trigA=(dLow>0&&dLow<=p.entry)||price<=p.entry;
-  var trigB=(dHigh>0&&dHigh>=planBEntry)||price>=planBEntry;
-  var trigC=price>0;
+  var trigA=price<=p.entry, trigB=price>=planBEntry, trigC=price>0;
   // 情绪周期与硬逆势判定(提前到此,供状态覆盖与折叠使用)
   var isHardTrade=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0);
   // 复盘形态:长上影线/大幅冲高回落识别 —— (最高-现价)>3% 且 现价<开盘价(提前到此,供状态降级与形态/资金文案使用)
@@ -5620,8 +6282,8 @@ function buildDecisionCardHtml(s){
   var collapseLabel=isHardTrade?'⛔ 破位·严禁现价抄底':'⛔ 等待触发·未达入场条件';
   function planRow(name,trig,entryV,stopV,tgtV,rrVal,triggered,tone,bad){return '<tr class="'+(triggered?'':'tp-notrig')+'"><td class="tp-name">'+name+'</td><td class="tp-trig">'+escHtmlF(trig)+'</td><td class="tp-num">'+f2(entryV)+'</td><td class="tp-num stop">'+f2(stopV)+'</td><td class="tp-num">'+f2(tgtV)+'</td><td class="tp-rr '+(!triggered?'tp-rr-muted':(bad?'rr-bad':'rr-'+tone))+'">'+(triggered?rrVal.toFixed(2):'未触发')+'</td></tr>';}
   var planTable='<table class="tp-table"><tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>'+
-    planRow('A 回踩低吸',trigA?('已触达回踩位'+f2(p.entry)+(dLow>0?'(当日最低'+f2(dLow)+')':'')):('回踩'+f2(p.entry)+'企稳'),p.entry,p.stop,p.target,p.rr,trigA,rrTone(p.rr))+
-    planRow('B 突破确认',trigB?('已触达突破位'+f2(planBEntry)):('放量突破'+f2(planBEntry)),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
+    planRow('A 回踩低吸','回踩'+f2(p.entry)+'企稳',p.entry,p.stop,p.target,p.rr,trigA,rrTone(p.rr))+
+    planRow('B 突破确认','放量突破'+f2(planBEntry),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
     (tRRHide?'':planRow('C 日内做T','现价'+f2(price)+'·ATR'+f2(atrC)+'动态止损',price,tStop,tTgt,tRR,trigC,rrTone(tRR),tRRBad))+
     '</table>';
   // 现价追入校验(v11.10:与状态机联动——非"可交易"状态即使现价盈亏比"看似合格",也禁止出现"可执行计划"暗示)
@@ -5693,10 +6355,7 @@ function buildDecisionCardHtml(s){
   // v11.55:技术画像所用K线不是最近交易日 → 关键价位(支撑/压力/止损)可能已失效,必须计入"数据不完整"
   var ks=t.klineStamp;
   if(ks&&ks.tradeDate&&ks.staleTDays>0)diMissing.push('K线旧('+String(ks.tradeDate).slice(5)+')');
-  // v11.58:龙虎榜是【事件驱动】(仅个股达标当日才公布),"近期未上榜"不是数据缺失 —— 原先计入
-  //   diMissing 会让卡片显示"⚠ 数据暂缺·龙虎榜(偏旧)",用户误以为系统抽风。改为只在【完全没有该股任何
-  //   上榜记录】时才算缺失;正文里 v11.37 的"最近上榜 MM-DD / 约N个交易日未再见"说明照旧保留。
-  if(!s.lhb)diMissing.push('龙虎榜');
+  if(!s.lhb)diMissing.push('龙虎榜'); else if(lhbStaleF(s.lhb.date))diMissing.push('龙虎榜(偏旧)');
   if(s.minTrend&&((s.minTrend.m60&&s.minTrend.m60.approx)||(s.minTrend.m15&&s.minTrend.m15.approx)))diMissing.push('分钟线');
   var integrityBadge=diMissing.length===0
     ?'<span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>'
