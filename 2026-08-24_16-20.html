@@ -699,6 +699,8 @@
 
 /* v11.50:涨停标的可能无法成交(战法"做不到最强的做第二强的套利") */
 .sc-limit{display:inline-block;margin-left:4px;font-size:8px;color:#a05a00;background:#fff3cd;border:1px solid #f0d68a;border-radius:6px;padding:1px 4px;white-space:nowrap}
+/* v11.61:炸板过的涨停 = 盘中可成交,与"一直封死"区分开(前者是机会,后者只是观察)。 */
+.sc-limit-zb{color:#0a6b3d;background:#e8f7ee;border-color:#a8ddc0}
 
 /* v11.51:超短核心——该值来自盘前快照(约09:43)而非盘中实时 */
 .sc-pre{display:inline-block;margin-left:3px;font-size:8px;font-style:normal;color:#185FA5;background:#eef4ff;border:1px solid #cddffb;border-radius:5px;padding:0 3px;vertical-align:middle}
@@ -2292,10 +2294,10 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">首页</a><a href="2026-08-24_08-30.html">盘前</a><a href="2026-08-24_11-35.html">盘中</a><a href="2026-08-24_16-20.html" class="active">收盘</a>
+      <a href="index.html">首页</a><a href="2026-08-24_08-30.html">盘前</a><a href="2026-08-24_16-20.html" class="active">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘 · <b>数据时间 19:55</b>（约 108 分钟前）</div><h1 class="hero-title">2026-08-24 · <span class="hero-time">16:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-warn">⚠️ 延迟补采（实际数据时点 19:55），非当日 16:20 收盘快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘 · <b>数据时间 19:55</b>（约 145 分钟前）</div><h1 class="hero-title">2026-08-24 · <span class="hero-time">16:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-warn">⚠️ 延迟补采（实际数据时点 19:55），非当日 16:20 收盘快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
 <div class="section">
 <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-24 收盘复盘 · 数据截至 16:20</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">71°</div><div class="ce-stage">高温区 · 情绪高涨</div><div class="ce-fact">主特征: 情绪高涨,接力效应强</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">25%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">46</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">46</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈74%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">4板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">22%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">1695</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">4851</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">140</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:1695"></div><div class="ce-bar-flat" style="flex:140"></div><div class="ce-bar-down" style="flex:4851"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>25%</b></span><span>成交额 <b>20075亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row" data-code="000001" data-prefix="sh"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val down">-0.59%</span><span class="ce-idx-price">3882.01</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:17.7%"></div></div></div><div class="ce-idx-row" data-code="399001" data-prefix="sz"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val down">-2.13%</span><span class="ce-idx-price">13794.29</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:63.9%"></div></div></div><div class="ce-idx-row" data-code="399006" data-prefix="sz"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-3.21%</span><span class="ce-idx-price">3431.89</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:96.3%"></div></div></div><div class="ce-block-hint">量能维持在 2 万亿上方 (20075 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">电力</span><span class="ce-ml-val up">+5.3%</span></div><div class="ce-ml-row"><span class="ce-ml-name">电池</span><span class="ce-ml-val up">+5.3%</span></div><div class="ce-ml-row"><span class="ce-ml-name">中药Ⅱ</span><span class="ce-ml-val up">+6.2%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">电力</span><span class="ce-mi-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">电池</span><span class="ce-mi-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">中药Ⅱ</span><span class="ce-mi-val up">+6.2亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制药</span><span class="ce-mi-val up">+5.4亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title">04 情绪高度(连板梯队)</div><div class="ce-ladder"><span class="ce-ladder-pill">4板 · 汉森制药</span><span class="ce-ladder-pill">3板 · 深中华A</span><span class="ce-ladder-pill">2板 · 新华百货</span></div></div><div class="card"><div class="card-title">05 明日观察锚点</div><div class="ce-anchor-grid"><div class="ce-anchor-card"><div class="ce-anchor-h">🎯 主线持续性</div><div class="ce-anchor-desc">观察 中药Ⅱ 龙头 汉森制药 能否继续表态</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">⚠️ 情绪退潮阈值</div><div class="ce-anchor-desc">今日炸板 16 家 · 晋级率 22%,炸板率 &gt; 40% 或晋级率 &lt; 50% 需警惕</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">📊 量能验证</div><div class="ce-anchor-desc">成交额 20075亿 基础上能否重拾放量</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">🛡️ 高位风险</div><div class="ce-anchor-desc">汉森制药 4 板,关注与所属板块是否背离</div></div></div></div><div class="card tw-card-outer"><div class="card-title"><span class="tw-eyebrow">06</span> 明日看什么</div><div class="tw-tabs"></div><div class="tw-details"></div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
     
@@ -2808,7 +2810,212 @@
       </div>
     </div>
   </div>
-  
+  <div class="card ms-card">
+    <div class="card-title">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+    <div class="ms-note">扫描范围：全市场 5004 只 → 精准筛选 66 只(优先排序)（66 只候选，剔除 ST/新股）→ 识别 20 只形态启动个股</div>
+    <div class="ms-gate red">反转闸门：红 · 禁开新仓（埋伏名单豁免） → 仅埋伏名单可操作，新仓需谨慎</div>
+    <div class="wave-tools">
+      <span class="wave-scan-info">全市场 5004 只 → 精准筛选 66 只(优先排序) + 腾讯/东财K线 形态识别</span>
+      <button id="ms-open-btn" class="wl-btn wl-btn-primary" onclick="openMarketScanModal()">📋 打开形态扫描名单</button>
+    </div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看完整形态个股名单 · 支持刷新重扫与一键全部加入观察池<br><span class="ss-note">⚠ 形态在<b>预筛候选池</b>内判定（全市场 → 涨幅 1~8% + 换手 1.5~20% + 成交额≥1.5亿，取前 66 只），因此榜内个股普遍同时具备「拉升」特征 —— 区分度请看<b>分数</b>（=5日涨幅×3 + 换手×3 + 形态数×8），而非形态标签数量</span></div>
+  </div><div class="modal-mask" id="market-scan-modal" onclick="if(event.target===this)closeMarketScanModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">形态扫描 · 启动 / 老鸭头 / 拉升</div>
+        <span class="modal-close" onclick="closeMarketScanModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：全市场 5004 只 → 精准筛选 66 只(优先排序)（66 只候选，剔除 ST/新股）→ 识别 20 只形态启动个股</div>
+        <div class="sc-tools">
+          <button class="wl-btn" onclick="bulkAddAllPicks()">⚡ 一键全部加入观察池</button>
+          <button class="wl-btn wl-btn-primary" id="ms-refresh-btn" onclick="refreshMarketScan()">🔄 刷新重扫</button>
+        </div>
+        <div class="ms-list" id="ms-list">
+    <div class="ms-row">
+      <span class="ms-rank">1</span>
+      <a class="da-stock ms-name" data-code="600250" onclick="openStockResearch(this.dataset.code)">南京商旅</a>
+      <span class="ms-code">600250</span>
+      <span class="ms-pct up">+3.72%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span><span class="ms-pattern">老鸭头</span><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">65</span>
+      <button class="wl-btn ms-add" data-code="600250" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">2</span>
+      <a class="da-stock ms-name" data-code="601069" onclick="openStockResearch(this.dataset.code)">西部黄金</a>
+      <span class="ms-code">601069</span>
+      <span class="ms-pct up">+6.27%</span>
+      <span class="ms-patterns"><span class="ms-pattern">老鸭头</span><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">58</span>
+      <button class="wl-btn ms-add" data-code="601069" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">3</span>
+      <a class="da-stock ms-name" data-code="301190" onclick="openStockResearch(this.dataset.code)">善水科技</a>
+      <span class="ms-code">301190</span>
+      <span class="ms-pct up">+7.14%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">58</span>
+      <button class="wl-btn ms-add" data-code="301190" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">4</span>
+      <a class="da-stock ms-name" data-code="002614" onclick="openStockResearch(this.dataset.code)">奥佳华</a>
+      <span class="ms-code">002614</span>
+      <span class="ms-pct up">+6.5%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span><span class="ms-pattern">老鸭头</span><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">57</span>
+      <button class="wl-btn ms-add" data-code="002614" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">5</span>
+      <a class="da-stock ms-name" data-code="000506" onclick="openStockResearch(this.dataset.code)">招金黄金</a>
+      <span class="ms-code">000506</span>
+      <span class="ms-pct up">+7.56%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="000506" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">6</span>
+      <a class="da-stock ms-name" data-code="000628" onclick="openStockResearch(this.dataset.code)">高新发展</a>
+      <span class="ms-code">000628</span>
+      <span class="ms-pct up">+5.31%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="000628" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">7</span>
+      <a class="da-stock ms-name" data-code="603626" onclick="openStockResearch(this.dataset.code)">科森科技</a>
+      <span class="ms-code">603626</span>
+      <span class="ms-pct up">+4.45%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="603626" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">8</span>
+      <a class="da-stock ms-name" data-code="300864" onclick="openStockResearch(this.dataset.code)">南大环境</a>
+      <span class="ms-code">300864</span>
+      <span class="ms-pct up">+6.6%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="300864" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">9</span>
+      <a class="da-stock ms-name" data-code="601011" onclick="openStockResearch(this.dataset.code)">宝泰隆</a>
+      <span class="ms-code">601011</span>
+      <span class="ms-pct up">+4.17%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">50</span>
+      <button class="wl-btn ms-add" data-code="601011" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">10</span>
+      <a class="da-stock ms-name" data-code="002274" onclick="openStockResearch(this.dataset.code)">华昌化工</a>
+      <span class="ms-code">002274</span>
+      <span class="ms-pct up">+5.67%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span><span class="ms-pattern">老鸭头</span><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">48</span>
+      <button class="wl-btn ms-add" data-code="002274" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">11</span>
+      <a class="da-stock ms-name" data-code="300328" onclick="openStockResearch(this.dataset.code)">宜安科技</a>
+      <span class="ms-code">300328</span>
+      <span class="ms-pct up">+6.35%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">46</span>
+      <button class="wl-btn ms-add" data-code="300328" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">12</span>
+      <a class="da-stock ms-name" data-code="603123" onclick="openStockResearch(this.dataset.code)">翠微股份</a>
+      <span class="ms-code">603123</span>
+      <span class="ms-pct up">+4.97%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span></span>
+      <span class="ms-score">44</span>
+      <button class="wl-btn ms-add" data-code="603123" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">13</span>
+      <a class="da-stock ms-name" data-code="000426" onclick="openStockResearch(this.dataset.code)">兴业银锡</a>
+      <span class="ms-code">000426</span>
+      <span class="ms-pct up">+3.45%</span>
+      <span class="ms-patterns"><span class="ms-pattern">老鸭头</span><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">43</span>
+      <button class="wl-btn ms-add" data-code="000426" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">14</span>
+      <a class="da-stock ms-name" data-code="300468" onclick="openStockResearch(this.dataset.code)">四方精创</a>
+      <span class="ms-code">300468</span>
+      <span class="ms-pct up">+3.51%</span>
+      <span class="ms-patterns"><span class="ms-pattern">启动</span></span>
+      <span class="ms-score">40</span>
+      <button class="wl-btn ms-add" data-code="300468" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">15</span>
+      <a class="da-stock ms-name" data-code="000020" onclick="openStockResearch(this.dataset.code)">深华发Ａ</a>
+      <span class="ms-code">000020</span>
+      <span class="ms-pct up">+4.77%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">39</span>
+      <button class="wl-btn ms-add" data-code="000020" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">16</span>
+      <a class="da-stock ms-name" data-code="300751" onclick="openStockResearch(this.dataset.code)">迈为股份</a>
+      <span class="ms-code">300751</span>
+      <span class="ms-pct up">+4.16%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">38</span>
+      <button class="wl-btn ms-add" data-code="300751" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">17</span>
+      <a class="da-stock ms-name" data-code="600313" onclick="openStockResearch(this.dataset.code)">农发种业</a>
+      <span class="ms-code">600313</span>
+      <span class="ms-pct up">+2.31%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">35</span>
+      <button class="wl-btn ms-add" data-code="600313" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">18</span>
+      <a class="da-stock ms-name" data-code="300386" onclick="openStockResearch(this.dataset.code)">飞天诚信</a>
+      <span class="ms-code">300386</span>
+      <span class="ms-pct up">+4.72%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">34</span>
+      <button class="wl-btn ms-add" data-code="300386" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">19</span>
+      <a class="da-stock ms-name" data-code="601101" onclick="openStockResearch(this.dataset.code)">昊华能源</a>
+      <span class="ms-code">601101</span>
+      <span class="ms-pct up">+6.21%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">33</span>
+      <button class="wl-btn ms-add" data-code="601101" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>
+    <div class="ms-row">
+      <span class="ms-rank">20</span>
+      <a class="da-stock ms-name" data-code="688315" onclick="openStockResearch(this.dataset.code)">诺禾致源</a>
+      <span class="ms-code">688315</span>
+      <span class="ms-pct up">+6.14%</span>
+      <span class="ms-patterns"><span class="ms-pattern">拉升</span></span>
+      <span class="ms-score">31</span>
+      <button class="wl-btn ms-add" data-code="688315" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div></div>
+        <div class="sc-hint">点击股票名称可查看深度分析 · 形态识别（启动/老鸭头/拉升）准确性 7/10</div>
+      </div>
+    </div>
+  </div>
   
   
   
