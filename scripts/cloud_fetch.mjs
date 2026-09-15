@@ -2528,6 +2528,15 @@ async function scanShortCore(ztList, identSet, auctionMap) {
     score: Math.min(100, Math.round(x.score)),
     ztCount: x.ztCount, lianban: x.lianban, volRatio: x.volRatio,
     maAlign: x.maAlign, newHigh: x.newHigh, gain20: x.gain20,
+    // v11.59b:补回被这张 map 丢掉的字段 —— 上游 shortCoreScore 已算出 openPct/aucVol/sealYi/fromAuction/ident,
+    //   但这里只挑了 15 个字段 ⇒ 卡片上「竞价/盘前量比/封单」永远显示「—」、「辨识度」永远显示默认「非辨识度」
+    //   (用户实测反馈"数据还是不全")。此处原样透传,不再丢字段。
+    openPct: x.openPct != null ? x.openPct : null,
+    aucVol: x.aucVol != null ? x.aucVol : null,
+    aucTurn: x.aucTurn != null ? x.aucTurn : null,
+    fromAuction: !!x.fromAuction,
+    sealYi: x.sealYi != null ? x.sealYi : null,
+    ident: x.ident || '',
     signalType: x.lianban >= 2 ? (x.lianban + '连板') : (x.ztCount >= 2 ? '多涨停' : '强势涨停')
   }));
   return { total: quotes.length, scanned: cands.length, list, limitUpExcluded: _limitUp,

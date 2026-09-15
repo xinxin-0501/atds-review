@@ -1992,7 +1992,7 @@ function renderShortCore(report) {
         <span>盘前量比 <b class="${x.aucVol != null && x.aucVol >= 1.5 ? 'ok' : 'no'}">${x.aucVol != null ? x.aucVol : '—'}</b></span>
         <span>封单 <b class="${x.sealYi != null && x.sealYi >= 2 ? 'ok' : 'no'}">${x.sealYi != null ? x.sealYi + '亿' : '—'}</b></span>
         <span>辨识度 <b class="${x.ident ? 'ok' : 'no'}">${esc(x.ident || '非辨识度')}</b></span>
-        <span>20日 <b class="${x.gain20 >= 15 ? 'ok' : 'no'}">+${x.gain20}%</b></span>
+        <span>20日 <b class="${x.gain20 >= 15 ? 'ok' : 'no'}">${x.gain20 >= 0 ? '+' : ''}${x.gain20}%</b></span>
         <span>突破 <b class="${x.newHigh ? 'ok' : 'no'}">${x.newHigh ? '✓' : '✗'}</b></span>
         <span>均线多头 <b class="${x.maAlign ? 'ok' : 'no'}">${x.maAlign ? '✓' : '✗'}</b></span>
       </div>
