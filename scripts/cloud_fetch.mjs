@@ -3177,7 +3177,10 @@ async function main() {
     rows.push({
       name, mappedName: name,
       changePct: Math.round(changePct * 100) / 100,
-      upDown: hs ? `${hs.up} / ${hs.down}` : '-- / --',
+      // v11.62: hotSectors 从不携带 up/down 字段(其构造处只给 name/changePct/leadStock/inflow),
+      //   直接拼 `${hs.up} / ${hs.down}` 会产出字面量 "undefined / undefined" 污染 json。
+      //   渲染层未引用该字段,但仍须落盘干净 —— 缺失时统一回退 '-- / --'。
+      upDown: (hs && hs.up != null && hs.down != null) ? `${hs.up} / ${hs.down}` : '-- / --',
       inflowYi,
       limitUpMax: `${v.count}家 / ${v.maxLB}板`,
       ztCount: v.count,
@@ -3195,11 +3198,11 @@ async function main() {
   for (const s of hotSectors) {
     if (s.changePct < 1) break;
     const matched = rows.find(r => r.name === s.name || s.name.includes(r.name) || r.name.includes(s.name));
-    if (matched) { matched.changePct = s.changePct; matched.upDown = `${s.up} / ${s.down}`; matched.inflowYi = Number(s.inflow || 0).toFixed(1); continue; }
+    if (matched) { matched.changePct = s.changePct; if (s.up != null && s.down != null) matched.upDown = `${s.up} / ${s.down}`; matched.inflowYi = Number(s.inflow || 0).toFixed(1); continue; }
     rows.push({
       name: s.name, mappedName: s.name,
       changePct: Math.round(s.changePct * 100) / 100,
-      upDown: `${s.up} / ${s.down}`,
+      upDown: (s.up != null && s.down != null) ? `${s.up} / ${s.down}` : '-- / --',
       inflowYi: Number(s.inflow || 0).toFixed(1),
       limitUpMax: '0', leadStock: '--', ztCount: 0, maxLB: 0,
       _score: s.changePct * 10,
