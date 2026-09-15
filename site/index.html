@@ -2190,6 +2190,8 @@
 /* 资金切换信号(今日核心) */
 .msw-card { background:linear-gradient(180deg,rgba(14,165,233,0.05),rgba(255,255,255,1)); border:1px solid rgba(14,165,233,0.18); border-radius:6px; padding:8px 10px; margin-top:6px; }
 .msw-h { font-size:12px; font-weight:800; color:#0ea5e9; padding-bottom:4px; }
+/* v11.62:盘前页复用本区块时标注视角,避免"今日核心"被读成当日实时 */
+.msw-sub { font-size:10px; font-weight:600; color:#64748b; margin-left:4px; }
 .msw-row { display:flex; gap:8px; align-items:flex-start; font-size:11px; padding:3px 0; }
 .msw-tag { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(14,165,233,0.12); color:#0ea5e9; min-width:88px; text-align:center; }
 .msw-tag-def { background:rgba(245,158,11,0.15); color:#f59e0b; }
