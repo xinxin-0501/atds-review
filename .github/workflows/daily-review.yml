@@ -78,6 +78,7 @@ jobs:
           HOUR=$(TZ='Asia/Shanghai' date +%H%M)
           HOUR=$((10#$HOUR))   # 去掉前导零,避免 bash 八进制解析错误
           TYPE="${{ steps.type.outputs.type }}"
+          TODAY=$(TZ='Asia/Shanghai' date +%Y-%m-%d)
           OK=0
           case "$TYPE" in
             premarket) [ "$HOUR" -ge 940 ] && [ "$HOUR" -le 954 ] && OK=1 ;;
@@ -87,9 +88,25 @@ jobs:
               { [ "$HOUR" -ge 955 ] && [ "$HOUR" -le 1005 ]; } || { [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1140 ]; } || { [ "$HOUR" -ge 1325 ] && [ "$HOUR" -le 1340 ]; } || { [ "$HOUR" -ge 1425 ] && [ "$HOUR" -le 1440 ]; } && OK=1 ;;
             close) [ "$HOUR" -ge 1610 ] && [ "$HOUR" -le 1730 ] && OK=1 ;;
           esac
+          # v11.57 自愈式回填(重要):窗口外空转,会把"外部定时器失效 / 原生 cron 触发稀疏"直接放大成
+          #   【整天零产出】—— 2026-09-15 就是这样:external cron 0 次 + schedule 仅 2 次且都在窗口外,
+          #   用户手机端一整天看到的都是昨日数据。现改为:窗口外时,若某个"已过采集时点"的槽位当日仍缺失,
+          #   就补采它(按 收盘 > 盘中 > 盘前 的优先级,一次只补一个,避免单轮耗时过长)。
+          #   页面会按 meta.generatedAt 自动显示"补采"提示,不会拿旧数据冒充当时点数据。
+          CATCHUP=""
+          if [ "$OK" != "1" ] && [ "$TYPE" != "auction" ]; then
+            if [ "$HOUR" -ge 1610 ] && [ ! -f "data/reviews/${TODAY}_16-20.json" ]; then CATCHUP="close"
+            elif [ "$HOUR" -ge 1005 ] && [ ! -f "data/reviews/${TODAY}_11-35.json" ]; then CATCHUP="midday"
+            elif [ "$HOUR" -ge 955 ] && [ ! -f "data/reviews/${TODAY}_09-45.json" ]; then CATCHUP="premarket"
+            fi
+          fi
           if [ "$OK" = "1" ]; then
             echo "时间窗口命中: $TYPE @ $HOUR 北京,执行采集"
             echo "inwin=true" >> "$GITHUB_OUTPUT"
+          elif [ -n "$CATCHUP" ]; then
+            echo "窗口外回填: $CATCHUP @ $HOUR 北京,当日槽位缺失 → 补采"
+            echo "inwin=true" >> "$GITHUB_OUTPUT"
+            echo "catchup=$CATCHUP" >> "$GITHUB_OUTPUT"
           else
             echo "时间窗口外: $TYPE @ $HOUR 北京,空转跳过"
             echo "inwin=false" >> "$GITHUB_OUTPUT"
@@ -157,7 +174,8 @@ jobs:
       - name: Fetch market data
         if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && github.event_name != 'push'
         run: |
-          TYPE="${{ steps.type.outputs.type }}"
+          TYPE="${{ steps.win.outputs.catchup }}"
+          if [ -z "$TYPE" ]; then TYPE="${{ steps.type.outputs.type }}"; else echo "补采缺失槽位: $TYPE"; fi
           DATE_ARG="${{ github.event.inputs.date }}"
           # v11.54:盘中一律写规范槽位 midday(= 11:35),不再按当前时刻生成
           #   10:00/11:30/13:30/14:40 四个**不同文件名** —— 那与"每日三槽位(盘前/盘中/收盘)"的
