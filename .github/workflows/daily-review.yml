@@ -88,16 +88,19 @@ jobs:
               { [ "$HOUR" -ge 955 ] && [ "$HOUR" -le 1005 ]; } || { [ "$HOUR" -ge 1125 ] && [ "$HOUR" -le 1140 ]; } || { [ "$HOUR" -ge 1325 ] && [ "$HOUR" -le 1340 ]; } || { [ "$HOUR" -ge 1425 ] && [ "$HOUR" -le 1440 ]; } && OK=1 ;;
             close) [ "$HOUR" -ge 1610 ] && [ "$HOUR" -le 1730 ] && OK=1 ;;
           esac
-          # v11.57 自愈式回填(重要):窗口外空转,会把"外部定时器失效 / 原生 cron 触发稀疏"直接放大成
-          #   【整天零产出】—— 2026-09-15 就是这样:external cron 0 次 + schedule 仅 2 次且都在窗口外,
-          #   用户手机端一整天看到的都是昨日数据。现改为:窗口外时,若某个"已过采集时点"的槽位当日仍缺失,
-          #   就补采它(按 收盘 > 盘中 > 盘前 的优先级,一次只补一个,避免单轮耗时过长)。
-          #   页面会按 meta.generatedAt 自动显示"补采"提示,不会拿旧数据冒充当时点数据。
+          # v11.57 自愈式回填, v11.60 收敛(重要):
+          #   v11.57 原逻辑"窗口外若某槽位当日缺失就补采",出发点是防【整天零产出】。但它把
+          #   midday/premarket 也纳入回填 —— 而这两个槽位**只在特定时段有意义**,窗口外补出来的
+          #   内容是"补采那一刻的行情"(实测 2026-09-15 18:49 采的 midday:上证=收盘价 3864.28、
+          #   超短核心 17/20 是涨停),页面标称「11:35 盘中」,实际是收盘 —— 比没有数据更坏。
+          #   v11.60 起:①close 仍可回填(15:00 后收盘数据语义不再变化,拦它只会让某天彻底没报告);
+          #             ②midday / premarket **不再回填**,宁可槽位留空(页面显示"未采集"),
+          #               也不写进别的时段的盘面;
+          #             ③cloud_fetch.mjs 的 slotGuardF 同时做了服务端硬拦截(exit 3),
+          #               此处收敛是"第一道闸",脚本内守则是"第二道闸",双保险。
           CATCHUP=""
           if [ "$OK" != "1" ] && [ "$TYPE" != "auction" ]; then
             if [ "$HOUR" -ge 1610 ] && [ ! -f "data/reviews/${TODAY}_16-20.json" ]; then CATCHUP="close"
-            elif [ "$HOUR" -ge 1005 ] && [ ! -f "data/reviews/${TODAY}_11-35.json" ]; then CATCHUP="midday"
-            elif [ "$HOUR" -ge 955 ] && [ ! -f "data/reviews/${TODAY}_09-45.json" ]; then CATCHUP="premarket"
             fi
           fi
           if [ "$OK" = "1" ]; then
