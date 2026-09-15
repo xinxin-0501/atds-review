@@ -2442,6 +2442,12 @@ function shortCoreScore(klines, quote, ctx) {
     aucTurn: C.aucTurn != null ? Math.round(C.aucTurn * 100) / 100 : null,   // v11.52:竞价换手
     fromAuction: !!C.fromAuction,                                            // v11.51:是否来自盘前快照
     sealYi: C.sealYi != null ? C.sealYi : null,
+    kaiban: C.kaiban != null ? Number(C.kaiban) : null,   // v11.61b:炸板次数必须透传!
+    //   ← 漏了这行 ⇒ results[].kaiban 恒 undefined ⇒ 下方 `x.kaiban == null` 恒真
+    //     ⇒ 所有涨停股一律被判"封死"剔除,与 v11.59 的"一律排除涨停"行为完全相同,
+    //     但 source 文案却写"已排除【一直封死】的涨停"→ 谎报。实证 2026-09-15 收盘
+    //     limitUpExcluded=38 而涨停池仅 32 只、list 里 pct>=9.8 为 0。
+    ztLianban: C.ztLianban != null ? Number(C.ztLianban) : null, // v11.61b:涨停池连板数(与K线推算互补)
     ident: C.ident || ''
   };
 }
