@@ -742,7 +742,13 @@ function buildDecisionCardHtml(s){
   var tRR=1;
   var tRRBad=tRR<1.5;
   var tRRHide=tRR<=1.0;
-  var trigA=price<=p.entry, trigB=price>=planBEntry, trigC=price>0;
+  // v11.58 修(用户实测):触发判定原用【现价】比计划价位 —— 盘中一旦回踩到位后又拉回,就永远显示"未触发",
+  //   且与模拟跟踪的口径不一致(跟踪是按日K逐根 low≤入场价 判定)。改为【当日已发生的触达事实】优先、现价兜底:
+  //   方案A 触达 = 当日最低曾 ≤ 入场价;方案B 触达 = 当日最高曾 ≥ 突破价。
+  var dLow=Number(s.low)||0, dHigh=Number(s.high)||0;
+  var trigA=(dLow>0&&dLow<=p.entry)||price<=p.entry;
+  var trigB=(dHigh>0&&dHigh>=planBEntry)||price>=planBEntry;
+  var trigC=price>0;
   // 情绪周期与硬逆势判定(提前到此,供状态覆盖与折叠使用)
   var isHardTrade=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0);
   // 复盘形态:长上影线/大幅冲高回落识别 —— (最高-现价)>3% 且 现价<开盘价(提前到此,供状态降级与形态/资金文案使用)
@@ -765,8 +771,8 @@ function buildDecisionCardHtml(s){
   var collapseLabel=isHardTrade?'⛔ 破位·严禁现价抄底':'⛔ 等待触发·未达入场条件';
   function planRow(name,trig,entryV,stopV,tgtV,rrVal,triggered,tone,bad){return '<tr class="'+(triggered?'':'tp-notrig')+'"><td class="tp-name">'+name+'</td><td class="tp-trig">'+escHtmlF(trig)+'</td><td class="tp-num">'+f2(entryV)+'</td><td class="tp-num stop">'+f2(stopV)+'</td><td class="tp-num">'+f2(tgtV)+'</td><td class="tp-rr '+(!triggered?'tp-rr-muted':(bad?'rr-bad':'rr-'+tone))+'">'+(triggered?rrVal.toFixed(2):'未触发')+'</td></tr>';}
   var planTable='<table class="tp-table"><tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>'+
-    planRow('A 回踩低吸','回踩'+f2(p.entry)+'企稳',p.entry,p.stop,p.target,p.rr,trigA,rrTone(p.rr))+
-    planRow('B 突破确认','放量突破'+f2(planBEntry),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
+    planRow('A 回踩低吸',trigA?('已触达回踩位'+f2(p.entry)+(dLow>0?'(当日最低'+f2(dLow)+')':'')):('回踩'+f2(p.entry)+'企稳'),p.entry,p.stop,p.target,p.rr,trigA,rrTone(p.rr))+
+    planRow('B 突破确认',trigB?('已触达突破位'+f2(planBEntry)):('放量突破'+f2(planBEntry)),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
     (tRRHide?'':planRow('C 日内做T','现价'+f2(price)+'·ATR'+f2(atrC)+'动态止损',price,tStop,tTgt,tRR,trigC,rrTone(tRR),tRRBad))+
     '</table>';
   // 现价追入校验(v11.10:与状态机联动——非"可交易"状态即使现价盈亏比"看似合格",也禁止出现"可执行计划"暗示)
@@ -838,7 +844,10 @@ function buildDecisionCardHtml(s){
   // v11.55:技术画像所用K线不是最近交易日 → 关键价位(支撑/压力/止损)可能已失效,必须计入"数据不完整"
   var ks=t.klineStamp;
   if(ks&&ks.tradeDate&&ks.staleTDays>0)diMissing.push('K线旧('+String(ks.tradeDate).slice(5)+')');
-  if(!s.lhb)diMissing.push('龙虎榜'); else if(lhbStaleF(s.lhb.date))diMissing.push('龙虎榜(偏旧)');
+  // v11.58:龙虎榜是【事件驱动】(仅个股达标当日才公布),"近期未上榜"不是数据缺失 —— 原先计入
+  //   diMissing 会让卡片显示"⚠ 数据暂缺·龙虎榜(偏旧)",用户误以为系统抽风。改为只在【完全没有该股任何
+  //   上榜记录】时才算缺失;正文里 v11.37 的"最近上榜 MM-DD / 约N个交易日未再见"说明照旧保留。
+  if(!s.lhb)diMissing.push('龙虎榜');
   if(s.minTrend&&((s.minTrend.m60&&s.minTrend.m60.approx)||(s.minTrend.m15&&s.minTrend.m15.approx)))diMissing.push('分钟线');
   var integrityBadge=diMissing.length===0
     ?'<span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>'

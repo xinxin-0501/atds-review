@@ -1354,8 +1354,10 @@ function _effStatus(s, p, ff, t, confTotal, confTone) {
   const price = Number(s.price) || 0;
   const preStrong = _preStrong(s);
   const planBEntry = preStrong ? preStrong.price : (price * 1.05);
-  const trigA = price <= p.entry;
-  const trigB = price >= planBEntry;
+  // v11.58 修:触发判定改用【当日已发生的触达事实】(原用现价 → 回踩到位后拉回就永远"未触发",与模拟跟踪口径不一致)
+  const _dLow = Number(s.low) || 0, _dHigh = Number(s.high) || 0;
+  const trigA = (_dLow > 0 && _dLow <= p.entry) || price <= p.entry;
+  const trigB = (_dHigh > 0 && _dHigh >= planBEntry) || price >= planBEntry;
   const abUnTriggered = !trigA && !trigB;
   const emotionCycle = _emotionCycle(s);
   const isHardTrade = (emotionCycle === '冰点' && t.trend === 'down' && (ff.d1 || 0) < 0);
@@ -1650,8 +1652,9 @@ const lhbHtml = lhb
   const tRRBad = tRR < 1.5;
   const tRRHide = tRR <= 1.0;
   // 触发判定:现价是否已到达触发条件(A回踩到位/B突破到位/C围绕现价始终可做)
-  const trigA = price <= p.entry;
-  const trigB = price >= planBEntry;
+  const _dLow = Number(s.low) || 0, _dHigh = Number(s.high) || 0;   // v11.58:当日最低/最高作为"已触达"证据
+  const trigA = (_dLow > 0 && _dLow <= p.entry) || price <= p.entry;
+  const trigB = (_dHigh > 0 && _dHigh >= planBEntry) || price >= planBEntry;
   const trigC = price > 0;
   // 情绪周期与硬逆势判定(提前到此,供状态覆盖与折叠使用)
   const emotionCycle = _emotionCycle(s);
@@ -1681,8 +1684,8 @@ const lhbHtml = lhb
   </tr>`;
   const planTable = `<table class="tp-table">
     <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
-    ${planRow('A 回踩低吸', '回踩' + f2(p.entry) + '企稳', p.entry, p.stop, p.target, p.rr, trigA, _rrTone(p.rr))}
-    ${planRow('B 突破确认', '放量突破' + f2(planBEntry), planBEntry, planBStop, planBTarget, planBRR, trigB, _rrTone(planBRR))}
+    ${planRow('A 回踩低吸', trigA ? ('已触达回踩位' + f2(p.entry) + (_dLow > 0 ? '(当日最低' + f2(_dLow) + ')' : '')) : ('回踩' + f2(p.entry) + '企稳'), p.entry, p.stop, p.target, p.rr, trigA, _rrTone(p.rr))}
+    ${planRow('B 突破确认', trigB ? ('已触达突破位' + f2(planBEntry)) : ('放量突破' + f2(planBEntry)), planBEntry, planBStop, planBTarget, planBRR, trigB, _rrTone(planBRR))}
     ${tRRHide ? '' : planRow('C 日内做T', '现价' + f2(price) + '·ATR' + f2(atrC) + '动态止损', price, tStop, tTgt, tRR, trigC, _rrTone(tRR), tRRBad)}
   </table>`;
   // 现价追入校验
@@ -1762,7 +1765,8 @@ const lhbHtml = lhb
   // v11.55:技术画像所用K线不是最近交易日 → 关键价位(支撑/压力/止损)可能已失效(客户端镜像同段)
   const ks = t.klineStamp;
   if (ks && ks.tradeDate && ks.staleTDays > 0) diMissing.push('K线旧(' + String(ks.tradeDate).slice(5) + ')');
-  if (!s.lhb) diMissing.push('龙虎榜'); else if (lhbStaleS(s.lhb.date)) diMissing.push('龙虎榜(偏旧)');
+  // v11.58:事件驱动数据不计入"数据暂缺"(与客户端镜像同步)
+  if (!s.lhb) diMissing.push('龙虎榜');
   if (s.minTrend && ((s.minTrend.m60 && s.minTrend.m60.approx) || (s.minTrend.m15 && s.minTrend.m15.approx))) diMissing.push('分钟线');
   const dataIntegrity = { complete: diMissing.length === 0, missing: diMissing };
   const integrityBadge = dataIntegrity.complete
