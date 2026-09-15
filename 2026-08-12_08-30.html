@@ -349,15 +349,18 @@
 .wave-list{display:flex;flex-direction:column;gap:6px}
 .wave-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:6px 8px;cursor:pointer}
 .wave-item:active{background:#f5f0ff}
-.wave-row{display:flex;align-items:center;gap:4px;font-size:11px}
+/* v11.59 修"数字压字"(真机实测 409px:固定宽列+长标签放不下 → 股名列被 flex 压到 9px,
+   nowrap 的股名溢出压到数字列上):①数字/评分/标签列 flex:0 0 <w> 不许收缩 ②股名列设 72px 下限 + 省略号
+   ③行允许换行(flex-wrap) —— 实在放不下就换行,绝不压字 */
+.wave-row{display:flex;align-items:center;gap:4px;font-size:11px;flex-wrap:wrap;row-gap:3px}
 .wave-row>span{white-space:nowrap}
-.wave-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#7b1fa2;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0}
-.wave-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
-.wave-name small{font-size:9px;color:#999;font-weight:400}
-.wave-price{width:56px;text-align:right;font-weight:700}
-.wave-pct{width:58px;text-align:right;font-weight:700}
-.wave-score{width:30px;text-align:center;font-weight:700;color:#7b1fa2;background:#f3e8ff;border-radius:4px;padding:1px 0}
-.wave-sig{font-size:9px;padding:2px 5px;border-radius:4px}
+.wave-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#7b1fa2;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex:0 0 22px}
+.wave-name{flex:1 1 auto;min-width:72px;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis}
+.wave-name small{display:block;font-size:9px;color:#999;font-weight:400;overflow:hidden;text-overflow:ellipsis}
+.wave-price{flex:0 0 52px;text-align:right;font-weight:700}
+.wave-pct{flex:0 0 54px;text-align:right;font-weight:700}
+.wave-score{flex:0 0 28px;text-align:center;font-weight:700;color:#7b1fa2;background:#f3e8ff;border-radius:4px;padding:1px 0}
+.wave-sig{flex:0 0 auto;font-size:9px;padding:2px 5px;border-radius:4px}
 .wave-row.wave-head{font-size:9px;color:#999;font-weight:600}
 .wave-row.wave-head .wave-rank{background:#ddd;color:#666}
 .wave-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:4px;padding-left:26px}
@@ -374,15 +377,16 @@
 .sc-list{display:flex;flex-direction:column;gap:6px}
 .sc-item{background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:6px 8px;cursor:pointer}
 .sc-item:active{background:#fff8f8}
-.sc-row{display:flex;align-items:center;gap:4px;font-size:11px}
+/* v11.59 同上:超短核心行(实测 17/20 行股名被压到 20px) */
+.sc-row{display:flex;align-items:center;gap:4px;font-size:11px;flex-wrap:wrap;row-gap:3px}
 .sc-row>span{white-space:nowrap}
-.sc-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#c33;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex-shrink:0}
-.sc-name{flex:1;min-width:0;font-weight:600;color:#333;display:flex;flex-direction:column}
-.sc-name small{font-size:9px;color:#999;font-weight:400}
-.sc-price{width:56px;text-align:right;font-weight:700}
-.sc-pct{width:58px;text-align:right;font-weight:700}
-.sc-score{width:30px;text-align:center;font-weight:700;color:#c33;background:#ffecec;border-radius:4px;padding:1px 0}
-.sc-sig{font-size:9px;padding:2px 5px;border-radius:4px}
+.sc-rank{width:22px;height:18px;line-height:18px;text-align:center;background:#c33;color:#fff;border-radius:4px;font-size:10px;font-weight:700;flex:0 0 22px}
+.sc-name{flex:1 1 auto;min-width:72px;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis}
+.sc-name small{display:block;font-size:9px;color:#999;font-weight:400;overflow:hidden;text-overflow:ellipsis}
+.sc-price{flex:0 0 52px;text-align:right;font-weight:700}
+.sc-pct{flex:0 0 54px;text-align:right;font-weight:700}
+.sc-score{flex:0 0 28px;text-align:center;font-weight:700;color:#c33;background:#ffecec;border-radius:4px;padding:1px 0}
+.sc-sig{flex:0 0 auto;font-size:9px;padding:2px 5px;border-radius:4px}
 .sc-row.sc-head{font-size:9px;color:#999;font-weight:600}
 .sc-row.sc-head .sc-rank{background:#ddd;color:#666}
 .sc-meta{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:9px;color:#888;margin-top:4px;padding-left:26px}
@@ -691,6 +695,8 @@
 
 /* v11.50:涨停标的可能无法成交(战法"做不到最强的做第二强的套利") */
 .sc-limit{display:inline-block;margin-left:4px;font-size:8px;color:#a05a00;background:#fff3cd;border:1px solid #f0d68a;border-radius:6px;padding:1px 4px;white-space:nowrap}
+/* v11.61:炸板过的涨停 = 盘中可成交,与"一直封死"区分开(前者是机会,后者只是观察)。 */
+.sc-limit-zb{color:#0a6b3d;background:#e8f7ee;border-color:#a8ddc0}
 
 /* v11.51:超短核心——该值来自盘前快照(约09:43)而非盘中实时 */
 .sc-pre{display:inline-block;margin-left:3px;font-size:8px;font-style:normal;color:#185FA5;background:#eef4ff;border:1px solid #cddffb;border-radius:5px;padding:0 3px;vertical-align:middle}
@@ -809,6 +815,10 @@
 .hero-sub{font-size:11px;color:#888;margin-top:6px;line-height:1.5}
 /* v11.53:晚采提示(槽位被延迟任务覆盖时显式声明,避免把收盘数据读成盘中快照) */
 .hero-warn{font-size:11px;color:#a15c00;background:#fff8e6;border:1px solid #ffe0a3;border-radius:6px;padding:5px 8px;margin-top:8px;line-height:1.5;text-align:left}
+/* v11.60(B):服务端显式标记的补采(meta.lateCapture)—— 比"时间偏晚"更严重:
+   内容是别的时段的盘面,用户若据此判断盘中信号会被误导,故用红底强告警并加粗关键信息。 */
+.hero-warn-late{color:#b3261e;background:#fdecea;border-color:#f5b5ae;font-weight:500}
+.hero-warn-late b{font-weight:800}
 .hero-tags{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
 .hero-temp-tag{font-size:10px;padding:3px 8px;border-radius:10px;background:#fff0f0;color:#c33;border:1px solid #fcc;font-weight:600}
 
@@ -2280,10 +2290,10 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">首页</a><a href="2026-08-12_08-30.html" class="active">盘前</a><a href="2026-08-12_11-35.html">盘中</a><a href="2026-08-12_15-20.html">收盘</a>
+      <a href="index.html">首页</a><a href="2026-08-12_08-30.html" class="active">盘前</a><a href="2026-08-12_15-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:35</b>（约 1275 分钟前）</div><h1 class="hero-title">2026-08-12 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:35</b>（约 68 分钟前）</div><h1 class="hero-title">2026-08-12 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-12 21:35:31</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -3182,7 +3192,13 @@ function buildDecisionCardHtml(s){
   var tRR=1;
   var tRRBad=tRR<1.5;
   var tRRHide=tRR<=1.0;
-  var trigA=price<=p.entry, trigB=price>=planBEntry, trigC=price>0;
+  // v11.58 修(用户实测):触发判定原用【现价】比计划价位 —— 盘中一旦回踩到位后又拉回,就永远显示"未触发",
+  //   且与模拟跟踪的口径不一致(跟踪是按日K逐根 low≤入场价 判定)。改为【当日已发生的触达事实】优先、现价兜底:
+  //   方案A 触达 = 当日最低曾 ≤ 入场价;方案B 触达 = 当日最高曾 ≥ 突破价。
+  var dLow=Number(s.low)||0, dHigh=Number(s.high)||0;
+  var trigA=(dLow>0&&dLow<=p.entry)||price<=p.entry;
+  var trigB=(dHigh>0&&dHigh>=planBEntry)||price>=planBEntry;
+  var trigC=price>0;
   // 情绪周期与硬逆势判定(提前到此,供状态覆盖与折叠使用)
   var isHardTrade=(emotionCycle==='冰点'&&t.trend==='down'&&(ff.d1||0)<0);
   // 复盘形态:长上影线/大幅冲高回落识别 —— (最高-现价)>3% 且 现价<开盘价(提前到此,供状态降级与形态/资金文案使用)
@@ -3205,8 +3221,8 @@ function buildDecisionCardHtml(s){
   var collapseLabel=isHardTrade?'⛔ 破位·严禁现价抄底':'⛔ 等待触发·未达入场条件';
   function planRow(name,trig,entryV,stopV,tgtV,rrVal,triggered,tone,bad){return '<tr class="'+(triggered?'':'tp-notrig')+'"><td class="tp-name">'+name+'</td><td class="tp-trig">'+escHtmlF(trig)+'</td><td class="tp-num">'+f2(entryV)+'</td><td class="tp-num stop">'+f2(stopV)+'</td><td class="tp-num">'+f2(tgtV)+'</td><td class="tp-rr '+(!triggered?'tp-rr-muted':(bad?'rr-bad':'rr-'+tone))+'">'+(triggered?rrVal.toFixed(2):'未触发')+'</td></tr>';}
   var planTable='<table class="tp-table"><tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>'+
-    planRow('A 回踩低吸','回踩'+f2(p.entry)+'企稳',p.entry,p.stop,p.target,p.rr,trigA,rrTone(p.rr))+
-    planRow('B 突破确认','放量突破'+f2(planBEntry),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
+    planRow('A 回踩低吸',trigA?('已触达回踩位'+f2(p.entry)+(dLow>0?'(当日最低'+f2(dLow)+')':'')):('回踩'+f2(p.entry)+'企稳'),p.entry,p.stop,p.target,p.rr,trigA,rrTone(p.rr))+
+    planRow('B 突破确认',trigB?('已触达突破位'+f2(planBEntry)):('放量突破'+f2(planBEntry)),planBEntry,planBStop,planBTarget,planBRR,trigB,rrTone(planBRR))+
     (tRRHide?'':planRow('C 日内做T','现价'+f2(price)+'·ATR'+f2(atrC)+'动态止损',price,tStop,tTgt,tRR,trigC,rrTone(tRR),tRRBad))+
     '</table>';
   // 现价追入校验(v11.10:与状态机联动——非"可交易"状态即使现价盈亏比"看似合格",也禁止出现"可执行计划"暗示)
@@ -3278,7 +3294,10 @@ function buildDecisionCardHtml(s){
   // v11.55:技术画像所用K线不是最近交易日 → 关键价位(支撑/压力/止损)可能已失效,必须计入"数据不完整"
   var ks=t.klineStamp;
   if(ks&&ks.tradeDate&&ks.staleTDays>0)diMissing.push('K线旧('+String(ks.tradeDate).slice(5)+')');
-  if(!s.lhb)diMissing.push('龙虎榜'); else if(lhbStaleF(s.lhb.date))diMissing.push('龙虎榜(偏旧)');
+  // v11.58:龙虎榜是【事件驱动】(仅个股达标当日才公布),"近期未上榜"不是数据缺失 —— 原先计入
+  //   diMissing 会让卡片显示"⚠ 数据暂缺·龙虎榜(偏旧)",用户误以为系统抽风。改为只在【完全没有该股任何
+  //   上榜记录】时才算缺失;正文里 v11.37 的"最近上榜 MM-DD / 约N个交易日未再见"说明照旧保留。
+  if(!s.lhb)diMissing.push('龙虎榜');
   if(s.minTrend&&((s.minTrend.m60&&s.minTrend.m60.approx)||(s.minTrend.m15&&s.minTrend.m15.approx)))diMissing.push('分钟线');
   var integrityBadge=diMissing.length===0
     ?'<span class="dc-integrity ok" title="资金/关键位/龙虎榜/分钟线均已加载">✓ 数据完整</span>'
