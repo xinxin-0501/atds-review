@@ -3224,6 +3224,16 @@ async function main() {
   // 强势股选股(仅午盘):全A扫描剔除ST,优先排序TOP30
   let strongStock = null;
   if (type === 'midday') {
+    // v11.49:从 mainRank(板块强度榜)提取板块龙头 → 作为"辨识度"的可操作口径
+    // (fix 2026-09-15: 原 v11.51 在 scanShortCore 之后才声明 identSet,TDZ 崩溃 "Cannot access 'identSet' before initialization")
+    const identSet = { leaders: new Set(), mainLines: new Set() };
+    for (const sec of mainRank) {
+      const lc = String((sec && sec.leadCode) || '').trim();
+      if (!lc) continue;
+      identSet.leaders.add(lc);
+      if ((sec.rank || 99) <= 10) identSet.mainLines.add(lc);   // 前10强板块的龙头 = 主线龙头
+    }
+    console.log('辨识度集合: 板块龙头', identSet.leaders.size, '只 / 其中主线龙头', identSet.mainLines.size, '只');
     console.log('开始超短核心全市场扫描(午盘)...');
     shortCore = await scanShortCore(zt.list, identSet, auctionMap);   // v11.51:再传盘前竞价/开盘强度快照
     console.log('超短核心扫描完成:', shortCore ? shortCore.list.length : 0, '只');
@@ -3235,15 +3245,6 @@ async function main() {
     for (const s of (shortCore && shortCore.list) || []) themeCodes.add(String(s.code));
     for (const s of (strongStock && strongStock.list) || []) themeCodes.add(String(s.code));
     console.log('开始波背离全市场扫描(午盘,题材交叉集 '+themeCodes.size+' 个)...');
-    // v11.49:从 mainRank(板块强度榜)提取板块龙头 → 作为"辨识度"的可操作口径
-    const identSet = { leaders: new Set(), mainLines: new Set() };
-    for (const sec of mainRank) {
-      const lc = String((sec && sec.leadCode) || '').trim();
-      if (!lc) continue;
-      identSet.leaders.add(lc);
-      if ((sec.rank || 99) <= 10) identSet.mainLines.add(lc);   // 前10强板块的龙头 = 主线龙头
-    }
-    console.log('辨识度集合: 板块龙头', identSet.leaders.size, '只 / 其中主线龙头', identSet.mainLines.size, '只');
     waveDivergence = await scanWaveDivergence(themeCodes, identSet);
     console.log('波背离扫描完成:', waveDivergence ? waveDivergence.list.length : 0, '只');
   }
