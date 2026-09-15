@@ -817,6 +817,10 @@
 .hero-sub{font-size:11px;color:#888;margin-top:6px;line-height:1.5}
 /* v11.53:晚采提示(槽位被延迟任务覆盖时显式声明,避免把收盘数据读成盘中快照) */
 .hero-warn{font-size:11px;color:#a15c00;background:#fff8e6;border:1px solid #ffe0a3;border-radius:6px;padding:5px 8px;margin-top:8px;line-height:1.5;text-align:left}
+/* v11.60(B):服务端显式标记的补采(meta.lateCapture)—— 比"时间偏晚"更严重:
+   内容是别的时段的盘面,用户若据此判断盘中信号会被误导,故用红底强告警并加粗关键信息。 */
+.hero-warn-late{color:#b3261e;background:#fdecea;border-color:#f5b5ae;font-weight:500}
+.hero-warn-late b{font-weight:800}
 .hero-tags{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
 .hero-temp-tag{font-size:10px;padding:3px 8px;border-radius:10px;background:#fff0f0;color:#c33;border:1px solid #fcc;font-weight:600}
 
