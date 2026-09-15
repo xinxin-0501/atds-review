@@ -417,251 +417,13 @@ function renderCloseEmotion(report) {
     '<div class="ce-ladder">' + ladderItems + '</div></div>';
 
   // 04 午盘专属:涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换(图1 完整版 5 大节)
+  // v11.62:盘中槽位已停用。此块保留给 midday(历史页/补跑),盘前页由 renderPremarketReport 单独渲染
+  //   （盘前不走 renderCloseEmotion，见 renderReport 里的分发）。
+  const _btData = (report.limitUp || []).length > 0 && (report.mainRank || []).length > 0;
+  const _btSlot = (m.type === 'midday') && _btData;
+  // v11.62: 区块已抽为 renderBoardTierBlock()，见文件末尾。
   let boardTierMidday = '';
-  if (m.type === 'midday') {
-    const maxLB = ce.maxLB || 4;
-    const ztList = report.limitUp || [];
-    const mr4 = (report.mainRank || []);
-    const L1 = mr4[0] || {};
-    const L2 = mr4[1] || {};
-    const L3 = mr4[2] || {};
-    const L4 = mr4[3] || {};
-    const L1Name = L1.mappedName || L1.name || '--';
-    const L2Name = L2.mappedName || L2.name || '--';
-    const L3Name = L3.mappedName || L3.name || '--';
-    const L4Name = L4.mappedName || L4.name || '--';
-    const L1Lead = L1.leadStock || '--';
-    const L2Lead = L2.leadStock || '--';
-    const L1Pct = Number(L1.changePct || 0);
-    const L2Pct = Number(L2.changePct || 0);
-    const L3Pct = Number(L3.changePct || 0);
-    const L4Pct = Number(L4.changePct || 0);
-    const L1In = Number(L1.inflowYi || 0);
-    const L2In = Number(L2.inflowYi || 0);
-    const L3In = Number(L3.inflowYi || 0);
-    const L4In = Number(L4.inflowYi || 0);
-
-    // === 1) 涨停梯队 5 张卡片(动态档位)+ 1 行结构辨证 ===
-    let tierLvls;
-    if (maxLB >= 6) {
-      tierLvls = [
-        { lv: 6, label: '6板', cls: 'bt-6' },
-        { lv: 5, label: '5板', cls: 'bt-5' },
-        { lv: 3, label: '3板', cls: 'bt-3' },
-        { lv: 2, label: '2板', cls: 'bt-2' },
-        { lv: 0, label: '断板', cls: 'bt-new' }
-      ];
-    } else if (maxLB === 5) {
-      tierLvls = [
-        { lv: 5, label: '5板', cls: 'bt-5' },
-        { lv: 4, label: '4板', cls: 'bt-4' },
-        { lv: 3, label: '3板', cls: 'bt-3' },
-        { lv: 2, label: '2板', cls: 'bt-2' },
-        { lv: 0, label: '断板', cls: 'bt-new' }
-      ];
-    } else if (maxLB === 4) {
-      tierLvls = [
-        { lv: 4, label: '4板', cls: 'bt-4' },
-        { lv: 3, label: '3板', cls: 'bt-3' },
-        { lv: 2, label: '2板', cls: 'bt-2' },
-        { lv: 1, label: '1板', cls: 'bt-1' },
-        { lv: 0, label: '断板', cls: 'bt-new' }
-      ];
-    } else if (maxLB === 3) {
-      tierLvls = [
-        { lv: 3, label: '3板', cls: 'bt-3' },
-        { lv: 2, label: '2板', cls: 'bt-2' },
-        { lv: 1, label: '1板', cls: 'bt-1' },
-        { lv: 0, label: '断板', cls: 'bt-new' },
-        { lv: -1, label: '炸板', cls: 'bt-zb' }
-      ];
-    } else {
-      tierLvls = [
-        { lv: 2, label: '2板', cls: 'bt-2' },
-        { lv: 1, label: '1板', cls: 'bt-1' },
-        { lv: 0, label: '断板', cls: 'bt-new' },
-        { lv: -1, label: '炸板', cls: 'bt-zb' },
-        { lv: -2, label: '跌停', cls: 'bt-down' }
-      ];
-    }
-    const findTierLead = (lv) => {
-      if (lv >= 1) {
-        const tier = (ce.ladder || []).find(l => String(l.lianban || '').startsWith(String(lv) + '板'));
-        if (tier) return tier.lead;
-        const matches = ztList.filter(z => (z.lianban || 1) === lv).sort((a, b) => (b.pct || 0) - (a.pct || 0));
-        return matches[0] ? matches[0].name : null;
-      } else if (lv === 0 || lv === -1) {
-        const matches = ztList.filter(z => z.status === '炸板' || z.status === '炸板回封' || z.zhaban);
-        return matches[0] ? matches[0].name : null;
-      } else {
-        const limitDown = (report.limitDown || []);
-        return limitDown[0] ? limitDown[0].name : null;
-      }
-    };
-    const tierSub = {
-      6: '六板高度', 5: '五板高度', 4: '四板高度', 3: '三板高度', 2: '二板', 1: '首板',
-      0: '断板', '-1': '炸板', '-2': '跌停'
-    };
-    const tierCards = tierLvls.map(t => {
-      const lead = findTierLead(t.lv) || '--';
-      const subLabel = tierSub[t.lv] || '--';
-      return '<div class="bt-card ' + t.cls + '">' +
-        '<div class="bt-lv">' + t.label + '</div>' +
-        '<div class="bt-name">' + esc(lead) + '</div>' +
-        '<div class="bt-sub">' + esc(subLabel) + '</div>' +
-      '</div>';
-    }).join('');
-    const ztRow = '<div class="bt-row">' + tierCards + '</div>';
-
-    // 结构辨证(动态)
-    const structNote = '<div class="bt-struct-note">' +
-      '<b>结构辨证</b>:' + esc(L1Name) + ' 今日最高 ' + maxLB + '板(龙头 ' + esc(L1Lead) + '),板块 +' + L1Pct.toFixed(1) + '% / 资金 +' + L1In.toFixed(1) + '亿;' +
-      esc(L2Name) + ' +' + L2Pct.toFixed(1) + '% 居次,' + esc(L3Name) + ' +' + L3Pct.toFixed(1) + '% 第三,' + esc(L4Name) + ' +' + L4Pct.toFixed(1) + '%。' +
-      '梯队高度 ' + maxLB + '板,情绪 ' + (ce.tempScore || '--') + '°(' + (ce.stage || '') + '),注意高位分歧与一致兑现风险。' +
-      '</div>';
-
-    // === 2) 主线研判(4 条) ===
-    const vtLines = '<div class="vt-section"><div class="vt-h">② 主线研判</div>' +
-      '<div class="vt-line"><span class="vt-rank">①</span><b>' + esc(L1Name) + '</b> — 穿越板块总龙头(<b class="up">' + esc(L1Lead) + ' ' + maxLB + '板</b>)' +
-        '<div class="vt-desc">板块 +' + L1Pct.toFixed(2) + '%、资金 +' + L1In.toFixed(1) + '亿,' + (Number(L1.ztCount || 0)) + '家涨停,龙头 ' + esc(L1Lead) + ' 领涨,是当前情绪总龙头,注意高位分歧。</div></div>' +
-      '<div class="vt-line"><span class="vt-rank">②</span><b>' + esc(L2Name) + '</b> — 今日次强爆发(<b class="up">' + esc(L2Lead) + '</b>)' +
-        '<div class="vt-desc">板块 +' + L2Pct.toFixed(2) + '%、资金 +' + L2In.toFixed(1) + '亿,' + (Number(L2.ztCount || 0)) + '家涨停,龙头 ' + esc(L2Lead) + ' 领涨,为二线主线。</div></div>' +
-      '<div class="vt-line"><span class="vt-rank">③</span><b>' + esc(L3Name) + '</b> — 梯队成形' +
-        '<div class="vt-desc">板块 +' + L3Pct.toFixed(2) + '%、资金 +' + L3In.toFixed(1) + '亿,' + (Number(L3.ztCount || 0)) + '家涨停,龙头 ' + esc(L3.leadStock || '--') + '。</div></div>' +
-      '<div class="vt-line"><span class="vt-rank">④</span><b>' + esc(L4Name) + '</b> — 资金主节奏' +
-        '<div class="vt-desc">板块 +' + L4Pct.toFixed(2) + '%、资金 ' + (L4In >= 0 ? '+' : '') + L4In.toFixed(1) + '亿,' + (Number(L4.ztCount || 0)) + '家涨停,关注承接力度。</div></div>' +
-      '</div>';
-
-    // === 3) 午后-明日观察锚(6 条) ===
-    const anchors = [
-      { tag: esc(L1Lead) + ' ' + maxLB + '板', text: esc(L1Name) + ' 板块 +' + L1Pct.toFixed(1) + '% 领涨,龙头 ' + esc(L1Lead) + ' 表态,关注能否延续 ' + maxLB + ' 板穿越' },
-      { tag: esc(L2Lead), text: esc(L2Name) + ' 今日次强,龙头 ' + esc(L2Lead) + ' 领涨,观察明日能否接力' },
-      { tag: esc(L3.leadStock || L3Name), text: esc(L3Name) + ' 梯队成形,资金 ' + (L3In >= 0 ? '净流入' : '净流出') + ' ' + Math.abs(L3In).toFixed(1) + '亿,关注持续性' },
-      { tag: esc(L4.leadStock || L4Name), text: esc(L4Name) + ' 板块 +' + L4Pct.toFixed(1) + '%,资金 ' + (L4In >= 0 ? '净流入' : '净流出') + ' ' + Math.abs(L4In).toFixed(1) + '亿,高位注意回撤' },
-      { tag: '炸板监控', text: '今日炸板 ' + (ce.zbTotal || 0) + '家,炸板率超 40% 需警惕情绪退潮' },
-      { tag: '量能验证', text: '成交额 ' + esc(report.marketStats && report.marketStats.totalAmount || '--') + ',关注量能能否维持' }
-    ];
-    const vAnchors = '<div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors">' +
-      anchors.map(a => '<li><span class="vt-tag">' + esc(a.tag) + '</span>' + esc(a.text) + '</li>').join('') +
-      '</ul></div>';
-
-    // === 4) 板块强弱表(3 段式:最强/分歧/流出,每段 3 个板块) ===
-    const findSector = (keys) => mr4.find(s => keys.some(k => (s.name || '').indexOf(k) >= 0)) || null;
-    const isLeadYiZi = (sector, ztAll) => {
-      if (!sector) return false;
-      const leadPct = Number(sector.leadPct || 0);
-      if (leadPct >= 9.5) return true;
-      if (sector.leadStock) {
-        const hit = (ztAll || []).find(z => z.name === sector.leadStock);
-        if (hit && (hit.pct || 0) >= 9.5) return true;
-      }
-      if (sector.leadStock && Number(sector.changePct || 0) >= 9) return true;
-      return false;
-    };
-    // 强度评分(涨幅 0.6 + 资金 0.3 + 涨停梯队 0.5)
-    const allRanked = (mr4 || []).map(s => {
-      const pct = Number(s.changePct || 0);
-      const inflow = Number(s.inflowYi || 0);
-      const zt = Number(s.ztCount || s.limitUpCount || 0);
-      return Object.assign({}, s, { _pct: pct, _inflow: inflow, _zt: zt, _score: pct * 0.6 + inflow * 0.3 + zt * 0.5 });
-    }).sort((a, b) => b._score - a._score);
-
-    // 3 段分类
-    const segStrongest = [];  // 最强:涨幅>=9 且 一字带动 或 涨停>=3
-    const segDiverge   = [];  // 分歧:资金净流入 且 1<=涨幅<5
-    const segOutflow   = [];  // 流出/退潮:资金净流出 或 涨幅<0
-    for (const s of allRanked) {
-      const yiZi = isLeadYiZi(s, ztList);
-      if (segStrongest.length < 3 && s._pct >= 9 && (yiZi || s._zt >= 3)) {
-        segStrongest.push(s);
-      } else if (segDiverge.length < 3 && s._inflow > 0 && s._pct >= 1 && s._pct < 5) {
-        segDiverge.push(s);
-      } else if (segOutflow.length < 3 && (s._inflow < 0 || s._pct < 0)) {
-        segOutflow.push(s);
-      }
-    }
-    // 不足的按强度从剩余补齐
-    const usedNames = new Set();
-    [...segStrongest, ...segDiverge, ...segOutflow].forEach(s => usedNames.add(s.name));
-    const fillers = allRanked.filter(s => !usedNames.has(s.name));
-    for (const arr of [segStrongest, segDiverge, segOutflow]) {
-      while (arr.length < 3 && fillers.length) {
-        const f = fillers.shift();
-        arr.push(f);
-        usedNames.add(f.name);
-      }
-    }
-    // 段头
-    const segments = [
-      { name: '最强', sub: '一字带动 · 龙头确立', segCls: 'bd-seg-1' },
-      { name: '分歧', sub: '资金流入但涨幅收敛', segCls: 'bd-seg-2' },
-      { name: '流出', sub: '退潮 / 资金撤离',   segCls: 'bd-seg-3' }
-    ];
-    // 行渲染(段内 #,方向用段标签)
-    const buildBdRow = (s, idx, segIdx) => {
-      const pct = s._pct;
-      let inflow = s._inflow;
-      if (inflow === 0) {
-        if (pct >= 5) inflow = +(pct * 0.6).toFixed(1);
-        else if (pct <= -1) inflow = -(Math.abs(pct) * 0.5).toFixed(1);
-      }
-      const pctStr = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%';
-      const amtStr = (inflow > 0 ? '+' : '') + inflow.toFixed(1) + '亿';
-      const pctCls = pct >= 0 ? 'up' : 'down';
-      const amtCls = inflow >= 0 ? 'up' : 'down';
-      return '<tr><td class="bd-rank">' + (idx + 1) + '</td><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-seg-pill bd-seg-pill-' + (segIdx + 1) + '">' + segments[segIdx].name + '</span></td></tr>';
-    };
-    // 段头分隔行
-    const segHdr = (seg, segIdx) => {
-      return '<tr class="bd-seg-h ' + seg.segCls + '"><td colspan="5"><span class="bd-seg-num">' + (segIdx + 1) + '</span><b>' + esc(seg.name) + '</b> · ' + esc(seg.sub) + '</td></tr>';
-    };
-    const dynamicSubtitle = '· ' + segStrongest.length + '最强 · ' + segDiverge.length + '分歧 · ' + segOutflow.length + '流出';
-    const blockTbl = '<div class="bd-section"><div class="bd-h">④ 板块强弱 ' + dynamicSubtitle + '</div>' +
-      '<table class="bd-tbl"><thead><tr>' +
-      '<th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>方向</th>' +
-      '</tr></thead><tbody>' +
-      segHdr(segments[0], 0) + segStrongest.map((s, i) => buildBdRow(s, i, 0)).join('') +
-      segHdr(segments[1], 1) + segDiverge.map((s, i) => buildBdRow(s, i, 1)).join('') +
-      segHdr(segments[2], 2) + segOutflow.map((s, i) => buildBdRow(s, i, 2)).join('') +
-      '</tbody></table></div>';
-
-    // === 5) 资金切换信号(今日核心) ===
-    const defSector = findSector(['贵金属', '黄金', '白银', '珠宝']) || findSector(['有色金属', '工业金属', '小金属']);
-    const seedSector = findSector(['种植业', '种业', '种子', '农产品', '粮食']);
-    const defName = defSector ? (defSector.name || '防御') : '防御';
-    const defPct = defSector ? Number(defSector.changePct || 0) : 0;
-    const defIn = defSector ? Number(defSector.inflowYi || 0) : 0;
-    const seedName = seedSector ? (seedSector.name || '农业') : '农业';
-    const seedPct = seedSector ? Number(seedSector.changePct || 0) : 0;
-    const seedIn = seedSector ? Number(seedSector.inflowYi || 0) : 0;
-    const pctCls = (v) => (v >= 0 ? 'up' : 'down');
-    const sign = (v) => (v >= 0 ? '+' : '');
-    // 主力净流入 Top4(真实,来自 mainRank 按 inflowYi 排序)
-    const flowTop = mr4.slice().sort((a, b) => (Number(b.inflowYi || 0)) - (Number(a.inflowYi || 0))).slice(0, 4);
-    const flowSrc = flowTop.length ? flowTop : mr4.slice(0, 4);
-    const mswNums = flowSrc.map(s => {
-      const v = Number(s.inflowYi || 0);
-      return '<div class="msw-num"><div class="msw-num-v ' + pctCls(v) + '">' + sign(v) + v.toFixed(1) + '亿</div><div class="msw-num-l">' + esc(s.name || '--') + '</div></div>';
-    }).join('');
-    const topName = flowSrc[0] ? (flowSrc[0].name || '--') : '--';
-    const topIn = flowSrc[0] ? Number(flowSrc[0].inflowYi || 0) : 0;
-    const mswTag1 = '<div class="msw-row"><span class="msw-tag msw-tag-def">' + esc(defName) + '</span><div class="msw-vals"><span class="' + pctCls(defPct) + '">' + sign(defPct) + defPct.toFixed(2) + '%</span> · <span class="' + pctCls(defIn) + '">资金 ' + sign(defIn) + defIn.toFixed(1) + '亿</span></div></div>';
-    const mswTag2 = '<div class="msw-row"><span class="msw-tag msw-tag-ag">' + esc(seedName) + '</span><div class="msw-vals"><span class="' + pctCls(seedPct) + '">' + sign(seedPct) + seedPct.toFixed(2) + '%</span> · <span class="' + pctCls(seedIn) + '">资金 ' + sign(seedIn) + seedIn.toFixed(1) + '亿</span></div></div>';
-    const mswSwitch = '<div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div>' +
-      mswTag1 + mswTag2 +
-      '<div class="msw-note">今日主力净流入最强:' + esc(topName) + ' ' + sign(topIn) + topIn.toFixed(1) + '亿;资金承接方向切换至 ' + esc(seedName) + ' / ' + esc(defName) + '</div>' +
-      '<div class="msw-nums">' + mswNums + '</div>' +
-      '<div class="msw-foot">主力净流入(亿元)按板块封单+成交额汇总:' + esc(flowSrc.map(s => s.name).join('、')) + ' 领涨;防御(' + esc(defName) + ')与农业(' + esc(seedName) + ')为资金切换承接方向,谨防一致兑现。</div>' +
-      '</div>';
-
-    // 拼装
-    boardTierMidday = '<div class="card bt-card-outer">' +
-      '<div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换<span class="bt-time">· ' + esc(m.time || '') + '</span></div>' +
-      '<div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div>' +
-      ztRow + structNote + vtLines + vAnchors + blockTbl + mswSwitch +
-      '<div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div>' +
-      '</div>';
-  }
+  if (_btSlot) boardTierMidday = renderBoardTierBlock(report, { isPre: m.type === 'premarket' });
 
   // 05 明日观察锚点（午盘隐藏，收盘展示）—— 全部基于当日真实数据动态生成
   const mrTop = (report.mainRank && report.mainRank[0]) || {};
@@ -681,6 +443,7 @@ function renderCloseEmotion(report) {
   const anchorCards = anchors.map(a => {
     return '<div class="ce-anchor-card"><div class="ce-anchor-h">' + a.icon + ' ' + esc(a.title) + '</div><div class="ce-anchor-desc">' + esc(a.desc) + '</div></div>';
   }).join('');
+  // v11.62:只有 midday(已停用)才隐藏;盘前保留 —— 盘前正需要"明日观察锚点"与"今天怎么看"。
   const anchorBlock = m.type === 'midday' ? '' : '<div class="card"><div class="card-title">05 明日观察锚点</div>' +
     '<div class="ce-anchor-grid">' + anchorCards + '</div></div>';
 
@@ -717,13 +480,12 @@ function renderCloseEmotion(report) {
 
   return '<div class="close-emotion">' +
     '<div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div>' +
-    '<div class="ce-title">' + esc(m.date || '') + ' ' + esc(m.typeLabel || '') + (m.type === 'midday' ? ' · 实时更新中' : ' · 数据截至 ' + esc(m.time || '15:00')) + '</div>' +
+    '<div class="ce-title">' + esc(m.date || '') + ' ' + esc(m.typeLabel || '') + (m.type === 'midday' ? ' · 实时更新中' : (m.type === 'premarket' ? ' · 盘前基准' : ' · 数据截至 ' + esc(m.time || '15:00'))) + '</div>' +
     topPanel +
     emotion +
     broadBlock +
     flowBlock +
-    (m.type === 'midday' ? boardTierMidday : ladderBlock) +
-    anchorBlock +
+    (boardTierMidday || ladderBlock) +    anchorBlock +
     todayWatchBlock +
     banner +
   '</div>';
@@ -2634,6 +2396,7 @@ ${renderFollowerRiskBanner(report)}
   ${renderWatchlist(report)}
   ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report, { title: '盘前参与策略', subtitle: '盘前接力判断 · 板块联动确认 · 强势股池筛选' })}
+  ${renderBoardTierBlock(report, { isPre: true, slot: 'premarket' })}
   ${renderMainDirection(report)}
   ${renderMainRank(report)}
   ${renderStockResearch(report)}
@@ -3020,3 +2783,264 @@ function build() {
 }
 
 build();
+/* v11.62: 04 区块(涨停梯队+主线研判+关注锚点+板块强弱+资金切换)抽为独立函数，
+   供盘前页(renderPremarketReport)与历史 mid 页共用。
+   opts.isPre = true 时文案改为"昨日收盘基准"(盘前语义)。 */
+function renderBoardTierBlock(report, opts) {
+  opts = opts || {};
+  const ce = (report && report.closeEmotion) || {};
+  const m = (report && report.meta) || {};
+  let boardTierMidday = '';
+  {
+  const maxLB = ce.maxLB || 4;
+  const ztList = report.limitUp || [];
+  const mr4 = (report.mainRank || []);
+  const L1 = mr4[0] || {};
+  const L2 = mr4[1] || {};
+  const L3 = mr4[2] || {};
+  const L4 = mr4[3] || {};
+  const L1Name = L1.mappedName || L1.name || '--';
+  const L2Name = L2.mappedName || L2.name || '--';
+  const L3Name = L3.mappedName || L3.name || '--';
+  const L4Name = L4.mappedName || L4.name || '--';
+  const L1Lead = L1.leadStock || '--';
+  const L2Lead = L2.leadStock || '--';
+  const L1Pct = Number(L1.changePct || 0);
+  const L2Pct = Number(L2.changePct || 0);
+  const L3Pct = Number(L3.changePct || 0);
+  const L4Pct = Number(L4.changePct || 0);
+  const L1In = Number(L1.inflowYi || 0);
+  const L2In = Number(L2.inflowYi || 0);
+  const L3In = Number(L3.inflowYi || 0);
+  const L4In = Number(L4.inflowYi || 0);
+  
+  // === 1) 涨停梯队 5 张卡片(动态档位)+ 1 行结构辨证 ===
+  let tierLvls;
+  if (maxLB >= 6) {
+    tierLvls = [
+      { lv: 6, label: '6板', cls: 'bt-6' },
+      { lv: 5, label: '5板', cls: 'bt-5' },
+      { lv: 3, label: '3板', cls: 'bt-3' },
+      { lv: 2, label: '2板', cls: 'bt-2' },
+      { lv: 0, label: '断板', cls: 'bt-new' }
+    ];
+  } else if (maxLB === 5) {
+    tierLvls = [
+      { lv: 5, label: '5板', cls: 'bt-5' },
+      { lv: 4, label: '4板', cls: 'bt-4' },
+      { lv: 3, label: '3板', cls: 'bt-3' },
+      { lv: 2, label: '2板', cls: 'bt-2' },
+      { lv: 0, label: '断板', cls: 'bt-new' }
+    ];
+  } else if (maxLB === 4) {
+    tierLvls = [
+      { lv: 4, label: '4板', cls: 'bt-4' },
+      { lv: 3, label: '3板', cls: 'bt-3' },
+      { lv: 2, label: '2板', cls: 'bt-2' },
+      { lv: 1, label: '1板', cls: 'bt-1' },
+      { lv: 0, label: '断板', cls: 'bt-new' }
+    ];
+  } else if (maxLB === 3) {
+    tierLvls = [
+      { lv: 3, label: '3板', cls: 'bt-3' },
+      { lv: 2, label: '2板', cls: 'bt-2' },
+      { lv: 1, label: '1板', cls: 'bt-1' },
+      { lv: 0, label: '断板', cls: 'bt-new' },
+      { lv: -1, label: '炸板', cls: 'bt-zb' }
+    ];
+  } else {
+    tierLvls = [
+      { lv: 2, label: '2板', cls: 'bt-2' },
+      { lv: 1, label: '1板', cls: 'bt-1' },
+      { lv: 0, label: '断板', cls: 'bt-new' },
+      { lv: -1, label: '炸板', cls: 'bt-zb' },
+      { lv: -2, label: '跌停', cls: 'bt-down' }
+    ];
+  }
+  const findTierLead = (lv) => {
+    if (lv >= 1) {
+      const tier = (ce.ladder || []).find(l => String(l.lianban || '').startsWith(String(lv) + '板'));
+      if (tier) return tier.lead;
+      const matches = ztList.filter(z => (z.lianban || 1) === lv).sort((a, b) => (b.pct || 0) - (a.pct || 0));
+      return matches[0] ? matches[0].name : null;
+    } else if (lv === 0 || lv === -1) {
+      const matches = ztList.filter(z => z.status === '炸板' || z.status === '炸板回封' || z.zhaban);
+      return matches[0] ? matches[0].name : null;
+    } else {
+      const limitDown = (report.limitDown || []);
+      return limitDown[0] ? limitDown[0].name : null;
+    }
+  };
+  const tierSub = {
+    6: '六板高度', 5: '五板高度', 4: '四板高度', 3: '三板高度', 2: '二板', 1: '首板',
+    0: '断板', '-1': '炸板', '-2': '跌停'
+  };
+  const tierCards = tierLvls.map(t => {
+    const lead = findTierLead(t.lv) || '--';
+    const subLabel = tierSub[t.lv] || '--';
+    return '<div class="bt-card ' + t.cls + '">' +
+      '<div class="bt-lv">' + t.label + '</div>' +
+      '<div class="bt-name">' + esc(lead) + '</div>' +
+      '<div class="bt-sub">' + esc(subLabel) + '</div>' +
+    '</div>';
+  }).join('');
+  const ztRow = '<div class="bt-row">' + tierCards + '</div>';
+  
+  // 结构辨证(动态)
+  const structNote = '<div class="bt-struct-note">' +
+    '<b>结构辨证</b>:' + esc(L1Name) + ' 今日最高 ' + maxLB + '板(龙头 ' + esc(L1Lead) + '),板块 +' + L1Pct.toFixed(1) + '% / 资金 +' + L1In.toFixed(1) + '亿;' +
+    esc(L2Name) + ' +' + L2Pct.toFixed(1) + '% 居次,' + esc(L3Name) + ' +' + L3Pct.toFixed(1) + '% 第三,' + esc(L4Name) + ' +' + L4Pct.toFixed(1) + '%。' +
+    '梯队高度 ' + maxLB + '板,情绪 ' + (ce.tempScore || '--') + '°(' + (ce.stage || '') + '),注意高位分歧与一致兑现风险。' +
+    '</div>';
+  
+  // === 2) 主线研判(4 条) ===
+  const vtLines = '<div class="vt-section"><div class="vt-h">② 主线研判</div>' +
+    '<div class="vt-line"><span class="vt-rank">①</span><b>' + esc(L1Name) + '</b> — 穿越板块总龙头(<b class="up">' + esc(L1Lead) + ' ' + maxLB + '板</b>)' +
+      '<div class="vt-desc">板块 +' + L1Pct.toFixed(2) + '%、资金 +' + L1In.toFixed(1) + '亿,' + (Number(L1.ztCount || 0)) + '家涨停,龙头 ' + esc(L1Lead) + ' 领涨,是当前情绪总龙头,注意高位分歧。</div></div>' +
+    '<div class="vt-line"><span class="vt-rank">②</span><b>' + esc(L2Name) + '</b> — 今日次强爆发(<b class="up">' + esc(L2Lead) + '</b>)' +
+      '<div class="vt-desc">板块 +' + L2Pct.toFixed(2) + '%、资金 +' + L2In.toFixed(1) + '亿,' + (Number(L2.ztCount || 0)) + '家涨停,龙头 ' + esc(L2Lead) + ' 领涨,为二线主线。</div></div>' +
+    '<div class="vt-line"><span class="vt-rank">③</span><b>' + esc(L3Name) + '</b> — 梯队成形' +
+      '<div class="vt-desc">板块 +' + L3Pct.toFixed(2) + '%、资金 +' + L3In.toFixed(1) + '亿,' + (Number(L3.ztCount || 0)) + '家涨停,龙头 ' + esc(L3.leadStock || '--') + '。</div></div>' +
+    '<div class="vt-line"><span class="vt-rank">④</span><b>' + esc(L4Name) + '</b> — 资金主节奏' +
+      '<div class="vt-desc">板块 +' + L4Pct.toFixed(2) + '%、资金 ' + (L4In >= 0 ? '+' : '') + L4In.toFixed(1) + '亿,' + (Number(L4.ztCount || 0)) + '家涨停,关注承接力度。</div></div>' +
+    '</div>';
+  
+  // === 3) 午后-明日观察锚(6 条) ===
+  const anchors = [
+    { tag: esc(L1Lead) + ' ' + maxLB + '板', text: esc(L1Name) + ' 板块 +' + L1Pct.toFixed(1) + '% 领涨,龙头 ' + esc(L1Lead) + ' 表态,关注能否延续 ' + maxLB + ' 板穿越' },
+    { tag: esc(L2Lead), text: esc(L2Name) + ' 今日次强,龙头 ' + esc(L2Lead) + ' 领涨,观察明日能否接力' },
+    { tag: esc(L3.leadStock || L3Name), text: esc(L3Name) + ' 梯队成形,资金 ' + (L3In >= 0 ? '净流入' : '净流出') + ' ' + Math.abs(L3In).toFixed(1) + '亿,关注持续性' },
+    { tag: esc(L4.leadStock || L4Name), text: esc(L4Name) + ' 板块 +' + L4Pct.toFixed(1) + '%,资金 ' + (L4In >= 0 ? '净流入' : '净流出') + ' ' + Math.abs(L4In).toFixed(1) + '亿,高位注意回撤' },
+    { tag: '炸板监控', text: '今日炸板 ' + (ce.zbTotal || 0) + '家,炸板率超 40% 需警惕情绪退潮' },
+    { tag: '量能验证', text: '成交额 ' + esc(report.marketStats && report.marketStats.totalAmount || '--') + ',关注量能能否维持' }
+  ];
+  const vAnchors = '<div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors">' +
+    anchors.map(a => '<li><span class="vt-tag">' + esc(a.tag) + '</span>' + esc(a.text) + '</li>').join('') +
+    '</ul></div>';
+  
+  // === 4) 板块强弱表(3 段式:最强/分歧/流出,每段 3 个板块) ===
+  const findSector = (keys) => mr4.find(s => keys.some(k => (s.name || '').indexOf(k) >= 0)) || null;
+  const isLeadYiZi = (sector, ztAll) => {
+    if (!sector) return false;
+    const leadPct = Number(sector.leadPct || 0);
+    if (leadPct >= 9.5) return true;
+    if (sector.leadStock) {
+      const hit = (ztAll || []).find(z => z.name === sector.leadStock);
+      if (hit && (hit.pct || 0) >= 9.5) return true;
+    }
+    if (sector.leadStock && Number(sector.changePct || 0) >= 9) return true;
+    return false;
+  };
+  // 强度评分(涨幅 0.6 + 资金 0.3 + 涨停梯队 0.5)
+  const allRanked = (mr4 || []).map(s => {
+    const pct = Number(s.changePct || 0);
+    const inflow = Number(s.inflowYi || 0);
+    const zt = Number(s.ztCount || s.limitUpCount || 0);
+    return Object.assign({}, s, { _pct: pct, _inflow: inflow, _zt: zt, _score: pct * 0.6 + inflow * 0.3 + zt * 0.5 });
+  }).sort((a, b) => b._score - a._score);
+  
+  // 3 段分类
+  const segStrongest = [];  // 最强:涨幅>=9 且 一字带动 或 涨停>=3
+  const segDiverge   = [];  // 分歧:资金净流入 且 1<=涨幅<5
+  const segOutflow   = [];  // 流出/退潮:资金净流出 或 涨幅<0
+  for (const s of allRanked) {
+    const yiZi = isLeadYiZi(s, ztList);
+    if (segStrongest.length < 3 && s._pct >= 9 && (yiZi || s._zt >= 3)) {
+      segStrongest.push(s);
+    } else if (segDiverge.length < 3 && s._inflow > 0 && s._pct >= 1 && s._pct < 5) {
+      segDiverge.push(s);
+    } else if (segOutflow.length < 3 && (s._inflow < 0 || s._pct < 0)) {
+      segOutflow.push(s);
+    }
+  }
+  // 不足的按强度从剩余补齐
+  const usedNames = new Set();
+  [...segStrongest, ...segDiverge, ...segOutflow].forEach(s => usedNames.add(s.name));
+  const fillers = allRanked.filter(s => !usedNames.has(s.name));
+  for (const arr of [segStrongest, segDiverge, segOutflow]) {
+    while (arr.length < 3 && fillers.length) {
+      const f = fillers.shift();
+      arr.push(f);
+      usedNames.add(f.name);
+    }
+  }
+  // 段头
+  const segments = [
+    { name: '最强', sub: '一字带动 · 龙头确立', segCls: 'bd-seg-1' },
+    { name: '分歧', sub: '资金流入但涨幅收敛', segCls: 'bd-seg-2' },
+    { name: '流出', sub: '退潮 / 资金撤离',   segCls: 'bd-seg-3' }
+  ];
+  // 行渲染(段内 #,方向用段标签)
+  const buildBdRow = (s, idx, segIdx) => {
+    const pct = s._pct;
+    let inflow = s._inflow;
+    if (inflow === 0) {
+      if (pct >= 5) inflow = +(pct * 0.6).toFixed(1);
+      else if (pct <= -1) inflow = -(Math.abs(pct) * 0.5).toFixed(1);
+    }
+    const pctStr = (pct > 0 ? '+' : '') + pct.toFixed(2) + '%';
+    const amtStr = (inflow > 0 ? '+' : '') + inflow.toFixed(1) + '亿';
+    const pctCls = pct >= 0 ? 'up' : 'down';
+    const amtCls = inflow >= 0 ? 'up' : 'down';
+    return '<tr><td class="bd-rank">' + (idx + 1) + '</td><td class="bd-cat">' + esc(s.name) + '</td><td class="' + pctCls + '">' + pctStr + '</td><td class="' + amtCls + '">' + amtStr + '</td><td><span class="bd-seg-pill bd-seg-pill-' + (segIdx + 1) + '">' + segments[segIdx].name + '</span></td></tr>';
+  };
+  // 段头分隔行
+  const segHdr = (seg, segIdx) => {
+    return '<tr class="bd-seg-h ' + seg.segCls + '"><td colspan="5"><span class="bd-seg-num">' + (segIdx + 1) + '</span><b>' + esc(seg.name) + '</b> · ' + esc(seg.sub) + '</td></tr>';
+  };
+  const dynamicSubtitle = '· ' + segStrongest.length + '最强 · ' + segDiverge.length + '分歧 · ' + segOutflow.length + '流出';
+  const blockTbl = '<div class="bd-section"><div class="bd-h">④ 板块强弱 ' + dynamicSubtitle + '</div>' +
+    '<table class="bd-tbl"><thead><tr>' +
+    '<th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>方向</th>' +
+    '</tr></thead><tbody>' +
+    segHdr(segments[0], 0) + segStrongest.map((s, i) => buildBdRow(s, i, 0)).join('') +
+    segHdr(segments[1], 1) + segDiverge.map((s, i) => buildBdRow(s, i, 1)).join('') +
+    segHdr(segments[2], 2) + segOutflow.map((s, i) => buildBdRow(s, i, 2)).join('') +
+    '</tbody></table></div>';
+  
+  // === 5) 资金切换信号(今日核心) ===
+  const defSector = findSector(['贵金属', '黄金', '白银', '珠宝']) || findSector(['有色金属', '工业金属', '小金属']);
+  const seedSector = findSector(['种植业', '种业', '种子', '农产品', '粮食']);
+  const defName = defSector ? (defSector.name || '防御') : '防御';
+  const defPct = defSector ? Number(defSector.changePct || 0) : 0;
+  const defIn = defSector ? Number(defSector.inflowYi || 0) : 0;
+  const seedName = seedSector ? (seedSector.name || '农业') : '农业';
+  const seedPct = seedSector ? Number(seedSector.changePct || 0) : 0;
+  const seedIn = seedSector ? Number(seedSector.inflowYi || 0) : 0;
+  const pctCls = (v) => (v >= 0 ? 'up' : 'down');
+  const sign = (v) => (v >= 0 ? '+' : '');
+  // 主力净流入 Top4(真实,来自 mainRank 按 inflowYi 排序)
+  const flowTop = mr4.slice().sort((a, b) => (Number(b.inflowYi || 0)) - (Number(a.inflowYi || 0))).slice(0, 4);
+  const flowSrc = flowTop.length ? flowTop : mr4.slice(0, 4);
+  const mswNums = flowSrc.map(s => {
+    const v = Number(s.inflowYi || 0);
+    return '<div class="msw-num"><div class="msw-num-v ' + pctCls(v) + '">' + sign(v) + v.toFixed(1) + '亿</div><div class="msw-num-l">' + esc(s.name || '--') + '</div></div>';
+  }).join('');
+  const topName = flowSrc[0] ? (flowSrc[0].name || '--') : '--';
+  const topIn = flowSrc[0] ? Number(flowSrc[0].inflowYi || 0) : 0;
+  const mswTag1 = '<div class="msw-row"><span class="msw-tag msw-tag-def">' + esc(defName) + '</span><div class="msw-vals"><span class="' + pctCls(defPct) + '">' + sign(defPct) + defPct.toFixed(2) + '%</span> · <span class="' + pctCls(defIn) + '">资金 ' + sign(defIn) + defIn.toFixed(1) + '亿</span></div></div>';
+  const mswTag2 = '<div class="msw-row"><span class="msw-tag msw-tag-ag">' + esc(seedName) + '</span><div class="msw-vals"><span class="' + pctCls(seedPct) + '">' + sign(seedPct) + seedPct.toFixed(2) + '%</span> · <span class="' + pctCls(seedIn) + '">资金 ' + sign(seedIn) + seedIn.toFixed(1) + '亿</span></div></div>';
+  const mswSwitch = '<div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div>' +
+    mswTag1 + mswTag2 +
+    '<div class="msw-note">今日主力净流入最强:' + esc(topName) + ' ' + sign(topIn) + topIn.toFixed(1) + '亿;资金承接方向切换至 ' + esc(seedName) + ' / ' + esc(defName) + '</div>' +
+    '<div class="msw-nums">' + mswNums + '</div>' +
+    '<div class="msw-foot">主力净流入(亿元)按板块封单+成交额汇总:' + esc(flowSrc.map(s => s.name).join('、')) + ' 领涨;防御(' + esc(defName) + ')与农业(' + esc(seedName) + ')为资金切换承接方向,谨防一致兑现。</div>' +
+    '</div>';
+  
+  // 拼装(v11.62:文案随槽位变化 —— 盘前是"昨日收盘基准 + 今日预判",不是"实时追踪")
+  const _isPre = m.type === 'premarket';
+  const _btBanner = _isPre
+    ? '<div class="bt-banner"><span class="bt-b-dot"></span><b>昨日收盘基准 · 主力资金 · 连板梯队</b><span class="bt-b-tip">今日主线预判 · 资金切换方向 · 风险提示</span></div>'
+    : '<div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div>';
+  const _btHint = _isPre
+    ? '<div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断(基于上一交易日收盘数据);开盘后紧盯龙头表态。</div>'
+    : '<div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div>';
+  boardTierMidday = '<div class="card bt-card-outer">' +
+    '<div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换<span class="bt-time">· ' + esc(m.time || '') + '</span></div>' +
+    _btBanner +
+    ztRow + structNote + vtLines + vAnchors + blockTbl + mswSwitch +
+    _btHint +
+    '</div>';
+  }
+  return boardTierMidday;
+}
