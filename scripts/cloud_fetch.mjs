@@ -39,26 +39,49 @@ function bjHM(d) {
 //   而采集脚本原先**没有任何时刻校验**,于是把"收盘数据"无条件写进「盘中快照」槽位 ——
 //   2026-09-09~09-14 连续 4 个交易日的 data/reviews/*_11-35.json 装的都是收盘数据
 //   (generatedAt 15:27~19:00,且与同日 *_16-20.json 的指数/成交额完全相同)。
-// 规则:
+// 规则(v11.60 修订,A+B 组合):
 //   ① 目标日期 != 北京今天 → 一律放行(历史补跑是合法需求);
 //   ② 落在该槽位应有时段内 → 放行;
-//   ③ 超时且当日槽位**已有数据** → 拒绝(保住槽位里原有的真实数据,这是主要目的);
-//   ④ 超时但当日槽位**尚无数据** → 放行(迟到总比没有好;页面会按 generatedAt 显示"补采"告警);
-//   ⑤ auction 例外:集合竞价只在 09:20~09:35 有采集意义,超时一律拒绝(否则会把全天口径写成竞价数据)。
+//   ③【A.槽位冻结】超时且**已跨越到别的时段** → 一律拒绝(不再看槽位有没有数据)。
+//       原第④条"超时但槽位无数据就放行"是**假数据的总源头**:本机自动机 18:49 触发 midday,
+//       槽位为空 → 放行 → 把 18:49 的收盘行情写进 2026-09-15_11-35.json,
+//       表现为"上证=收盘价、超短核心 17/20 是涨停"。这比没有数据更坏:用户拿收盘结果当盘中信号。
+//   ④【B.补采打标】同一交易时段内的迟到补采仍放行,但返回 late=true,
+//       调用方写入 meta.lateCapture,页面顶部出红字告警「补采于 HH:MM,非槽位应有数据」。
+//   ⑤ auction 例外:集合竞价只在 09:20~09:35 有采集意义,超时一律拒绝。
 // 注意:close 不设守卫 —— 15:00 之后收盘数据的语义不再随时点变化,拦它只会让某天彻底没有收盘报告。
+//
+// 时段划分(北京): 早盘 09:30~11:30 / 午盘 13:00~15:00。
+//   判定"是否同一交易时段"用 TAPE_SESSIONS,midday 槽位只在其所属时段内允许补采。
 const SLOT_WINDOWS = { premarket: ['08:30', '10:00'], midday: ['09:25', '14:59'], auction: ['09:20', '09:35'] };
+// 各槽位允许"迟到补采"的最晚时刻:超过这个点,数据语义已经变了,必须拒绝(A)。
+//   premarket: 盘前数据到 10:00 为止(开盘后 30 分钟,早盘格局已定);
+//   midday   : 盘中数据到 14:59 为止(14:59 之后是尾盘集合竞价前的最后时刻,仍算盘中)。
+const LATE_LIMIT = { premarket: '10:00', midday: '14:59', auction: '09:35' };
 function slotGuardF(type, targetDate, todayBj, nowHM, slotExists) {
   const w = SLOT_WINDOWS[type];
-  if (!w) return { ok: true, warn: '' };                    // close / 未知类型:不设守卫
-  if (!targetDate || targetDate !== todayBj) return { ok: true, warn: '' };
-  if (nowHM >= w[0] && nowHM <= w[1]) return { ok: true, warn: '' };
+  if (!w) return { ok: true, warn: '', late: false };        // close / 未知类型:不设守卫
+  if (!targetDate || targetDate !== todayBj) return { ok: true, warn: '', late: false };
+  if (nowHM >= w[0] && nowHM <= w[1]) return { ok: true, warn: '', late: false };
   if (type === 'auction') {
     return { ok: false, reason: '集合竞价仅在 ' + w[0] + '~' + w[1] + ' 有采集意义,当前 ' + nowHM + ' 拒绝写入(否则会把全天口径写成竞价数据)' };
   }
-  if (slotExists) {
-    return { ok: false, reason: '当日 ' + type + ' 槽位已有数据,当前 ' + nowHM + ' 超出应有时段 ' + w[0] + '~' + w[1] + ' → 拒绝覆盖(否则会把后续时段数据写进该槽位)' };
+  const lim = LATE_LIMIT[type] || w[1];
+  if (nowHM > lim) {
+    // A: 越过该槽位的数据语义边界 → 拒绝,不再看槽位是否存在
+    return {
+      ok: false,
+      reason: '当前 ' + nowHM + ' 已超出 ' + type + ' 槽位的数据有效边界 ' + lim +
+        ' → 拒绝写入(否则会把后续时段数据伪装成该槽位快照;'
+        + (slotExists ? '当日槽位已有数据,保持原样' : '当日槽位宁可留空,页面会显示"未采集"') + ')'
+    };
   }
-  return { ok: true, warn: '当前 ' + nowHM + ' 超出 ' + type + ' 应有时段 ' + w[0] + '~' + w[1] + ',但当日槽位尚无数据 → 放行补采(页面会显示"补采"告警)' };
+  // B: 仍在有效边界内,但不在"理想窗口"里 → 放行补采 + 打标
+  return {
+    ok: true, late: true,
+    warn: '当前 ' + nowHM + ' 晚于 ' + type + ' 理想窗口 ' + w[0] + '~' + w[1] +
+      ',但在数据有效边界 ' + lim + ' 内 → 放行补采(将标记 lateCapture,页面显示"补采"告警)'
+  };
 }
 
 async function fetchTencent(codes) {
@@ -2912,6 +2935,7 @@ async function runAuctionSnapshot() {
 async function main() {
   const now = shanghaiNow();
   // v11.54:时刻守卫(必须在任何落盘之前;auction 分支也要经过它)
+  let LATE_CAPTURE = false;   // v11.60(B):迟到补采标记,写进 meta.lateCapture
   {
     const _ex = process.argv[3] || '';
     const _tgt = _ex ? _ex.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : fmtDate(now);
@@ -2925,6 +2949,7 @@ async function main() {
       process.exit(3);
     }
     if (g.warn) console.warn('[时刻守卫] ' + g.warn);
+    if (g.late) LATE_CAPTURE = true;
   }
   // v11.52:集合竞价快照模式(轻量,不生成报告)
   if (type === "auction") { await runAuctionSnapshot(); return; }
@@ -3268,7 +3293,13 @@ async function main() {
       date, time, type, typeLabel: typeConf.label, generatedAt, market: 'A股',
       dataSource: '腾讯行情 + 东方财富公开接口',
       dataAsOfDate,
-      dataAsOfLabel: isPre ? '今日盘前实时' : '今日盘中/收盘'
+      dataAsOfLabel: isPre ? '今日盘前实时' : '今日盘中/收盘',
+      // v11.60(B):迟到补采标记 —— 采集时刻晚于该槽位理想窗口(但仍在数据有效边界内)。
+      //   页面据此在顶部输出红字告警,避免用户把"补采快照"误当成"槽位应有数据"。
+      lateCapture: LATE_CAPTURE ? true : undefined,
+      lateCaptureNote: LATE_CAPTURE
+        ? ('本槽位理想采集时点为 ' + (typeConf.time || '--') + ',实际采集于 ' + generatedAt.slice(11, 16) + ',数据为该时刻的实时快照')
+        : undefined
     },
     indices,
     marketStats: {
