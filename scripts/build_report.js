@@ -2887,17 +2887,20 @@ function renderBoardTierBlock(report, opts) {
   const ztRow = '<div class="bt-row">' + tierCards + '</div>';
   
   // 结构辨证(动态)
+  const _preFrame3 = m.type === 'premarket';
   const structNote = '<div class="bt-struct-note">' +
-    '<b>结构辨证</b>:' + esc(L1Name) + ' 今日最高 ' + maxLB + '板(龙头 ' + esc(L1Lead) + '),板块 +' + L1Pct.toFixed(1) + '% / 资金 +' + L1In.toFixed(1) + '亿;' +
+    '<b>结构辨证</b>:' + esc(L1Name) + ' ' + (_preFrame3 ? '上一交易日最高' : '今日最高') + ' ' + maxLB + '板(龙头 ' + esc(L1Lead) + '),板块 +' + L1Pct.toFixed(1) + '% / 资金 +' + L1In.toFixed(1) + '亿;' +
     esc(L2Name) + ' +' + L2Pct.toFixed(1) + '% 居次,' + esc(L3Name) + ' +' + L3Pct.toFixed(1) + '% 第三,' + esc(L4Name) + ' +' + L4Pct.toFixed(1) + '%。' +
     '梯队高度 ' + maxLB + '板,情绪 ' + (ce.tempScore || '--') + '°(' + (ce.stage || '') + '),注意高位分歧与一致兑现风险。' +
     '</div>';
   
   // === 2) 主线研判(4 条) ===
+  // v11.62:盘前页数据基准是上一交易日收盘,措辞随之分叉(否则"今日次强爆发"会被读成盘前已发生)。
+  const _preFrame2 = m.type === 'premarket';
   const vtLines = '<div class="vt-section"><div class="vt-h">② 主线研判</div>' +
     '<div class="vt-line"><span class="vt-rank">①</span><b>' + esc(L1Name) + '</b> — 穿越板块总龙头(<b class="up">' + esc(L1Lead) + ' ' + maxLB + '板</b>)' +
       '<div class="vt-desc">板块 +' + L1Pct.toFixed(2) + '%、资金 +' + L1In.toFixed(1) + '亿,' + (Number(L1.ztCount || 0)) + '家涨停,龙头 ' + esc(L1Lead) + ' 领涨,是当前情绪总龙头,注意高位分歧。</div></div>' +
-    '<div class="vt-line"><span class="vt-rank">②</span><b>' + esc(L2Name) + '</b> — 今日次强爆发(<b class="up">' + esc(L2Lead) + '</b>)' +
+    '<div class="vt-line"><span class="vt-rank">②</span><b>' + esc(L2Name) + '</b> — ' + (_preFrame2 ? '上一交易日次强' : '今日次强爆发') + '(<b class="up">' + esc(L2Lead) + '</b>)' +
       '<div class="vt-desc">板块 +' + L2Pct.toFixed(2) + '%、资金 +' + L2In.toFixed(1) + '亿,' + (Number(L2.ztCount || 0)) + '家涨停,龙头 ' + esc(L2Lead) + ' 领涨,为二线主线。</div></div>' +
     '<div class="vt-line"><span class="vt-rank">③</span><b>' + esc(L3Name) + '</b> — 梯队成形' +
       '<div class="vt-desc">板块 +' + L3Pct.toFixed(2) + '%、资金 +' + L3In.toFixed(1) + '亿,' + (Number(L3.ztCount || 0)) + '家涨停,龙头 ' + esc(L3.leadStock || '--') + '。</div></div>' +
@@ -2906,15 +2909,19 @@ function renderBoardTierBlock(report, opts) {
     '</div>';
   
   // === 3) 午后-明日观察锚(6 条) ===
+  // v11.62:盘前页复用本区块时，"午后""今日次强""今日炸板"全部是午盘语义 ——
+  //   盘前看到的其实是上一交易日收盘数据，称"今日"会误导。按槽位分叉措辞。
+  const _preFrame = m.type === 'premarket';
+  const _dLabel = _preFrame ? '上一交易日' : '今日';
   const anchors = [
     { tag: esc(L1Lead) + ' ' + maxLB + '板', text: esc(L1Name) + ' 板块 +' + L1Pct.toFixed(1) + '% 领涨,龙头 ' + esc(L1Lead) + ' 表态,关注能否延续 ' + maxLB + ' 板穿越' },
-    { tag: esc(L2Lead), text: esc(L2Name) + ' 今日次强,龙头 ' + esc(L2Lead) + ' 领涨,观察明日能否接力' },
+    { tag: esc(L2Lead), text: esc(L2Name) + ' ' + (_preFrame ? '上一交易日次强' : '今日次强') + ',龙头 ' + esc(L2Lead) + ' 领涨,观察能否接力' },
     { tag: esc(L3.leadStock || L3Name), text: esc(L3Name) + ' 梯队成形,资金 ' + (L3In >= 0 ? '净流入' : '净流出') + ' ' + Math.abs(L3In).toFixed(1) + '亿,关注持续性' },
     { tag: esc(L4.leadStock || L4Name), text: esc(L4Name) + ' 板块 +' + L4Pct.toFixed(1) + '%,资金 ' + (L4In >= 0 ? '净流入' : '净流出') + ' ' + Math.abs(L4In).toFixed(1) + '亿,高位注意回撤' },
-    { tag: '炸板监控', text: '今日炸板 ' + (ce.zbTotal || 0) + '家,炸板率超 40% 需警惕情绪退潮' },
-    { tag: '量能验证', text: '成交额 ' + esc(report.marketStats && report.marketStats.totalAmount || '--') + ',关注量能能否维持' }
+    { tag: (_preFrame ? '昨日炸板' : '炸板监控'), text: _dLabel + '炸板 ' + (ce.zbTotal || 0) + '家,炸板率超 40% 需警惕情绪退潮' },
+    { tag: (_preFrame ? '昨日量能' : '量能验证'), text: _dLabel + '成交额 ' + esc(report.marketStats && report.marketStats.totalAmount || '--') + ',关注量能能否维持' }
   ];
-  const vAnchors = '<div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors">' +
+  const vAnchors = '<div class="vt-section"><div class="vt-h">③ ' + (_preFrame ? '昨日收盘锚 · 今日盘前' : '午后·明日观察锚') + '</div><ul class="vt-anchors">' +
     anchors.map(a => '<li><span class="vt-tag">' + esc(a.tag) + '</span>' + esc(a.text) + '</li>').join('') +
     '</ul></div>';
   
@@ -3020,9 +3027,12 @@ function renderBoardTierBlock(report, opts) {
   const topIn = flowSrc[0] ? Number(flowSrc[0].inflowYi || 0) : 0;
   const mswTag1 = '<div class="msw-row"><span class="msw-tag msw-tag-def">' + esc(defName) + '</span><div class="msw-vals"><span class="' + pctCls(defPct) + '">' + sign(defPct) + defPct.toFixed(2) + '%</span> · <span class="' + pctCls(defIn) + '">资金 ' + sign(defIn) + defIn.toFixed(1) + '亿</span></div></div>';
   const mswTag2 = '<div class="msw-row"><span class="msw-tag msw-tag-ag">' + esc(seedName) + '</span><div class="msw-vals"><span class="' + pctCls(seedPct) + '">' + sign(seedPct) + seedPct.toFixed(2) + '%</span> · <span class="' + pctCls(seedIn) + '">资金 ' + sign(seedIn) + seedIn.toFixed(1) + '亿</span></div></div>';
-  const mswSwitch = '<div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div>' +
+  // v11.62:⑤ 标题保留"今日核心"作为可辨识名称(用户即以此名指代该区块),
+  //   但**说明文案**里的"今日"在盘前页指代错位(数据实为上一交易日收盘),须分叉。
+  const _isPreMsw = m.type === 'premarket';
+  const mswSwitch = '<div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)' + (_isPreMsw ? '<span class="msw-sub">· 盘前视角</span>' : '') + '</div>' +
     mswTag1 + mswTag2 +
-    '<div class="msw-note">今日主力净流入最强:' + esc(topName) + ' ' + sign(topIn) + topIn.toFixed(1) + '亿;资金承接方向切换至 ' + esc(seedName) + ' / ' + esc(defName) + '</div>' +
+    '<div class="msw-note">' + (_isPreMsw ? '上一交易日' : '今日') + '主力净流入最强:' + esc(topName) + ' ' + sign(topIn) + topIn.toFixed(1) + '亿;资金承接方向切换至 ' + esc(seedName) + ' / ' + esc(defName) + '</div>' +
     '<div class="msw-nums">' + mswNums + '</div>' +
     '<div class="msw-foot">主力净流入(亿元)按板块封单+成交额汇总:' + esc(flowSrc.map(s => s.name).join('、')) + ' 领涨;防御(' + esc(defName) + ')与农业(' + esc(seedName) + ')为资金切换承接方向,谨防一致兑现。</div>' +
     '</div>';
