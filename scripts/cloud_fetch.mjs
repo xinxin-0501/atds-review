@@ -3281,7 +3281,18 @@ async function main() {
   // 支持显式传入目标日期 YYYYMMDD（用于补生成历史日期），否则用当前日期
   const date = explicitArg ? explicitArg.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') : fmtDate(now);
   const time = timeOverride ? argv2 : typeConf.time;
-  const generatedAt = `${date} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+  // v11.73【时间戳语义修正】generatedAt 必须是【真实采集时刻】(北京),不能是"目标报告日期 + 当前时钟"的拼接。
+  //   原写法 `${date} HH:MM:SS` 在**跨日重采**时会产生自相矛盾的串:
+  //   实测 2026-09-17 03:25 重采 09-16 的报告 → generatedAt = "2026-09-16 03:25:45"
+  //   (09-16 凌晨 3 点根本不可能有收盘数据)。呈现端拿它的 HH:MM 与槽位窗口比较,
+  //   便把一次**合法的历史重采**误判成"当日 16:20 的延迟补采",页面顶部出现误导告警
+  //   「⚠️ 延迟补采（实际数据时点 03:25），非当日 16:20 收盘快照」+ hero 显示「数据时间 03:25」
+  //   ⇒ 用户看到"凌晨 3 点的数据"就认为报告是坏的(本次真实反馈来源)。
+  //   修正后:generatedAt = 真实采集时刻(含真实日期),历史重采另立 meta.replay 标记,
+  //   由呈现端区分三种情况(正常 / 同日迟到补采 / 跨日历史重采),告警措辞各不相同。
+  const capturedAt = `${fmtDate(now)} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+  const generatedAt = capturedAt;
+  const isReplay = fmtDate(now) !== date;   // 目标日 ≠ 采集日 ⇒ 历史重采(非当日迟到)
 
   const isPre = type === 'premarket';
   const todayCompact = explicitArg || `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
@@ -3645,7 +3656,10 @@ async function main() {
 
   const report = {
     meta: {
-      date, time, type, typeLabel: typeConf.label, generatedAt, market: 'A股',
+      date, time, type, typeLabel: typeConf.label, generatedAt, capturedAt, market: 'A股',
+      // v11.73:历史重采标记(目标日 ≠ 采集日)。呈现端据此显示中性的"重采"说明,
+      //   而不是把它当成"当日 16:20 的延迟补采"来告警(后者会让人以为报告是坏的)。
+      replay: isReplay ? true : undefined,
       dataSource: '腾讯行情 + 东方财富公开接口',
       dataAsOfDate,
       dataAsOfLabel: isPre ? '今日盘前实时' : '今日盘中/收盘',

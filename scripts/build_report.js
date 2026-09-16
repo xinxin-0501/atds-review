@@ -80,7 +80,9 @@ function renderHeader(report, nav) {
 //   现在服务端在采集时就知道自己有没有迟到(g.late),直接落盘,呈现端不再靠猜。
 function lateCaptureNote(m) {
   const t = String((m && m.type) || '');
-  const genHM = (String((m && m.generatedAt) || '').match(/(\d{2}:\d{2})/) || [])[1] || '';
+  const genAt = String((m && m.generatedAt) || '');
+  const genHM = (genAt.match(/(\d{2}:\d{2})/) || [])[1] || '';
+  const capDate = (genAt.match(/^(\d{4}-\d{2}-\d{2})/) || [])[1] || '';
   if (!genHM) return '';
   const SPEC = {
     midday:    { from: '09:25', to: '14:59', kind: '收盘后补采', slot: '11:35 盘中快照' },
@@ -89,6 +91,23 @@ function lateCaptureNote(m) {
   };
   const s = SPEC[t];
   if (!s) return '';
+  // v11.73【历史重采】采集日 ≠ 数据日 ⇒ 单独处理,不再套"当日迟到补采"的措辞。
+  //   旧 json 没有 meta.replay,但 generatedAt 的日期部分与 meta.date 不同即可判定(向后兼容)。
+  //   两种重采的危险程度完全不同,必须分开说:
+  //     · close: 收盘数据在收盘后不再变化 ⇒ 重采内容仍是当日真实收盘盘面,可正常复盘 ⇒ 中性说明;
+  //     · premarket/midday: 采集时取的是【重采那一刻】的实时行情,与标称日期无关
+  //       ⇒ 标着"09-15 盘前"却装着 09-17 的盘面,是典型的伪装盘 ⇒ 必须强告警。
+  const isReplay = !!(m && (m.replay === true || (capDate && m.date && capDate !== m.date)));
+  if (isReplay) {
+    const when = esc(capDate.slice(5)) + ' ' + esc(genHM);
+    if (t === 'close') {
+      return '<div class="hero-warn hero-warn-replay">📁 历史重采 —— 本页为 <b>' + esc(m.date || '') + '</b> 的' + esc(s.slot) +
+        ',于 <b>' + when + '</b> 重新采集。收盘数据在收盘后不再变化,内容仍是该日真实收盘盘面,可正常用于复盘。</div>';
+    }
+    return '<div class="hero-warn hero-warn-late">⛔ 历史重采的' + esc(s.slot) + '不可信 —— 于 <b>' + when +
+      '</b> 重采,而采集端取的是<b>重采那一刻的实时行情</b>,与标称日期 <b>' + esc(m.date || '') +
+      '</b> 无关。请勿据此判断该日盘中信号。</div>';
+  }
   // 服务端标记优先:它带明确的采集时刻与理想时点,措辞更强(用户据此判断"这是不是当时的盘面")
   if (m && m.lateCapture) {
     const ideal = (String(m.time || '').match(/\d{2}:\d{2}/) || [])[0] || s.slot;
@@ -113,15 +132,23 @@ function renderHero(report) {
   // 用户会把跳动的时钟读成"数据是此刻的",而静态部分其实来自快照时刻(实测标称 11:35 实际 10:07)。
   const genAt = String(m.generatedAt || '');
   const genHM = (genAt.match(/(\d{2}:\d{2})/) || [])[1] || '';
+  const capDate = (genAt.match(/^(\d{4}-\d{2}-\d{2})/) || [])[1] || '';
+  // v11.73:采集日 ≠ 数据日(历史重采)时,绝不能把【采集时刻的 HH:MM】当成"数据时间"显示 ——
+  //   那会显示成「数据时间 03:25」,用户读到"凌晨 3 点"就认为报告是坏的(本次真实反馈)。
+  //   跨日一律改成「数据日期 MM-DD(采集于 MM-DD HH:MM)」;相对时长("约 N 分钟前")跨日无意义,一并省略。
+  const crossDay = !!(capDate && m.date && capDate !== m.date);
   let lagTxt = '';
-  if (genHM) {
+  if (genHM && !crossDay) {
     const nowMin = (() => { const d = new Date(Date.now() + 8 * 3600 * 1000); return d.getUTCHours() * 60 + d.getUTCMinutes(); })();
     const g = genHM.split(':');
     let lag = nowMin - (parseInt(g[0], 10) * 60 + parseInt(g[1], 10));
     if (lag < 0) lag += 24 * 60;                       // 跨零点兜底
     if (lag >= 1) lagTxt = '（约 ' + lag + ' 分钟前）';
   }
-  const dataTimeHtml = genHM ? (' · <b>数据时间 ' + genHM + '</b>' + lagTxt) : '';
+  const dataTimeHtml = !genHM ? ''
+    : crossDay
+      ? (' · <b>数据日期 ' + esc(String(m.date || '').slice(5)) + '</b>（采集于 ' + esc(capDate.slice(5)) + ' ' + esc(genHM) + '）')
+      : (' · <b>数据时间 ' + genHM + '</b>' + lagTxt);
   const nowHM = (() => { const d = new Date(Date.now() + 8 * 3600 * 1000); return d.toISOString().slice(11, 16); })();
   const timeHtml = m.type === 'midday'
     ? '<span class="hero-time">' + (esc(m.time || '')) + '</span><span class="hero-clock">现在 <b id="rt-hero-time">' + nowHM + '</b></span>'
