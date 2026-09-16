@@ -81,18 +81,25 @@ console.log('tracked files:', files.length);
 
 const needUpload = []; // {p, buf}
 const localSha = new Map();
+const skipKeepRemote = new Set(); // ATDS_SKIP_PATHS 命中且远程已有:跳过上传,tree 沿用远程内容
 for (const f of files) {
   const abs = path.join(ROOT, f);
   const buf = fs.readFileSync(abs);
   const sha = gitBlobSha(buf);
   localSha.set(f, sha);
   const rp = f.split(path.sep).join('/');
+  if ((process.env.ATDS_SKIP_PATHS || '').split(',').filter(Boolean).includes(rp) && remotePaths.has(rp)) {
+    skipKeepRemote.add(f);
+    continue;
+  }
   if (remotePaths.get(rp) !== sha) needUpload.push({ p: f, buf, rp });
 }
 console.log(`diff blobs to upload: ${needUpload.length}/${files.length}`);
 
 // 2. 并发上传差异 blob (dry-run 时跳过:用远程 sha 占位,只关心路径集合是否有丢失)
 const blobSha = new Map(localSha);
+for (const f of skipKeepRemote) blobSha.set(f, remotePaths.get(f.split(path.sep).join('/')));
+if (skipKeepRemote.size) console.log(`skip(沿用远程): ${[...skipKeepRemote].join(', ')}`);
 let done = 0;
 const CONC = Number(process.env.ATDS_CONC) || 5;
 if (DRYRUN) {
