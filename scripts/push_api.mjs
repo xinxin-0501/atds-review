@@ -82,6 +82,13 @@ console.log('tracked files:', files.length);
 const needUpload = []; // {p, buf}
 const localSha = new Map();
 const skipKeepRemote = new Set(); // ATDS_SKIP_PATHS 命中且远程已有:跳过上传,tree 沿用远程内容
+// v11.66【铁律护栏】data/*_cache.json 只由云端 Actions 维护,本地副本必然陈旧。
+//   背景(实测 2026-09-16):本机自动化调用本脚本全量推送时,把【本地陈旧缓存】覆盖到了云端 ——
+//   data/auction_cache.json 当天 09:30 云端刚采到 date=2026-09-16,被本地那份 date=2026-09-14 覆盖回去,
+//   此后所有报告读竞价快照时因 date 不匹配而丢弃 ⇒ 「竞价量比/竞价换手」静默变成 null(页面显示 --)。
+//   原先只靠调用方自觉(文档里写"绝不推 cache"),现改为【脚本内硬拦截】:命中 cache 且远程已有时,
+//   一律跳过上传、tree 沿用远程内容。
+const FORBID_CACHE = /^data\/.*_cache\.json$/;
 for (const f of files) {
   const abs = path.join(ROOT, f);
   const buf = fs.readFileSync(abs);
@@ -89,6 +96,10 @@ for (const f of files) {
   localSha.set(f, sha);
   const rp = f.split(path.sep).join('/');
   if ((process.env.ATDS_SKIP_PATHS || '').split(',').filter(Boolean).includes(rp) && remotePaths.has(rp)) {
+    skipKeepRemote.add(f);
+    continue;
+  }
+  if (FORBID_CACHE.test(rp) && remotePaths.has(rp)) {
     skipKeepRemote.add(f);
     continue;
   }
