@@ -279,11 +279,28 @@ jobs:
           git add -A
           git commit -m "ATDS daily A-share review $(TZ='Asia/Shanghai' date +%Y-%m-%d-%H%M)" || echo "No changes to commit"
           # v11.35: 外部 REST 推送(人工改代码)可能在本 run 构建期间推进远端,导致 push 被拒。
-          #         裸 push 会让整轮定时构建失败并丢掉本次数据提交 —— 加一次 rebase 重推兜底。
-          if ! git push; then
-            echo "push 被拒,尝试 fetch+rebase 后重推"
-            git pull --rebase --autostash origin main
-            git push
+          # v11.72 修:原实现用 `git pull --rebase --autostash` —— 实测**必然冲突**并让整轮失败。
+          #   原因:`site/*.html` 是本 run 全量重建的产物,而且 hero 里带"约 N 分钟前"这种**按构建时刻计算**的
+          #   相对时间 ⇒ 任何两次重建的同一文件都不可能逐字节相同 ⇒ rebase 把每一个 html 都判成 CONFLICT,
+          #   rebase 中断 → 提交步骤红 X → **本次采集的数据全部丢弃**(实测 2026-09-17 03:19 那一轮)。
+          #   改法:push 失败时用 `git merge -X ours`(冲突处保留**本 run 刚构建的产物**;非冲突的远端改动照常并入,
+          #   远程独有的新文件也不会丢),循环重试 3 次。绝不 force push。
+          PUSHED=0
+          for i in 1 2 3; do
+            if git push; then echo "push ok(第 $i 次尝试)"; PUSHED=1; break; fi
+            echo "push 被拒(第 $i 次),fetch + merge -X ours 后重试"
+            git fetch origin main
+            if ! git merge -X ours --no-edit origin/main; then
+              echo "merge 异常,回滚后重试"
+              git merge --abort || true
+              sleep 5
+              continue
+            fi
+            sleep 3
+          done
+          if [ "$PUSHED" != "1" ]; then
+            echo "!! 三次重试后仍未推送成功 —— 本次数据未落盘,请人工检查"
+            exit 1
           fi
 
       - name: Upload Pages artifact
