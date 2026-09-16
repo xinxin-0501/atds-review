@@ -41,6 +41,7 @@ function fmtHM(v) {
   const p = t.padStart(6, '0');
   return p.slice(0, 2) + ':' + p.slice(2, 4);
 }
+function f2v(v) { return (v == null || isNaN(Number(v))) ? '--' : Number(v).toFixed(2); }
 function fmtAmount(wan) {
   const v = Number(wan);
   if (isNaN(v) || !v) return '--';
@@ -1903,21 +1904,42 @@ function renderStrongStock(report) {
 
 // 每只个股的今日执行策略(图2 风格,仅盘前展示)
 function renderPerStockTodayStrategy(s) {
-  const t = s.todayStrategy;
-  if (!t) return '';
-  if (!t.core && !t.planA.content && !t.planB.content && !t.choice && !t.position && !t.alert) return '';
+  const t = s.todayStrategy || {};
+  const st = s.strategy || {};
+  // v11.69:策略参数(入场/止损/止盈)由程序按技术画像生成;⚠️ 使用人工覆盖时必须显式标注
+  let paramBlock = '';
+  if (st.entry != null && st.stop != null && st.target != null) {
+    const rrTxt = st.rr != null ? Number(st.rr).toFixed(2) : '--';
+    const srcNote = st.source === 'manual'
+      ? '<div class="ts-manual">⚠️ 当前使用自定义人工参数，非系统自动生成 —— 请自行确认其合理性</div>'
+      : (st.invalidReason
+        ? '<div class="ts-invalid-manual">⛔ 自定义参数未通过合理性校验（' + esc(st.invalidReason) + '），已自动回退为系统生成值</div>'
+        : '');
+    paramBlock = '<div class="ts-params">' +
+      '<span class="ts-param">入场 <b>' + f2v(st.entry) + '</b></span>' +
+      '<span class="ts-param">止损 <b>' + f2v(st.stop) + '</b>' + (st.stopPct != null ? ('<i>(可损 ' + st.stopPct + '%)</i>') : '') + '</span>' +
+      '<span class="ts-param">止盈 <b>' + f2v(st.target) + '</b></span>' +
+      '<span class="ts-param">盈亏比 <b>' + rrTxt + '</b></span>' +
+      '<span class="ts-src">' + (st.source === 'manual' ? '人工' : '系统自动') + '</span>' +
+    '</div>' + srcNote;
+  } else if (st.invalidReason) {
+    paramBlock = '<div class="ts-invalid-manual">⛔ 策略参数不可用（' + esc(st.invalidReason) + '）</div>';
+  }
+  const A = t.planA || {}, B = t.planB || {};
+  // ⚠️ 原实现直接读 t.planA.content —— todayStrategy 只有 core/position 时会抛 TypeError(可达崩溃点)
+  if (!t.core && !A.content && !B.content && !t.choice && !t.position && !t.alert && !paramBlock) return '';
   const core = t.core ? `<div class="ts-core"><span class="ts-core-tag">核心</span>${esc(t.core)}</div>` : '';
-  const planA = t.planA && (t.planA.title || t.planA.content) ? `<li><span class="ts-dot ts-dot-a"></span><b>方案A (${esc(t.planA.title || '求稳回踩')})</b>: ${esc(t.planA.content || '')}</li>` : '';
-  const planB = t.planB && (t.planB.title || t.planB.content) ? `<li><span class="ts-dot ts-dot-b"></span><b>方案B (${esc(t.planB.title || '突破确认')})</b>: ${esc(t.planB.content || '')}</li>` : '';
+  const planA = A.content ? `<li><span class="ts-dot ts-dot-a"></span><b>方案A (${esc(A.title || '求稳回踩')})</b>: ${esc(A.content)}</li>` : '';
+  const planB = B.content ? `<li><span class="ts-dot ts-dot-b"></span><b>方案B (${esc(B.title || '突破确认')})</b>: ${esc(B.content)}</li>` : '';
   const plans = (planA || planB) ? '<ul class="ts-plans">' + planA + planB + '</ul>' : '';
   const extrasList = (t.choice || t.position) ? '<ul class="ts-plans">' +
     (t.choice ? `<li><span class="ts-dot"></span><b>二选一建议</b>: ${esc(t.choice)}</li>` : '') +
     (t.position ? `<li><span class="ts-dot"></span><b>仓位控制</b>: ${esc(t.position)}</li>` : '') +
-  '</ul>' : '';
+    '</ul>' : '';
   const alert = t.alert ? `<div class="ts-alert"><b>关键提醒</b>: ${esc(t.alert)}</div>` : '';
   return '<div class="card ts-stock-card">' +
     '<div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div>' +
-    core + plans + extrasList + alert +
+    paramBlock + core + plans + extrasList + alert +
   '</div>';
 }
 

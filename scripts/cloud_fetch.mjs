@@ -1018,6 +1018,35 @@ function calcWatchPlan(tech, price) {
     supLabel: sup ? sup.label : 'MA20', preLabel: pre ? pre.label : 'MA5', atr: r2(atr)
   };
 }
+/* v11.69:策略参数合理性校验 —— 做多语境下的三条硬约束,任一不过即【拒绝使用】。
+   为什么必须有:config 里手写的 strategy 曾出现「止损价高于现价」「入场价是另一只票的价格」这类
+   **自相矛盾**的参数,却照样上屏。参数一旦矛盾,卡片上的执行纪律就是错的。
+   规则(馨馨 2026-09-17 定制):
+     ① 止损价 ≥ 现价 → 拒绝("止损位高于现价,做多时无意义")
+     ② 入场价偏离现价 > 20% → 拒绝("入场价偏离现价过远")
+     ③ 止损 ≥ 入场 / 止盈 ≤ 入场 → 拒绝(计划内部不自洽) */
+function validatePlanF(plan, price) {
+  const px = Number(price) || 0;
+  if (!plan) return { ok: false, reason: '无法生成计划(技术画像缺失)' };
+  const e = Number(plan.entry), st = Number(plan.stop), tg = Number(plan.target);
+  if (!(px > 0)) return { ok: false, reason: '现价无效' };
+  if (!(e > 0) || !(st > 0) || !(tg > 0)) return { ok: false, reason: '计划参数缺失或非正数' };
+  if (st >= px) return { ok: false, reason: '止损价 ' + st.toFixed(2) + ' 不低于现价 ' + px.toFixed(2) };
+  if (Math.abs(e - px) / px > 0.20) return { ok: false, reason: '入场价 ' + e.toFixed(2) + ' 偏离现价 ' + px.toFixed(2) + ' 超过 20%' };
+  if (st >= e) return { ok: false, reason: '止损价 ' + st.toFixed(2) + ' 不低于入场价 ' + e.toFixed(2) };
+  if (tg <= e) return { ok: false, reason: '止盈价 ' + tg.toFixed(2) + ' 不高于入场价 ' + e.toFixed(2) };
+  return { ok: true, reason: '' };
+}
+/* 由计划参数生成"今日执行策略"的两套方案文案 —— 程序生成,杜绝手写文本与真实价位脱节 */
+function buildStrategyTextF(plan, price) {
+  const px = Number(price) || 0;
+  const gap = (v) => (px > 0 ? ((v / px - 1) * 100).toFixed(1) + '%' : '--');
+  return {
+    planA: { title: '求稳回踩', content: '回踩 ' + plan.entry + ' 附近分批低吸（计划入场价，距现价 ' + gap(plan.entry) + '）' },
+    planB: { title: '突破确认', content: '放量突破 ' + plan.target + ' 视为趋势确认（计划止盈/压力位，距现价 +' + gap(plan.target) + '）' },
+    choice: '跌破 ' + plan.stop + ' 无条件止损（可损 ' + plan.stopPct + '%）；未回踩到 ' + plan.entry + ' 则空仓等待。'
+  };
+}
 function limitPctOf(code) {
   const c = String(code || '').replace(/^(sh|sz|bj)/i, '');
   if (/^(300|301|302)/.test(c)) return 20;   // 创业板
@@ -2013,7 +2042,45 @@ async function enrichWatchlistTech(list) {
       const kl = await fetchKline(pre + s.code, 90);
       const t = calcTechFromKline(kl);
       // v11.68:技术画像就绪后立刻把"交易计划"量化落盘(镜像客户端推导),供服务端回测按预测日回填
-      if (t) { s.tech = t; s.planNum = calcWatchPlan(t, Number(s.price) || t.price || 0); }
+      if (t) {
+        s.tech = t;
+        const _px = Number(s.price) || t.price || 0;
+        const _auto = calcWatchPlan(t, _px);
+        // v11.69:人工覆盖优先 —— 但必须先过校验;不合法则【拒绝】并回退自动值(绝不让矛盾参数上屏)
+        const _ov = (s.strategy && s.strategy.manual_override) || null;
+        let _plan = _auto, _src = 'auto', _bad = '';
+        if (_ov && (_ov.entry != null || _ov.stop != null || _ov.target != null)) {
+          const _merged = { entry: _ov.entry != null ? Number(_ov.entry) : (_auto ? _auto.entry : null),
+                            stop:  _ov.stop  != null ? Number(_ov.stop)  : (_auto ? _auto.stop  : null),
+                            target:_ov.target != null ? Number(_ov.target): (_auto ? _auto.target: null) };
+          const _v = validatePlanF(_merged, _px);
+          if (_v.ok) {
+            _plan = Object.assign({}, _auto || {}, _merged,
+              { rr: (_merged.target - _merged.entry) / (_merged.entry - _merged.stop),
+                stopPct: Math.round((_merged.entry - _merged.stop) / _merged.entry * 1000) / 10 });
+            _src = 'manual';
+          } else {
+            _bad = _v.reason;
+            console.error('[策略校验] ' + s.name + '(' + s.code + ') manual_override 被拒绝: ' + _v.reason + ' → 回退自动生成值');
+          }
+        }
+        if (_plan) {
+          const _p = validatePlanF(_plan, _px);
+          if (_p.ok) {
+            s.planNum = _plan;
+            s.strategy = Object.assign({}, s.strategy || {}, {
+              entry: _plan.entry, stop: _plan.stop, target: _plan.target,
+              rr: _plan.rr != null ? Math.round(_plan.rr * 100) / 100 : null,
+              stopPct: _plan.stopPct, source: _src, invalidReason: _bad || undefined
+            });
+            // 文案也由程序生成(手写文本曾出现"回踩位高于现价"这类矛盾)
+            s.todayStrategy = Object.assign({}, buildStrategyTextF(_plan, _px), s.todayStrategy || {});
+          } else {
+            s.planNum = null;
+            s.strategy = Object.assign({}, s.strategy || {}, { source: 'none', invalidReason: _p.reason });
+          }
+        }
+      }
     } catch (e) { /* 技术画像缺失时渲染层降级为通用建议 */ }
     try {
       const ff = await fetchStockFundFlow(s.code);
