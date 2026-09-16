@@ -3183,6 +3183,20 @@ function togglePlanBlock(h){
   var caret=block.querySelector('.dc-plan-caret');
   if(caret)caret.textContent=collapsed?'▸':'▾';
 }
+/* v11.72 回测表折叠(默认收起,点标题展开) —— 四处共用:
+   盘前「观察池回测追踪」「手动新增股回测」 + 收盘「历史Top5」「观察池回测追踪」。
+   摘要行常显(不丢汇总),只折叠 10 列明细表与口径说明。 */
+function toggleBtFold(h){
+  // ⚠️ 必须兼容两种结构:折叠头既可能是 .bt-fold 的【子孙】(推荐,closest 直接命中),
+  //   也可能是它的【兄弟】(早期写法)—— 只用 closest 会在兄弟结构下返回 null 并**静默不动作**(踩过)。
+  var block=h.closest('.bt-fold') || (h.parentElement && h.parentElement.querySelector('.bt-fold'));
+  if(!block)return;
+  var opened=block.classList.toggle('open');
+  var caret=block.querySelector('.bt-fold-caret');
+  if(caret)caret.textContent=opened?'▾':'▸';
+  var tip=block.querySelector('.bt-fold-tip');
+  if(tip)tip.style.display=opened?'none':'';
+}
 
 function setTradeStatus(btn,status){
   var code=btn.getAttribute('data-code');
@@ -3392,15 +3406,19 @@ async function renderWlManualBacktestF() {
   var h = v.filter(function (x) { return x.result === 'holding'; }).length;
   var ne = v.filter(function (x) { return x.result === 'noentry'; }).length;
   var entered = w + l + h;
-  host.innerHTML = '<div class="card-title" style="margin-top:10px">手动新增股回测 · 次日复核</div>' +
+  host.innerHTML = '<div class="bt-fold">' +
+    '<div class="card-title bt-fold-head" style="margin-top:10px" onclick="toggleBtFold(this)">手动新增股回测 · 次日复核<span class="bt-fold-tip">👆 点击展开明细</span><span class="bt-fold-caret">▸</span></div>' +
     '<div class="hint" style="margin-bottom:4px">已验证 <b>' + v.length + '</b> 条 · 触发入场 <b>' + entered + '</b> 条' +
     (v.length ? ('（' + Math.round(entered / v.length * 100) + '%）') : '') +
     ' · 止盈 <b>' + w + '</b> / 止损 <b>' + l + '</b>' + (h ? (' / 持有中 <b>' + h + '</b>') : '') + (ne ? (' · 未触入场价 ' + ne) : '') +
     '　<span class="tb-slot">样本存在本机浏览器，换机/清缓存即丢失</span></div>' +
+    '<div class="bt-fold-body">' +
     '<div class="tb-backtest-wrap"><table class="tb-backtest"><thead><tr>' +
     '<th>预测日期</th><th>标的</th><th>来源</th><th>当日收盘</th><th>计划入场</th><th>止损</th><th>止盈</th><th>盈亏比</th><th>次日实际</th><th>结果</th>' +
     '</tr></thead><tbody>' + body + '</tbody></table></div>' +
-    '<div class="hint">口径与服务端一致；<b>无未来函数</b>：每个历史交易日的计划是把K线截断到当日重算得到的（等于当天真实会看到的计划）。</div>';
+    '<div class="hint">口径与服务端一致；<b>无未来函数</b>：每个历史交易日的计划是把K线截断到当日重算得到的（等于当天真实会看到的计划）。</div>' +
+    '</div>' +
+    '</div>';
 }
 
 function klineFullF(code){
@@ -3836,6 +3854,7 @@ window.clearReviewData=clearReviewData;
 window.confirmClearReviewData=confirmClearReviewData;
 window.toggleShadowTrack=toggleShadowTrack;
 window.togglePlanBlock=togglePlanBlock;
+window.toggleBtFold=toggleBtFold;
 if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initReviewState,500);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initReviewState,500);});}
 /* 移动端:点击决策卡头部折叠/展开详情 */
 function bindMobileCollapse(){

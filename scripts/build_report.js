@@ -2479,14 +2479,21 @@ function renderWatchlistBacktest(report) {
   const summary = v.length
     ? ('已验证 <b>' + v.length + '</b> / ' + rows.length + ' 条 · 触发入场 <b>' + entered + '</b> 条（' + Math.round(entered / v.length * 100) + '%）· 止盈 <b>' + w + '</b> / 止损 <b>' + l + '</b>' + (h ? (' / 持有中 <b>' + h + '</b>') : '') + (ne ? (' · 未触入场价 ' + ne) : ''))
     : ('暂无已验证样本（' + rows.length + ' 条待下一交易日收盘后复核）');
+  // v11.72:表格默认收起(点标题展开)——409px 手机屏上这几张 10 列宽表占掉数屏,
+  //   汇总行(已验证/止盈/止损计数)常显,明细表与口径说明折叠。
+  //   ⚠️ 折叠头必须放在 .bt-fold 内层(closest 才能命中),不要写成兄弟节点。
   return '<div class="card">' +
-    '<div class="card-title">观察池回测追踪 · 次日复核</div>' +
+    '<div class="bt-fold">' +
+    '<div class="card-title bt-fold-head" onclick="toggleBtFold(this)">观察池回测追踪 · 次日复核<span class="bt-fold-tip">👆 点击展开明细</span><span class="bt-fold-caret">▸</span></div>' +
     '<div class="hint" style="margin-bottom:4px">' + summary + '</div>' +
+    '<div class="bt-fold-body">' +
     '<div class="tb-backtest-wrap"><table class="tb-backtest"><thead><tr>' +
     '<th>预测日期</th><th>标的</th><th>板块</th><th>当日收盘</th><th>计划入场</th><th>止损</th><th>止盈</th><th>盈亏比</th><th>次日实际</th><th>结果</th>' +
     '</tr></thead><tbody>' + body + '</tbody></table></div>' +
-    host +
     '<div class="hint">回测口径:取该股<b>当日收盘时的量化计划</b>（入场=强支撑位或现价、止损=入场−max(ATR,3%)、止盈=强压力位）,用<b>次一交易日</b>日K复核——次日最低触及入场价即视为入场,其后<b>最高先触止盈→止盈</b>、<b>最低先触止损→止损</b>,同日双触保守计止损;次日未触及入场价记「未触入场价」。仅复核次日一根K线,不做多日推演。仅作策略复盘,不构成投资建议。</div>' +
+    '</div>' +
+    '</div>' +
+    host +
   '</div>';
 }
 function renderTopBoardBacktest(report) {
@@ -2532,13 +2539,18 @@ function renderTopBoardBacktest(report) {
   const summary = vRows.length
     ? ('已验证 <b>' + vRows.length + '</b> / ' + rows.length + ' 条 · 次日盘中触及涨停 <b>' + vTouch + '</b> 条（<b>' + Math.round(vTouch / vRows.length * 100) + '%</b>）· 其中收盘守住 <b>' + vClose + '</b> 条')
     : ('暂无已验证样本（' + rows.length + ' 条待下一交易日收盘后复核）');
+  // v11.72:同观察池回测——默认收起,汇总常显(25 条 10 列表在手机上占数屏)
   return '<div class="card">' +
-    '<div class="card-title">回测追踪 · 历史 Top5 全量 ' + rows.length + ' 条</div>' +
+    '<div class="bt-fold">' +
+    '<div class="card-title bt-fold-head" onclick="toggleBtFold(this)">回测追踪 · 历史 Top5 全量 ' + rows.length + ' 条<span class="bt-fold-tip">👆 点击展开明细</span><span class="bt-fold-caret">▸</span></div>' +
     '<div class="hint" style="margin-bottom:4px">' + summary + '</div>' +
+    '<div class="bt-fold-body">' +
     '<div class="tb-backtest-wrap"><table class="tb-backtest"><thead><tr>' +
     '<th>预测日期</th><th>代码</th><th>名称</th><th>预测当日涨幅</th><th>命中</th><th>综合分</th><th>连板</th><th>所属板块</th><th>次日实际</th><th>回测状态</th>' +
     '</tr></thead><tbody>' + body + '</tbody></table></div>' +
     '<div class="hint">回测口径:历史日报告中综合评分 Top5 的摘要；用<b>预测日次一交易日</b>行情复核——<b>盘中最高价触及涨停记为「命中」（能否打上板）</b>，另单列<b>收盘是否守住涨停</b>（涨跌停幅度按板块区分：主板 10% / 创业板·科创板 20% / 北交所 30%）。仅作策略复盘，不构成投资建议。</div>' +
+    '</div>' +
+    '</div>' +
     '</div>';
 }
 
