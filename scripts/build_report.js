@@ -2415,6 +2415,7 @@ ${renderHero(report)}
 ${renderFollowerRiskBanner(report)}
 <div class="section">
   ${renderWatchlist(report)}
+  ${renderWatchlistBacktest(report)}
   ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report, { title: '盘前参与策略', subtitle: '盘前接力判断 · 板块联动确认 · 强势股池筛选' })}
   ${renderBoardTierBlock(report, { isPre: true, slot: 'premarket' })}
@@ -2545,6 +2546,54 @@ function renderTopBoardPicks(report) {
   '</div>';
 }
 
+/* v11.68:观察池回测追踪表 —— 复核每只观察池个股【当日量化计划】在【次一交易日】的表现。
+   与「打板五佳股回测」同一套思路,但对象是观察池(含手动新增股,后者由客户端补行)。 */
+function renderWatchlistBacktest(report) {
+  const rows = report.watchlistBacktest || [];
+  const host = '<div id="wl-backtest-host"></div>';
+  if (!rows.length) return '<div class="card"><div class="card-title">观察池回测追踪 · 次日复核</div>' + host + '<div class="hint">暂无历史样本。</div></div>';
+  const r2 = (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
+  const resCell = (r) => {
+    if (r.verify === 'nodata') return '<td class="verif">无K线</td>';
+    if (r.result === 'win') return '<td class="verif ok">✅ 止盈</td>';
+    if (r.result === 'loss') return '<td class="verif no">🛑 止损</td>';
+    if (r.result === 'holding') return '<td class="verif">持有中</td>';
+    if (r.result === 'noentry') return '<td class="verif">未触入场价</td>';
+    return '<td class="verif">待验证</td>';
+  };
+  const body = rows.map((r) => '<tr>' +
+    '<td>' + esc(r.predictDate || '--') + '<span class="tb-slot">' + esc(r.slot || '') + '</span></td>' +
+    '<td>' + esc(r.name || '--') + '<span class="tb-rank-mini">' + esc(r.code || '') + '</span></td>' +
+    '<td>' + esc(r.category || '--') + '</td>' +
+    '<td>' + (r.close != null ? f2(r.close) : '--') + '</td>' +
+    '<td>' + f2(r.entry) + '</td>' +
+    '<td>' + f2(r.stop) + '</td>' +
+    '<td>' + f2(r.target) + '</td>' +
+    '<td>' + (r.rr != null ? Number(r.rr).toFixed(2) : '--') + '</td>' +
+    '<td class="verif-now">' + (r.actual && r.actual.pct != null
+      ? ('<span class="' + (r.actual.pct >= 0 ? 'up' : 'down') + '">' + r2(r.actual.pct) + '</span><span class="tb-slot">' + esc(String(r.actual.date || '').slice(5)) + '</span>')
+      : '--') + '</td>' +
+    resCell(r) +
+    '</tr>').join('');
+  const v = rows.filter(x => x.verify === 'verified');
+  const w = v.filter(x => x.result === 'win').length;
+  const l = v.filter(x => x.result === 'loss').length;
+  const h = v.filter(x => x.result === 'holding').length;
+  const ne = v.filter(x => x.result === 'noentry').length;
+  const entered = w + l + h;
+  const summary = v.length
+    ? ('已验证 <b>' + v.length + '</b> / ' + rows.length + ' 条 · 触发入场 <b>' + entered + '</b> 条（' + Math.round(entered / v.length * 100) + '%）· 止盈 <b>' + w + '</b> / 止损 <b>' + l + '</b>' + (h ? (' / 持有中 <b>' + h + '</b>') : '') + (ne ? (' · 未触入场价 ' + ne) : ''))
+    : ('暂无已验证样本（' + rows.length + ' 条待下一交易日收盘后复核）');
+  return '<div class="card">' +
+    '<div class="card-title">观察池回测追踪 · 次日复核</div>' +
+    '<div class="hint" style="margin-bottom:4px">' + summary + '</div>' +
+    '<div class="tb-backtest-wrap"><table class="tb-backtest"><thead><tr>' +
+    '<th>预测日期</th><th>标的</th><th>板块</th><th>当日收盘</th><th>计划入场</th><th>止损</th><th>止盈</th><th>盈亏比</th><th>次日实际</th><th>结果</th>' +
+    '</tr></thead><tbody>' + body + '</tbody></table></div>' +
+    host +
+    '<div class="hint">回测口径:取该股<b>当日收盘时的量化计划</b>（入场=强支撑位或现价、止损=入场−max(ATR,3%)、止盈=强压力位）,用<b>次一交易日</b>日K复核——次日最低触及入场价即视为入场,其后<b>最高先触止盈→止盈</b>、<b>最低先触止损→止损</b>,同日双触保守计止损;次日未触及入场价记「未触入场价」。仅复核次日一根K线,不做多日推演。仅作策略复盘,不构成投资建议。</div>' +
+  '</div>';
+}
 function renderTopBoardBacktest(report) {
   const rows = report.topBoardBacktest || [];
   if (!rows.length) return '';
@@ -2625,6 +2674,7 @@ ${renderCloseEmotion(report)}
     ${/* v11.67:回测追踪表此前只定义未调用(死代码),现接到打板卡之后 */''}
     ${_carryOver ? renderTopBoardPicks(report) : ''}
     ${_carryOver ? renderTopBoardBacktest(report) : ''}
+    ${renderWatchlistBacktest(report)}
     ${renderRegimeGate(report)}
   ${_isMidR ? '' : renderMarketScan(report)}
   ${_isMidR ? '' : renderWaveDivergence(report)}

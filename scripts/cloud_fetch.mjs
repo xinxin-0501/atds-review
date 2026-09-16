@@ -987,6 +987,37 @@ function scanTopBoardPicks(ztList, klineMap, opt) {
 
 // 回测查取:取历史报告的 topBoardPicks 全 Top5 行,用于"回测追踪"表
 /* v11.67:各板块涨跌停幅度(用于判定"次日是否涨停") */
+/* v11.68:观察池"交易计划"量化 —— 镜像客户端 buildDecisionCardHtml 的推导(强支撑/强压力 + ATR),
+   把 entry/stop/target 算成【结构化数字】落盘,供服务端"回测追踪"按预测日回填。
+   为什么必须结构化:过去这些数字只活在客户端;config 里手写的 strategy.entryPrice/stopLoss/target 是
+   自由文本(实测存在与股价矛盾的值,如 65.4 元的股票写"突破 3.93"),无法参与任何自动复核。 */
+function calcWatchPlan(tech, price) {
+  const t = tech || {};
+  const px = Number(price) || 0;
+  if (!(px > 0)) return null;
+  const pickLvl = (arr, want) => {
+    const a = (Array.isArray(arr) ? arr : []).filter(x => x && x.price != null && x.price > 0);
+    // 与客户端 splitLvls() 一致:剔除偏离现价 >20% 的价位
+    const f = a.filter(x => Math.abs(x.price - px) / px <= 0.20);
+    return f.find(x => x.weight === want) || f[0] || null;
+  };
+  const sup = pickLvl(t.supports, 'strong');
+  const pre = pickLvl(t.pressures, 'strong');
+  const supPrice = sup ? sup.price : (t.ma20 || px * 0.96);
+  const prePrice = pre ? pre.price : (t.ma5 || px * 1.05);
+  const entry = supPrice < px ? supPrice : px;
+  const atr = t.atr14 || px * 0.03;
+  const stop = entry - Math.max(atr, entry * 0.03);
+  const target = prePrice > entry ? prePrice : entry * 1.06;
+  if (!(entry > stop) || !(target > entry)) return null;   // 与模拟跟踪同一套防御:计划必须自洽
+  const r2 = (x) => Math.round(x * 100) / 100;
+  return {
+    entry: r2(entry), stop: r2(stop), target: r2(target),
+    rr: Math.round((target - entry) / (entry - stop) * 100) / 100,
+    stopPct: Math.round((entry - stop) / entry * 1000) / 10,
+    supLabel: sup ? sup.label : 'MA20', preLabel: pre ? pre.label : 'MA5', atr: r2(atr)
+  };
+}
 function limitPctOf(code) {
   const c = String(code || '').replace(/^(sh|sz|bj)/i, '');
   if (/^(300|301|302)/.test(c)) return 20;   // 创业板
@@ -1079,6 +1110,102 @@ async function loadTopBoardBacktest(dataDir, currentDateTime, dayLimit, today, f
     console.log('回测回填: 已验证', verified, '/', rows.length, '条' + (noData ? ('（' + noData + ' 条无K线）') : ''));
     return rows;
   } catch (e) { console.error('回测装配失败:', e.message); return []; }
+}
+
+/* v11.68:观察池回测追踪 —— 与"打板五佳股"同一套思路,复核【观察池每只个股当日的量化计划】。
+   口径:预测日次一交易日的日K ——
+     · 次日最低 ≤ 计划入场价 → 视为触发入场;
+     · 触发后:最高 ≥ 止盈 → 止盈(win);最低 ≤ 止损 → 止损(loss);同日双触 → 保守计止损;
+       两者都没触 → 持有中(holding,只复核次日这一根,不做多日推演);
+     · 次日未触及入场价 → 未入场(noentry)。
+   取不到K线 → nodata;次日未到 → pending。**一律不编造**。
+   为什么需要它:模拟跟踪是"用户勾选 + 浏览器本地"的,不勾就没有样本;
+   而回测追踪是【服务端自动、对观察池里每一只(含手动新增)都跑】,这才构成闭环。 */
+async function loadWatchlistBacktest(dataDir, currentDateTime, dayLimit, today, fetchK) {
+  try {
+    if (!fs.existsSync(dataDir)) return [];
+    const files = fs.readdirSync(dataDir)
+      .filter(f => /^(\d{4}-\d{2}-\d{2})_(08-30|09-45|11-35|16-20)\.json$/.test(f))
+      .filter(f => f !== currentDateTime)
+      .sort().reverse();
+    const rows = [];
+    const cap = typeof dayLimit === 'number' ? dayLimit : 5;
+    for (const f of files) {
+      try {
+        const j = JSON.parse(fs.readFileSync(path.join(dataDir, f), 'utf8'));
+        const wl = Array.isArray(j.watchlist) ? j.watchlist : [];
+        if (!wl.length) continue;
+        const predictDate = f.slice(0, 10);
+        const sm = f.match(/_(\d{2}-\d{2})\.json$/);
+        const slot = sm ? (sm[1] === '08-30' || sm[1] === '09-45' ? '盘前' : (sm[1] === '11-35' ? '午盘' : '收盘')) : '收盘';
+        for (const w of wl) {
+          // v11.68:历史报告写于 planNum 上线之前 —— 用【该报告自己的 tech】现算即可
+          //   (tech 是当日 K 线产物,不引入未来函数),这样当天就能看到 5 个交易日的回测。
+          const p = w.planNum || calcWatchPlan(w.tech, Number(w.price) || 0);
+          if (!p || !p.entry || !p.stop || !p.target) continue;
+          rows.push({
+            predictDate: predictDate, slot: slot, code: w.code, name: w.name,
+            category: w.category || '--', tag: (Array.isArray(w.tags) && w.tags[0]) || '--',
+            close: Number(w.price) || 0, dayPct: w.pct != null ? w.pct : null,
+            entry: p.entry, stop: p.stop, target: p.target, rr: p.rr, stopPct: p.stopPct,
+            supLabel: p.supLabel, preLabel: p.preLabel,
+            actual: null, result: null
+          });
+        }
+        if (files.indexOf(f) >= cap - 1) break;
+        if (rows.length >= 150) break;
+      } catch (e) { /* 单文件损坏忽略 */ }
+    }
+    if (!rows.length) return rows;
+    // ---- 次日回填 ----
+    const uniq = [];
+    for (const r of rows) { if (r.code && uniq.indexOf(r.code) < 0) uniq.push(r.code); }
+    const klCache = {};
+    if (typeof fetchK === 'function') {
+      for (const c of uniq.slice(0, 60)) {
+        try { klCache[c] = await fetchK(c, 30); } catch (e) { klCache[c] = []; }
+      }
+    }
+    let win = 0, loss = 0, hold = 0, noent = 0, noData = 0;
+    for (const r of rows) {
+      const kl = klCache[r.code] || [];
+      if (!kl.length) { r.verify = 'nodata'; noData++; continue; }
+      let pred = null, next = null;
+      for (const b of kl) {
+        const d = String((b && b[0]) || '').slice(0, 10);
+        if (!d) continue;
+        if (d === r.predictDate) pred = b;
+        else if (d > r.predictDate && !next) next = b;
+      }
+      if (!pred || !next) { r.verify = 'pending'; continue; }
+      const pClose = parseFloat(pred[2]);
+      const nOpen = parseFloat(next[1]), nClose = parseFloat(next[2]);
+      const nHi = parseFloat(next[3]), nLo = parseFloat(next[4]);
+      if (!(pClose > 0) || !(nClose > 0) || !(nHi > 0) || !(nLo > 0)) { r.verify = 'nodata'; noData++; continue; }
+      // ⚠️ 入参已是百分数,只需保留 1 位小数(原先误写成 v*1000/10 ⇒ 7% 变 700%)
+      const r2 = (v) => Math.round(v * 10) / 10;
+      r.actual = {
+        date: String(next[0]).slice(0, 10),
+        openPct: r2((nOpen / pClose - 1) * 100),
+        pct: r2((nClose / pClose - 1) * 100),
+        highPct: r2((nHi / pClose - 1) * 100),
+        lowPct: r2((nLo / pClose - 1) * 100)
+      };
+      if (nLo <= r.entry) {
+        const hitT = nHi >= r.target, hitS = nLo <= r.stop;
+        if (hitT && hitS) { r.result = 'loss'; r.resultPrice = r.stop; loss++; }
+        else if (hitS) { r.result = 'loss'; r.resultPrice = r.stop; loss++; }
+        else if (hitT) { r.result = 'win'; r.resultPrice = r.target; win++; }
+        else { r.result = 'holding'; r.resultPrice = nClose; hold++; }
+      } else {
+        r.result = 'noentry'; noent++;
+      }
+      r.verify = 'verified';
+    }
+    console.log('观察池回测: 已验证', (win + loss + hold + noent), '/', rows.length,
+      '| 止盈', win, '止损', loss, '持有中', hold, '未入场', noent, (noData ? ('| 无K线 ' + noData) : ''));
+    return rows;
+  } catch (e) { console.error('观察池回测装配失败:', e.message); return []; }
 }
 
 /* ============ "明日看什么" 动态板块观察锚 (2026-09-12) ============ */
@@ -1885,7 +2012,8 @@ async function enrichWatchlistTech(list) {
       const pre = String(s.code).charAt(0) === '6' ? 'sh' : 'sz';
       const kl = await fetchKline(pre + s.code, 90);
       const t = calcTechFromKline(kl);
-      if (t) s.tech = t;
+      // v11.68:技术画像就绪后立刻把"交易计划"量化落盘(镜像客户端推导),供服务端回测按预测日回填
+      if (t) { s.tech = t; s.planNum = calcWatchPlan(t, Number(s.price) || t.price || 0); }
     } catch (e) { /* 技术画像缺失时渲染层降级为通用建议 */ }
     try {
       const ff = await fetchStockFundFlow(s.code);
@@ -3478,6 +3606,7 @@ async function main() {
   // 打板五佳股 Top5 + 历史回测查取(仅 midday/close)
   let topBoardPicks = null;
   let topBoardBacktest = [];
+  let watchlistBacktest = [];
   if (!isPre) {
     // 1) 五维评分 + 8 维基础雷达 + 板型/形态/题材/涨停原因 派生
     const t0 = Date.now();
@@ -3509,6 +3638,11 @@ async function main() {
     }
     const outFileName = `${date}_${time.replace(':', '-')}.json`;
     topBoardBacktest = await loadTopBoardBacktest(DATA_DIR, outFileName, 5, date, (c, n) => fetchKline(fullCode(c), n));
+    // v11.68:观察池回测(对所有类型都跑 —— 观察池在盘前页展示,但复盘价值对收盘页同样成立)
+    try {
+      watchlistBacktest = await loadWatchlistBacktest(DATA_DIR, outFileName, 5, date, (c, n) => fetchKline(fullCode(c), n));
+      report.watchlistBacktest = watchlistBacktest;
+    } catch (e) { console.error('观察池回测失败:', e.message); }
     report.topBoardPicks = topBoardPicks;
     report.topBoardBacktest = topBoardBacktest;
     console.log('回测追踪:', topBoardBacktest.length, '条');
