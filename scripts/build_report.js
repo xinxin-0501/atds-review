@@ -1140,6 +1140,15 @@ function _plan(s) {
   const rr = (target - entry) / (entry - stop);
   const rrNow = (price > stop) ? (target - price) / (price - stop) : 0;
   const stopPct = entry > 0 ? (entry - stop) / entry * 100 : 3;
+  // v11.69:人工覆盖 —— 只在云端已把 manual_override 校验通过并写入 source='manual' 时采用,
+  //        故此处不需要再放一份校验器(避免第 4 份镜像代码分叉)。
+  //        客户端(shared_client.applyManualOverrideF)另有一份同口径校验器,保证「填完立即生效」不等采集。
+  if (s.strategy && s.strategy.source === 'manual' && s.strategy.entry != null && s.strategy.stop != null && s.strategy.target != null) {
+    const _e = Number(s.strategy.entry), _st = Number(s.strategy.stop), _tg = Number(s.strategy.target);
+    if (_e > 0 && _st > 0 && _tg > 0 && _st < _e && _tg > _e) {
+      return { entry: _e, stop: _st, target: _tg, rr: (_tg - _e) / (_e - _st), rrNow: (price > _st) ? (_tg - price) / (price - _st) : 0, stopPct: (_e - _st) / _e * 100, sup, pre, atr, manual: true };
+    }
+  }
   return { entry, stop, target, rr, rrNow, stopPct, sup, pre, atr };
 }
 // v11.10 状态机(列表行徽章 + 卡片头部共用):非"可交易" → 盈亏比/置信度置灰,
