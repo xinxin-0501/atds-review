@@ -6,7 +6,7 @@ on:
     branches: [main]
   # 高频探测:工作日北京 08:00-16:59 每 10 分钟触发一次(UTC 0-8 时),窗口内且报告缺失才真正采集,大幅提高定时可靠性
   # v11.61:盘中槽位停用后,真正会采集的窗口只剩三个:
-  #   盘前 09:40~09:54 / 竞价 09:25~09:35 / 收盘 16:10~17:30。
+  #   盘前 09:36~10:00(09:30 为竞价快照) / 竞价 09:25~09:35 / 收盘 16:10~17:30。
   #   cron 仍保留 0-8 时(UTC)全覆盖 —— 收紧小时段收益有限,而**漏掉窗口的代价是整天没报告**
   #   (2026-09-15 已有惨痛先例:schedule 稀疏 + 窗口全错过)。宁可多几次空转,不可漏窗口。
   schedule:
@@ -65,7 +65,11 @@ jobs:
             HOUR=$(TZ='Asia/Shanghai' date +%H%M)
             HOUR=$((10#$HOUR))   # 去掉前导零,避免 bash 八进制解析错误
             if [ "$HOUR" -ge 925 ] && [ "$HOUR" -le 935 ]; then echo "type=auction" >> "$GITHUB_OUTPUT";
-            elif [ "$HOUR" -lt 955 ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
+            # v11.62b:盘前判定上界 0955 → 1000,与服务端 SLOT_WINDOWS.premarket=['08:30','10:00']
+            #   的有效边界对齐。理由:10 分钟节拍下若 GitHub 排队延迟数分钟(job 实际 09:55 才启动),
+            #   旧上界会让它被判成 close 而永久空转;放宽到 1000 可多出 5 分钟容忍度,
+            #   且仍落在"开盘后 30 分钟内=早盘格局已定"的设计区间里。
+            elif [ "$HOUR" -lt 1000 ]; then echo "type=premarket" >> "$GITHUB_OUTPUT";
             # v11.61:盘中槽位(midday/11-35)已停用 —— 盘中数据全部由收盘页承载。
             #   原逻辑 elif [ "$HOUR" -lt 1500 ] → midday,会在 09:55~14:59 每 10 分钟刷一次盘中快照;
             #   用户 2026-09-15 决策"盘中可以全部转移收盘"。此处改为:未到收盘窗口一律按 close 处理
@@ -89,7 +93,7 @@ jobs:
           TODAY=$(TZ='Asia/Shanghai' date +%Y-%m-%d)
           OK=0
           case "$TYPE" in
-            premarket) [ "$HOUR" -ge 940 ] && [ "$HOUR" -le 954 ] && OK=1 ;;
+            premarket) [ "$HOUR" -ge 936 ] && [ "$HOUR" -le 1000 ] && OK=1 ;;
             auction) [ "$HOUR" -ge 925 ] && [ "$HOUR" -le 935 ] && OK=1 ;;
             close) [ "$HOUR" -ge 1610 ] && [ "$HOUR" -le 1730 ] && OK=1 ;;
             midday)

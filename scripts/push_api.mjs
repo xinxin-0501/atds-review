@@ -28,7 +28,7 @@ const H = { Authorization: `token ${TOKEN}`, Accept: 'application/vnd.github+jso
 async function req(method, url, body, retries = 5) {
   for (let i = 0; i < retries; i++) {
     const ac = new AbortController();
-    const timer = setTimeout(() => ac.abort(), 60000);
+    const timer = setTimeout(() => ac.abort(), Number(process.env.ATDS_HTTP_TIMEOUT_MS) || 60000);
     try {
       const r = await fetch(url, { method, headers: H, body: body ? JSON.stringify(body) : undefined, signal: ac.signal });
       const t = await r.text();
@@ -94,7 +94,7 @@ console.log(`diff blobs to upload: ${needUpload.length}/${files.length}`);
 // 2. 并发上传差异 blob (dry-run 时跳过:用远程 sha 占位,只关心路径集合是否有丢失)
 const blobSha = new Map(localSha);
 let done = 0;
-const CONC = 5;
+const CONC = Number(process.env.ATDS_CONC) || 5;
 if (DRYRUN) {
   console.log(`dry-run:跳过上传 ${needUpload.length} 个 blob`);
   for (const { p, rp } of needUpload) blobSha.set(p, remotePaths.get(rp) || localSha.get(p));
