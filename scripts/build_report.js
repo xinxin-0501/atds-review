@@ -2615,7 +2615,9 @@ ${renderHeader(report, nav)}
 ${renderHero(report)}
 <div class="section">
 ${renderCloseEmotion(report)}
+    ${/* v11.67:回测追踪表此前只定义未调用(死代码),现接到打板卡之后 */''}
     ${_carryOver ? renderTopBoardPicks(report) : ''}
+    ${_carryOver ? renderTopBoardBacktest(report) : ''}
     ${renderRegimeGate(report)}
   ${_isMidR ? '' : renderMarketScan(report)}
   ${_isMidR ? '' : renderWaveDivergence(report)}
