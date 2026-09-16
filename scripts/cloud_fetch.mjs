@@ -611,10 +611,12 @@ async function fetchSectors() {
   //   现改为【分页取全量】: 服务端把 pz 封顶 100,必须翻页。实测 496 个板块,匹配率 27/27。
   //   字段: f3=涨跌幅(%) · f62=主力净流入(元) · f104/f105=上涨/下跌家数 · f20=总市值。
   const out = [], seen = new Set();
+  const T0 = Date.now(), BUDGET_MS = 20000;   // v11.66:总时间预算 —— 分页是顺序请求,必须设上限,否则个别主机超时会拖慢整个采集
   for (let pn = 1; pn <= 8; pn++) {
+    if (pn > 1 && Date.now() - T0 > BUDGET_MS) { console.warn('  板块分页超时预算,已取到', out.length, '个'); break; }
     const j = await emFetchJson('https://push2.eastmoney.com/api/qt/clist/get?pn=' + pn +
       '&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:2&fields=f12,f14,f3,f104,f105,f62,f20',
-      { 'User-Agent': 'Mozilla/5.0' }, 10000, 2);
+      { 'User-Agent': 'Mozilla/5.0' }, 6000, 1);
     const diff = (j && j.data && j.data.diff) || [];
     if (!diff.length) break;
     for (const x of diff) {
@@ -624,7 +626,7 @@ async function fetchSectors() {
     }
     if (diff.length < 100) break;
   }
-  if (out.length) console.log('  板块全量:', out.length, '个');
+  if (out.length) console.log('  板块全量:', out.length, '个 (' + (Date.now() - T0) + 'ms)');
   return out;
 }
 
