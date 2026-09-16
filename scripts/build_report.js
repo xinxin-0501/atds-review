@@ -2557,9 +2557,15 @@ function renderTopBoardBacktest(report) {
     return '<td class="verif-now"><span class="' + cls + '">' + (a.pct >= 0 ? '+' : '') + a.pct.toFixed(2) + '%</span>' +
       '<span class="tb-slot">' + esc(String(a.date || '').slice(5)) + '</span></td>';
   };
+  // v11.67c:命中口径=次日【盘中触及涨停】(打板关注"能不能打上板"),并单列是否收盘守住
+  const limOf = (a) => (a && a.lim) || 10;
+  const touchedLimit = (r) => { const a = r.actual; return !!(a && a.highPct != null && a.highPct >= limOf(a) - 0.3); };
+  const closedAtLimit = (r) => { const a = r.actual; return !!(a && a.pct != null && a.pct >= limOf(a) - 0.3); };
   const verdictCell = (r) => {
     if (r.verify === 'verified' && r.actual) {
-      return '<td class="verif ' + (r.actual.hit ? 'ok' : 'no') + '">' + (r.actual.hit ? '✅ 命中涨停' : '✘ 未涨停') + '</td>';
+      if (closedAtLimit(r)) return '<td class="verif ok">✅ 收盘涨停</td>';
+      if (touchedLimit(r)) return '<td class="verif ok">✅ 盘中涨停·未守住</td>';
+      return '<td class="verif no">✘ 未涨停</td>';
     }
     if (r.verify === 'nodata') return '<td class="verif">无K线</td>';
     return '<td class="verif">待验证</td>';
@@ -2577,9 +2583,10 @@ function renderTopBoardBacktest(report) {
     verdictCell(r) +
     '</tr>').join('');
   const vRows = rows.filter(r => r.verify === 'verified' && r.actual && r.actual.pct != null);
-  const vHit = vRows.filter(r => r.actual.hit).length;
+  const vTouch = vRows.filter(touchedLimit).length;
+  const vClose = vRows.filter(closedAtLimit).length;
   const summary = vRows.length
-    ? ('已验证 <b>' + vRows.length + '</b> / ' + rows.length + ' 条 · 次日涨停 <b>' + vHit + '</b> 条 · 命中率 <b>' + Math.round(vHit / vRows.length * 100) + '%</b>')
+    ? ('已验证 <b>' + vRows.length + '</b> / ' + rows.length + ' 条 · 次日盘中触及涨停 <b>' + vTouch + '</b> 条（<b>' + Math.round(vTouch / vRows.length * 100) + '%</b>）· 其中收盘守住 <b>' + vClose + '</b> 条')
     : ('暂无已验证样本（' + rows.length + ' 条待下一交易日收盘后复核）');
   return '<div class="card">' +
     '<div class="card-title">回测追踪 · 历史 Top5 全量 ' + rows.length + ' 条</div>' +
@@ -2587,7 +2594,7 @@ function renderTopBoardBacktest(report) {
     '<div class="tb-backtest-wrap"><table class="tb-backtest"><thead><tr>' +
     '<th>预测日期</th><th>代码</th><th>名称</th><th>预测当日涨幅</th><th>命中</th><th>综合分</th><th>连板</th><th>所属板块</th><th>次日实际</th><th>回测状态</th>' +
     '</tr></thead><tbody>' + body + '</tbody></table></div>' +
-    '<div class="hint">回测口径:历史日报告中综合评分 Top5 的摘要;用<b>预测日次一交易日的收盘</b>复核——<b>次日收盘涨停记为「命中」</b>（涨跌停幅度按板块区分：主板 10% / 创业板·科创板 20% / 北交所 30%）。仅作策略复盘，不构成投资建议。</div>' +
+    '<div class="hint">回测口径:历史日报告中综合评分 Top5 的摘要；用<b>预测日次一交易日</b>行情复核——<b>盘中最高价触及涨停记为「命中」（能否打上板）</b>，另单列<b>收盘是否守住涨停</b>（涨跌停幅度按板块区分：主板 10% / 创业板·科创板 20% / 北交所 30%）。仅作策略复盘，不构成投资建议。</div>' +
     '</div>';
 }
 
