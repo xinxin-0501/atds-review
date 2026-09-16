@@ -2552,6 +2552,8 @@ function renderWatchlistBacktest(report) {
   const rows = report.watchlistBacktest || [];
   const host = '<div id="wl-backtest-host"></div>';
   if (!rows.length) return '<div class="card"><div class="card-title">观察池回测追踪 · 次日复核</div>' + host + '<div class="hint">暂无历史样本。</div></div>';
+  // ⚠️ f2 是局部辅助函数,本函数作用域内没有 —— 自己定义(否则 build 时报 ReferenceError)
+  const f2v = (v) => (v == null || isNaN(Number(v))) ? '--' : Number(v).toFixed(2);
   const r2 = (v) => (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%';
   const resCell = (r) => {
     if (r.verify === 'nodata') return '<td class="verif">无K线</td>';
@@ -2565,10 +2567,10 @@ function renderWatchlistBacktest(report) {
     '<td>' + esc(r.predictDate || '--') + '<span class="tb-slot">' + esc(r.slot || '') + '</span></td>' +
     '<td>' + esc(r.name || '--') + '<span class="tb-rank-mini">' + esc(r.code || '') + '</span></td>' +
     '<td>' + esc(r.category || '--') + '</td>' +
-    '<td>' + (r.close != null ? f2(r.close) : '--') + '</td>' +
-    '<td>' + f2(r.entry) + '</td>' +
-    '<td>' + f2(r.stop) + '</td>' +
-    '<td>' + f2(r.target) + '</td>' +
+    '<td>' + f2v(r.close) + '</td>' +
+    '<td>' + f2v(r.entry) + '</td>' +
+    '<td>' + f2v(r.stop) + '</td>' +
+    '<td>' + f2v(r.target) + '</td>' +
     '<td>' + (r.rr != null ? Number(r.rr).toFixed(2) : '--') + '</td>' +
     '<td class="verif-now">' + (r.actual && r.actual.pct != null
       ? ('<span class="' + (r.actual.pct >= 0 ? 'up' : 'down') + '">' + r2(r.actual.pct) + '</span><span class="tb-slot">' + esc(String(r.actual.date || '').slice(5)) + '</span>')
