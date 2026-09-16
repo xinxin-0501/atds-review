@@ -517,6 +517,12 @@
 /* v11.70 第4个安全阀:盈亏比<1(赚小亏大) → 禁止建仓,红色高亮且一刀切(人工参数不可绕过) */
 .dc-rrban{font-size:12px;font-weight:900;color:#fff;background:linear-gradient(90deg,#dc2626,#b91c1c);border-left:4px solid #7f1d1d;border-radius:4px;padding:7px 9px;margin:0 0 6px;line-height:1.5;letter-spacing:0.2px;box-shadow:0 2px 6px rgba(220,38,38,0.35)}
 .dc-rrban b{color:#fff;font-weight:900;text-decoration:underline}
+/* v11.72 回测表折叠:默认收起(.bt-fold 不带 .open),点标题展开;汇总行常显,只折叠明细表与口径说明 */
+.bt-fold-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.bt-fold-caret{font-size:12px;color:#64748b;margin-left:auto;flex-shrink:0}
+.bt-fold-tip{font-size:10px;color:#94a3b8;font-weight:400}
+.bt-fold .bt-fold-body{display:none}
+.bt-fold.open .bt-fold-body{display:block}
 /* 事件风险标签(财报/业绩预告/解禁):等级控制底色,方向控制文字色 */
 .dc-events{display:flex;flex-wrap:wrap;gap:5px}
 .ev{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:600;background:#f5f5f7;color:#555;border:1px solid #eee;white-space:nowrap}
@@ -2124,7 +2130,7 @@
       <a href="index.html">首页</a><a href="2026-09-07_08-30.html" class="active">盘前</a><a href="2026-09-07_16-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:06</b>（约 390 分钟前）</div><h1 class="hero-title">2026-09-07 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:06），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">低温区 · °</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:06</b>（约 436 分钟前）</div><h1 class="hero-title">2026-09-07 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:06），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">低温区 · °</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-07 21:06:24</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -6426,6 +6432,20 @@ function togglePlanBlock(h){
   var caret=block.querySelector('.dc-plan-caret');
   if(caret)caret.textContent=collapsed?'▸':'▾';
 }
+/* v11.72 回测表折叠(默认收起,点标题展开) —— 四处共用:
+   盘前「观察池回测追踪」「手动新增股回测」 + 收盘「历史Top5」「观察池回测追踪」。
+   摘要行常显(不丢汇总),只折叠 10 列明细表与口径说明。 */
+function toggleBtFold(h){
+  // ⚠️ 必须兼容两种结构:折叠头既可能是 .bt-fold 的【子孙】(推荐,closest 直接命中),
+  //   也可能是它的【兄弟】(早期写法)—— 只用 closest 会在兄弟结构下返回 null 并**静默不动作**(踩过)。
+  var block=h.closest('.bt-fold') || (h.parentElement && h.parentElement.querySelector('.bt-fold'));
+  if(!block)return;
+  var opened=block.classList.toggle('open');
+  var caret=block.querySelector('.bt-fold-caret');
+  if(caret)caret.textContent=opened?'▾':'▸';
+  var tip=block.querySelector('.bt-fold-tip');
+  if(tip)tip.style.display=opened?'none':'';
+}
 
 function setTradeStatus(btn,status){
   var code=btn.getAttribute('data-code');
@@ -6635,15 +6655,19 @@ async function renderWlManualBacktestF() {
   var h = v.filter(function (x) { return x.result === 'holding'; }).length;
   var ne = v.filter(function (x) { return x.result === 'noentry'; }).length;
   var entered = w + l + h;
-  host.innerHTML = '<div class="card-title" style="margin-top:10px">手动新增股回测 · 次日复核</div>' +
+  host.innerHTML = '<div class="bt-fold">' +
+    '<div class="card-title bt-fold-head" style="margin-top:10px" onclick="toggleBtFold(this)">手动新增股回测 · 次日复核<span class="bt-fold-tip">👆 点击展开明细</span><span class="bt-fold-caret">▸</span></div>' +
     '<div class="hint" style="margin-bottom:4px">已验证 <b>' + v.length + '</b> 条 · 触发入场 <b>' + entered + '</b> 条' +
     (v.length ? ('（' + Math.round(entered / v.length * 100) + '%）') : '') +
     ' · 止盈 <b>' + w + '</b> / 止损 <b>' + l + '</b>' + (h ? (' / 持有中 <b>' + h + '</b>') : '') + (ne ? (' · 未触入场价 ' + ne) : '') +
     '　<span class="tb-slot">样本存在本机浏览器，换机/清缓存即丢失</span></div>' +
+    '<div class="bt-fold-body">' +
     '<div class="tb-backtest-wrap"><table class="tb-backtest"><thead><tr>' +
     '<th>预测日期</th><th>标的</th><th>来源</th><th>当日收盘</th><th>计划入场</th><th>止损</th><th>止盈</th><th>盈亏比</th><th>次日实际</th><th>结果</th>' +
     '</tr></thead><tbody>' + body + '</tbody></table></div>' +
-    '<div class="hint">口径与服务端一致；<b>无未来函数</b>：每个历史交易日的计划是把K线截断到当日重算得到的（等于当天真实会看到的计划）。</div>';
+    '<div class="hint">口径与服务端一致；<b>无未来函数</b>：每个历史交易日的计划是把K线截断到当日重算得到的（等于当天真实会看到的计划）。</div>' +
+    '</div>' +
+    '</div>';
 }
 
 function klineFullF(code){
@@ -7079,6 +7103,7 @@ window.clearReviewData=clearReviewData;
 window.confirmClearReviewData=confirmClearReviewData;
 window.toggleShadowTrack=toggleShadowTrack;
 window.togglePlanBlock=togglePlanBlock;
+window.toggleBtFold=toggleBtFold;
 if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initReviewState,500);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initReviewState,500);});}
 /* 移动端:点击决策卡头部折叠/展开详情 */
 function bindMobileCollapse(){
