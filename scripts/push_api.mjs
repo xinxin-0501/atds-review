@@ -89,8 +89,14 @@ const skipKeepRemote = new Set(); // ATDS_SKIP_PATHS 命中且远程已有:跳�
 //   原先只靠调用方自觉(文档里写"绝不推 cache"),现改为【脚本内硬拦截】:命中 cache 且远程已有时,
 //   一律跳过上传、tree 沿用远程内容。
 const FORBID_CACHE = /^data\/.*_cache\.json$/;
+const missingLocal = [];   // v11.71:本地已删除但 git 索引里仍跟踪的文件
 for (const f of files) {
   const abs = path.join(ROOT, f);
+  // v11.71【容缺】不能在缺失文件上崩:本脚本按 git 索引枚举(全量快照),而文件可能已被删除
+  //   (如 v11.70 清理死代码删掉 dragon_pool.css)→ 原实现直接 readFileSync 抛 ENOENT,
+  //   **整条本机自动化推送中断**,当天数据就上不去。缺文件应当"跳过+告警",而不是崩。
+  //   注意:跳过 = 保持远程原样(不删远程),这是安全方向;要真删请用 push_3files 的 DELETE_FILES。
+  if (!fs.existsSync(abs)) { missingLocal.push(f.split(path.sep).join('/')); continue; }
   const buf = fs.readFileSync(abs);
   const sha = gitBlobSha(buf);
   localSha.set(f, sha);
@@ -104,6 +110,9 @@ for (const f of files) {
     continue;
   }
   if (remotePaths.get(rp) !== sha) needUpload.push({ p: f, buf, rp });
+}
+if (missingLocal.length) {
+  console.warn(`⚠️ 本地缺失 ${missingLocal.length} 个索引内文件(已跳过,远程保持原样): ${missingLocal.slice(0, 8).join(', ')}${missingLocal.length > 8 ? ' …' : ''}`);
 }
 console.log(`diff blobs to upload: ${needUpload.length}/${files.length}`);
 

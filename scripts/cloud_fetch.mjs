@@ -55,9 +55,14 @@ function bjHM(d) {
 //   判定"是否同一交易时段"用 TAPE_SESSIONS,midday 槽位只在其所属时段内允许补采。
 const SLOT_WINDOWS = { premarket: ['08:30', '10:00'], midday: ['09:25', '14:59'], auction: ['09:20', '09:35'] };
 // 各槽位允许"迟到补采"的最晚时刻:超过这个点,数据语义已经变了,必须拒绝(A)。
-//   premarket: 盘前数据到 10:00 为止(开盘后 30 分钟,早盘格局已定);
+//   premarket: 理想窗口 08:30~10:00(开盘后 30 分钟),但**有效边界放到 10:15**:
+//     实测第三方 cron(cron-job.org)当前是【30 分钟】节拍(仅 :00/:30),盘前窗口内只剩 10:00 这一跳,
+//     而 dispatch→job 启动实测要 38 秒,加上 checkout/setup-node 约 15 秒,cloud_fetch 可能在 10:01 才启动
+//     ⇒ 若边界卡在 10:00,当天盘前会【整份缺失】(容差只剩几秒,等于赌运气)。
+//     放到 10:15 后:10:00 那一跳稳过,且因仍在理想窗口之外会被标记 lateCapture=true,
+//     页面照实显示"补采/数据时间",**不伪装成 09:45 原始采集** —— 宁可标注迟到,不可丢掉整份报告。
 //   midday   : 盘中数据到 14:59 为止(14:59 之后是尾盘集合竞价前的最后时刻,仍算盘中)。
-const LATE_LIMIT = { premarket: '10:00', midday: '14:59', auction: '09:35' };
+const LATE_LIMIT = { premarket: '10:15', midday: '14:59', auction: '09:35' };
 function slotGuardF(type, targetDate, todayBj, nowHM, slotExists) {
   const w = SLOT_WINDOWS[type];
   if (!w) return { ok: true, warn: '', late: false };        // close / 未知类型:不设守卫
@@ -2197,7 +2202,6 @@ async function fetchNewHighCount(dateArg) {
 
 
 // ===== 全市场形态扫描(启动/老鸭头/拉升) =====
-async 
 const FALLBACK_SYMBOLS = [
   "sh600000","sh600004","sh600006","sh600007","sh600008","sh600009","sh600010","sh600011","sh600012","sh600015","sh600016","sh600017","sh600018","sh600019","sh600020","sh600021","sh600022","sh600023","sh600025","sh600026","sh600027","sh600028","sh600029","sh600030","sh600031","sh600032","sh600033","sh600035","sh600036","sh600037","sh600038","sh600039","sh600048","sh600050","sh600051","sh600052","sh600054","sh600055","sh600056","sh600057",
   "sh600058","sh600059","sh600060","sh600061","sh600062","sh600063","sh600064","sh600066","sh600067","sh600071","sh600072","sh600073","sh600075","sh600076","sh600078","sh600081","sh600085","sh600088","sh600089","sh600094","sh600095","sh600096","sh600097","sh600098","sh600099","sh600100","sh600101","sh600103","sh600104","sh600105","sh600106","sh600108","sh600109","sh600110","sh600111","sh600113","sh600114","sh600115","sh600116","sh600117",
@@ -3238,6 +3242,21 @@ async function runAuctionSnapshot() {
 }
 
 async function main() {
+  // v11.71【自检模式】`node scripts/cloud_fetch.mjs --selfcheck` —— 只验"模块能加载 + 配置合法",
+  //   不联网、不落盘、不判槽位。
+  //   为什么必须有:静默的顶层引用错误会让整条采集链直接挂掉,而 `node --check` 抓不到
+  //   (实测 v11.70 删死代码时留下孤儿 `async`,Node 认为孤立 `async` 是合法标识符 ⇒ --check 通过,
+  //    但运行时 `ReferenceError: async is not defined`,CI 的 "Fetch market data" 直接红 X,
+  //    **当天所有报告零产出**)。回归里跑一次 --selfcheck 就能在推送前拦住这一类。
+  if (process.argv.includes('--selfcheck')) {
+    const _wl = Array.isArray(config.watchlist) ? config.watchlist : [];
+    if (!Array.isArray(config.indices) || !config.indices.length) throw new Error('[selfcheck] config.indices 缺失');
+    if (!_wl.length) throw new Error('[selfcheck] config.watchlist 为空');
+    const _bad = _wl.filter(s => !s || !/^\d{6}$/.test(String(s.code || '')));
+    if (_bad.length) throw new Error('[selfcheck] watchlist 存在非法代码: ' + JSON.stringify(_bad.map(s => s && s.code)));
+    console.log('[selfcheck] OK · indices=' + config.indices.length + ' watchlist=' + _wl.length + ' node=' + process.version + ' tz=' + process.env.TZ);
+    return;
+  }
   const now = shanghaiNow();
   // v11.54:时刻守卫(必须在任何落盘之前;auction 分支也要经过它)
   let LATE_CAPTURE = false;   // v11.60(B):迟到补采标记,写进 meta.lateCapture
