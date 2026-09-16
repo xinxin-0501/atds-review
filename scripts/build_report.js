@@ -2548,6 +2548,22 @@ function renderTopBoardPicks(report) {
 function renderTopBoardBacktest(report) {
   const rows = report.topBoardBacktest || [];
   if (!rows.length) return '';
+  // v11.67:回填真实结果 —— 采集端用【预测日次一交易日】的收盘复核(打板口径:次日收盘涨停=命中)。
+  //   未回填(无K线/次日未到)的仍显示「待验证」,不编造。
+  const actCell = (r) => {
+    const a = r.actual;
+    if (!a || a.pct == null) return '<td class="verif-now">--</td>';
+    const cls = a.pct >= 0 ? 'up' : 'down';
+    return '<td class="verif-now"><span class="' + cls + '">' + (a.pct >= 0 ? '+' : '') + a.pct.toFixed(2) + '%</span>' +
+      '<span class="tb-slot">' + esc(String(a.date || '').slice(5)) + '</span></td>';
+  };
+  const verdictCell = (r) => {
+    if (r.verify === 'verified' && r.actual) {
+      return '<td class="verif ' + (r.actual.hit ? 'ok' : 'no') + '">' + (r.actual.hit ? '✅ 命中涨停' : '✘ 未涨停') + '</td>';
+    }
+    if (r.verify === 'nodata') return '<td class="verif">无K线</td>';
+    return '<td class="verif">待验证</td>';
+  };
   const body = rows.map((r) => '<tr>' +
     '<td>' + esc(r.predictDate || '--') + '<span class="tb-slot">' + esc(r.slot || '') + '</span></td>' +
     '<td>' + esc(r.code || '--') + '</td>' +
@@ -2557,14 +2573,21 @@ function renderTopBoardBacktest(report) {
     '<td>' + (r.totalScore != null ? r.totalScore : '--') + '</td>' +
     '<td>' + (r.lianban || 1) + ' 板</td>' +
     '<td>' + esc(r.sector || '--') + '</td>' +
-    '<td class="verif">待验证</td>' +
+    actCell(r) +
+    verdictCell(r) +
     '</tr>').join('');
+  const vRows = rows.filter(r => r.verify === 'verified' && r.actual && r.actual.pct != null);
+  const vHit = vRows.filter(r => r.actual.hit).length;
+  const summary = vRows.length
+    ? ('已验证 <b>' + vRows.length + '</b> / ' + rows.length + ' 条 · 次日涨停 <b>' + vHit + '</b> 条 · 命中率 <b>' + Math.round(vHit / vRows.length * 100) + '%</b>')
+    : ('暂无已验证样本（' + rows.length + ' 条待下一交易日收盘后复核）');
   return '<div class="card">' +
     '<div class="card-title">回测追踪 · 历史 Top5 全量 ' + rows.length + ' 条</div>' +
+    '<div class="hint" style="margin-bottom:4px">' + summary + '</div>' +
     '<div class="tb-backtest-wrap"><table class="tb-backtest"><thead><tr>' +
-    '<th>预测日期</th><th>代码</th><th>名称</th><th>预测当日涨幅</th><th>命中</th><th>综合分</th><th>连板</th><th>所属板块</th><th>回测状态</th>' +
+    '<th>预测日期</th><th>代码</th><th>名称</th><th>预测当日涨幅</th><th>命中</th><th>综合分</th><th>连板</th><th>所属板块</th><th>次日实际</th><th>回测状态</th>' +
     '</tr></thead><tbody>' + body + '</tbody></table></div>' +
-    '<div class="hint">回测状态:历史日报告中 AI 综合评分的 Top5 摘要;下一交易日收盘后再用行情数据复核"当时推荐 vs 实际表现"。</div>' +
+    '<div class="hint">回测口径:历史日报告中综合评分 Top5 的摘要;用<b>预测日次一交易日的收盘</b>复核——<b>次日收盘涨停记为「命中」</b>（涨跌停幅度按板块区分：主板 10% / 创业板·科创板 20% / 北交所 30%）。仅作策略复盘，不构成投资建议。</div>' +
     '</div>';
 }
 

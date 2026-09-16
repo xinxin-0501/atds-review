@@ -986,7 +986,20 @@ function scanTopBoardPicks(ztList, klineMap, opt) {
 }
 
 // 回测查取:取历史报告的 topBoardPicks 全 Top5 行,用于"回测追踪"表
-function loadTopBoardBacktest(dataDir, currentDateTime, dayLimit) {
+/* v11.67:各板块涨跌停幅度(用于判定"次日是否涨停") */
+function limitPctOf(code) {
+  const c = String(code || '').replace(/^(sh|sz|bj)/i, '');
+  if (/^(300|301|302)/.test(c)) return 20;   // 创业板
+  if (/^688/.test(c)) return 20;             // 科创板
+  if (/^(4|8|92)/.test(c)) return 30;        // 北交所
+  return 10;                                 // 主板
+}
+/* v11.67:回测追踪改为 async —— 读历史报告装配"预测清单"后,用【预测日次一交易日】的真实行情回填结果。
+   为什么必须回填:原实现 actual 恒为 null,渲染层把「回测状态」硬编码成"待验证",
+   于是 09-11/09-14 的预测早该复核却永远显示"待验证" —— 声明了回测却没实现。
+   判据(与"打板五佳股"的策略口径一致):【次日收盘是否涨停】= 命中。
+   K线用一个 by-code 缓存避免同一只股票在多天重复请求;取不到则保持 null(=待验证),绝不编造。 */
+async function loadTopBoardBacktest(dataDir, currentDateTime, dayLimit, today, fetchK) {
   try {
     if (!fs.existsSync(dataDir)) return [];
     const files = fs.readdirSync(dataDir)
@@ -1025,8 +1038,47 @@ function loadTopBoardBacktest(dataDir, currentDateTime, dayLimit) {
         if (files.indexOf(f) >= cap - 1) break;     // 限制天数
       } catch (e) { /* 单文件损坏忽略 */ }
     }
+    // ---- v11.67 回填实际表现 ----
+    if (!rows.length) return rows;
+    const uniq = [];
+    for (const r of rows) { if (r.code && uniq.indexOf(r.code) < 0) uniq.push(r.code); }
+    const klCache = {};
+    if (typeof fetchK === 'function') {
+      for (const c of uniq.slice(0, 40)) {
+        try { klCache[c] = await fetchK(c, 30); } catch (e) { klCache[c] = []; }
+      }
+    }
+    let verified = 0, noData = 0;
+    for (const r of rows) {
+      const kl = klCache[r.code] || [];
+      if (!kl.length) { r.actual = null; r.verify = 'nodata'; noData++; continue; }
+      let pred = null, next = null;
+      for (const k of kl) {
+        const d = String((k && k[0]) || '').slice(0, 10);
+        if (!d) continue;
+        if (d === r.predictDate) pred = k;
+        else if (d > r.predictDate && !next) next = k;   // K线按日期升序 ⇒ 首个更晚的就是次一交易日
+      }
+      if (!pred || !next) { r.actual = null; r.verify = 'pending'; continue; }
+      const pClose = parseFloat(pred[2]);
+      const nOpen = parseFloat(next[1]), nClose = parseFloat(next[2]), nHigh = parseFloat(next[3]);
+      if (!(pClose > 0) || !(nClose > 0)) { r.actual = null; r.verify = 'nodata'; noData++; continue; }
+      const lim = limitPctOf(r.code);
+      const pct = Math.round((nClose / pClose - 1) * 10000) / 100;
+      r.actual = {
+        date: String(next[0]).slice(0, 10),
+        pct: pct,
+        openPct: Number.isFinite(nOpen) ? Math.round((nOpen / pClose - 1) * 10000) / 100 : null,
+        highPct: Number.isFinite(nHigh) ? Math.round((nHigh / pClose - 1) * 10000) / 100 : null,
+        hit: pct >= lim - 0.3,
+        lim: lim
+      };
+      r.verify = 'verified';
+      verified++;
+    }
+    console.log('回测回填: 已验证', verified, '/', rows.length, '条' + (noData ? ('（' + noData + ' 条无K线）') : ''));
     return rows;
-  } catch (e) { return []; }
+  } catch (e) { console.error('回测装配失败:', e.message); return []; }
 }
 
 /* ============ "明日看什么" 动态板块观察锚 (2026-09-12) ============ */
@@ -3456,7 +3508,7 @@ async function main() {
       topBoardPicks = { picks: [], totalCandidates: 0, latestLianBan: 0 };
     }
     const outFileName = `${date}_${time.replace(':', '-')}.json`;
-    topBoardBacktest = loadTopBoardBacktest(DATA_DIR, outFileName, 5);
+    topBoardBacktest = await loadTopBoardBacktest(DATA_DIR, outFileName, 5, date, (c, n) => fetchKline(fullCode(c), n));
     report.topBoardPicks = topBoardPicks;
     report.topBoardBacktest = topBoardBacktest;
     console.log('回测追踪:', topBoardBacktest.length, '条');
