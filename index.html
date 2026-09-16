@@ -757,6 +757,9 @@
    内容是别的时段的盘面,用户若据此判断盘中信号会被误导,故用红底强告警并加粗关键信息。 */
 .hero-warn-late{color:#b3261e;background:#fdecea;border-color:#f5b5ae;font-weight:500}
 .hero-warn-late b{font-weight:800}
+/* v11.73 历史重采(采集日≠数据日):中性说明(蓝),不要用红色告警 —— 收盘数据重采后内容不变,不是坏快照 */
+.hero-warn-replay{color:#1e40af;background:#eff6ff;border-color:#bfdbfe}
+.hero-warn-replay b{font-weight:800}
 .hero-tags{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
 .hero-temp-tag{font-size:10px;padding:3px 8px;border-radius:10px;background:#fff0f0;color:#c33;border:1px solid #fcc;font-weight:600}
 
