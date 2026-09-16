@@ -209,20 +209,6 @@ function renderLimitUp(report) {
   </div>`;
 }
 
-function renderLimitDown(report) {
-  const list = report.limitDown || [];
-  if (!list.length) return '';
-  const rows = list.map((s, i) => {
-    return `<div class="stock-row">
-      <div class="stock-info"><div class="stock-name">${i + 1}. ${esc(s.name)}</div><div class="stock-code">${esc(s.code)}</div></div>
-      <div class="stock-price"><div class="price down">${fmtNum(s.price)}</div><div class="pct down">${fmtPct(s.pct)}</div></div>
-    </div>`;
-  }).join('');
-  return `<div class="card">
-    <div class="card-title">跌停梯队 · ${list.length} 只</div>
-    ${rows}
-  </div>`;
-}
 
 function renderSectors(report) {
   const list = report.hotSectors || [];
@@ -992,71 +978,6 @@ function deriveStockAtds(pct, turnover) {
   return 70 + Math.min(25, Math.max(-15, Math.round(v * 2 + t * 0.5)));
 }
 
-function deriveRiskLevel(pct) {
-  const v = Number(pct) || 0;
-  if (v >= 5 || v <= -5) return { name: '高风险', tone: 'high' };
-  if (v >= 2 || v <= -2) return { name: '中风险', tone: 'mid' };
-  return { name: '低风险', tone: 'low' };
-}
-function deriveTimeHorizon(pct, turnover) {
-  const v = Number(pct) || 0;
-  const t = Number(turnover) || 0;
-  if (v >= 3 && t >= 2) return { name: '短线', tone: 'short' };
-  if (v >= -1 && v <= 3 && t >= 0.5) return { name: '波段', tone: 'wave' };
-  return { name: '长线', tone: 'long' };
-}
-function deriveAdvice(pct, atds, risk) {
-  const v = Number(pct) || 0;
-  const a = Number(atds) || 0;
-  if (v <= -5) return { name: '减仓规避', tone: 'cut' };
-  if (a >= 85 && risk !== 'high') return { name: '重点关注', tone: 'focus' };
-  if (a >= 70) return { name: '持有观察', tone: 'hold' };
-  if (a < 60 && v <= -1) return { name: '观望', tone: 'wait' };
-  return { name: '持有观察', tone: 'hold' };
-}
-function deriveRiskText(pct, turnover) {
-  const v = Number(pct) || 0;
-  const t = Number(turnover) || 0;
-  const lines = [];
-  if (v >= 5) lines.push('涨幅>5%,RSI 超买区');
-  else if (v >= 2) lines.push('涨幅 2-5%,技术偏强');
-  else if (v >= -1) lines.push('震荡整理,方向未明');
-  else if (v >= -3) lines.push('回调 2-3%,观察支撑');
-  else lines.push('跌幅>3%,风险增大');
-  if (t >= 5) lines.push('放量活跃');
-  else if (t >= 2) lines.push('量能温和');
-  else if (t >= 0.5) lines.push('量能一般');
-  else lines.push('量能偏低');
-  return lines;
-}
-function deriveHorizonLines(pct, turnover) {
-  const v = Number(pct) || 0;
-  const t = Number(turnover) || 0;
-  const short = v >= 3 && t >= 2 ? '回踩 MA5 不破可继续,跌破减仓'
-    : v >= 1 ? '区间震荡,顺势做 T,关注 MA10'
-    : v <= -3 ? '下跌趋势,反弹至 MA5 减仓'
-    : '区间震荡,关注 MA10 方向选择';
-  const wave = v >= 2 ? '沿 MA20 运行,跌破 MA60 警惕走弱'
-    : v <= -2 ? '跌至 MA20 下方,关注 MA60 是否守住'
-    : '区间震荡,等待 MA20 方向选择';
-  const long = v >= 0 ? '站上 MA120 偏多,关注 MA250 突破'
-    : '跌破 MA120,长线宜减仓观望';
-  return [{ k: '短线', v: short }, { k: '波段', v: wave }, { k: '长线', v: long }];
-}
-function deriveAdviceText(pct, atds, riskTone, tech) {
-  const v = Number(pct) || 0;
-  const a = Number(atds) || 0;
-  if (v <= -5) return '跌幅较大,建议减仓规避';
-  if (tech) {
-    const tw = wlTechAdviceText(pct, tech);
-    if (tw) return tw;
-  }
-  if (a >= 85 && riskTone !== 'high') return 'ATDS 证据强,重点关注';
-  if (a >= 75 && v >= 0) return '持有观察,等待放量催化';
-  if (a < 60 && v <= -1) return '技术偏弱,观望等待企稳';
-  if (v >= 5) return '高位震荡,逢高减仓为主';
-  return '持有观察,关注量能配合';
-}
 // 观察池"建议"五类情形文案(2026-09-07):基于 MA/量比/KDJ/趋势 技术画像,输出可执行的跟踪结论
 // ①满足条件可跟踪 ②等回踩MA10企稳后买入 ③放量突破MA20确认后纳入 ④信号不充分先观望 ⑤强势可关注回踩买入
 function wlTechAdviceText(pct, tech) {
@@ -1167,17 +1088,21 @@ function _effStatus(s, p, ff, t, confTotal, confTone) {
   const isHardTrade = (emotionCycle === '冰点' && t.trend === 'down' && (ff.d1 || 0) < 0);
   const upperShadow = (s.high > 0 && price > 0 && s.open > 0 && ((s.high - price) / price * 100 > 3) && price < s.open);
   const rrNowBad = p.rrNow < 1.5;
+  const rrBan = Number(p.rr) < 1;   // v11.70:第4个安全阀(赚小亏大 → 禁止建仓)
   const riskDowngrade = (ff.d1 || 0) < 0; // 做T盈亏比恒=1<1.5 → tRRBad 恒真
   let label, tone;
-  if (isHardTrade) { label = '不建议参与'; tone = 'down'; }
+  // v11.70【第4个安全阀】盈亏比 < 1(赚小亏大) → 强制"高风险观察·不建仓"。
+  //   优先级最高(放在最前),且**一刀切**:无论参数来自程序自动还是人工 manual_override,
+  //   只要最终算出的 rr<1 就禁止建仓 —— 人工参数不允许绕过。
+  if (rrBan) { label = '高风险观察·不建仓'; tone = 'down'; }
+  else if (isHardTrade) { label = '不建议参与'; tone = 'down'; }
   else if (upperShadow) { label = '高风险观察'; tone = 'down'; }
   else if (riskDowngrade) { label = '高风险观察'; tone = 'down'; }
   else if (rrNowBad || abUnTriggered) { label = '等待触发'; tone = 'down'; }
   else { label = confTotal >= 75 ? '可交易' : confTotal >= 60 ? '轻仓试错' : '观察'; tone = confTone; }
-  return { label, tone, actionable: label === '可交易', isHardTrade, upperShadow, abUnTriggered, trigA, trigB, rrNowBad };
+  return { label, tone, actionable: label === '可交易', isHardTrade, upperShadow, abUnTriggered, trigA, trigB, rrNowBad, rrBan };
 }
 function _rrTone(rr) { return rr >= 2 ? 'good' : rr >= 1.5 ? 'ok' : rr >= 1 ? 'warn' : 'bad'; }
-function _rrToneLabel(rr) { return rr >= 2 ? '合格(≥2)' : rr >= 1.5 ? '合格(≥1.5)' : rr >= 1 ? '偏低(1-1.5)' : '不合格(<1)'; }
 function _confidence(s, p) {
   const t = s.tech || {};
   const trendScore = t.trend === 'up' ? 30 : t.trend === 'repair' ? 20 : t.trend === 'flat' ? 12 : 5;
@@ -1262,8 +1187,6 @@ function _minWrap(m) {
   if (_minApprox(m)) return `<span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">${txt}<i class="min-approx-ico">ⓘ</i></span>`;
   return `<span>${txt}</span>`;
 }
-// 资金属性(龙虎榜席位归类;无龙虎榜则空,渲染层隐藏)
-function _fundAttr(s) { return (s.lhb && s.lhb.fundAttr) || ''; }
 // 容错率(板块地位派生:龙头高/中军次之/跟风低)
 function _tolerance(s) {
   const b = _boardStatus(s);
@@ -1348,7 +1271,7 @@ function buildStockRow(s, i, report) {
     <span class="wl-cell wl-cell-pct ${cls}">${fmtPct(s.pct)}</span>
     <span class="wl-cell wl-cell-amt">${esc(s.amount || '--')}</span>
     <span class="wl-cell wl-cell-atds"><span class="conf conf-${_eff.actionable ? confTone : 'down'}">${conf.total}</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-${_eff.actionable ? rrTone : 'muted'}">${_eff.actionable ? rrTxt : p.rr.toFixed(2)}</span></span>
+    <span class="wl-cell wl-cell-sig"><span class="rr rr-${_eff.actionable ? rrTone : 'muted'}"${_eff.rrBan ? ' title="盈亏比<1（赚小亏大），策略赔率不佳，禁止开仓"' : ''}>${_eff.rrBan ? '⛔ ' : ''}${_eff.actionable ? rrTxt : p.rr.toFixed(2)}</span></span>
     <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="${esc(code)}" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="${esc(code)}" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
   </div>`;
 
@@ -1644,24 +1567,6 @@ const lhbHtml = lhb
   return `<div class="wl-stock" data-stock-code="${esc(code)}"><div class="wl-stock-scroll">${headRow}${main}</div>${detail}</div>`;
 }
 
-function buildStockModal(s) {
-  const cls = upDownClass(s.pct);
-  const sig = deriveStockStrategy(s.pct);
-  const atds = deriveStockAtds(s.pct, s.turnover);
-  return `<div class="modal-mask" id="modal-${esc(s.code)}" data-code="${esc(s.code)}" onclick="if(event.target===this)closeModal(this.dataset.code)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="modal-head"><div class="modal-eyebrow">ATDS STOCK RESEARCH V1.1</div><span class="modal-close" data-code="${esc(s.code)}" onclick="closeModal(this.dataset.code)">×</span></div>
-    <div class="modal-title">个股深度研究</div>
-    <div class="modal-info">${esc(s.name)}（${esc(s.code)}）</div>
-    <div class="modal-meta">${fmtNum(s.price)} · ${fmtPct(s.pct)} · ${esc(s.amount || '')}</div>
-    <div class="modal-section"><div class="modal-h">核心定位</div><div class="modal-b">业务结构与产业位置(财务接口待接入)</div></div>
-    <div class="modal-section"><div class="modal-h">核心研判</div><div class="modal-b">${esc(sig.name)} · 概率倾向:延续可能性较高</div></div>
-    <div class="modal-section"><div class="modal-h">情景分析</div><div class="modal-b">保守:震荡整理 · 中性:沿均线运行 · 乐观:放量突破(待行情验证)</div></div>
-    <div class="modal-section"><div class="modal-h">资金面</div><div class="modal-b">换手 ${esc(s.turnover || '--')}% · 成交活跃度待复盘</div></div>
-    <div class="modal-section"><div class="modal-h">风险提示</div><div class="modal-b">技术位是概率参考,实际操作需结合实时走势</div></div>
-    <div class="modal-footer">数据来自腾讯行情 + 东方财富公开接口 · 概率倾向表述</div>
-    </div></div>`;
-}
 
 
 function renderWatchlist(report) {
@@ -1911,46 +1816,6 @@ function renderStrongStock(report) {
   return card + modal;
 }
 
-// 每只个股的今日执行策略(图2 风格,仅盘前展示)
-function renderPerStockTodayStrategy(s) {
-  const t = s.todayStrategy || {};
-  const st = s.strategy || {};
-  // v11.69:策略参数(入场/止损/止盈)由程序按技术画像生成;⚠️ 使用人工覆盖时必须显式标注
-  let paramBlock = '';
-  if (st.entry != null && st.stop != null && st.target != null) {
-    const rrTxt = st.rr != null ? Number(st.rr).toFixed(2) : '--';
-    const srcNote = st.source === 'manual'
-      ? '<div class="ts-manual">⚠️ 当前使用自定义人工参数，非系统自动生成 —— 请自行确认其合理性</div>'
-      : (st.invalidReason
-        ? '<div class="ts-invalid-manual">⛔ 自定义参数未通过合理性校验（' + esc(st.invalidReason) + '），已自动回退为系统生成值</div>'
-        : '');
-    paramBlock = '<div class="ts-params">' +
-      '<span class="ts-param">入场 <b>' + f2v(st.entry) + '</b></span>' +
-      '<span class="ts-param">止损 <b>' + f2v(st.stop) + '</b>' + (st.stopPct != null ? ('<i>(可损 ' + st.stopPct + '%)</i>') : '') + '</span>' +
-      '<span class="ts-param">止盈 <b>' + f2v(st.target) + '</b></span>' +
-      '<span class="ts-param">盈亏比 <b>' + rrTxt + '</b></span>' +
-      '<span class="ts-src">' + (st.source === 'manual' ? '人工' : '系统自动') + '</span>' +
-    '</div>' + srcNote;
-  } else if (st.invalidReason) {
-    paramBlock = '<div class="ts-invalid-manual">⛔ 策略参数不可用（' + esc(st.invalidReason) + '）</div>';
-  }
-  const A = t.planA || {}, B = t.planB || {};
-  // ⚠️ 原实现直接读 t.planA.content —— todayStrategy 只有 core/position 时会抛 TypeError(可达崩溃点)
-  if (!t.core && !A.content && !B.content && !t.choice && !t.position && !t.alert && !paramBlock) return '';
-  const core = t.core ? `<div class="ts-core"><span class="ts-core-tag">核心</span>${esc(t.core)}</div>` : '';
-  const planA = A.content ? `<li><span class="ts-dot ts-dot-a"></span><b>方案A (${esc(A.title || '求稳回踩')})</b>: ${esc(A.content)}</li>` : '';
-  const planB = B.content ? `<li><span class="ts-dot ts-dot-b"></span><b>方案B (${esc(B.title || '突破确认')})</b>: ${esc(B.content)}</li>` : '';
-  const plans = (planA || planB) ? '<ul class="ts-plans">' + planA + planB + '</ul>' : '';
-  const extrasList = (t.choice || t.position) ? '<ul class="ts-plans">' +
-    (t.choice ? `<li><span class="ts-dot"></span><b>二选一建议</b>: ${esc(t.choice)}</li>` : '') +
-    (t.position ? `<li><span class="ts-dot"></span><b>仓位控制</b>: ${esc(t.position)}</li>` : '') +
-    '</ul>' : '';
-  const alert = t.alert ? `<div class="ts-alert"><b>关键提醒</b>: ${esc(t.alert)}</div>` : '';
-  return '<div class="card ts-stock-card">' +
-    '<div class="ts-title">🎯 今日执行策略 <span class="ts-sub">(二选一或分批)</span></div>' +
-    paramBlock + core + plans + extrasList + alert +
-  '</div>';
-}
 
 function renderPremarketStrategy(report, opts) {
   const o = opts || {};
@@ -2349,9 +2214,6 @@ function renderPremarketCockpit(report) {
   </div>`;
 }
 
-function renderDragonPool(report) {
-  return `<div class="card"><div class="card-title">动态擒龙池</div><div class="hint">数据详见盘前报告</div></div>`;
-}
 
 function renderMainDirection(report) {
   const list = (report.mainRank || []).slice(0, 5);
@@ -2757,9 +2619,6 @@ ${renderHeader(report, nav)}
 </html>`;
 }
 
-function renderFooter(report) {
-  return `<div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>`;
-}
 
 function renderIndex(reports) {
   // 同一天同一类型只保留最新时间(如收盘 15:20 已改为 16:20,过滤旧时间残留)
@@ -2839,7 +2698,7 @@ function renderIndex(reports) {
     <button class="tool-btn qr-btn" onclick="showQr()">手机扫码打开</button>
   </div>
   <div class="card">
-    <div class="card-title">历史复盘 (${list.length})</div>
+    <div class="card-title">历史复盘 (${filtered.length})</div>
     <div class="report-list">${list}</div>
   </div>
 </div>

@@ -14,7 +14,7 @@ try {
 
 const sharedJs = fs.readFileSync(path.join(ROOT, 'scripts/shared_client.js'), 'utf8').trim();
 const modalCss = fs.readFileSync(path.join(ROOT, 'modal_css.txt'), 'utf8').trim();
-const dragonCss = fs.readFileSync(path.join(ROOT, 'dragon_pool.css'), 'utf8').trim();
+// v11.70: dragonCss 读取已移除(死 CSS,见下方说明)
 const intlCss = fs.readFileSync(path.join(ROOT, 'intl_mkt.css'), 'utf8').trim();
 const tpCss = fs.readFileSync(path.join(ROOT, 'tech_playbook_verdict.css'), 'utf8').trim();
 const ceCss = fs.readFileSync(path.join(ROOT, 'close_emotion.css'), 'utf8').trim();
@@ -67,13 +67,9 @@ for (const rel of files) {
       console.log('  +modal CSS:', rel);
     }
   }
-  // Ensure dragon pool CSS exists
-  if (!c.includes('.dragon-pool{')) {
-    if (c.includes('</style>')) {
-      c = c.replace('</style>', dragonCss + '\n</style>', 1);
-      console.log('  +dragon CSS:', rel);
-    }
-  }
+  // v11.70:移除 dragon pool CSS 注入 —— 其唯一消费者 renderDragonPool() 是死代码(已删),
+  //   且实测 dragon_pool.css 的 71 个类选择器在全部 60 个页面 markup 中命中 0 次 ⇒ 整文件为死 CSS。
+  //   保留这一段会让每页白背 5.4KB。若日后要恢复龙虎池模块,从 git 历史取回即可。
   // Ensure intl mkt CSS exists
   if (!c.includes('.intl-mkt{')) {
     if (c.includes('</style>')) {

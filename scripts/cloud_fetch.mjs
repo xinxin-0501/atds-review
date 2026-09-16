@@ -486,7 +486,10 @@ function buildTechAnalysis(klinesByIndex, indices) {
     const high60 = highs.length ? Math.max(...highs) : null;
     const low60 = lows.length ? Math.min(...lows) : null;
     const round = (n, step) => Math.round(n / step) * step;
-    const intLevels = [round(last, 100), round(last, 200), round(last, 500)].sort((a, b) => a - b);
+    // v11.70 修:同一 last 按 100/200/500 三档取整会撞出重复值(实测深证成指 13454.74 →
+    //   [13400,13500,13500]),重复项会被 add() 两次塞进 pressure ⇒ 关键位显示同一个价位两遍。
+    //   去重后语义不变(仍是"附近的整数关口"),只是不再出现重复条目;不足 3 个不补齐(不编造)。
+    const intLevels = Array.from(new Set([round(last, 100), round(last, 200), round(last, 500)])).sort((a, b) => a - b);
     const vols = arr.slice(-5).map(k => parseFloat(k[5])).filter(n => !isNaN(n));
     const vol5 = vols.length ? vols.reduce((a, b) => a + b, 0) / vols.length / 1e8 : null;
     const supports = [];
@@ -494,8 +497,12 @@ function buildTechAnalysis(klinesByIndex, indices) {
     const add = (price, label) => {
       if (price == null || isNaN(price)) return;
       const item = { price: Math.round(price * 100) / 100, label };
-      if (price < last) supports.push(item);
-      else if (price > last) pressures.push(item);
+      // v11.70:同一价位只保留一条(如"某均线"与"整数关口"恰好重合时,合并标签而不是重复列两行)
+      const bucket = price < last ? supports : (price > last ? pressures : null);
+      if (!bucket) return;
+      const dup = bucket.find(x => x.price === item.price);
+      if (dup) { if (dup.label.indexOf(label) < 0) dup.label += '/' + label; return; }
+      bucket.push(item);
     };
     add(ma5, '5日均线·短期');
     add(ma10, '10日均线·周线');
@@ -2190,18 +2197,7 @@ async function fetchNewHighCount(dateArg) {
 
 
 // ===== 全市场形态扫描(启动/老鸭头/拉升) =====
-async function fetchWithRetry(url, opts, retries) {
-  retries = retries || 2;
-  for (let i = 0; i <= retries; i++) {
-    try {
-      const res = await fetch(url, opts || { headers: { 'User-Agent': 'Mozilla/5.0' } });
-      if (res.ok) return await res.json();
-    } catch (e) { /* retry */ }
-    if (i < retries) await new Promise(r => setTimeout(r, 800 * (i + 1)));
-  }
-  return null;
-}
-
+async 
 const FALLBACK_SYMBOLS = [
   "sh600000","sh600004","sh600006","sh600007","sh600008","sh600009","sh600010","sh600011","sh600012","sh600015","sh600016","sh600017","sh600018","sh600019","sh600020","sh600021","sh600022","sh600023","sh600025","sh600026","sh600027","sh600028","sh600029","sh600030","sh600031","sh600032","sh600033","sh600035","sh600036","sh600037","sh600038","sh600039","sh600048","sh600050","sh600051","sh600052","sh600054","sh600055","sh600056","sh600057",
   "sh600058","sh600059","sh600060","sh600061","sh600062","sh600063","sh600064","sh600066","sh600067","sh600071","sh600072","sh600073","sh600075","sh600076","sh600078","sh600081","sh600085","sh600088","sh600089","sh600094","sh600095","sh600096","sh600097","sh600098","sh600099","sh600100","sh600101","sh600103","sh600104","sh600105","sh600106","sh600108","sh600109","sh600110","sh600111","sh600113","sh600114","sh600115","sh600116","sh600117",

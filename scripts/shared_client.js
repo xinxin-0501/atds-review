@@ -650,7 +650,8 @@ function buildDecisionCardHtml(s){
   var pos={low:Math.min(Math.round(rawLow),15),high:Math.min(Math.round(rawHigh),15),capped:posCapped,stopPct:Math.round(stopPctMax*10)/10};
   var confTone=confTotal>=75?'good':confTotal>=60?'ok':'warn';
   var statusLabel=confTotal>=75?'可交易':confTotal>=60?'轻仓试错':'观察';
-  var priority=confTotal>=75&&p.rr>=2?'★★★':confTotal>=60?'★★':'★';
+  // v11.70:rr<1 时最高优先级只给 ★ —— 避免出现"★★★ 可交易"与"禁止开仓"并排的自相矛盾
+  var priority=(Number(p.rr)<1)?'★':(confTotal>=75&&p.rr>=2?'★★★':confTotal>=60?'★★':'★');
   var rrToneVal=rrTone(p.rr);
   // 催化/阶段/地位/分歧(提前计算 tags/divergence,供"一致加速→开盘预期"联动与题材具体化)
   var tagsArr=Array.isArray(s.tags)?s.tags:[];
@@ -788,8 +789,13 @@ function buildDecisionCardHtml(s){
   var rrNowBad=p.rrNow<1.5;
   var abUnTriggered=!trigA&&!trigB;
   var riskDowngrade=tRRBad&&(ff.d1||0)<0;
+  // v11.70【第4个安全阀·盈亏比<1 禁建仓】优先级最高且一刀切:
+  //   在 applyManualOverrideF 之后计算 ⇒ 人工参数同样受约束,无法绕过。
+  var rrBan=Number(p.rr)<1;
+  var rrBanWarn=rrBan?('<div class="dc-rrban">⛔ 盈亏比<1（赚小亏大），策略赔率不佳，禁止开仓 <b>（当前 '+Number(p.rr).toFixed(2)+'）</b></div>'):'';
   var effStatusLabel, effConfTone;
-  if(isHardTrade){effStatusLabel='不建议参与';effConfTone='down';}
+  if(rrBan){effStatusLabel='高风险观察·不建仓';effConfTone='down';}
+  else if(isHardTrade){effStatusLabel='不建议参与';effConfTone='down';}
   else if(upperShadow){effStatusLabel='高风险观察';effConfTone='down';}
   else if(riskDowngrade){effStatusLabel='高风险观察';effConfTone='down';}
   else if(rrNowBad||abUnTriggered){effStatusLabel='等待触发';effConfTone='down';}
@@ -912,7 +918,7 @@ function buildDecisionCardHtml(s){
     '<span class="dc-conf'+(rrActionable?'':' dc-conf-down')+'">置信度 '+confTotal+'</span>'+
     '<span class="dc-rr '+rrHeadCls+'"'+rrHeadTitle+'>盈亏比 '+p.rr.toFixed(2)+'</span>'+
     '<span class="dc-time'+_timeCls+'" title="'+escHtmlF(_timeTitle)+'">'+escHtmlF(_timeLabel)+'</span>'+
-    '</div>'+summaryHtml+klineNote+moWarn+
+    '</div>'+summaryHtml+klineNote+moWarn+rrBanWarn+
     '<div class="dc-tags">'+(s.category?'<span class="dc-tag">'+escHtmlF(s.category)+'</span>':'')+tagsArr.map(function(x){return '<span class="dc-tag">'+escHtmlF(x)+'</span>';}).join('')+'<span class="dc-tag">催化:'+escHtmlF(catalyst)+'</span><span class="dc-tag">时效:'+escHtmlF(catalystTime)+'</span><span class="dc-tag">阶段:'+escHtmlF(ferment)+'</span><span class="dc-tag">情绪:'+escHtmlF(emotionCycle)+'</span><span class="dc-tag">地位:'+escHtmlF(boardStatus)+'</span><span class="dc-tag">'+escHtmlF(tolerance)+'</span></div>'+
     (s.logic?'<div class="dc-block"><div class="dc-h">📐 逻辑与催化</div><div class="dc-line">'+escHtmlF(s.logic)+'</div></div>':'')+
     '<div class="dc-block"><div class="dc-h">💰 资金与量能</div>'+
@@ -1006,14 +1012,19 @@ function dcBadges(s){
   var upperShadow=(s.high>0&&price>0&&s.open>0&&((s.high-price)/price*100>3)&&price<s.open);
   var riskDowngrade=(ff.d1||0)<0; // 做T盈亏比恒=1<1.5 → tRRBad 恒真,故 riskDowngrade 等价于"资金净流出"
   var rrNowBad=rrNow<1.5;
+  // v11.70:第4个安全阀 —— rr<1 一律"高风险观察·不建仓"(人工参数同样受约束)
+  var rrBan=Number(rr)<1;
   var effStatusLabel;
-  if(isHardTrade)effStatusLabel='不建议参与';
+  if(rrBan)effStatusLabel='高风险观察·不建仓';
+  else if(isHardTrade)effStatusLabel='不建议参与';
   else if(upperShadow)effStatusLabel='高风险观察';
   else if(riskDowngrade)effStatusLabel='高风险观察';
   else if(rrNowBad||abUnTriggered)effStatusLabel='等待触发';
   else effStatusLabel=confTotal>=75?'可交易':confTotal>=60?'轻仓试错':'观察';
   var actionable=(effStatusLabel==='可交易');
-  return {rr:rr,rrTone:actionable?rrTone(rr):'muted',rrTxt:(actionable&&rr>=1.5)?(rr.toFixed(2)+' ✓'):rr.toFixed(2),confTotal:confTotal,confTone:actionable?(confTotal>=75?'good':confTotal>=60?'ok':'warn'):'down',status:effStatusLabel};
+  // v11.70:rrBan 时徽章带 ⛔ 且加 tooltip,让"不建仓"在列表行就可见(不必点开卡片)
+  var rrTxtOut=(rrBan?'⛔ ':'')+((actionable&&rr>=1.5)?(rr.toFixed(2)+' ✓'):rr.toFixed(2));
+  return {rr:rr,rrTone:actionable?rrTone(rr):'muted',rrTxt:rrTxtOut,rrBan:rrBan,confTotal:confTotal,confTone:actionable?(confTotal>=75?'good':confTotal>=60?'ok':'warn'):'down',status:effStatusLabel};
 }
 function addToWatchlistUI(s){
   var card=document.querySelector(".watchlist-card");
