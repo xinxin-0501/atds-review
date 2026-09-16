@@ -2293,7 +2293,7 @@
       <a href="index.html">首页</a><a href="2026-09-09_09-40.html" class="active">盘前</a><a href="2026-09-09_16-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:20</b>（约 15 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:20），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 79°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:20</b>（约 35 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:20），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 79°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-09 19:20:47</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -4469,7 +4469,7 @@ function buildDecisionCardHtml(s){
         '<button class="ts-btn ts-t-btn" data-code="'+escHtmlF(s.code)+'" onclick="recordTTrade(this)">记做T</button>'+
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
-      '<div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满 10 个交易日未触及则判为未触发入场）② 入场当日不判止损 —— 当日最低可能出现在入场之前(实测:当日早盘探底后拉升),故入场当日改用【1 分钟分时】(取不到时用 15 分钟K)判定「入场之后」的路径,两者都取不到则当日不判定、改为次日起按日K判定;次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
+      '<div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满 10 个交易日未触及则判为未触发入场）② 【A股 T+1：入场当日不可卖出】⇒ 入场日一律【不结算】，只用【1 分钟分时】(取不到时用 15 分钟K)记录「入场之后」的区间与曾否触达止盈/止损价(排除入场前价格，故不得用当日最低判止损)；结算自【入场次一交易日】起，用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-trace" data-trace-code="'+escHtmlF(s.code)+'"></div>'+
       '<div class="dc-line dc-next-day">🎯 明日核心观察点：'+nextDayFocus+'</div>'+
     '</div>';
@@ -6307,7 +6307,13 @@ async function fetchTodayMinuteF(code){
   }catch(e){/* 失败返回空 → 调用方回退 m15 或"不判定" */}
   return out;
 }
-// 只统计"入场时点之后"的分钟K,逐根判定止盈/止损(同根双触保守计止损)
+// 只统计"入场时点之后"的分钟K —— 用于给"入场日"提供真实区间(不含入场前价格)。
+// v11.63【T+1 修正,重要】:买入当日【不可卖出】⇒ 入场日一律【不产生结算】,不再判止盈/止损。
+//   修正前的实现会按分钟K在入场日直接结算,实测 002428 云南锗业
+//   「入场 2026-09-16@93.66 → 止盈 2026-09-16@94.07(入场当日 10:45 触及)」——
+//   该笔在 A 股物理上无法成交(T+1),属【无效样本】,会污染胜率。
+//   现改为:本函数只返回"入场后区间"与"曾否触达止盈/止损价"(供轨迹提示用户"为何当日不结算"),
+//   settle 恒为 null;真正的结算自【入场次一交易日】起由日K路径执行。
 function shadowJudgeEntryDayF(rec,bars,entryDate,entryTime){
   var stop=rec.stop,target=rec.target;
   if(!entryDate||!bars||!bars.length)return null;
@@ -6318,23 +6324,20 @@ function shadowJudgeEntryDayF(rec,bars,entryDate,entryTime){
   for(var i=0;i<bars.length;i++){
     var b=bars[i]; if(!b)continue;
     if(b.d!==entryDate)continue;
-    if(entryTime&&b.t&&b.t<=entryTime)continue;      // 入场前(含入场那一根)不计
+    if(b.t&&b.t<=entryTime)continue;      // 入场前(含入场那一根)不计
     seq.push(b);
   }
   if(!seq.length)return null;
   seq.sort(function(a,b){return String(a.t)<String(b.t)?-1:1;});
-  var afterHi=-Infinity,afterLo=Infinity,settle=null;
+  var afterHi=-Infinity,afterLo=Infinity,touchT=false,touchS=false,touchTAt=null,touchSAt=null;
   for(var j=0;j<seq.length;j++){
     var x=seq[j];
     if(x.h>afterHi)afterHi=x.h;
     if(x.l<afterLo)afterLo=x.l;
-    if(settle)continue;
-    var hitT=x.h>=target,hitS=x.l<=stop;
-    if(hitT&&hitS)settle={result:'loss',price:stop,t:x.t,note:'入场当日 '+x.t+' 同一15分钟K内触止盈与止损,保守计为止损'};
-    else if(hitS)settle={result:'loss',price:stop,t:x.t,note:'入场当日 '+x.t+' 触及止损(已排除入场前价格)'};
-    else if(hitT)settle={result:'win',price:target,t:x.t,note:'入场当日 '+x.t+' 触及止盈(已排除入场前价格)'};
+    if(x.h>=target&&!touchT){touchT=true;touchTAt=x.t;}
+    if(x.l<=stop&&!touchS){touchS=true;touchSAt=x.t;}
   }
-  return {settle:settle,hi:afterHi,lo:afterLo,firstT:seq[0].t,lastT:seq[seq.length-1].t};
+  return {settle:null,hi:afterHi,lo:afterLo,touchT:touchT,touchS:touchS,touchTAt:touchTAt,touchSAt:touchSAt,firstT:seq[0].t,lastT:seq[seq.length-1].t};
 }
 function lhbAgoTxtF(d){
   var k=tradingDaysBetweenF(d,bjTodayF());
@@ -6382,6 +6385,8 @@ function renderJournalStats(){
   var head='📒 模拟跟踪复盘：有效样本 <b>'+c.valid+'</b> 笔'+
     (c.winRate!=null?(' · 胜率 <b>'+c.winRate+'%</b>（'+c.win+'胜'+c.loss+'负'+(c.expired?'·'+c.expired+'过期':'')+'）'):'')+
     ' · 平均 <b>'+(c.avg>0?'+':'')+c.avg+'%</b>'+
+    // v11.63:A股 T+1 —— 入场当日即结算的历史样本物理上无法成交,已单列标记、不计入胜率
+    (c.t1?('　<span class="jrn-warn-chip" title="买入当日不可卖出（A股 T+1）。这些样本记录为“入场当日即止盈/止损”，实际无法成交，已从胜率中剔除并保持可追溯。对应跟踪记录已重置，将按新口径自入场次一交易日起重新判定。">⚠ T+1 无效样本 '+c.t1+' 笔（入场当日即结算，已剔除）</span>'):'')+
     ((c.win+c.loss)<10?'　<span class="jrn-warn-chip">⚠ 样本不足10笔，统计偶发性大，不构成投资参考</span>':'')+
     '　<button class="jrn-btn" onclick="toggleJournalDetail()">'+(jrnOpen?'收起明细':'每笔明细')+'</button>'+
     // v11.35:按入场方式分组(每类满 3 笔才显示,避免小样本误导)
@@ -6433,7 +6438,7 @@ function renderJournalStats(){
     }
     rows+='</div>';
     // v11.29:口径声明 —— 把理想化假设显式写出来,比假装数据精确更可信。
-    rows+='<div class="jrn-disc">口径说明：<b>入场当日</b>按 <b>1 分钟分时</b>（取不到时用 15 分钟K）判定「<b>入场之后</b>」的路径（当日最低可能出现在入场之前，故不得用日K当日最低判入场日；取不到分钟K则当日不判定、次日起再判）；<b>次日起</b>用<b>当日最高/最低</b>判定（日线无法还原日内先后，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率。<b>入场方式按"勾选时入场价相对现价"划分（回踩支撑=需回落才入场；现价入场=勾选价即入场价）；同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
+    rows+='<div class="jrn-disc">口径说明：<b>【A股 T+1】买入当日不可卖出</b>，故<b>入场日一律不结算</b>（只按 <b>1 分钟分时</b>，取不到时用 15 分钟K，记录「<b>入场之后</b>」的区间与曾否触达止盈/止损价；当日最低可能出现在入场之前，故不得用日K当日最低判入场日；取不到分钟K则当日不留判定）；<b>结算自入场次一交易日起</b>，用<b>当日最高/最低</b>判定（日线无法还原日内先后，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率；<b>入场当日即结算的历史样本违反 T+1，已单列标记、不计入胜率</b>。<b>入场方式按"勾选时入场价相对现价"划分（回踩支撑=需回落才入场；现价入场=勾选价即入场价）；同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
   }
   el.innerHTML=head+warn+rows;
 }
@@ -6753,27 +6758,24 @@ function settleShadowTrade(code,klines,minBars){
     if(ev==='win'){ doSettle('win',pct(target),target,'入场后当日最高触及止盈'); return; }
     if(ev==='loss'){ doSettle('loss',pct(stop),stop,'当日最低触及止损'); return; }
   }
-  // ①-b v11.44:【入场当日】路径判定 —— 只用带时间戳的 15 分钟K,只统计「入场之后」的分钟。
-  //   为什么不能退回用日K的当日高低:当日最低可能发生在入场之前(实测 002289 当日最低 34.14@09:31,
-  //   而用户 10:22 才入场)→ 旧逻辑据此判"入场当日即破止损 -4.85%"属必然误判。
-  //   取不到分钟K时【保持不判定】(次日走日K路径),绝不退回用当日最低。
+  // ①-b v11.63【T+1】:入场当日【只记轨迹、不结算】。
+  //   为什么必须排除入场前价格:当日最低可能发生在入场之前(实测 002289 当日最低 34.14@09:31,
+  //   而用户 10:22 才入场)→ 用日K当日高低判入场日必然误判。
+  //   为什么不结算:买入当日不可卖出(A股 T+1)。修正前此处会直接结算,产出"入场当日即止盈/止损"
+  //   的无效样本(实测 002428 云南锗业 2026-09-16 同日进出)。结算一律顺延至【入场次一交易日】,
+  //   由上面的日K路径执行。
+  //   取不到分钟K时【只留空、不判定】,绝不退回用当日最低。
   if(!rec.settled&&rec.entryHit&&rec.entryDate===today){
     var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.entryTime||null);
     if(mj){
-      if(mj.settle&&mj.settle.result){
-        if(!rec.trace||!rec.trace.length)rec.trace=[];
-        var k2=[];for(var t2=0;t2<rec.trace.length;t2++){if(rec.trace[t2].d!==today)k2.push(rec.trace[t2]);}
-        k2.push({d:today,hi:Math.round(mj.hi*100)/100,lo:Math.round(mj.lo*100)/100,ev:(mj.settle.result==='win'?'win':'loss'),px:mj.settle.price,at:mj.settle.t});
-        rec.trace=k2.slice(-12);
-        doSettle(mj.settle.result,pct(mj.settle.price),mj.settle.price,mj.settle.note,today);
-        return;
-      }
-      // 有分钟K且入场后未触达 → 轨迹记为"入场后持有中"(用入场后区间,不用全天高低)
       if(!rec.trace||!rec.trace.length)rec.trace=[];
       var k3=[];for(var t3=0;t3<rec.trace.length;t3++){if(rec.trace[t3].d!==today)k3.push(rec.trace[t3]);}
-      k3.push({d:today,hi:Math.round(mj.hi*100)/100,lo:Math.round(mj.lo*100)/100,ev:'hold',gapT:(mj.hi>0?Math.round((target-mj.hi)/mj.hi*10000)/100:null),afterEntry:true});
+      k3.push({d:today,hi:Math.round(mj.hi*100)/100,lo:Math.round(mj.lo*100)/100,ev:'hold',
+        gapT:(mj.hi>0?Math.round((target-mj.hi)/mj.hi*10000)/100:null),afterEntry:true,
+        t1:true,tTouch:(mj.touchT?'T':(mj.touchS?'S':null)),
+        tTouchAt:(mj.touchT?mj.touchTAt:(mj.touchS?mj.touchSAt:null))});
       rec.trace=k3.slice(-12);
-      rec.lastCheck={date:today,price:price,high:mj.hi,low:mj.lo,src:'m15',afterEntry:true};
+      rec.lastCheck={date:today,price:price,high:mj.hi,low:mj.lo,src:'m15',afterEntry:true,t1:true};
     }
   }
   // ③ 超期出口
@@ -6789,8 +6791,37 @@ function settleShadowTrade(code,klines,minBars){
   setShadowMap(sm);
 }
 
+// v11.63【T+1 一次性迁移】:把"入场当日即结算"的历史样本标记无效,并重开对应跟踪记录。
+//   背景:修正前入场日会按分钟K直接结算止盈/止损,而 A股【当日买入不可卖出】⇒ 这些样本物理上不可能成交,
+//   却会被计入胜率(实测 002428 云南锗业 2026-09-16 同日进出的 +0.44% 进入"有效样本 4 笔 · 胜率 75%")。
+//   处理原则(与 v11.28 历史脏样本一致):**不删用户数据** —— 只打 t1Invalid 标记单列、不计入胜率;
+//   同时把对应 atds_shadow 记录重置为未结算,使其自【入场次一交易日】起按新口径重新判定。
+//   幂等:重复调用不会重复处理(靠 t1Invalid 标记与 settled 状态双重判断)。
+function migrateT1InvalidF(){
+  try{
+    var cnt=0,j=getJournal();
+    for(var i=0;i<j.length;i++){
+      var e=j[i];
+      if(e&&e.shadow&&!e.t1Invalid&&e.entryDate&&e.settleDate&&String(e.settleDate)===String(e.entryDate)){
+        e.t1Invalid=true;cnt++;
+      }
+    }
+    var sm=getShadowMap(),changed=false;
+    for(var k in sm){
+      var r=sm[k];
+      if(r&&r.entryHit&&r.settled&&r.entryDate&&r.settleDate&&String(r.settleDate)===String(r.entryDate)){
+        r.settled=false;delete r.result;delete r.pnl;delete r.settleDate;delete r.settlePrice;delete r.settleNote;
+        changed=true;
+      }
+    }
+    if(cnt)localStorage.setItem('atds_trade_journal',JSON.stringify(j));
+    if(changed)setShadowMap(sm);
+    return cnt;
+  }catch(e){return 0;}
+}
 // v11.31:改为异步 —— 先并行取各跟踪个股日K,再逐只判定(未打开页面的交易日由日K回补)
 async function settleAllShadowTrades(){
+  migrateT1InvalidF();   // v11.63:T+1 迁移必须先跑(重开被误结算的记录,否则它们不会被重判)
   var sm=getShadowMap();
   var codes=[];
   for(var c in sm){ if(sm[c]&&sm[c].enabled&&!sm[c].settled)codes.push(c); }
@@ -6842,6 +6873,12 @@ function renderShadowTrace(blockEl,code,rec){
       else if(x.ev==='hold')note+=x.afterEntry
         ? ('（入场后 高'+x.hi+' / 低'+x.lo+'，距止盈 '+((x.gapT!=null&&x.gapT>=0)?(x.gapT+'%'):'已越过')+'）')
         : ('（当日最高 '+x.hi+'，距止盈 '+((x.gapT!=null&&x.gapT>=0)?(x.gapT+'%'):'已越过')+'）');
+      // v11.63 A股 T+1:入场当日即使触及止盈/止损价也不结算(当日买入不可卖出),在轨迹里说明原因
+      if(x.ev==='hold'&&x.t1){
+        note+=(x.tTouch==='T'?(' · 曾触止盈价'+(x.tTouchAt?('('+x.tTouchAt+')'):'')+'，T+1 当日不可卖出，顺延次日结算')
+             :(x.tTouch==='S'?(' · 曾触止损价'+(x.tTouchAt?('('+x.tTouchAt+')'):'')+'，T+1 当日不可卖出，顺延次日结算')
+             :' · T+1 次日起可结算'));
+      }
       else if(x.ev==='enter')note+=' @'+rec.entry;
       else if(x.px!=null)note+=' @'+x.px;
       if(x.at)note+=' · '+x.at+' 触及';   // v11.44:分钟K判定的触及时刻
@@ -6858,11 +6895,14 @@ function renderShadowTrace(blockEl,code,rec){
 // 新口径:有效样本 = 已结算且非历史脏样本(v<28);胜率分母 = win+loss(排除 expired/missed);历史脏样本单列、不计入。
 function reviewClassification(){
   var j=getJournal();
-  var s={valid:0,win:0,loss:0,expired:0,missed:0,invalid:0,legacy:0,sum:0,avg:0,winRate:null,byType:{}};
+  var s={valid:0,win:0,loss:0,expired:0,missed:0,invalid:0,legacy:0,t1:0,sum:0,avg:0,winRate:null,byType:{}};
   for(var i=0;i<j.length;i++){
     var e=j[i],p=Number(e.pnl),rs=e.result;
     if(!rs&&!isNaN(p)&&e.pnl!=null)rs=(p>=0?'win':'loss');
     if(e.shadow&&e.v!==28){ s.legacy++; continue; }   // v11.28 之前写入的模拟样本:无入场门控、无结算价 → 不计入
+    // v11.63【T+1】入场当日即结算的样本违反 A股 T+1(当日买入不可卖出)→ 单列、不计入胜率。
+    //   不删除用户数据,只标记并隔离(可追溯),同时把对应跟踪记录重置为未结算、按新口径重判。
+    if(e.shadow&&e.t1Invalid){ s.t1++; continue; }
     if(rs==='win'||rs==='loss'||rs==='expired'){
       s.valid++;
       if(!isNaN(p))s.sum+=p;
@@ -6906,7 +6946,8 @@ function updateReviewProgress(){
       }
     } else {
       var mine=[];
-      for(var q=0;q<j.length;q++){ if(String(j[q].code)===String(code))mine.push(j[q]); }
+      // v11.63:T+1 无效样本(入场当日即结算)不作为该股的"最近结算"展示,避免误导
+      for(var q=0;q<j.length;q++){ if(String(j[q].code)===String(code)&&!j[q].t1Invalid)mine.push(j[q]); }
       var last=mine.length?mine[mine.length-1]:null;
       if(last&&last.shadow){
         if(last.v!==28){
@@ -6933,7 +6974,7 @@ function updateReviewProgress(){
   var els=document.querySelectorAll('.ts-progress');
   for(var k=0;k<els.length;k++)els[k].textContent=c.valid+'/10';
   var line=c.valid
-    ? (' · 有效样本'+c.valid+'笔'+(c.winRate!=null?('·胜率'+c.winRate+'%('+c.win+'胜'+c.loss+'负)'):'')+(c.expired?('·过期'+c.expired):'')+'，平均'+(c.avg>0?'+':'')+c.avg+'%'+((c.win+c.loss)<10?'（不足10笔仅供参考）':''))
+    ? (' · 有效样本'+c.valid+'笔'+(c.winRate!=null?('·胜率'+c.winRate+'%('+c.win+'胜'+c.loss+'负)'):'')+(c.expired?('·过期'+c.expired):'')+(c.t1?('·T+1无效'+c.t1+'笔(已单列)'):'')+'，平均'+(c.avg>0?'+':'')+c.avg+'%'+((c.win+c.loss)<10?'（不足10笔仅供参考）':''))
     : (' · 跟踪中'+openCnt+'笔（未结算）');
   if(c.legacy)line+=' · 早期未校验'+c.legacy+'笔(不计入)';
   if(c.missed)line+=' · 未触发入场'+c.missed+'笔';
