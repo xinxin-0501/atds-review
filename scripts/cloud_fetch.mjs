@@ -548,7 +548,7 @@ function derivePlaybook(zt, dragonPool) {
   return { offense, defense, themes: themeList, pitfall };
 }
 
-function deriveCloseEmotion(ztList, dragonPool, marketStats, breadth) {
+function deriveCloseEmotion(ztList, dragonPool, marketStats, breadth, sectorsIn) {
   const ztTotal = (dragonPool && dragonPool.todayTotal) || marketStats.limitUpCount || 0;
   const zbTotal = marketStats.zhaBanCount || 0;
   const maxLB = (dragonPool && dragonPool.maxLianBan) || marketStats.maxLianBan || 0;
@@ -581,32 +581,51 @@ function deriveCloseEmotion(ztList, dragonPool, marketStats, breadth) {
   else if (tempScore < 60) { stage = '中温区'; tone = '正常'; fact = '结构性机会'; }
   else if (tempScore < 85) { stage = '高温区'; tone = '高涨'; fact = '情绪高涨,接力效应强'; }
   else { stage = '过热区'; tone = '极度亢奋'; fact = '谨防高潮后分歧'; }
-  // 主线方向:从 sectorBoards 取家数最多的 3 个板块,作为"宽度"
-  const sectorBoards = (dragonPool && dragonPool.sectorBoards) || [];
-  const mainLines = sectorBoards.slice(0, 3).map((s, i) => ({ rank: i + 1, name: s.name, changePct: Math.round((s.count * 1.5 + s.maxLB * 0.8) * 100) / 100, leader: s.leadStock || s.stocks?.[0] || '--' }));
-  // 资金流向:用板块涨停家数 + 连板 推导"主力净流入估算"(亿元)
-  // 公式:涨停数 × 1.5 + 连板数 × 0.8(粗略估算)
-  const moneyInflow = sectorBoards.slice(0, 4).map(s => ({ name: s.name, valueYi: Math.round((s.count * 1.5 + s.maxLB * 0.8) * 10) / 10 }));
+  // v11.66【数据修正·重要】主线强度 / 资金流向 必须用【真实板块数据】。
+  //   原实现:mainLines.changePct 与 moneyInflow.valueYi 用的是【同一个公式】`涨停数×1.5 + 连板数×0.8`
+  //   ⇒ 页面上「主线强度 +6.8%」与「主力净流入 +6.8亿」永远相等 —— 两个数其实是一个数,
+  //   而且既不是涨幅也不是资金(实测 09-16 通信设备: 页面 +6.8%/6.8亿, 真实 +3.2%/106.3亿)。
+  //   现改用 sectorsIn(东财行业板块 f3 涨幅 / f62 主力净流入)。
+  const secAll = Array.isArray(sectorsIn) ? sectorsIn : [];
+  const mainLines = secAll.filter(x => x && x.changePct != null)
+    .slice().sort((a, b) => b.changePct - a.changePct).slice(0, 3)
+    .map((x, i) => ({ rank: i + 1, name: x.name, changePct: Math.round(x.changePct * 100) / 100, leader: (ztList.find(z => z.hybk === x.name) || {}).name || (ztList.find(z => z.reason === x.name) || {}).name || '--' }));
+  // 主力净流入 Top4:按真实 f62 排序;并做名称去重(避免"通信"与"通信设备"这类同族重复占位)
+  const _mi = [];
+  for (const x of secAll.slice().sort((a, b) => (b.inflow || 0) - (a.inflow || 0))) {
+    if (x.inflow == null) continue;
+    if (_mi.some(p => p.name.includes(x.name) || x.name.includes(p.name))) continue;
+    _mi.push(x);
+    if (_mi.length >= 4) break;
+  }
+  const moneyInflow = _mi.map(x => ({ name: x.name, valueYi: Math.round(x.inflow / 1e8 * 10) / 10 }));
   // 梯队显示
   const ladder = tierKeys.slice(0, 3).map(k => ({ lianban: k + '板', lead: (tiers[k] || [])[0] ? (tiers[k][0].n || tiers[k][0].name) : '--' }));
   return { tempScore, stage, tone, fact, ztTotal, zbTotal, maxLB, limitBoardRate, promotionRate, redRate, upCount, downCount, flatCount, total, mainLines, moneyInflow, ladder };
 }
 
 async function fetchSectors() {
-  const tryHosts = ['https://push2.eastmoney.com', 'http://push2ex.eastmoney.com'];
-  const urlPath = '/api/qt/clist/get?pn=1&pz=60&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:2&fields=f12,f14,f3,f104,f105,f62,f20';
-  for (const base of tryHosts) {
-    try {
-      const r = await fetch(base + urlPath, { headers: { 'User-Agent': 'Mozilla/5.0' } });
-      if (r.ok) {
-        const j = await r.json();
-        if (j.data && j.data.diff) return j.data.diff.map(s => ({
-          code: s.f12, name: s.f14, changePct: s.f3, up: s.f104 || 0, down: s.f105 || 0, inflow: s.f62 || 0
-        }));
-      }
-    } catch (e) { /* try next */ }
+  // v11.66【数据修正】板块全量(东财行业板块 m:90 t:2)。
+  //   原实现 pz=60 只取"涨幅前 60" —— 而 mainRank 里的板块(电力/IT服务Ⅱ/家居用品…)
+  //   涨幅靠后,根本不在前 60 ⇒ 名称匹配率只有 13/27,匹配不到就只能退回"造"的估算值。
+  //   现改为【分页取全量】: 服务端把 pz 封顶 100,必须翻页。实测 496 个板块,匹配率 27/27。
+  //   字段: f3=涨跌幅(%) · f62=主力净流入(元) · f104/f105=上涨/下跌家数 · f20=总市值。
+  const out = [], seen = new Set();
+  for (let pn = 1; pn <= 8; pn++) {
+    const j = await emFetchJson('https://push2.eastmoney.com/api/qt/clist/get?pn=' + pn +
+      '&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:2&fields=f12,f14,f3,f104,f105,f62,f20',
+      { 'User-Agent': 'Mozilla/5.0' }, 10000, 2);
+    const diff = (j && j.data && j.data.diff) || [];
+    if (!diff.length) break;
+    for (const x of diff) {
+      if (!x || !x.f14 || seen.has(x.f12)) continue;
+      seen.add(x.f12);
+      out.push({ code: x.f12, name: x.f14, changePct: x.f3, up: x.f104 || 0, down: x.f105 || 0, inflow: x.f62 || 0 });
+    }
+    if (diff.length < 100) break;
   }
-  return [];
+  if (out.length) console.log('  板块全量:', out.length, '个');
+  return out;
 }
 
 function fmtAmount(wan) {
@@ -835,7 +854,11 @@ function deriveBoardMeta(p, secCount) {
   const lianban = p.lianban || 1;
   const boardType = lianban === 1 ? '首板' : (lianban === 2 ? '2板' : (lianban === 3 ? '3板' : (lianban === 4 ? '4板' : (lianban + '连板'))));
   // 形态派生:基于 firstTime(封板时间 HHmm)/ kaiban(开板次数)/ pct 涨幅
-  const ft = String(p.firstTime || '').slice(0, 4);
+  // v11.66【数据修正】东财 fbt 是【未补零】的 HMMSS:09:25:00→92500、09:35:00→93500。
+  //   原实现 String(p.firstTime).slice(0,4) 得到 "9350" ⇒ 与 '0933'/'1430' 字符串比较全部落错分支
+  //   ("9350" > "1430" 恒真 ⇒ 09:35 的板被标成「尾盘封板」);再 slice 拼接得到 "93:50" 这种非法时间。
+  //   现统一补零到 6 位(HHMMSS),再取 HHMM 用于比较与展示(对已是 6 位的输入无副作用)。
+  const ft = String(p.firstTime || '').padStart(6, '0').slice(0, 4);
   let shape = '盘中拉板';
   if (p.kaiban && p.kaiban >= 1) shape = '炸板回封';
   else if (ft && ft < '0933') shape = '一字板';
@@ -855,7 +878,8 @@ function deriveBoardMeta(p, secCount) {
   // 封板时间表述
   if (ft && ft < '0933') reasonParts.push('一字封板');
   else if (ft) reasonParts.push('首封 ' + ft.slice(0, 2) + ':' + ft.slice(2, 4));
-  if (p.sealAmountYi && p.sealAmountYi >= 2) reasonParts.push('首封 ' + Math.round(p.sealAmountYi * 100) / 100 + '亿');
+  // v11.66:此处数值是【封单额】,原标签误写成"首封"(与上一行的首封时间混淆)
+  if (p.sealAmountYi && p.sealAmountYi >= 2) reasonParts.push('封单 ' + Math.round(p.sealAmountYi * 100) / 100 + '亿');
   if (p.kaiban && p.kaiban >= 1) reasonParts.push('炸板 ' + p.kaiban + ' 次');
   const reason = reasonParts.slice(0, 4).join(' · ');
   return { boardType, shape, theme, reason };
@@ -3109,9 +3133,11 @@ async function main() {
   // 国际联动：盘中/盘前外盘快照
   const intlMkt = await fetchIntlMkt();
 
+  // v11.66:板块全量数据必须【先取】—— deriveCloseEmotion 与 mainRank 都要用它(原先在 mainRank 处才取,晚了一步)
+  const sectorsAll = await fetchSectors();
   // 收盘情绪复盘(maxLB 已定义)
   const _emotionTemp = { upCount: breadth.up, downCount: breadth.down, flatCount: breadth.flat, limitUpCount: zt.total, limitDownCount: 0, zhaBanCount: zbCount, maxLianBan: dragonPool.maxLianBan || 0, maxLianBanStock: (dragonPool.consecutiveBoards && dragonPool.consecutiveBoards[0]) ? dragonPool.consecutiveBoards[0].name : '--' };
-  const closeEmotion = deriveCloseEmotion(zt.list, dragonPool, _emotionTemp, breadth);
+  const closeEmotion = deriveCloseEmotion(zt.list, dragonPool, _emotionTemp, breadth, sectorsAll);
 
   const maxLB = zt.list.reduce((m, s) => (s.lianban > m.lianban ? s : m), zt.list[0] || { lianban: 0 });
 
@@ -3139,7 +3165,8 @@ async function main() {
   }));
 
   // 4. 全部方向实时强度排名：东财行业板块 + 涨停池聚合（hybk）
-  const sectorsAll = await fetchSectors();
+  //    (sectorsAll 已在上面取好 —— v11.66)
+  const _findSector = (nm) => sectorsAll.find(x => x.name === nm) || sectorsAll.find(x => x.name && (x.name.includes(nm) || nm.includes(x.name)));
   const ztByHybk = new Map();
   for (const s of zt.list) {
     const k = s.hybk;
@@ -3171,17 +3198,28 @@ async function main() {
     let hs = hotSectors.find(s => s.name === name);
     if (!hs) hs = hotSectors.find(s => s.name.includes(name) || name.includes(s.name));
     const avgPct = v.pctSum / v.count;
+    // changePct 保留旧口径(该板块【涨停股的平均涨幅】),仅供内部排序/状态判定,不再对外当"板块涨幅"展示
     const changePct = hs ? hs.changePct : Math.round(avgPct * 100) / 100;
     const score = v.count * 12 + v.maxLB * 20 + Math.min(changePct, 10) * 3;
-    const inflowYi = Math.round((v.inflow || 0) / 10000 * 10) / 10;
+    // v11.66【数据修正】两个展示字段原先都是"造"的,现改用真实数据:
+    //   · sectorPct = 真实板块涨幅(东财 f3)。旧 changePct 被当"板块涨幅"展示 ⇒ 电力显示 +10%,真实 +0.49%。
+    //   · inflowYi  = 真实主力净流入(东财 f62)。旧值实为【封单额合计】(v.inflow 累计的是 sealWan),
+    //                 却标成「资金/主力净流入」⇒ 半导体显示 +7.1亿,真实 +136.5亿。
+    //   · 封单额移到 sealYi 单独保留(它的正确标签就是「封单」)。
+    const _rs = _findSector(name);
+    const sectorPct = (_rs && _rs.changePct != null) ? Math.round(_rs.changePct * 100) / 100 : null;
+    const inflowYi = (_rs && _rs.inflow != null) ? Math.round(_rs.inflow / 1e8 * 10) / 10 : null;
+    const sealYi = Math.round((v.inflow || 0) / 10000 * 10) / 10;
     rows.push({
       name, mappedName: name,
       changePct: Math.round(changePct * 100) / 100,
+      sectorPct,
       // v11.62: hotSectors 从不携带 up/down 字段(其构造处只给 name/changePct/leadStock/inflow),
       //   直接拼 `${hs.up} / ${hs.down}` 会产出字面量 "undefined / undefined" 污染 json。
       //   渲染层未引用该字段,但仍须落盘干净 —— 缺失时统一回退 '-- / --'。
       upDown: (hs && hs.up != null && hs.down != null) ? `${hs.up} / ${hs.down}` : '-- / --',
       inflowYi,
+      sealYi,
       limitUpMax: `${v.count}家 / ${v.maxLB}板`,
       ztCount: v.count,
       maxLB: v.maxLB,
@@ -3198,12 +3236,23 @@ async function main() {
   for (const s of hotSectors) {
     if (s.changePct < 1) break;
     const matched = rows.find(r => r.name === s.name || s.name.includes(r.name) || r.name.includes(s.name));
-    if (matched) { matched.changePct = s.changePct; if (s.up != null && s.down != null) matched.upDown = `${s.up} / ${s.down}`; matched.inflowYi = Number(s.inflow || 0).toFixed(1); continue; }
+    if (matched) {
+      matched.changePct = s.changePct;
+      if (s.up != null && s.down != null) matched.upDown = `${s.up} / ${s.down}`;
+      const _rs2 = _findSector(s.name);
+      if (_rs2 && _rs2.changePct != null) matched.sectorPct = Math.round(_rs2.changePct * 100) / 100;
+      if (_rs2 && _rs2.inflow != null) matched.inflowYi = Math.round(_rs2.inflow / 1e8 * 10) / 10;
+      matched.sealYi = Number(s.inflow || 0).toFixed(1);
+      continue;
+    }
+    const _rs3 = _findSector(s.name);
     rows.push({
       name: s.name, mappedName: s.name,
       changePct: Math.round(s.changePct * 100) / 100,
+      sectorPct: (_rs3 && _rs3.changePct != null) ? Math.round(_rs3.changePct * 100) / 100 : null,
       upDown: (s.up != null && s.down != null) ? `${s.up} / ${s.down}` : '-- / --',
-      inflowYi: Number(s.inflow || 0).toFixed(1),
+      inflowYi: (_rs3 && _rs3.inflow != null) ? Math.round(_rs3.inflow / 1e8 * 10) / 10 : null,
+      sealYi: Number(s.inflow || 0).toFixed(1),
       limitUpMax: '0', leadStock: '--', ztCount: 0, maxLB: 0,
       _score: s.changePct * 10,
       _hasZT: false

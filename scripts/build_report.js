@@ -33,6 +33,14 @@ function upDownClass(pct) {
 }
 
 // 万 → 亿/万 显示
+// v11.66:封板时间格式化。东财 fbt 是【未补零】的 HMMSS(92500=09:25:00、100731=10:07:31),
+//   直接输出会显示 "92500" 这种原始值,直接 slice 又会得到 "93:50" 这种非法时间 ⇒ 统一补零到 6 位再取 HH:MM。
+function fmtHM(v) {
+  const t = String(v == null ? '' : v).trim();
+  if (!/^\d{4,6}$/.test(t)) return '--';
+  const p = t.padStart(6, '0');
+  return p.slice(0, 2) + ':' + p.slice(2, 4);
+}
 function fmtAmount(wan) {
   const v = Number(wan);
   if (isNaN(v) || !v) return '--';
@@ -391,14 +399,24 @@ function renderCloseEmotion(report) {
     '</div></div>';
 
   // 03 主线强度与资金流向
+  // v11.66:真实数据会出现负值(板块下跌 / 主力净流出),原实现硬编码 '+…' 与 up 配色 ⇒ 符号与颜色都会说反
+  const _signed = (v, unit) => {
+    const n = Number(v); if (!isFinite(n)) return '<span class="ce-ml-val">--</span>';
+    const cls = n >= 0 ? 'up' : 'down';
+    return '<span class="ce-ml-val ' + cls + '">' + (n >= 0 ? '+' : '') + n + unit + '</span>';
+  };
   const mainLineRows = (ce.mainLines || []).map(m => {
-    return '<div class="ce-ml-row"><span class="ce-ml-name">' + esc(m.name) + '</span><span class="ce-ml-val up">+' + m.changePct + '%</span></div>';
+    return '<div class="ce-ml-row"><span class="ce-ml-name">' + esc(m.name) + '</span>' + _signed(m.changePct, '%') + '</div>';
   }).join('');
   const moneyRows = (ce.moneyInflow || []).map(m => {
-    return '<div class="ce-mi-row"><span class="ce-mi-name">' + esc(m.name) + '</span><span class="ce-mi-val up">+' + m.valueYi + '亿</span></div>';
+    return '<div class="ce-mi-row"><span class="ce-mi-name">' + esc(m.name) + '</span>' + _signed(m.valueYi, '亿') + '</div>';
   }).join('');
-  const mlBlock = '<div class="ce-ml-block"><div class="ce-block-h">主线强度</div>' + mainLineRows + '</div>';
-  const miBlock = '<div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div>' + moneyRows + '</div>';
+  const _mlEmpty = !(ce.mainLines || []).length;
+  const _miEmpty = !(ce.moneyInflow || []).length;
+  const mlBlock = '<div class="ce-ml-block"><div class="ce-block-h">主线强度</div>' +
+    (_mlEmpty ? '<div class="ce-mi-row"><span class="ce-mi-name">板块数据暂缺</span></div>' : mainLineRows) + '</div>';
+  const miBlock = '<div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div>' +
+    (_miEmpty ? '<div class="ce-mi-row"><span class="ce-mi-name">板块数据暂缺</span></div>' : moneyRows) + '</div>';
   const flowBlock = '<div class="card"><div class="card-title">03 主线强度与资金流向</div>' +
     '<div class="ce-flow-grid">' +
       '<div class="ce-flow-item">' + mlBlock + '</div>' +
@@ -754,7 +772,7 @@ function renderRegimeNHModal(report) {
         <span>首板</span>
         <span>封单 <b>${fmtAmount(x.sealWan)}</b></span>
         <span>板块 <b>${esc(x.hybk || '--')}</b></span>
-        <span>首封 <b>${esc(x.firstTime || '--')}</b></span>
+        <span>首封 <b>${esc(fmtHM(x.firstTime))}</b></span>
       </div>
     </div>`;
   }).join('');
@@ -1922,6 +1940,9 @@ function renderPremarketStrategy(report, opts) {
   const mr1 = mr[0] || {};
   const mr2 = mr[1] || mr1;
   const mr3 = mr[2] || mr1;
+    // v11.66【数据修正】「主线涨幅」优先取真实板块涨幅(sectorPct);资金带符号(真实主力净流入会出现负值)
+    const _msPct = (x) => { const v = (x && x.sectorPct != null) ? Number(x.sectorPct) : Number((x && x.changePct) || 0); const c = v >= 0 ? 'up' : 'down'; return '<span class="' + c + '">' + (v >= 0 ? '+' : '') + v.toFixed(2) + '%</span>'; };
+    const _msYi = (x) => { if (!x || x.inflowYi == null) return '<b>--</b>'; const n = Number(x.inflowYi); const c = n >= 0 ? 'up' : 'down'; return '<b class="' + c + '">' + (n >= 0 ? '+' : '') + n.toFixed(1) + '亿</b>'; };
   const stage = ce.stage || '正常';
   const tone = ce.tone || '';
   const fact = ce.fact || '主线机会窗口';
@@ -1929,8 +1950,8 @@ function renderPremarketStrategy(report, opts) {
     '<div class="ms-banner"><span class="ms-b-dot"></span><b>0️⃣ 市场状态 · 参考背景</b><span class="ms-b-eyebrow">' + esc(stage + ' · ' + tone) + '</span></div>' +
     '<div class="ms-eyebrow">主线机会律 · 顺大势逆小势</div>' +
     '<div class="ms-grid">' +
-      '<div class="ms-cell ms-cell-a"><div class="ms-cell-k">主线 A</div><div class="ms-cell-v">' + esc(mr1.mappedName || mr1.name || '--') + '</div><div class="ms-cell-meta"><span class="up">+' + Number(mr1.changePct || 0).toFixed(2) + '%</span> · 资金 <b class="up">+' + Number(mr1.inflowYi || 0).toFixed(1) + '亿</b></div></div>' +
-      '<div class="ms-cell ms-cell-b"><div class="ms-cell-k">主线 B</div><div class="ms-cell-v">' + esc(mr2.mappedName || mr2.name || '--') + '</div><div class="ms-cell-meta"><span class="up">+' + Number(mr2.changePct || 0).toFixed(2) + '%</span> · 资金 <b class="up">+' + Number(mr2.inflowYi || 0).toFixed(1) + '亿</b></div></div>' +
+      '<div class="ms-cell ms-cell-a"><div class="ms-cell-k">主线 A</div><div class="ms-cell-v">' + esc(mr1.mappedName || mr1.name || '--') + '</div><div class="ms-cell-meta">' + _msPct(mr1) + ' · 资金 ' + _msYi(mr1) + '</div></div>' +
+      '<div class="ms-cell ms-cell-b"><div class="ms-cell-k">主线 B</div><div class="ms-cell-v">' + esc(mr2.mappedName || mr2.name || '--') + '</div><div class="ms-cell-meta">' + _msPct(mr2) + ' · 资金 ' + _msYi(mr2) + '</div></div>' +
       '<div class="ms-cell ms-cell-c"><div class="ms-cell-k">状态 C</div><div class="ms-cell-v">' + esc(fact) + '</div><div class="ms-cell-meta">情绪 <b>' + (ce.tempScore || '--') + '°</b> · 高度 <b>' + maxLB + '板</b></div></div>' +
       '<div class="ms-cell ms-cell-d"><div class="ms-cell-k">分歧 D</div><div class="ms-cell-v">' + (ce.promotionRate || '--') + '% 晋级</div><div class="ms-cell-meta">炸板 <b>' + zhaBan + '家</b> · 红盘 <b>' + redRate + '%</b></div></div>' +
     '</div>' +
@@ -2236,7 +2257,7 @@ function renderPremarketStrategy(report, opts) {
   // 🔭 关注锚点(图1:4条)
   const anchorHtml = '<div class="em-section"><div class="em-section-h">🔭 关注锚点</div>' +
     '<ul class="em-anchor">' +
-    '<li><span class="em-anchor-tag">顺势资金驱动</span> <b>' + esc(mr1.mappedName || mr1.name || '--') + '</b> 资金 +' + Number(mr1.inflowYi || 0).toFixed(1) + '亿,主线低吸机会。</li>' +
+    '<li><span class="em-anchor-tag">顺势资金驱动</span> <b>' + esc(mr1.mappedName || mr1.name || '--') + '</b> 资金 ' + (Number(mr1.inflowYi || 0) >= 0 ? '+' : '') + Number(mr1.inflowYi || 0).toFixed(1) + '亿,主线低吸机会。</li>' +
     '<li><span class="em-anchor-tag">异动主线</span> <b>' + esc(mr2.mappedName || mr2.name || '--') + '</b> +' + Number(mr2.changePct || 0).toFixed(1) + '% 加速,看分时承接。</li>' +
     '<li><span class="em-anchor-tag">低位资源</span> 黄金/有色资金切换,关注防御+科技双线联动。</li>' +
     '<li><span class="em-anchor-tag">错位节奏</span> 量能维持 2 万亿上方,主线分化后看二线品种接续。</li>' +
@@ -2805,10 +2826,13 @@ function renderBoardTierBlock(report, opts) {
   const L4Name = L4.mappedName || L4.name || '--';
   const L1Lead = L1.leadStock || '--';
   const L2Lead = L2.leadStock || '--';
-  const L1Pct = Number(L1.changePct || 0);
-  const L2Pct = Number(L2.changePct || 0);
-  const L3Pct = Number(L3.changePct || 0);
-  const L4Pct = Number(L4.changePct || 0);
+  // v11.66【数据修正】展示用的「板块 +X%」必须取【真实板块涨幅】(sectorPct);
+  //   旧值 changePct 实为"该板块涨停股的平均涨幅"(恒≈10%),被当板块涨幅展示 ⇒ 电力显示 +10%,真实 +0.49%。
+  //   inflowYi 已改为真实主力净流入(东财 f62),会出现负值 ⇒ 展示一律带符号,缺失时显示 '--'。
+  const _pctOf = (x) => { const v = (x && x.sectorPct != null) ? Number(x.sectorPct) : Number((x && x.changePct) || 0); return isFinite(v) ? v : 0; };
+  const _sp = (v, d) => (v >= 0 ? '+' : '') + v.toFixed(d == null ? 1 : d);
+  const _yiOf = (x) => (x && x.inflowYi != null) ? ((Number(x.inflowYi) >= 0 ? '+' : '') + Number(x.inflowYi).toFixed(1) + '亿') : '--';
+  const L1Pct = _pctOf(L1), L2Pct = _pctOf(L2), L3Pct = _pctOf(L3), L4Pct = _pctOf(L4);
   const L1In = Number(L1.inflowYi || 0);
   const L2In = Number(L2.inflowYi || 0);
   const L3In = Number(L3.inflowYi || 0);
@@ -2892,30 +2916,30 @@ function renderBoardTierBlock(report, opts) {
   //   统计基准均为【当日开盘初段】(实证 09-14 09:43 采集:成交额 3715 亿 = 开盘 13 分钟累计)。
   //   ⇒ 两槽位共用"今日"表述,不再分叉。
   const structNote = '<div class="bt-struct-note">' +
-    '<b>结构辨证</b>:' + esc(L1Name) + ' 今日最高 ' + maxLB + '板(龙头 ' + esc(L1Lead) + '),板块 +' + L1Pct.toFixed(1) + '% / 资金 +' + L1In.toFixed(1) + '亿;' +
-    esc(L2Name) + ' +' + L2Pct.toFixed(1) + '% 居次,' + esc(L3Name) + ' +' + L3Pct.toFixed(1) + '% 第三,' + esc(L4Name) + ' +' + L4Pct.toFixed(1) + '%。' +
+    '<b>结构辨证</b>:' + esc(L1Name) + ' 今日最高 ' + maxLB + '板(龙头 ' + esc(L1Lead) + '),板块 ' + _sp(L1Pct) + '% / 资金 ' + _yiOf(L1) + ';' +
+    esc(L2Name) + ' ' + _sp(L2Pct) + '% 居次,' + esc(L3Name) + ' ' + _sp(L3Pct) + '% 第三,' + esc(L4Name) + ' ' + _sp(L4Pct) + '%。' +
     '梯队高度 ' + maxLB + '板,情绪 ' + (ce.tempScore || '--') + '°(' + (ce.stage || '') + '),注意高位分歧与一致兑现风险。' +
     '</div>';
   
   // === 2) 主线研判(4 条) ===
   const vtLines = '<div class="vt-section"><div class="vt-h">② 主线研判</div>' +
     '<div class="vt-line"><span class="vt-rank">①</span><b>' + esc(L1Name) + '</b> — 穿越板块总龙头(<b class="up">' + esc(L1Lead) + ' ' + maxLB + '板</b>)' +
-      '<div class="vt-desc">板块 +' + L1Pct.toFixed(2) + '%、资金 +' + L1In.toFixed(1) + '亿,' + (Number(L1.ztCount || 0)) + '家涨停,龙头 ' + esc(L1Lead) + ' 领涨,是当前情绪总龙头,注意高位分歧。</div></div>' +
+      '<div class="vt-desc">板块 ' + _sp(L1Pct, 2) + '%、资金 ' + _yiOf(L1) + ',' + (Number(L1.ztCount || 0)) + '家涨停,龙头 ' + esc(L1Lead) + ' 领涨,是当前情绪总龙头,注意高位分歧。</div></div>' +
     '<div class="vt-line"><span class="vt-rank">②</span><b>' + esc(L2Name) + '</b> — 今日次强爆发(<b class="up">' + esc(L2Lead) + '</b>)' +
-      '<div class="vt-desc">板块 +' + L2Pct.toFixed(2) + '%、资金 +' + L2In.toFixed(1) + '亿,' + (Number(L2.ztCount || 0)) + '家涨停,龙头 ' + esc(L2Lead) + ' 领涨,为二线主线。</div></div>' +
+      '<div class="vt-desc">板块 ' + _sp(L2Pct, 2) + '%、资金 ' + _yiOf(L2) + ',' + (Number(L2.ztCount || 0)) + '家涨停,龙头 ' + esc(L2Lead) + ' 领涨,为二线主线。</div></div>' +
     '<div class="vt-line"><span class="vt-rank">③</span><b>' + esc(L3Name) + '</b> — 梯队成形' +
-      '<div class="vt-desc">板块 +' + L3Pct.toFixed(2) + '%、资金 +' + L3In.toFixed(1) + '亿,' + (Number(L3.ztCount || 0)) + '家涨停,龙头 ' + esc(L3.leadStock || '--') + '。</div></div>' +
+      '<div class="vt-desc">板块 ' + _sp(L3Pct, 2) + '%、资金 ' + _yiOf(L3) + ',' + (Number(L3.ztCount || 0)) + '家涨停,龙头 ' + esc(L3.leadStock || '--') + '。</div></div>' +
     '<div class="vt-line"><span class="vt-rank">④</span><b>' + esc(L4Name) + '</b> — 资金主节奏' +
-      '<div class="vt-desc">板块 +' + L4Pct.toFixed(2) + '%、资金 ' + (L4In >= 0 ? '+' : '') + L4In.toFixed(1) + '亿,' + (Number(L4.ztCount || 0)) + '家涨停,关注承接力度。</div></div>' +
+      '<div class="vt-desc">板块 ' + _sp(L4Pct, 2) + '%、资金 ' + _yiOf(L4) + ',' + (Number(L4.ztCount || 0)) + '家涨停,关注承接力度。</div></div>' +
     '</div>';
   
   // === 3) 午后-明日观察锚(6 条) ===
   // v11.62b:两槽位共用"今日"表述(盘前数据基准亦为当日,见结构辨证处注释)。
   const anchors = [
-    { tag: esc(L1Lead) + ' ' + maxLB + '板', text: esc(L1Name) + ' 板块 +' + L1Pct.toFixed(1) + '% 领涨,龙头 ' + esc(L1Lead) + ' 表态,关注能否延续 ' + maxLB + ' 板穿越' },
+    { tag: esc(L1Lead) + ' ' + maxLB + '板', text: esc(L1Name) + ' 板块 ' + _sp(L1Pct) + '% 领涨,龙头 ' + esc(L1Lead) + ' 表态,关注能否延续 ' + maxLB + ' 板穿越' },
     { tag: esc(L2Lead), text: esc(L2Name) + ' 今日次强,龙头 ' + esc(L2Lead) + ' 领涨,观察明日能否接力' },
     { tag: esc(L3.leadStock || L3Name), text: esc(L3Name) + ' 梯队成形,资金 ' + (L3In >= 0 ? '净流入' : '净流出') + ' ' + Math.abs(L3In).toFixed(1) + '亿,关注持续性' },
-    { tag: esc(L4.leadStock || L4Name), text: esc(L4Name) + ' 板块 +' + L4Pct.toFixed(1) + '%,资金 ' + (L4In >= 0 ? '净流入' : '净流出') + ' ' + Math.abs(L4In).toFixed(1) + '亿,高位注意回撤' },
+    { tag: esc(L4.leadStock || L4Name), text: esc(L4Name) + ' 板块 ' + _sp(L4Pct) + '%,资金 ' + (L4In >= 0 ? '净流入' : '净流出') + ' ' + Math.abs(L4In).toFixed(1) + '亿,高位注意回撤' },
     { tag: '炸板监控', text: '今日炸板 ' + (ce.zbTotal || 0) + '家,炸板率超 40% 需警惕情绪退潮' },
     { tag: '量能验证', text: '成交额 ' + esc(report.marketStats && report.marketStats.totalAmount || '--') + ',关注量能能否维持' }
   ];
@@ -3030,7 +3054,7 @@ function renderBoardTierBlock(report, opts) {
     mswTag1 + mswTag2 +
     '<div class="msw-note">今日主力净流入最强:' + esc(topName) + ' ' + sign(topIn) + topIn.toFixed(1) + '亿;资金承接方向切换至 ' + esc(seedName) + ' / ' + esc(defName) + '</div>' +
     '<div class="msw-nums">' + mswNums + '</div>' +
-    '<div class="msw-foot">主力净流入(亿元)按板块封单+成交额汇总:' + esc(flowSrc.map(s => s.name).join('、')) + ' 领涨;防御(' + esc(defName) + ')与农业(' + esc(seedName) + ')为资金切换承接方向,谨防一致兑现。</div>' +
+    '<div class="msw-foot">主力净流入(亿元)取自东财行业板块口径(真实值,非估算):' + esc(flowSrc.map(s => s.name).join('、')) + ' 居前;防御(' + esc(defName) + ')与农业(' + esc(seedName) + ')为资金切换承接方向,谨防一致兑现。</div>' +
     '</div>';
   
   // 拼装(v11.62b:前缀统一"实时追踪" —— 两槽位数据均为当日实时快照;
