@@ -511,6 +511,9 @@
 .tp-rr{text-align:right;font-weight:700;white-space:nowrap}
 .tp-warn{font-size:9px;color:#d49000;background:#fff7e6;border:1px solid #ffe6c2;border-radius:4px;padding:4px 6px;margin-top:4px;line-height:1.5}
 .tp-warn.tp-ok{color:#2e7d32;background:#e8f5e9;border-color:#c8e6c9}
+/* v11.69 人工参数安全阀:橙色=正在使用人工自定义参数(需用户自行确认);红色=人工参数被拒绝并已回退自动值 */
+.dc-manual-warn{font-size:11px;font-weight:800;color:#b45309;background:rgba(245,158,11,0.14);border-left:4px solid #f59e0b;border-radius:4px;padding:5px 8px;margin:0 0 6px;line-height:1.55}
+.dc-manual-invalid{font-size:11px;font-weight:800;color:#b91c1c;background:rgba(220,38,38,0.10);border-left:4px solid #dc2626;border-radius:4px;padding:5px 8px;margin:0 0 6px;line-height:1.55}
 /* 事件风险标签(财报/业绩预告/解禁):等级控制底色,方向控制文字色 */
 .dc-events{display:flex;flex-wrap:wrap;gap:5px}
 .ev{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:600;background:#f5f5f7;color:#555;border:1px solid #eee;white-space:nowrap}
@@ -2307,7 +2310,7 @@
       <a href="index.html">首页</a><a href="2026-09-09_09-40.html" class="active">盘前</a><a href="2026-09-09_16-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:20</b>（约 362 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:20），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 79°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:20</b>（约 364 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:20），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 79°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-09 19:20:47</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -4118,6 +4121,35 @@ function autoGenStrategy(s, v, atds, turnover, tech, existingLogic) {
 }
 // 单独渲染 detail 区(供 refreshWatchlistQuotes 复用,保证手动添加个股 detail 也跟随最新行情)
 // 交易决策卡(主卡片+复盘卡):镜像云端 buildStockRow 的 detail 结构,真实数据 + 量化盈亏比/置信度/仓位
+/* ══ v11.69 人工参数安全阀(决策卡/列表行徽章共用) ══
+   背景:config 的 strategy 曾长期手写价格,出现过「止损价高于现价」「入场价是另一只票的价格」这类
+   **自相矛盾**的参数,却照样上屏 —— 卡片上的执行纪律因此是错的。现在默认由程序按技术画像生成,
+   只允许 strategy.manual_override 引入人工值,且**必须先过合理性校验**。
+   三端同口径(cloud_fetch.validatePlanF / validate_config.validatePlanF / 本函数),一致性由回归断言保护。 */
+function validatePlanClientF(plan, price){
+  var px=Number(price)||0;
+  if(!plan)return {ok:false,reason:'无法生成计划(技术画像缺失)'};
+  var e=Number(plan.entry), st=Number(plan.stop), tg=Number(plan.target);
+  if(!(px>0))return {ok:false,reason:'现价无效'};
+  if(!(e>0)||!(st>0)||!(tg>0))return {ok:false,reason:'计划参数缺失或非正数'};
+  if(st>=px)return {ok:false,reason:'止损价 '+st.toFixed(2)+' 不低于现价 '+px.toFixed(2)};
+  if(Math.abs(e-px)/px>0.20)return {ok:false,reason:'入场价 '+e.toFixed(2)+' 偏离现价 '+px.toFixed(2)+' 超过 20%'};
+  if(st>=e)return {ok:false,reason:'止损价 '+st.toFixed(2)+' 不低于入场价 '+e.toFixed(2)};
+  if(tg<=e)return {ok:false,reason:'止盈价 '+tg.toFixed(2)+' 不高于入场价 '+e.toFixed(2)};
+  return {ok:true,reason:''};
+}
+/* 把 manual_override 应用到计划对象 p(就地改写);返回要展示的警示 HTML(无人工值则返回空串)。
+   通过 → 采用人工值 + 橙色标注;不通过 → 保持程序自动值 + 红色报错(绝不静默采用矛盾参数)。 */
+function applyManualOverrideF(p, price, s){
+  var mo=(s&&s.strategy&&s.strategy.manual_override)||null;
+  if(!mo||(mo.entry==null&&mo.stop==null&&mo.target==null)||!(Number(price)>0))return '';
+  var e=(mo.entry!=null?Number(mo.entry):p.entry), st=(mo.stop!=null?Number(mo.stop):p.stop), tg=(mo.target!=null?Number(mo.target):p.target);
+  var v=validatePlanClientF({entry:e,stop:st,target:tg}, price);
+  if(!v.ok)return '<div class="dc-manual-invalid">⛔ 自定义参数未通过合理性校验（'+escHtmlF(v.reason)+'），已自动回退为系统生成值</div>';
+  p.entry=e; p.stop=st; p.target=tg;
+  p.rr=(tg-e)/(e-st); p.rrNow=(Number(price)>st)?(tg-Number(price))/(Number(price)-st):0; p.stopPct=e>0?(e-st)/e*100:0;
+  return '<div class="dc-manual-warn">⚠️ 当前使用自定义人工参数，非系统自动生成 —— 请自行确认其合理性（入场 '+e.toFixed(2)+' / 止损 '+st.toFixed(2)+' / 止盈 '+tg.toFixed(2)+'）</div>';
+}
 function buildDecisionCardHtml(s){
   s=s||{};
   var t=s.tech||{};
@@ -4155,6 +4187,8 @@ function buildDecisionCardHtml(s){
   var rrNow=(price>stop)?(target-price)/(price-stop):0;
   var stopPct=entry>0?(entry-stop)/entry*100:3;
   var p={entry:entry,stop:stop,target:target,rr:rr,rrNow:rrNow,stopPct:stopPct,sup:sup,pre:pre,atr:atr};
+  // v11.69:人工覆盖安全阀 —— 在置信度/状态机计算【之前】应用,保证卡片头部、计划表、复盘卡、模拟跟踪用的都是同一套价位
+  var moWarn=applyManualOverrideF(p,price,s);
   function rrTone(r){return r>=2?'good':r>=1.5?'ok':r>=1?'warn':'bad';}
   // 置信度(趋势30/资金25/题材20/关键位15/盈亏比10)
   var trendScore=t.trend==='up'?30:t.trend==='repair'?20:t.trend==='flat'?12:5;
@@ -4461,7 +4495,7 @@ function buildDecisionCardHtml(s){
     '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div><div class="dc-line dc-src-note">'+evNote+'</div></div>'+
     '<div class="dc-block dc-plan '+(shouldCollapsePlan?'dc-plan-collapsed':'')+'">'+
       '<div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">'+(shouldCollapsePlan?'▸':'▾')+'</span>'+(shouldCollapsePlan?'<span class="dc-plan-lock">'+collapseLabel+'</span><span class="dc-plan-expand">👆 点击展开</span>':'')+'</div>'+
-      '<div class="dc-plan-body">'+planTable+tRRBadWarn+nowWarn+
+      '<div class="dc-plan-body">'+moWarn+planTable+tRRBadWarn+nowWarn+
       '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>'+(pos.capped?'（受单股上限压制，实际最高仓位15%）':'（单股≤15%、单题材≤30%）')+'</div>'+
       '<div class="dc-line dc-disc">执行纪律：跌破'+f2(p.stop)+'无条件止损 · 到达'+f2(p.target)+'无条件止盈 · 日内做T当日必须平T不隔夜</div>'+
       '</div>'+
@@ -4514,6 +4548,10 @@ function dcBadges(s){
   var target=prePrice>entry?prePrice:(entry*1.06);
   var rr=(target-entry)/(entry-stop);
   var rrNow=(price>stop)?(target-price)/(price-stop):0;
+  // v11.69:与决策卡同源应用人工覆盖 —— 否则「列表行盈亏比徽章」与「卡片计划表」会互相矛盾
+  var _moP={entry:entry,stop:stop,target:target,rr:rr,rrNow:rrNow};
+  applyManualOverrideF(_moP,price,s);
+  entry=_moP.entry; stop=_moP.stop; target=_moP.target; rr=_moP.rr; rrNow=_moP.rrNow;
   function rrTone(r){return r>=2?'good':r>=1.5?'ok':r>=1?'warn':'bad';}
   var trendScore=t.trend==='up'?30:t.trend==='repair'?20:t.trend==='flat'?12:5;
   var fundScore=12;if((ff.d1||0)>0)fundScore+=6;if((ff.d3||0)>0)fundScore+=4;
