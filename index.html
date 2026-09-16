@@ -4202,23 +4202,52 @@ function weekKeyF(dateStr){
   d.setUTCDate(d.getUTCDate()-dow);
   return d.toISOString().slice(0,10);
 }
-/* 入场门控(5 项硬门,全过才虚拟入场)。返回 {ok, fails:[]} */
-function entryGateF(ind){
-  var f=[];
-  if(!ind)return {ok:false,fails:['指标不足']};
-  // ① 周K定方向:周MA5 ≥ 周MA10;历史不足 10 周时退化为"现价 ≥ 周MA5"(避免样本期短就永久不触发)
-  var wkOk=(ind.wkMa5!=null&&ind.wkMa10!=null)?(ind.wkMa5>=ind.wkMa10)
-          :(ind.wkMa5!=null?((ind.close||0)>=ind.wkMa5):false);
-  if(!wkOk)f.push('周K方向向下');
+/* v11.65:门控阈值集中配置 —— 便于"一次只松一个"地调参(馨馨 2026-09-16 定的优先级:
+   量比 0.8→0.6 → KDJ 85→90 → 最后才考虑松 BOLL/量能)。改这里即可,不必动逻辑。 */
+var GATE_CFG={volRatioMin:0.8,kdjMax:85,useBoll:true,useVol:true,useWeek:true,useMacd:true,useKdj:true};
+function gateR2F(v){return v==null?null:Math.round(v*100)/100;}
+/* 入场门控(5 项硬门,全过才虚拟入场)。返回 {ok, fails:[], pass:[]}
+   pass 是【本次实际满足的条件】的中文短句(带取值),用于写进归因 —— 用户据此判断哪个条件最常触发/哪个卡死了交易。 */
+function entryGateF(ind,rec){
+  var f=[],p=[];
+  if(!ind)return {ok:false,fails:['指标不足'],pass:[]};
+  // ① 周K定方向
+  if(GATE_CFG.useWeek){
+    var wkOk,wkTxt;
+    if(ind.wkMa5!=null&&ind.wkMa10!=null){wkOk=ind.wkMa5>=ind.wkMa10;wkTxt='周K多头(周MA5 '+gateR2F(ind.wkMa5)+'≥周MA10 '+gateR2F(ind.wkMa10)+')';}
+    else if(ind.wkMa5!=null){wkOk=(ind.close||0)>=ind.wkMa5;wkTxt='周K不空(现价≥周MA5 '+gateR2F(ind.wkMa5)+')';}
+    else {wkOk=false;wkTxt='周K方向向下(数据不足)';}
+    if(wkOk)p.push(wkTxt); else f.push('周K方向向下');
+  }
   // ② MACD 定趋势强度(日K买卖点)
-  if(!(ind.macd&&ind.macd.dif>=ind.macd.dea))f.push('MACD空头');
+  if(GATE_CFG.useMacd){
+    if(ind.macd&&ind.macd.dif>=ind.macd.dea)p.push('MACD多头(DIF '+gateR2F(ind.macd.dif)+'≥DEA '+gateR2F(ind.macd.dea)+')');
+    else f.push('MACD空头');
+  }
   // ③ KDJ 不超买
-  if(!(ind.kdj&&ind.kdj.k<=85))f.push('KDJ超买');
+  if(GATE_CFG.useKdj){
+    if(ind.kdj&&ind.kdj.k<=GATE_CFG.kdjMax)p.push('KDJ '+Math.round(ind.kdj.k)+'(≤'+GATE_CFG.kdjMax+')');
+    else f.push('KDJ超买');
+  }
   // ④ BOLL 不追高
-  if(!(ind.boll&&ind.close<=ind.boll.up))f.push('站上BOLL上轨');
+  if(GATE_CFG.useBoll){
+    if(ind.boll&&ind.close<=ind.boll.up)p.push('未站上轨(收'+gateR2F(ind.close)+'≤'+gateR2F(ind.boll.up)+')');
+    else f.push('站上BOLL上轨');
+  }
   // ⑤ 量能验证(缩量不接)
-  if(!(ind.volRatio!=null&&ind.volRatio>=0.8))f.push('量比不足');
-  return {ok:f.length===0,fails:f};
+  if(GATE_CFG.useVol){
+    if(ind.volRatio!=null&&ind.volRatio>=GATE_CFG.volRatioMin)p.push('量比'+gateR2F(ind.volRatio)+'(≥'+GATE_CFG.volRatioMin+')');
+    else f.push('量比不足');
+  }
+  return {ok:f.length===0,fails:f,pass:p};
+}
+/* 组装归因短句:入场方式 + 本次满足的全部门控条件。
+   ⚠️ 参数 gate 是【已算好的 entryGateF 结果】,不要在这里重算 —— 重算会用到不完整的对象而误判为空。 */
+function entryGateTextF(rec,gate){
+  if(!gate||!gate.ok)return '';
+  var et=(rec&&rec.entryType==='pullback')?'回踩支撑':'现价入场';
+  var ps=gate.pass||[];
+  return ps.length?(et+' + '+ps.join(' + ')):et;
 }
 /* 逐根累积出"每个交易日收盘时点"的指标快照(只用当日及之前数据) */
 function calcIndicatorSuiteF(klines){
@@ -5315,7 +5344,7 @@ function renderJournalStats(){
       var pnlTxt=(e.pnl==null?'—':((e.pnl>0?'+':'')+e.pnl+'%'));
       rows+='<div class="jrn-row'+(excluded?'':(e.pnl>0?' jrn-pos':(e.pnl<0?' jrn-neg':'')))+'">'+
         '<span class="jrn-code">'+escHtmlF(String(e.code))+' '+escHtmlF(e.name||'')+(e.strategy==='tTrade'?' [做T]':'')+'</span>'+
-        '<span class="jrn-flow">'+escHtmlF(flow)+'</span>'+
+        '<span class="jrn-flow">'+escHtmlF(flow)+((e.shadow&&e.entryConds)?('<br><b>入场依据：</b>'+escHtmlF(e.entryConds)):'')+'</span>'+
         '<span class="jrn-num">'+(excluded?'不计入':pnlTxt)+'</span></div>';
     }
     rows+='</div>';
@@ -5540,6 +5569,7 @@ function shadowJudgeKlinesF(rec,klines,today){
   // v11.64:仅在"尚未入场"时才需要门控(已入场的记录不再被拦)
   var suite=rec.entryHit?null:calcIndicatorSuiteF(klines);
   var entered=!!rec.entryHit,entryDate=rec.entryDate||null,out=null;
+  var entryConds='',entryInd=null;   // v11.65:本次入场满足了哪几个门控条件(写进归因)
   var trace=[];   // v11.32:逐交易日判定轨迹,供用户实时看到"系统每天看了什么、下了什么判断"
   for(var j=0;j<seq.length;j++){
     var s=seq[j];
@@ -5554,9 +5584,12 @@ function shadowJudgeKlinesF(rec,klines,today){
           continue;
         }
         entered=true;entryDate=s.d;
+        // v11.65:把"本次触发满足了哪几个门控条件"算出来 —— 用户据此判断哪个条件最常被触发、哪个卡死了交易
+        entryInd=g;
+        entryConds=g?entryGateTextF(rec,g):'';
         // v11.44:入场当日【不得】用当日最低判止损 —— 入场时点未知,当日最低可能早于入场。
         //         实测 002289:当日最低 34.14@09:31,用户 10:22 才入场 → 旧逻辑误判"入场当日即破止损 -4.85%"。
-        trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'enter',px:entry});
+        trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'enter',px:entry,conds:entryConds});
       } else {
         trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'wait',px:entry});
       }
@@ -5569,7 +5602,7 @@ function shadowJudgeKlinesF(rec,klines,today){
     if(hitS){ trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'loss',px:stop}); out={result:'loss',date:s.d,price:stop,note:'日K回补：'+s.d+' 最低'+s.lo+' 触及止损'}; break; }
     trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'hold',gapT:Math.round((target-s.hi)/s.hi*10000)/100});
   }
-  return {entered:entered,entryDate:entryDate,settle:out,lastDate:seq[seq.length-1].d,trace:trace.slice(-12)};
+  return {entered:entered,entryDate:entryDate,settle:out,lastDate:seq[seq.length-1].d,trace:trace.slice(-12),entryConds:entryConds};
 }
 function settleShadowTrade(code,klines,minBars){
   var sm=getShadowMap();
@@ -5596,7 +5629,8 @@ function settleShadowTrade(code,klines,minBars){
     rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=sd;rec.settlePrice=settlePrice;rec.settleNote=note||'';
     if(!dup){
       addJournalEntry({code:code,name:rec.name||code,date:sd,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',
-        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing',entryType:rec.entryType||''});
+        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing',entryType:rec.entryType||'',
+        entryConds:rec.entryConds||''});   // v11.65:本次触发满足的门控条件(归因用)
     }
     setShadowMap(sm);
   };
@@ -5614,6 +5648,8 @@ function settleShadowTrade(code,klines,minBars){
       if(v){
         kUsed=true;
         if(v.entered&&!rec.entryHit){ rec.entryHit=true;rec.entryDate=v.entryDate;rec.entryPrice=entry; }
+        // v11.65:持久化"本次入场满足了哪几个门控条件",供归因/每笔明细展示
+        if(v.entryConds)rec.entryConds=v.entryConds;
         if(v.trace&&v.trace.length)rec.trace=v.trace;      // v11.32:保存逐日轨迹
         rec.lastCheck={date:today,price:price,high:high,low:low,src:'kline',bar:v.lastDate};
         if(v.settle&&v.settle.result){ doSettle(v.settle.result,pct(v.settle.price),v.settle.price,v.settle.note,v.settle.date); return; }
@@ -5773,7 +5809,7 @@ function renderShadowTrace(blockEl,code,rec){
              :(x.tTouch==='S'?(' · 曾触止损价'+(x.tTouchAt?('('+x.tTouchAt+')'):'')+'，T+1 当日不可卖出，顺延次日结算')
              :' · T+1 次日起可结算'));
       }
-      else if(x.ev==='enter')note+=' @'+rec.entry;
+      else if(x.ev==='enter'){note+=' @'+rec.entry+(x.conds?('（'+x.conds+'）'):'');}
       else if(x.px!=null)note+=' @'+x.px;
       if(x.at)note+=' · '+x.at+' 触及';   // v11.44:分钟K判定的触及时刻
       h+='<div class="tr-row"><span class="tr-d">'+escHtmlF(String(x.d))+'</span>'+
@@ -5842,7 +5878,7 @@ function updateReviewProgress(){
       }else{
         var gap=(px&&r.target)?Math.round((r.target-px)/px*10000)/100:null;
         var fl=(px&&r.entry)?Math.round((px-r.entry)/r.entry*10000)/100:null;   // v11.29:实时浮动,让"跟踪中"可衡量
-        txt='跟踪中：'+r.openedDate+' 起观察 → '+r.entryDate+' 入场@'+r.entry+'（已跟踪 '+ntd+' 个交易日）。现价'+px+'，浮动'+(fl!=null?((fl>=0?'+':'')+fl+'%'):'--')+'，距止盈'+(gap!=null?((gap>=0?'+':'')+gap+'%'):'--')+'（止损'+r.stop+'），触达即自动结算';
+        txt='跟踪中：'+r.openedDate+' 起观察 → '+r.entryDate+' 入场@'+r.entry+'（已跟踪 '+ntd+' 个交易日）。现价'+px+'，浮动'+(fl!=null?((fl>=0?'+':'')+fl+'%'):'--')+'，距止盈'+(gap!=null?((gap>=0?'+':'')+gap+'%'):'--')+'（止损'+r.stop+'）'+(r.entryConds?('；入场依据：'+r.entryConds):'')+'，触达即自动结算';
       }
     } else {
       var mine=[];
@@ -5860,7 +5896,7 @@ function updateReviewProgress(){
           var rn={win:'止盈',loss:'止损',expired:'过期按现价',invalid:'计划失效'}[last.result]||(last.result||'已结算');
           txt='已结算：'+rn+' '+(last.pnl>0?'+':'')+(last.pnl==null?'--':last.pnl)+'%'+
               '（'+((last.entryDate||last.openedDate||'—')+' 入场@'+last.entry)+' → '+(last.settleDate||'—')+' '+rn+(last.settlePrice!=null?('@'+last.settlePrice):'')+'）'+
-              (last.note?'，'+last.note:'');
+              (last.note?'，'+last.note:'')+(last.entryConds?'｜入场依据：'+last.entryConds:'');
         }
       } else if(last&&!last.shadow){
         txt='真实交易已记录：'+(last.pnl!=null?((last.pnl>0?'+':'')+last.pnl+'%'):'盈亏待补')+'（'+last.date+'）';
