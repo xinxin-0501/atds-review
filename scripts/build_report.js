@@ -65,7 +65,7 @@ function renderHeader(report, nav) {
       </div>
     </div>
     <div class="time-nav">
-      <a href="${nav.home}">首页</a><a href="${nav.premarket || 'index.html'}"${m.type === 'premarket' ? ' class="active"' : ''}>盘前</a>${isMid ? '<a href="' + nav.midday + '" class="active">盘中<i class="nav-retired">已停</i></a>' : ''}<a href="${nav.close}"${m.type === 'close' ? ' class="active"' : ''}>收盘</a>
+      <a href="${nav.home}">首页</a><a href="${nav.premarket || 'index.html'}"${m.type === 'premarket' ? ' class="active"' : ''}>盘前</a>${isMid ? '<a href="' + nav.midday + '" class="active">盘中<i class="nav-retired">已停</i></a>' : ''}<a href="${nav.close}"${m.type === 'close' ? ' class="active"' : ''}>收盘</a>${nav.tailscan ? '<a href="' + nav.tailscan + '"' + (m.type === 'tailscan' ? ' class="active"' : '') + '>尾盘</a>' : ''}
     </div>
   </div>`;
 }
@@ -2747,6 +2747,84 @@ function renderIndex(reports) {
 </html>`;
 }
 
+// ══════════ v11.75 尾盘定调快照页(tailscan, 14:30) ══════════
+// 只承载四大选股模块的【盘中未定型】快照,供 14:30~15:00 筛选次日观察池候选。
+// ⚠️ 与模拟跟踪严格分离:本页【刻意不渲染】观察池决策卡/模拟跟踪勾选框/任何 plan 字段
+//   (slim 报告里也没有 watchlist),⇒ 14:30 的静态价格不可能被写成模拟跟踪的入场价;
+//   入场判定仍只认盘中实时价格触发(见 §7 门控)。16:20 收盘复盘会用定型数据覆盖。
+function renderTailscanReport(report, nav) {
+  const m = report.meta || {};
+  const genHM = (String(m.generatedAt || '').match(/(\d{2}:\d{2})/) || [])[1] || '';
+  const capDate = (String(m.generatedAt || '').match(/^(\d{4}-\d{2}-\d{2})/) || [])[1] || '';
+  const ms = report.marketScan || {};
+  const wave = report.waveDivergence || { list: [] };
+  const shortC = report.shortCore || { list: [] };
+  const strong = report.strongStock || { list: [] };
+  const f2 = (v) => (v == null || isNaN(Number(v))) ? '--' : Number(v).toFixed(2);
+  const pctTxt = (v) => (v == null || isNaN(Number(v))) ? '--' : ((Number(v) >= 0 ? '+' : '') + Number(v).toFixed(2) + '%');
+  const sealTxt = (v) => (v == null || isNaN(Number(v))) ? '' : '封单' + (Math.abs(v) / 1e8).toFixed(1) + '亿';
+
+  // 四大模块的"关键信号"标签(每行 1~2 个,409px 手机屏不挤)
+  const sigOf = {
+    pattern: (p) => ((p.patterns || []).join('+') || '形态') + ' · ' + p.score + '分',
+    wave: (p) => ((p.waveType || '') + (p.kdjDivergence ? '·KDJ背离金叉' : '') + ' · ' + p.score + '分'),
+    short: (p) => ('连板' + (p.lianban || p.ztCount || 1) + (p.sealYi != null ? '·' + sealTxt(p.sealYi) : '') + ' · ' + p.score + '分'),
+    strong: (p) => ((p.signalType || '强势') + ' · ' + p.score + '分'),
+  };
+  const rowOf = (p, i, sig) => `<div class="ts-row" data-code="${esc(p.code)}" data-pct="${Number(p.pct) || 0}">
+    <span class="ts-rank">${i + 1}</span>
+    <span class="ts-main"><a class="ts-name" data-code="${esc(p.code)}" onclick="openStockResearch(this.dataset.code)">${esc(p.name)}</a><span class="ts-code">${esc(p.code)}</span><span class="ts-sig">${esc(sig(p, i))}</span></span>
+    <span class="ts-pct ${Number(p.pct) >= 0 ? 'up' : 'down'}">${pctTxt(p.pct)}</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="${esc(p.code)}" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div>`;
+  const module = (key, title, note, list, sig) => `<div class="card ts-module" data-module="${key}">
+    <div class="card-title">${esc(title)}<span class="ts-count">${list.length} 只</span></div>
+    <div class="ts-note">${note}</div>
+    <div class="ts-head"><span>排名</span><span>标的 / 信号</span><span>14:30涨幅</span><span>尾盘表现</span><span></span></div>
+    <div class="ts-rows">${list.map((p, i) => rowOf(p, i, sig)).join('') || '<div class="ts-empty">当日无入选(数据源不可达或无满足战法条件的标的)</div>'}</div>
+  </div>`;
+
+  const modules = [
+    module('pattern', '形态扫描 · 14:30 尾盘定调', '启动/老鸭头/拉升 · 盘中未定型形态(候选池 ' + (ms.candidates || 0) + ' 只)', ms.picks || [], sigOf.pattern),
+    module('wave', '波背离 TOP20 · 14:30 尾盘定调', '前期强势→调整→缩量→KDJ背离金叉 · 盘中未定型', wave.list || [], sigOf.wave),
+    module('short', '超短核心 TOP20 · 14:30 尾盘定调', '涨停基因/连板+竞价/封单强度 · 盘中未定型(收盘定型版见 16:20)', shortC.list || [], sigOf.short),
+    module('strong', '强势股 TOP20 · 14:30 尾盘定调', '缺口/黄金坑/突破起爆 · 盘中未定型', strong.list || [], sigOf.strong),
+  ].join('');
+
+  const idxLine = (report.indices || []).map(i => '<span class="ts-idx">' + esc(i.name) + ' <b>' + fmtNum(i.price) + '</b> ' + fmtPct(i.changePct) + '</span>').join('');
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ATDS PRO · 14:30 尾盘定调快照</title>
+</head>
+<body>
+<div class="phone" data-report-date="${esc(m.date || '')}" data-snap-time="${esc(m.time || '14:30')}">
+${renderHeader(report, nav)}
+<div class="hero">
+  <div class="hero-title">14:30 尾盘定调快照 <span class="hero-time">${esc(m.time || '14:30')}</span></div>
+  <div class="hero-sub">四大选股模块盘中快照 · 采集于 ${esc(genHM || '--')}${capDate && m.date && capDate !== m.date ? '（' + esc(capDate.slice(5)) + ' 重采）' : ''} · 16:20 收盘复盘会用定型数据覆盖</div>
+  <div class="hero-warn hero-warn-late">⚠️ 14:30 盘中快照，指标未定型，尾盘可能有变盘风险，非最终结果。本页仅用于筛选<b>次日观察池候选</b>。</div>
+  <div class="ts-idxline">${idxLine}</div>
+  <div class="wave-tools" style="margin-top:8px">
+    <button id="ts-repull-btn" class="wl-btn wl-btn-primary" onclick="repullTailscan()">🔄 重新拉取最新 14:30 快照</button>
+    <span id="ts-repull-status" class="ts-repull-status"></span>
+  </div>
+  <div class="ts-sep-note">🔒 <b>选股 ≠ 模拟跟踪</b>：14:30 入选仅作次日观察池候选；系统模拟跟踪<b>不依据 14:30 静态价格入场</b>，入场判定仍只认盘中实时价格触发（本页不提供模拟跟踪开关，也不写入任何跟踪数据）。</div>
+</div>
+<div class="section">
+${modules}
+</div>
+<div class="footer">ATDS PRO · 14:30 尾盘定调快照（${esc(genHM || '--')} 采集）· 仅做行情与信息展示 · 不构成投资建议</div>
+</div>
+</body>
+</html>`;
+}
+
 function build() {
   fs.mkdirSync(REVIEWS_DIR, { recursive: true });
   const args = process.argv.slice(2);
@@ -2792,9 +2870,12 @@ function build() {
       premarket: stripReviews(sameDay.premarket) || latestOfType('premarket') || 'index.html',
       midday: stripReviews(sameDay.midday) || latestOfType('midday') || '../index.html',
       close: stripReviews(sameDay.close) || latestOfType('close') || '../index.html',
+      tailscan: stripReviews(sameDay.tailscan) || latestOfType('tailscan') || '',
       latest: stripReviews(latest)
     };
-    const html = m.type === 'premarket' ? renderPremarketReport(report, nav) : renderReport(report, nav);
+    const html = m.type === 'premarket' ? renderPremarketReport(report, nav)
+      : m.type === 'tailscan' ? renderTailscanReport(report, nav)
+      : renderReport(report, nav);
     const outName = `${m.date}_${String(m.time).replace(':', '-')}.html`;
     fs.writeFileSync(path.join(REVIEWS_DIR, outName), html, 'utf8');
     console.log('已生成:', outName);

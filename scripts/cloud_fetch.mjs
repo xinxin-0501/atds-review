@@ -53,7 +53,7 @@ function bjHM(d) {
 //
 // 时段划分(北京): 早盘 09:30~11:30 / 午盘 13:00~15:00。
 //   判定"是否同一交易时段"用 TAPE_SESSIONS,midday 槽位只在其所属时段内允许补采。
-const SLOT_WINDOWS = { premarket: ['08:30', '10:00'], midday: ['09:25', '14:59'], auction: ['09:20', '09:35'] };
+const SLOT_WINDOWS = { premarket: ['08:30', '10:00'], midday: ['09:25', '14:59'], auction: ['09:20', '09:35'], tailscan: ['14:20', '14:59'] };
 // 各槽位允许"迟到补采"的最晚时刻:超过这个点,数据语义已经变了,必须拒绝(A)。
 //   premarket: 理想窗口 08:30~10:00(开盘后 30 分钟),但**有效边界放到 10:15**:
 //     实测第三方 cron(cron-job.org)当前是【30 分钟】节拍(仅 :00/:30),盘前窗口内只剩 10:00 这一跳,
@@ -62,7 +62,9 @@ const SLOT_WINDOWS = { premarket: ['08:30', '10:00'], midday: ['09:25', '14:59']
 //     放到 10:15 后:10:00 那一跳稳过,且因仍在理想窗口之外会被标记 lateCapture=true,
 //     页面照实显示"补采/数据时间",**不伪装成 09:45 原始采集** —— 宁可标注迟到,不可丢掉整份报告。
 //   midday   : 盘中数据到 14:59 为止(14:59 之后是尾盘集合竞价前的最后时刻,仍算盘中)。
-const LATE_LIMIT = { premarket: '10:15', midday: '14:59', auction: '09:35' };
+//   tailscan : 尾盘定调快照(14:30 前后)。理想窗口 14:20~14:59(14:20 触发 → 四大扫描约 8~10 分钟 → ~14:30 完成);
+//     有效边界 15:00:15:00 之后今日K线已定型,再采就是收盘数据,不能再叫"14:30 盘中快照"(会伪装盘)。
+const LATE_LIMIT = { premarket: '10:15', midday: '14:59', auction: '09:35', tailscan: '15:00' };
 function slotGuardF(type, targetDate, todayBj, nowHM, slotExists) {
   const w = SLOT_WINDOWS[type];
   if (!w) return { ok: true, warn: '', late: false };        // close / 未知类型:不设守卫
@@ -3625,10 +3627,12 @@ async function main() {
   let shortCore = null;
   // 强势股选股(仅午盘):全A扫描剔除ST,优先排序TOP30
   let strongStock = null;
-  if (type === 'midday' || type === 'close') {
+  if (type === 'midday' || type === 'close' || type === 'tailscan') {
     // v11.61:盘中槽位停用("盘中可以全部转移收盘") —— 原只在 midday 采集的
     //   「超短核心 / 强势股 / 波背离」改为 midday + close 都采集,使其在收盘页可见。
     //   历史 midday 文件不受影响(条件仍含 midday)。
+    // v11.75:尾盘定调快照(tailscan, 14:30) —— 四大选股模块提前到尾盘 30 分钟,
+    //   让用户用【未定型】的盘中指标筛选次日观察池候选;16:20 收盘仍会用定型数据重采覆盖。
     // v11.49:从 mainRank(板块强度榜)提取板块龙头 → 作为"辨识度"的可操作口径
     // (fix 2026-09-15: 原 v11.51 在 scanShortCore 之后才声明 identSet,TDZ 崩溃 "Cannot access 'identSet' before initialization")
     const identSet = { leaders: new Set(), mainLines: new Set() };
@@ -3698,6 +3702,33 @@ async function main() {
     playbook,
     notes: isPre ? `盘前简报（${typeConf.time}），数据采集于开盘后实时行情（${dataAsOfDate}）。` : '数据来源：腾讯行情 + 东方财富公开接口（云端自动采集）。仅做行情展示，不构成投资建议。'
   };
+
+  // v11.75【尾盘定调快照】tailscan(14:30) 只需要「四大选股模块 + 市场概览」,
+  //   在此**提前返回**,跳过打板五佳/回测追踪/明日看什么等收盘专属重活 ⇒ 采集耗时比 close 短 1~2 分钟。
+  //   ⚠️ 安全边界(模拟跟踪分离):slim 报告【刻意不含 watchlist/决策卡/计划字段】⇒
+  //   build_report 对 tailscan 只渲染选股名单,没有模拟跟踪勾选框,也不写 atds_shadow/plan ——
+  //   14:30 的静态价格绝不可能变成模拟跟踪的入场价(入场判定仍只认盘中实时触发,见 §7 门控)。
+  if (type === 'tailscan') {
+    report.meta.dataAsOfLabel = '今日盘中 14:30 尾盘快照(指标未定型)';
+    report.meta.slotNote = '14:30 盘中快照';
+    const slim = {
+      meta: report.meta,
+      indices,
+      marketStats: report.marketStats,
+      marketScan,        // 形态扫描(启动/老鸭头/拉升)
+      waveDivergence,    // 波背离 TOP20
+      shortCore,         // 超短核心 TOP20
+      strongStock,       // 强势股 TOP20
+      mainRank,          // 板块强度榜(给四大模块提供"板块"上下文)
+      notes: '14:30 尾盘定调快照:四大选股模块为【盘中未定型】指标,仅供尾盘筛选次日观察池候选;16:20 收盘复盘会用定型数据重新采集覆盖。仅做行情展示,不构成投资建议。'
+    };
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    const outFile = path.join(DATA_DIR, `${date}_${time.replace(':', '-')}.json`);
+    fs.writeFileSync(outFile, JSON.stringify(slim, null, 2), 'utf8');
+    console.log('已生成(尾盘定调快照):', outFile, '| 超短核心', shortCore ? shortCore.list.length : 0, '/ 强势股', strongStock ? strongStock.list.length : 0, '/ 波背离', waveDivergence ? waveDivergence.list.length : 0, '/ 形态', marketScan && marketScan.picks ? marketScan.picks.length : 0);
+    console.log(JSON.stringify({ date, type, generatedAt, limitUpCount: zt.total, up: breadth.up, down: breadth.down }, null, 2));
+    return;
+  }
 
   // 打板五佳股 Top5 + 历史回测查取(仅 midday/close)
   let topBoardPicks = null;

@@ -3208,6 +3208,105 @@ function filterWatchlist(){
   if(tip)tip.style.display=(q && matched===0)?'':'none';
 }
 window.filterWatchlist=filterWatchlist;
+/* ════════ v11.75 尾盘定调快照页(tailscan, 14:30)客户端 ════════
+   ① 尾盘表现 = 实时涨幅 − 14:30 快照涨幅(单位:百分点)。
+      数学上 = 相对昨收涨幅的变化量:正=尾盘走强(涨幅扩大),负=尾盘走弱(涨幅回落);
+      15:00 之后实时价=收盘价 ⇒ 自动变成「14:30→收盘」的定调结果,无需任何云端补任务。
+   ② repullTailscan():重新拉取云端最新快照 JSON 并重渲染(带 cache-bust,绕过 CDN 旧缓存)。
+      ⚠️ 说明:静态页无法在不嵌 PAT 的前提下触发 GitHub Actions 重算(会泄露口令,绝对不做);
+      云端重算由 10 分钟节拍自动兜底(14:30/14:40/14:50 三次,当日已采则幂等跳过)。
+   ③ 本页绝不写 localStorage 跟踪数据:模拟跟踪的入场判定只认盘中实时触发(见 §7)。 */
+function tailscanRows(){return document.querySelectorAll('.ts-row[data-code]');}
+async function refreshTailscanTail(){
+  var rows=tailscanRows();if(!rows.length)return;
+  var codes=[],seen={};
+  rows.forEach(function(r){var c=r.getAttribute('data-code');if(c&&!seen[c]){seen[c]=1;codes.push(c);}});
+  var pctByCode={};
+  for(var i=0;i<codes.length;i+=80){
+    var batch=codes.slice(i,i+80).map(function(c){var c0=c.charAt(0);return (c0==='6'||c0==='5')?'sh'+c:((c0==='4'||c0==='8'||c0==='92')?'bj'+c:'sz'+c);});
+    try{
+      var res=await fetch('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
+      if(!res.ok)continue;
+      var text=new TextDecoder('gbk').decode(await res.arrayBuffer());
+      text.split(';').forEach(function(line){
+        var m=line.trim().match(/^v_[a-z]+\d+="(.*)"$/);if(!m)return;
+        var f=m[1].split('~');if(f.length<40)return;
+        var code=String(f[2]||'').trim();var pct=parseFloat(f[32]);
+        if(code&&!isNaN(pct))pctByCode[code]=pct;
+      });
+    }catch(e){}
+  }
+  var filled=0;
+  rows.forEach(function(r){
+    var c=r.getAttribute('data-code'),snap=parseFloat(r.getAttribute('data-pct'));
+    var cell=r.querySelector('.ts-tail');if(!cell)return;
+    if(pctByCode[c]==null||isNaN(snap)){cell.textContent='--';cell.className='ts-tail';return;}
+    var tail=pctByCode[c]-snap;
+    filled++;
+    cell.textContent=(tail>=0?'+':'')+tail.toFixed(2)+'pp';
+    cell.className='ts-tail '+(tail>=0.05?'up':(tail<=-0.05?'down':''));
+    cell.title='实时 '+pctByCode[c].toFixed(2)+'% − 快照 '+snap.toFixed(2)+'% = '+tail.toFixed(2)+'pp';
+  });
+  var st=document.getElementById('ts-repull-status');
+  if(st&&filled)st.textContent='尾盘表现已更新('+filled+' 只 · '+bjTimeF()+')';
+}
+function tailscanRenderRows(list,sig){
+  var pctTxt=function(v){return (v==null||isNaN(Number(v)))?'--':((Number(v)>=0?'+':'')+Number(v).toFixed(2)+'%');};
+  return (list||[]).map(function(p,i){
+    return '<div class="ts-row" data-code="'+escHtmlF(p.code)+'" data-pct="'+(Number(p.pct)||0)+'">'
+      +'<span class="ts-rank">'+(i+1)+'</span>'
+      +'<span class="ts-main"><a class="ts-name" data-code="'+escHtmlF(p.code)+'" onclick="openStockResearch(this.dataset.code)">'+escHtmlF(p.name)+'</a><span class="ts-code">'+escHtmlF(p.code)+'</span><span class="ts-sig">'+escHtmlF(sig(p))+'</span></span>'
+      +'<span class="ts-pct '+(Number(p.pct)>=0?'up':'down')+'">'+pctTxt(p.pct)+'</span>'
+      +'<span class="ts-tail">—</span>'
+      +'<button class="wl-btn ts-add" data-code="'+escHtmlF(p.code)+'" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>'
+      +'</div>';
+  }).join('')||'<div class="ts-empty">当日无入选</div>';
+}
+async function repullTailscan(){
+  var btn=document.getElementById('ts-repull-btn'),st=document.getElementById('ts-repull-status');
+  var phone=document.querySelector('.phone[data-report-date]');
+  if(!phone)return;
+  var date=phone.getAttribute('data-report-date')||'';
+  if(!date){if(st)st.textContent='缺少报告日期,无法重拉';return;}
+  if(btn){btn.disabled=true;}
+  if(st)st.textContent='正在重新拉取…';
+  try{
+    var res=await fetch('data/reviews/'+date+'_14-30.json?t='+Date.now(),{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    var d=await res.json();
+    var sig={
+      pattern:function(p){return ((p.patterns||[]).join('+')||'形态')+' · '+p.score+'分';},
+      wave:function(p){return ((p.waveType||'')+(p.kdjDivergence?'·KDJ背离金叉':'')+' · '+p.score+'分');},
+      short:function(p){return '连板'+(p.lianban||p.ztCount||1)+(p.sealYi!=null?'·封单'+(Math.abs(p.sealYi)/1e8).toFixed(1)+'亿':'')+' · '+p.score+'分';},
+      strong:function(p){return ((p.signalType||'强势')+' · '+p.score+'分');}
+    };
+    var set=function(key,list){var box=document.querySelector('.ts-module[data-module="'+key+'"] .ts-rows');if(box)box.innerHTML=tailscanRenderRows(list,sig[key]);};
+    set('pattern',(d.marketScan||{}).picks);
+    set('wave',(d.waveDivergence||{}).list);
+    set('short',(d.shortCore||{}).list);
+    set('strong',(d.strongStock||{}).list);
+    var cnt=function(l){return (l||[]).length;};
+    document.querySelectorAll('.ts-module').forEach(function(mo){
+      var k=mo.getAttribute('data-module');
+      var n=k==='pattern'?cnt((d.marketScan||{}).picks):k==='wave'?cnt((d.waveDivergence||{}).list):k==='short'?cnt((d.shortCore||{}).list):cnt((d.strongStock||{}).list);
+      var c=mo.querySelector('.ts-count');if(c)c.textContent=n+' 只';
+    });
+    var g=(String((d.meta||{}).generatedAt||'').match(/(\d{2}:\d{2})/)||[])[1];
+    if(g){var sub=document.querySelector('.hero-sub');if(sub)sub.textContent=sub.textContent.replace(/采集于 [\d:]+/,'采集于 '+g);}
+    if(st)st.textContent='已拉取云端最新快照('+g+')';
+    await refreshTailscanTail();
+  }catch(e){
+    if(st)st.textContent='暂无更新的云端快照('+e.message+');每 10 分钟节拍会在 14:40/14:50 自动补跑';
+  }
+  if(btn){btn.disabled=false;}
+}
+window.refreshTailscanTail=refreshTailscanTail;
+window.repullTailscan=repullTailscan;
+(function(){
+  if(!document.querySelector('.ts-row[data-code]'))return;
+  setTimeout(refreshTailscanTail,1500);
+  setInterval(function(){try{refreshTailscanTail();}catch(e){}},60000);
+})();
 /* v11.72 回测表折叠(默认收起,点标题展开) —— 四处共用:
    盘前「观察池回测追踪」「手动新增股回测」 + 收盘「历史Top5」「观察池回测追踪」。
    摘要行常显(不丢汇总),只折叠 10 列明细表与口径说明。 */
