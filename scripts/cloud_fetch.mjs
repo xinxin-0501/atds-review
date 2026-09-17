@@ -2631,6 +2631,7 @@ async function scanWaveDivergence(themeCodes, identSet) {
     volRatio: x.volRatio, volTrap: x.volTrap,
     kdjGold: x.kdjGold, kdjDivergence: x.kdjDivergence, maAlign: x.maAlign,
     themeHit: !!x.themeHit,
+    rawScore: Math.round(x.score * 10) / 10,   // v11.77:未封顶原始分(显示分按100封顶;同分排序依据)
     ident: x.ident || '', waveType: x.waveType || '',                  // v11.49:辨识度(板块龙头)与战法三类划分
     volBreak5: !!x.volBreak5, volProj: x.volProj != null ? x.volProj : null,   // v11.49:出五日量(盘中折算)
     signalType: x.signalType, prevHigh: x.prevHigh, support: x.support
@@ -2868,11 +2869,12 @@ async function scanShortCore(ztList, identSet, auctionMap) {
     fromAuction: !!x.fromAuction,
     sealYi: x.sealYi != null ? x.sealYi : null,
     kaiban: x.kaiban != null ? Number(x.kaiban) : null,   // v11.61:炸板次数(卡片标注"炸板N次"),也是入选依据
+    rawScore: Math.round(x.score * 10) / 10,   // v11.77:未封顶原始分(显示分按100封顶;同分再按封单额→连板排序)
     ident: x.ident || '',
     signalType: x.lianban >= 2 ? (x.lianban + '连板') : (x.ztCount >= 2 ? '多涨停' : '强势涨停')
   }));
   return { total: quotes.length, scanned: cands.length, list, limitUpExcluded: _limitUp,
-    source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只'
+    source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只，按综合分(原始)→封单额→连板排序，显示分按100封顶'
       + (_limitUp ? '，已排除【一直封死】的涨停 ' + _limitUp + ' 只（盘中买不到）' : '')
       + '，按 score 优先取前 ' + list.length + ' 只' };
 }
@@ -3107,6 +3109,7 @@ async function scanStrongStock() {
     amount: fmtAmount(x.amountWan),
     turnover: x.turnover,
     score: Math.min(100, Math.round(x.score)),
+    rawScore: Math.round(x.score * 10) / 10,   // v11.77:未封顶原始分(显示分按100封顶;同分排序依据)
     gapFound: x.gapFound, gapVolOK: x.gapVolOK, gapDays: x.gapDays,
     goldPit: x.goldPit, pitLow: x.pitLow, pitDays: x.pitDays, pitVolOK: x.pitVolOK,
     ztCount: x.ztCount,
@@ -3184,14 +3187,16 @@ async function scanMarketPatterns(ztPool) {
       const score = Math.min(100, Math.round(
         Math.min(det.pct5, 12) * 3 + Math.min(Number(s.turn) || 0, 10) * 3 + Math.min(det.patterns.length * 8, 24)
       ));
+      const _lastClose = Number(arr[arr.length - 1] && arr[arr.length - 1][2]) || 0;   // v11.77:当日收盘价(=K线最后一根),与其它三榜字段对齐
       picks.push({
-        code, name: s.f14 || code, pct: Math.round((Number(s.f3) || 0) * 100) / 100,
+        code, name: s.f14 || code, pct: Math.round((Number(s.f3) || 0) * 100) / 100, price: Math.round(_lastClose * 100) / 100,
         patterns: det.patterns, score,
         reason: det.patterns.join('+') + (s.turn != null ? ('·换手' + Number(s.turn).toFixed(1) + '%') : '') + '·5日涨' + det.pct5.toFixed(1) + '%'
       });
     } catch (e) { /* skip */ }
   }
   picks.sort((a, b) => b.score - a.score);
+  picks.forEach((p, i) => { p.rank = i + 1; });   // v11.77:rank 与其它三榜对齐(1..N)
   return { scanned: (mkt && mkt.total) || cands.length, candidates: cands.length, source, klineOk, klineFail, picks: picks.slice(0, 20),
     openMap: (mkt && mkt.openMap) || null };   // v11.51:全市场开盘强度映射(供竞价快照,不参与渲染)
 }

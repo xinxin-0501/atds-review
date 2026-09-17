@@ -834,7 +834,7 @@ function renderMarketScan(report) {
       <span class="wave-scan-info">${esc(ms.source || '--')} + 腾讯/东财K线 形态识别</span>
       <button id="ms-open-btn" class="wl-btn wl-btn-primary" onclick="openMarketScanModal()">📋 打开形态扫描名单</button>
     </div>
-    <div class="sc-hint">点击上方按钮弹出弹窗，查看完整形态个股名单 · 支持刷新重扫与一键全部加入观察池<br><span class="ss-note">⚠ 形态在<b>预筛候选池</b>内判定（全市场 → 涨幅 1~8% + 换手 1.5~20% + 成交额≥1.5亿，取前 66 只），因此榜内个股普遍同时具备「拉升」特征 —— 区分度请看<b>分数</b>（=5日涨幅×3 + 换手×3 + 形态数×8），而非形态标签数量</span></div>
+    <div class="sc-hint">点击上方按钮弹出弹窗，查看完整形态个股名单 · 支持刷新重扫与一键全部加入观察池<br><span class="ss-note">⚠ 形态在<b>预筛候选池</b>内判定（全市场 → 涨幅 1~8% + 换手 1.5~20% + 成交额≥1.5亿，取前 66 只），因此榜内个股普遍同时具备「拉升」特征 —— 区分度请看<b>分数</b>（=min(5日涨幅,12%)×3 + min(换手,10%)×3 + min(形态数×8,24)，总分100封顶 —— 5日涨/换手超限部分不计分，防高换手垃圾股主导），而非形态标签数量</span></div>
   </div>`;
   const modal = `<div class="modal-mask" id="market-scan-modal" onclick="if(event.target===this)closeMarketScanModal()">
     <div class="modal" onclick="event.stopPropagation()">
@@ -1651,7 +1651,7 @@ function renderWaveDivergence(report) {
         <span class="wave-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
         <span class="wave-price ${cls}">${fmtNum(x.price)}</span>
         <span class="wave-pct ${cls}">${fmtPct(x.pct)}</span>
-        <span class="wave-score">${x.score}</span>
+        <span class="wave-score">${x.score}${x.rawScore && x.rawScore > x.score ? ("·原" + x.rawScore) : ""}</span>
         <span class="wave-sig sig sig-${sig.tone}">${esc(x.signalType)}</span>
       </div>
       <div class="wave-meta">
@@ -1726,7 +1726,7 @@ function renderShortCore(report) {
         <span class="sc-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
         <span class="sc-price ${cls}">${fmtNum(x.price)}</span>
         <span class="sc-pct ${cls}">${fmtPct(x.pct)}</span>
-        <span class="sc-score">${x.score}</span>
+        <span class="sc-score">${x.score}${x.rawScore && x.rawScore > x.score ? ("·原" + x.rawScore) : ""}</span>
         <span class="sc-sig sig sig-${sigTone}">${esc(sigText)}</span>
         ${Number(x.pct) >= 9.8
           ? (_sealed(x)
@@ -1795,7 +1795,7 @@ function renderStrongStock(report) {
         <span class="ss-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
         <span class="ss-price ${cls}">${fmtNum(x.price)}</span>
         <span class="ss-pct ${cls}">${fmtPct(x.pct)}</span>
-        <span class="ss-score">${x.score}</span>
+        <span class="ss-score">${x.score}${x.rawScore && x.rawScore > x.score ? ("·原" + x.rawScore) : ""}</span>
       </div>
       <div class="ss-meta">
         <span>信号 <b class="ok">${esc(x.signalType)}</b></span>
