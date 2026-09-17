@@ -69,6 +69,8 @@
 .wl-time.fail::before{content:'●';color:#b71c1c}
 .wl-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .wl-search-input{font-size:11px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:14px;width:120px;outline:none;background:#fafafa}
+/* v11.74 池内过滤:无结果兜底提示(灰色,不抢眼,只做引导) */
+.wl-filter-empty{color:#94a3b8;font-size:12px;text-align:center;padding:16px 10px;background:#fafafa;border:1px dashed #e5e7eb;border-radius:10px;margin:8px 4px;line-height:1.6}
 .wl-tool{font-size:10px;padding:4px 10px;border:1px solid #e0e0e0;border-radius:14px;background:#fff;color:#555;cursor:pointer;white-space:nowrap}
 .wl-tool-red{background:#c33;color:#fff;border-color:#c33}
 .wl-table{width:100%;border-collapse:collapse;font-size:10px}
@@ -2137,7 +2139,7 @@
       <a href="index.html">首页</a><a href="2026-08-18_08-30.html">盘前</a><a href="2026-08-18_15-20.html" class="active">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘 · <b>数据时间 18:38</b>（约 1301 分钟前）</div><h1 class="hero-title">2026-08-18 · <span class="hero-time">15:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-warn">⚠️ 延迟补采（实际数据时点 18:38），非当日 16:20 收盘快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 85°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘 · <b>数据时间 18:38</b>（约 19 分钟前）</div><h1 class="hero-title">2026-08-18 · <span class="hero-time">15:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-warn">⚠️ 延迟补采（实际数据时点 18:38），非当日 16:20 收盘快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 85°</span></div></div>
 <div class="section">
 <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-18 收盘复盘 · 数据截至 15:20</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">85°</div><div class="ce-stage">过热区 · 情绪极度亢奋</div><div class="ce-fact">主特征: 谨防高潮后分歧</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">34%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">79</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">79</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈77%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">4板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">32%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">2279</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">4257</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">147</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:2279"></div><div class="ce-bar-flat" style="flex:147"></div><div class="ce-bar-down" style="flex:4257"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>34%</b></span><span>成交额 <b>24008亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row" data-code="000001" data-prefix="sh"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val up">+0.19%</span><span class="ce-idx-price">3990.3</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:5.7%"></div></div></div><div class="ce-idx-row" data-code="399001" data-prefix="sz"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val down">-0.56%</span><span class="ce-idx-price">14622.5</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:16.8%"></div></div></div><div class="ce-idx-row" data-code="399006" data-prefix="sz"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-0.93%</span><span class="ce-idx-price">3705.56</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:27.900000000000002%"></div></div></div><div class="ce-block-hint">量能维持在 2 万亿上方 (24008 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">种植业</span><span class="ce-ml-val up">+9.1%</span></div><div class="ce-ml-row"><span class="ce-ml-name">化学制药</span><span class="ce-ml-val up">+7.7%</span></div><div class="ce-ml-row"><span class="ce-ml-name">养殖业</span><span class="ce-ml-val up">+6.1%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">种植业</span><span class="ce-ml-val up">+9.1亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制药</span><span class="ce-ml-val up">+7.7亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">养殖业</span><span class="ce-ml-val up">+6.1亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制品</span><span class="ce-ml-val up">+6.1亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title">04 情绪高度(连板梯队)</div><div class="ce-ladder"><span class="ce-ladder-pill">4板 · 神奇制药</span><span class="ce-ladder-pill">3板 · 桂发祥</span><span class="ce-ladder-pill">2板 · 哈森股份</span></div></div><div class="card"><div class="card-title">05 明日观察锚点</div><div class="ce-anchor-grid"><div class="ce-anchor-card"><div class="ce-anchor-h">🎯 主线持续性</div><div class="ce-anchor-desc">观察 化学制药 龙头 神奇制药 能否继续表态</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">⚠️ 情绪退潮阈值</div><div class="ce-anchor-desc">今日炸板 23 家 · 晋级率 32%,炸板率 &gt; 40% 或晋级率 &lt; 50% 需警惕</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">📊 量能验证</div><div class="ce-anchor-desc">成交额 24008亿 基础上能否重拾放量</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">🛡️ 高位风险</div><div class="ce-anchor-desc">神奇制药 4 板,关注与所属板块是否背离</div></div></div></div><div class="card tw-card-outer"><div class="card-title"><span class="tw-eyebrow">06</span> 明日看什么</div><div class="tw-tabs"></div><div class="tw-details"></div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
     
@@ -3579,6 +3581,8 @@ async function addFetchedToWatchlist(code){
   var mm=document.getElementById("modal-"+code);
   if(mm)mm.classList.remove("show");
   document.body.style.overflow="";
+  // v11.74:加入后重跑一次池内过滤(新卡也要遵循当前输入框的过滤条件)
+  if(typeof filterWatchlist==='function')filterWatchlist();
 }
 async function fetchKlineF(code, count) {
   count = count || 70;
@@ -6618,6 +6622,29 @@ function togglePlanBlock(h){
   var caret=block.querySelector('.dc-plan-caret');
   if(caret)caret.textContent=collapsed?'▸':'▾';
 }
+/* v11.74 观察池【池内实时过滤】:输入代码/名称即过滤下方列表(只改 DOM 显示,绝不碰 localStorage/cache)。
+   严格只做 UI 过滤:通过 toggle 卡片 style.display 实现 ⇒ 勾选框/交易状态/数据缓存等全部原地保留,
+   不会触发"状态丢失"。匹配规则:代码或名称【包含】输入串(忽略大小写)。空串 → 恢复完整列表。
+   无匹配 → 显示灰色提示,引导用户用「+ 搜索加入」做全网添加,而不是误以为池内搜不到。
+   与 refreshWatchlistQuotes(只更新卡片内单元格、不重建 .wl-stock 卡片)天然兼容:display 状态跨刷新保留。 */
+function filterWatchlist(){
+  var input=document.getElementById('search-input');
+  if(!input)return;
+  var q=(input.value||'').trim().toLowerCase();
+  var cards=document.querySelectorAll('.wl-stock[data-stock-code]');
+  var matched=0;
+  cards.forEach(function(card){
+    var code=(card.getAttribute('data-stock-code')||'').toLowerCase();
+    var nameEl=card.querySelector('.wl-name');
+    var name=(nameEl?nameEl.textContent:'').toLowerCase();
+    var hit=!q || code.indexOf(q)>=0 || name.indexOf(q)>=0;
+    if(hit)matched++;
+    card.style.display=hit?'':'none';
+  });
+  var tip=document.getElementById('wl-filter-empty');
+  if(tip)tip.style.display=(q && matched===0)?'':'none';
+}
+window.filterWatchlist=filterWatchlist;
 /* v11.72 回测表折叠(默认收起,点标题展开) —— 四处共用:
    盘前「观察池回测追踪」「手动新增股回测」 + 收盘「历史Top5」「观察池回测追踪」。
    摘要行常显(不丢汇总),只折叠 10 列明细表与口径说明。 */

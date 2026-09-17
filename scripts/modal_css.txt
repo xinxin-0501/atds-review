@@ -59,6 +59,8 @@
 .wl-time.fail::before{content:'●';color:#b71c1c}
 .wl-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .wl-search-input{font-size:11px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:14px;width:120px;outline:none;background:#fafafa}
+/* v11.74 池内过滤:无结果兜底提示(灰色,不抢眼,只做引导) */
+.wl-filter-empty{color:#94a3b8;font-size:12px;text-align:center;padding:16px 10px;background:#fafafa;border:1px dashed #e5e7eb;border-radius:10px;margin:8px 4px;line-height:1.6}
 .wl-tool{font-size:10px;padding:4px 10px;border:1px solid #e0e0e0;border-radius:14px;background:#fff;color:#555;cursor:pointer;white-space:nowrap}
 .wl-tool-red{background:#c33;color:#fff;border-color:#c33}
 .wl-table{width:100%;border-collapse:collapse;font-size:10px}
