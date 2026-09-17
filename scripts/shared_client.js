@@ -144,6 +144,8 @@ async function addFetchedToWatchlist(code){
   var mm=document.getElementById("modal-"+code);
   if(mm)mm.classList.remove("show");
   document.body.style.overflow="";
+  // v11.74:加入后重跑一次池内过滤(新卡也要遵循当前输入框的过滤条件)
+  if(typeof filterWatchlist==='function')filterWatchlist();
 }
 async function fetchKlineF(code, count) {
   count = count || 70;
@@ -3183,6 +3185,29 @@ function togglePlanBlock(h){
   var caret=block.querySelector('.dc-plan-caret');
   if(caret)caret.textContent=collapsed?'▸':'▾';
 }
+/* v11.74 观察池【池内实时过滤】:输入代码/名称即过滤下方列表(只改 DOM 显示,绝不碰 localStorage/cache)。
+   严格只做 UI 过滤:通过 toggle 卡片 style.display 实现 ⇒ 勾选框/交易状态/数据缓存等全部原地保留,
+   不会触发"状态丢失"。匹配规则:代码或名称【包含】输入串(忽略大小写)。空串 → 恢复完整列表。
+   无匹配 → 显示灰色提示,引导用户用「+ 搜索加入」做全网添加,而不是误以为池内搜不到。
+   与 refreshWatchlistQuotes(只更新卡片内单元格、不重建 .wl-stock 卡片)天然兼容:display 状态跨刷新保留。 */
+function filterWatchlist(){
+  var input=document.getElementById('search-input');
+  if(!input)return;
+  var q=(input.value||'').trim().toLowerCase();
+  var cards=document.querySelectorAll('.wl-stock[data-stock-code]');
+  var matched=0;
+  cards.forEach(function(card){
+    var code=(card.getAttribute('data-stock-code')||'').toLowerCase();
+    var nameEl=card.querySelector('.wl-name');
+    var name=(nameEl?nameEl.textContent:'').toLowerCase();
+    var hit=!q || code.indexOf(q)>=0 || name.indexOf(q)>=0;
+    if(hit)matched++;
+    card.style.display=hit?'':'none';
+  });
+  var tip=document.getElementById('wl-filter-empty');
+  if(tip)tip.style.display=(q && matched===0)?'':'none';
+}
+window.filterWatchlist=filterWatchlist;
 /* v11.72 回测表折叠(默认收起,点标题展开) —— 四处共用:
    盘前「观察池回测追踪」「手动新增股回测」 + 收盘「历史Top5」「观察池回测追踪」。
    摘要行常显(不丢汇总),只折叠 10 列明细表与口径说明。 */

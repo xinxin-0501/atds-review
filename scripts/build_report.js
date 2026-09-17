@@ -1605,7 +1605,7 @@ function renderWatchlist(report) {
     '<div class="wl-header">' +
       '<div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● ' + esc(time) + '</span></div>' +
       '<div class="wl-tools">' +
-        '<input id="search-input" class="wl-search-input" placeholder="🔍 输入代码 / 名称" maxlength="6" inputmode="numeric">' +
+        '<input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()">' +
         '<button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button>' +
         '<button class="wl-tool" onclick="handleSearchStock()">个股分析</button>' +
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
@@ -1613,7 +1613,7 @@ function renderWatchlist(report) {
       '</div>' +
     '</div>' +
     '<div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div>' +
-    '<div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll">' + stocks + '</div></div></div>' +
+    '<div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll">' + stocks + '</div></div><div id="wl-filter-empty" class="wl-filter-empty" style="display:none">未在观察池中找到匹配个股，如需添加请点击右侧「+ 搜索加入」</div></div>' +
     '<div class="wl-details"></div>' +
     '</div>';
   const modals = '';  // v12b: 不再静态生成个股 modal,统一由 openStockResearch/showDynamicResearch 动态生成,避免 id 重复导致关闭失效
