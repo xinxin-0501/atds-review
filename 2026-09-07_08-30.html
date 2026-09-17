@@ -2162,7 +2162,7 @@
       <a href="index.html">首页</a><a href="2026-09-07_08-30.html" class="active">盘前</a><a href="2026-09-07_16-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 12:40</b>（约 423 分钟前）</div><h1 class="hero-title">2026-09-07 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 12:40），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 92°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 12:40</b>（约 487 分钟前）</div><h1 class="hero-title">2026-09-07 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 12:40），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 92°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-07 12:40:13</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -4499,6 +4499,12 @@ function addToWatchlistUI(s){
 function removeWatchlistRow(code){
   code=String(code||'').trim();
   console.log('[removeWatchlistRow] code=', JSON.stringify(code));
+  // v11.76【归档优先】:删除个股前,若其模拟跟踪尚有未结算的虚拟持仓,必须按现价了结并归档 —— 绝不静默丢历史
+  try{
+    var _sm=getShadowMap(),_rec=_sm[code];
+    if(_rec&&_rec.enabled){ if(_rec.entryHit&&!_rec.settled)archiveShadowPositionF(code,_rec,'删除个股'); delete _sm[code]; setShadowMap(_sm); }
+    try{localStorage.removeItem('sim_track_'+code);}catch(e){}
+  }catch(e){console.warn('[removeWatchlistRow] 模拟跟踪归档失败:',e&&e.message);}
   var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();
   var m=document.getElementById("modal-"+code);if(m)m.remove();
   try{var w=localStorage.getItem("atds_watchlist");var arr=w?JSON.parse(w):[];arr=arr.filter(function(c){return String(c)!==String(code);});localStorage.setItem("atds_watchlist",JSON.stringify(arr));}catch(e){console.warn('[removeWatchlistRow] atds_watchlist 删除失败:',e.message);}
@@ -4886,7 +4892,10 @@ async function refreshWatchlistQuotes(){
             if(d){
               // v11.5:同样合并全量缓存,避免补拉 K 线重建时清空 events/lhb/logic 等已补齐字段
               var fullData2=loadWatchlistStockData(c)||{};
-              var sObj2=Object.assign({},fullData2,{code:c,name:name,price:price,pct:pct,amount:amount,turnover:'--',prevClose:fullData2.prevClose||0,open:fullData2.open||0,high:fullData2.high||0,low:fullData2.low||0,amplitude:fullData2.amplitude||0,volRatio:fullData2.volRatio||0,tech:t,fundFlow:ff||fullData2.fundFlow||null});
+              // v11.76【防偷价】high/low 绝不能取自本地缓存(fullData2.low 可能是**前几天**的最低价)!决策卡的 data-low
+              //   会被模拟跟踪的"当日高低"判定读到 —— 串了旧值就会拿旧低点判"已触及入场价"(600111 实测踩坑)。
+              //   置 0 ⇒ buildDecisionCardHtml 回退为 data-low=现价(真实、安全方向:只会少判不会多判),真实高低由主刷新循环补上。
+var sObj2=Object.assign({},fullData2,{code:c,name:name,price:price,pct:pct,amount:amount,turnover:'--',prevClose:fullData2.prevClose||0,open:fullData2.open||0,high:0,low:0,amplitude:fullData2.amplitude||0,volRatio:fullData2.volRatio||0,tech:t,fundFlow:ff||fullData2.fundFlow||null});
               d.innerHTML=buildDecisionCardHtml(sObj2);
               restoreReviewUI(d.querySelector('.dc-review'));   // 补拉后重建,恢复勾选/交易状态
             }
@@ -6401,6 +6410,59 @@ function shadowJudgeEntryDayF(rec,bars,entryDate,entryTime){
   }
   return {settle:null,hi:afterHi,lo:afterLo,touchT:touchT,touchS:touchS,touchTAt:touchTAt,touchSAt:touchSAt,firstT:seq[0].t,lastT:seq[seq.length-1].t};
 }
+// v11.76【防偷价·打勾当日入场判定】只认「打勾时刻之后」的分钟级真实触及。
+//   真实触及的定义:该分钟的成交区间覆盖入场价(分钟最低 l ≤ 入场价 ≤ 分钟最高 h) ——
+//   只有 l≤入场价 而 h<入场价 意味着该分钟根本没交易到入场价,不能成交。
+//   打勾之前的分钟一律排除(那时用户还没决定跟踪,其价格与本次跟踪决策无关)。
+//   分钟K不可得/无触及 ⇒ 返回 touched:false,调用方保持「监控中」,绝不回退用当日最低判入场。
+function judgeEntryTouchIntradayF(rec,bars,tickDate,tickTime){
+  var entry=Number(rec&&rec.entry);
+  if(!entry||!bars||!bars.length)return {touched:false,reason:'分钟K不可得'};
+  var seq=[];
+  for(var i=0;i<bars.length;i++){
+    var b=bars[i];if(!b)continue;
+    if(String(b.d||'').slice(0,10)!==tickDate)continue;
+    if(b.t&&tickTime&&String(b.t)<=String(tickTime).slice(0,5))continue;   // 打勾之前(含当根)不计
+    seq.push(b);
+  }
+  if(!seq.length)return {touched:false,reason:'打勾后暂无分钟K'};
+  seq.sort(function(a,b){return String(a.t)<String(b.t)?-1:1;});
+  for(var j=0;j<seq.length;j++){
+    var x=seq[j];
+    var lo=Number(x.l),hi=Number(x.h);
+    if(!(lo>0))continue;
+    if(lo<=entry&&hi>=entry)return {touched:true,at:x.t,price:entry};
+  }
+  return {touched:false,reason:'打勾后未触及 '+entry+'（打勾后最低 '+seq[0].l+'）'};
+}
+// v11.76【历史归档】两层:
+//   ① atds_trade_journal:全量结算/归档记录(独立于观察池,删股/取消勾选都不动它)⇒ 总胜率与每笔明细的数据源;
+//   ② sim_track_history_<code>:按股票的独立历史副本(用户点名要求的键名),删除个股/清空跟踪后仍可单独查阅。
+//      两个档案都【只增不删】,唯一能清空它们的是「清空复盘数据」按钮(带二次确认)。
+function archiveHistoryCopyF(code,obj){
+  try{
+    var k='sim_track_history_'+String(code);
+    var arr=[];try{arr=JSON.parse(localStorage.getItem(k)||'[]');}catch(e){}
+    arr.push(obj);
+    localStorage.setItem(k,JSON.stringify(arr));
+  }catch(e){}
+}
+// v11.76:取消勾选/删除个股时,若该股尚有【未结算的虚拟持仓】,按现价了结并归档(result='cancelled',
+//   单列展示、不计入胜率 —— 这是用户主动终止,不是策略打出的止盈/止损)。绝不允许静默丢弃历史。
+function archiveShadowPositionF(code,rec,reason){
+  if(!rec)return;
+  var block=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+  var price=block?(parseFloat(block.getAttribute('data-price'))||0):0;
+  if(!(price>0))price=Number(rec.refPrice)||0;
+  var pnl=(price&&rec.entry)?Math.round((price-rec.entry)/rec.entry*10000)/100:0;
+  var note=(reason||'取消')+'，按现价了结（未触发止盈/止损，不计入胜率）';
+  var planKey=[code,rec.entry,rec.stop,rec.target,'cancelled'].join('|');
+  addJournalEntry({code:code,name:rec.name||code,date:bjTodayF(),entry:rec.entry,stop:rec.stop,target:rec.target,close:price,pnl:pnl,shadow:true,
+    result:'cancelled',note:note,openedDate:rec.openedDate||'',entryDate:rec.entryDate||rec.openedDate||'',settleDate:bjTodayF(),settlePrice:price,
+    v:28,planKey:planKey,strategy:'swing',entryType:rec.entryType||'',entryConds:rec.entryConds||''});
+  archiveHistoryCopyF(code,{entry:rec.entry,entryDate:rec.entryDate||rec.openedDate,stop:rec.stop,target:rec.target,result:'cancelled',pnl:pnl,settleDate:bjTodayF(),settlePrice:price,note:reason||'取消'});
+  showToast('已归档 '+code+' 的模拟跟踪记录（按现价 '+(pnl>0?'+':'')+pnl+'% 了结，历史保留在复盘模块）');
+}
 function lhbAgoTxtF(d){
   var k=tradingDaysBetweenF(d,bjTodayF());
   return k>0?('，约'+k+'个交易日前'):'（今日）';
@@ -6462,6 +6524,7 @@ function renderJournalStats(){
   if(c.legacy)ex.push('早期未校验 '+c.legacy+' 笔（无入场门控，不计入胜率）');
   if(c.missed)ex.push('未触发入场 '+c.missed+' 笔（不计入胜率）');
   if(c.invalid)ex.push('计划失效 '+c.invalid+' 笔（起点已破位，不计入胜率）');
+  if(c.cancelled)ex.push('中途取消/删除归档 '+c.cancelled+' 笔（按现价了结，不计入胜率，历史永久保留）');
   var warn='<div class="jrn-warn">'+(ex.length?('⚠ '+ex.join('　·　')+'　'):'')+
     '<button class="jrn-btn" onclick="toggleBackupPanel()">'+(backupOpen?'收起备份':'备份/恢复')+'</button>'+
     '<button class="jrn-btn jrn-del" onclick="confirmClearReviewData()">清空复盘数据</button></div>'+
@@ -6473,6 +6536,7 @@ function renderJournalStats(){
       '<button class="jrn-btn" onclick="importReviewData()">⬆ 恢复合并</button>'+
       '</div></div>'):'');
   var rows='';
+  var perStock=renderPerStockArchive();   // v11.76:个股历史档案(按股票聚合,永久保留)
   if(jrnOpen){
     rows='<div class="jrn-wrap">';
     for(var i=j.length-1;i>=0;i--){
@@ -6502,7 +6566,32 @@ function renderJournalStats(){
     // v11.29:口径声明 —— 把理想化假设显式写出来,比假装数据精确更可信。
     rows+='<div class="jrn-disc">口径说明：<b>① 入场门控（多周期多指标）</b> —— 需<b>价格回落至计划入场价</b> 且 <b>前收门控五项全过</b>：周K方向(周MA5≥周MA10)、MACD(DIF≥DEA)、KDJ(K≤85 不超买)、BOLL(收盘不站上轨)、量比(≥0.8)；全部用<b>入场日前一根已完成K线</b>计算（<b>无未来函数</b>），未过则记「⏸ 门控未通过·未入场」并继续等待（不消耗观察期）。<b>② 【A股 T+1】买入当日不可卖出</b>，故<b>入场日一律不结算</b>（只按 <b>1 分钟分时</b>，取不到时用 15 分钟K，记录「<b>入场之后</b>」的区间与曾否触达止盈/止损价；当日最低可能出现在入场之前，故不得用日K当日最低判入场日；取不到分钟K则当日不留判定）；<b>结算自入场次一交易日起</b>，用<b>当日最高/最低</b>判定（日线无法还原日内先后，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率；<b>入场当日即结算的历史样本违反 T+1，已单列标记、不计入胜率</b>。<b>入场方式按"勾选时入场价相对现价"划分（回踩支撑=需回落才入场；现价入场=勾选价即入场价）；同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
   }
-  el.innerHTML=head+warn+rows;
+  el.innerHTML=head+warn+perStock+rows;
+}
+// v11.76:个股历史档案视图(按股票聚合 journal 中该股的全部模拟跟踪记录)。
+//   ⭐ 独立于观察池:个股被删除/取消勾选/清空跟踪后,这里的档案**永久保留**(除非「清空复盘数据」)。
+function renderPerStockArchive(){
+  var j=getJournal(),g={};
+  for(var i=0;i<j.length;i++){
+    var e=j[i];if(!e||!e.shadow)continue;
+    var k=String(e.code);
+    if(!g[k])g[k]={name:e.name||k,n:0,win:0,loss:0,cancelled:0,missed:0,invalid:0,open:0,last:null};
+    var it=g[k];it.n++;
+    var p=Number(e.pnl),rs=e.result||( !isNaN(p)&&e.pnl!=null?(p>=0?'win':'loss'):'');
+    if(rs==='win')it.win++;else if(rs==='loss')it.loss++;else if(rs==='cancelled')it.cancelled++;else if(rs==='missed')it.missed++;else if(rs==='invalid')it.invalid++;else it.open++;
+    if(!it.last||String(e.settleDate||e.date||'')>String(it.last.settleDate||it.last.date||''))it.last=e;
+  }
+  var keys=Object.keys(g).sort(function(a,b){return (g[b].win+g[b].loss)-(g[a].win+g[a].loss);});
+  if(!keys.length)return '<div class="jrn-disc">个股档案：暂无（勾选个股「系统模拟跟踪」后，每笔虚拟买入/结算都会按股票永久归档在这里）</div>';
+  var h='<div class="jrn-disc"><b>📁 个股历史档案</b>（按股票聚合 · 删除个股/取消勾选/清空跟踪都不会丢，仅「清空复盘数据」可清）<br>';
+  for(var i2=0;i2<keys.length;i2++){
+    var it2=g[keys[i2]];
+    var wr=(it2.win+it2.loss)?(Math.round(it2.win/(it2.win+it2.loss)*100)+'%'):'—';
+    h+='<div class="jrn-ps"><b>'+escHtmlF(String(keys[i2]))+' '+escHtmlF(it2.name)+'</b>：共 '+it2.n+' 笔 · 止盈 '+it2.win+' / 止损 '+it2.loss+'（胜率 '+wr+'）'
+      +(it2.cancelled?(' · 取消归档 '+it2.cancelled):'')+(it2.missed?(' · 未触发 '+it2.missed):'')+(it2.invalid?(' · 失效 '+it2.invalid):'')+(it2.open?(' · <b>监控中</b>'):'')
+      +(it2.last?('　最近：'+escHtmlF(String(it2.last.settleDate||it2.last.date||'—'))+' '+(it2.last.pnl!=null?((it2.last.pnl>0?'+':'')+it2.last.pnl+'%'):'—')):'')+'</div>';
+  }
+  return h+'</div>';
 }
 // v11.35:样本备份/恢复 —— 样本是唯一不可重建的资产(换机/清浏览器数据即永久丢失)。
 var backupOpen=false;
@@ -6806,20 +6895,45 @@ function toggleShadowTrack(cb){
   var m=getShadowMap();
   if(cb.checked&&block){
     var _en=r2fF(block.getAttribute('data-entry')), _px=r2fF(block.getAttribute('data-price'));
+    var _stop=r2fF(block.getAttribute('data-stop')), _tg=r2fF(block.getAttribute('data-target'));
     // v11.35:入场方式标注(勾选时一次性判定,之后价格变化无法回溯)。
     // 计划入场价 = (支撑位<现价 ? 支撑位 : 现价),故天然分两类:pullback=需回踩支撑才入场 / current=现价即为入场价。
     var _et=(_en&&_px&&_en<_px*0.999)?'pullback':'current';
-    m[code]={enabled:true,name:block.getAttribute('data-name')||code,entry:_en,stop:r2fF(block.getAttribute('data-stop')),target:r2fF(block.getAttribute('data-target')),openedDate:bjTodayF(),settled:false,entryType:_et,refPrice:_px,entryTime:bjTimeF()};
+    // v11.76【防偷价·核心改造】打勾 ≠ 入场。打勾只代表「加入今日候选监控队列」,状态=监控中。
+    //   虚拟买入必须等盘中价格【真实触及】计划入场价(且触及发生在打勾之后)才记录,入场价才成立。
+    //   ① current(打勾时现价已落在计划入场价附近):虚拟成交价 = 打勾那一刻的【真实现价】,
+    //      而不是更低的计划价 —— 用市场当时给不到的价格成交就是偷价。
+    //      止损/止盈按差值平移,保持与原计划完全相同的风险结构(盈亏比不变)。
+    //   ② pullback:虚拟成交价 = 计划入场价,但必须等【打勾之后】分钟级真实回落触及;
+    //      打勾之前/之时已经出现的当日最低一律不算(那次最低发生在用户还没决定跟踪的时候)。
+    //   ③ 勾选后【不再立即结算/判定】(v11.33 的"勾完立即评估一次"正是本次偷价的直接推手) ——
+    //      只把状态置为「监控中」,判定交给限频刷新(60s)与分钟K。
+    var entry,stop,target;
+    if(_et==='current'&&_px){
+      entry=_px;
+      var shift=Math.round((_px-_en)*100)/100;
+      stop=Math.round(((_stop||0)+shift)*100)/100;
+      target=Math.round(((_tg||0)+shift)*100)/100;
+    }else{
+      entry=_en;stop=_stop;target=_tg;
+    }
+    m[code]={enabled:true,status:'monitoring',name:block.getAttribute('data-name')||code,entry:entry,planEntry:_en,stop:stop,target:target,openedDate:bjTodayF(),settled:false,entryHit:false,entryType:_et,refPrice:_px,entryTime:bjNowHM()};
+    setShadowMap(m);   // ⚠️ 必须先落盘再 return(漏写会让勾选不持久)
     try{localStorage.setItem('sim_track_'+code,'true');}catch(e){}
-    showToast('已加入模拟跟踪队列（'+( _et==='pullback'?'需回踩':'现价入场')+'），开始累积样本');
+    showToast(_et==='pullback'
+      ? ('已加入监控队列（等待回落至 '+entry+' 触发虚拟入场；打勾前的最低价不算）')
+      : ('已按现价 '+entry+' 建立虚拟跟踪（止损 '+stop+' / 止盈 '+target+'）'),'');
+    updateReviewProgress();
+    return;   // ⚠️ 不再立即评估 —— 打勾当日的入场只认「打勾之后」的分钟级触及,交给限频刷新判定
   }else{
+    // v11.76【归档】取消勾选:若已有虚拟持仓(入场未结算),按现价了结并写入复盘档案 —— 绝不静默丢历史。
+    var _rec=m[code];
+    if(_rec&&_rec.entryHit&&!_rec.settled){ try{ archiveShadowPositionF(code,_rec,'取消勾选'); }catch(e){} }
     if(m[code])delete m[code];
     try{localStorage.removeItem('sim_track_'+code);}catch(e){}
   }
   setShadowMap(m);
   updateReviewProgress();
-  // v11.33:勾选后立即评估一次 —— 否则要等下一次 60s 限频刷新才产生 lastCheck/轨迹,用户勾完看不到反馈。
-  if(cb.checked){ try{ settleAllShadowTrades(); }catch(e){} }
 }
 
 // v11.28:模拟跟踪结算 —— 加入「入场门控」。这是本轮最关键的修正。
@@ -6989,7 +7103,9 @@ function shadowJudgeKlinesF(rec,klines,today){
   for(var j=0;j<seq.length;j++){
     var s=seq[j];
     if(!entered){
-      if(s.lo<=entry){
+      if(s.lo<=entry&&s.hi>=entry){
+        // v11.76【防偷价·双保险】:真实触及 = 当日成交区间覆盖入场价(l≤entry≤h)。
+        //   只判 l≤entry 而 entry>h 的交易日,价格根本没到过入场价 ⇒ 旧逻辑会用更优价格虚拟成交(偷价)。
         // v11.64【入场门控】用【前一交易日收盘】的周K/MACD/KDJ/BOLL/量比判定(无未来函数)。
         //   任一硬门不过 ⇒ 不虚拟入场,记 skip + 原因,entered 保持 false 继续等待。
         //   取不到前一根(如序列起点)时按"不拦"处理,避免数据不足导致永久不触发。
@@ -7035,6 +7151,7 @@ function settleShadowTrade(code,klines,minBars){
   if(!entry||!stop||!target||!(target>entry&&entry>stop))return;
   if(!(price>0))return;
   var today=bjTodayF();
+  var isTickDay=(String(rec.openedDate)===today);   // v11.76:打勾当日(当日最低可能发生在打勾之前,不可用于判入场)
   var pct=function(v){return Math.round((v-entry)/entry*10000)/100;};
   var doSettle=function(result,pnl,settlePrice,note,settleDate){
     var sd=settleDate||today;
@@ -7046,15 +7163,17 @@ function settleShadowTrade(code,klines,minBars){
       addJournalEntry({code:code,name:rec.name||code,date:sd,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',
         openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing',entryType:rec.entryType||'',
         entryConds:rec.entryConds||''});   // v11.65:本次触发满足的门控条件(归因用)
+      try{ archiveHistoryCopyF(code,{entry:entry,entryDate:rec.entryDate||rec.openedDate,stop:stop,target:target,result:result,pnl:pnl,settleDate:sd,settlePrice:settlePrice,note:note||''}); }catch(e){}
     }
     setShadowMap(sm);
   };
-  // 防御4:观察起点作废(仅首个有效检查日判定一次)
+  // 防御4:观察起点作废(仅首个有效检查日判定一次)。打勾当日现价已低于止损位 ⇒ 计划前提本就不成立,
+  //   当天就该判 invalid(未入场、不消耗样本),与是否打勾日无关。
   if(!rec.entryHit&&!rec.firstCheck){
     rec.firstCheck=today;
     if(price<=stop){ doSettle('invalid',0,null,'观察起点现价'+price+'已低于计划止损位'+stop+'，计划已失效，未入场'); return; }
   }
-  // ① 优先:日K线逐日回补判定
+  // ① 优先:日K线逐日回补判定(⚠️ 打勾当日被 d>openedDate 天然排除,不会用当日数据判入场)
   var kUsed=false;
   if(klines&&klines.length){
     var last=klines[klines.length-1],lastClose=last?parseFloat(last[2])||0:0;
@@ -7072,6 +7191,11 @@ function settleShadowTrade(code,klines,minBars){
     }
   }
   // ② 回退:用实时当天最高/最低判定(同时把当日判定写入轨迹,保证"当天勾选就能看到")
+  //    v11.76【防偷价·核心】:打勾当日【禁止】用"当日最低"判入场 —— 当日最低可能发生在打勾之前
+  //    (实测 600111:10:31 打勾时最低 36.80,全天最低 36.70,计划入场 36.69,三者都不该触发,
+  //     但旧逻辑在数据源抖动/缓存串值时就会用 36.69 判定"已入场" ⇒ 偷价)。
+  //    打勾当日只认【打勾时刻之后】的分钟级真实触及(l≤入场价≤h,即该分钟真实成交区间覆盖入场价);
+  //    分钟K不可得 ⇒ 保持「监控中」,不判定、不产生样本。
   if(!kUsed){
     if(!(high>0&&low>0&&high>=low))return;
     if((high-low)/low>0.5){
@@ -7082,9 +7206,20 @@ function settleShadowTrade(code,klines,minBars){
     rec.lastCheck={date:today,price:price,high:high,low:low};
     var ev=null;
     if(!rec.entryHit){
-      if(low<=entry){
+      if(isTickDay){
+        var _tj=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);
+        if(_tj&&_tj.touched){
+          rec.entryHit=true;rec.entryDate=today;rec.entryPrice=entry;rec.touchAt=_tj.at;rec.entryMinute=_tj.at;
+          ev='enter';
+        }else{
+          ev='monitor';
+          rec.lastCheck.skip='打勾当日：仅认打勾('+ (rec.entryTime||'—') +')之后的分钟级触及('+( (_tj&&_tj.reason)||'分钟K不可得' )+')，当前不入场';
+        }
+      }else if(low<=entry&&high>=entry){
+        // v11.76:真实触及 = 当日成交区间覆盖入场价(low≤entry≤high)。只满足 low≤entry 而 entry>high
+        //   意味着当日从未交易到该价 ⇒ 旧逻辑同样会偷价(用更优的入场价成交)。
         rec.entryHit=true;rec.entryDate=today;rec.entryPrice=entry;
-        ev='enter';   // v11.44:当天入场不判止损(同一原因:low 可能是入场前的价格)
+        ev='enter';
       } else ev='wait';
     } else if(rec.entryDate!==today){
       var hitT=high>=target,hitS=low<=stop;
@@ -7179,6 +7314,10 @@ async function settleAllShadowTrades(){
     if(_rec&&_rec.entryHit&&_rec.entryDate===bjTodayF()){
       try{ var _mp=await fetchTodayMinuteF(codes[i]); if(_mp&&_mp.length)mbs[codes[i]]=_mp; }catch(e){}
     }
+    // v11.76【防偷价】:打勾当日尚未入场的记录,改用 1 分钟分时判"打勾之后是否真实触及入场价"
+    if(_rec&&!_rec.entryHit&&String(_rec.openedDate)===bjTodayF()){
+      try{ var _mp2=await fetchTodayMinuteF(codes[i]); if(_mp2&&_mp2.length)mbs[codes[i]]=_mp2; }catch(e){}
+    }
   }
   for(var j=0;j<codes.length;j++){
     try{ await settleShadowTrade(codes[j],kls[codes[j]],mbs[codes[j]]); }catch(e){ console.warn('[settleShadowTrade]',codes[j],e.message); }
@@ -7200,7 +7339,7 @@ function toggleTrace(){
   try{localStorage.setItem('atds_trace_open',traceOpen?'1':'0');}catch(e){}
   updateReviewProgress();
 }
-var TRACE_EV={wait:'未触及入场价',enter:'✅ 触发入场','enter-stop':'入场当日即破止损',hold:'持有中',win:'🎯 触及止盈',loss:'🛑 触及止损','both-stop':'双触·保守计止损',skip:'⏸ 门控未通过·未入场'};
+var TRACE_EV={wait:'未触及入场价',enter:'✅ 触发入场','enter-stop':'入场当日即破止损',hold:'持有中',win:'🎯 触及止盈',loss:'🛑 触及止损','both-stop':'双触·保守计止损',skip:'⏸ 门控未通过·未入场',monitor:'🟡 监控中（打勾当日仅认打勾后触及）'};
 function renderShadowTrace(blockEl,code,rec){
   var el=blockEl.querySelector('.dc-trace');
   if(!el)return;
@@ -7260,6 +7399,7 @@ function reviewClassification(){
       }
     } else if(rs==='missed'){ s.missed++; }
     else if(rs==='invalid'){ s.invalid++; }   // v11.29:观察起点已破位的作废样本,不计入胜率
+    else if(rs==='cancelled'){ s.cancelled=(s.cancelled||0)+1; }   // v11.76:用户主动取消/删除时按现价了结的持仓(不计入胜率,但永久归档)
   }
   s.avg=s.valid?Math.round(s.sum/s.valid*100)/100:0;
   s.winRate=(s.win+s.loss)?Math.round(s.win/(s.win+s.loss)*100):null;
@@ -7289,7 +7429,13 @@ function updateReviewProgress(){
           for(var z=r.trace.length-1;z>=0;z--){ if(r.trace[z]&&r.trace[z].ev==='skip'){ sk=r.trace[z]; break; } }
         }
         var skTxt=sk?('；'+(sk.d||'')+' 已触计划价但【门控未过：'+(sk.skip||'—')+'】，未虚拟入场'):'';
-        txt='待入场：观察起点 '+r.openedDate+'（已 '+days+' 天 / '+ntd+' 个交易日）。现价'+px+'，需回落至计划入场价'+r.entry+(need!=null?('（还差'+need+'%）'):'')+skTxt+'；未触发入场前不计入样本';
+        // v11.76:状态机重构 —— 打勾=监控中(候选队列),绝不显示"已入场"。
+        //   收盘后(15:00)未触发 ⇒ 明示「今日未触发（未消耗样本）」;盘中 ⇒ 显示还需回落多少。
+        var afterClose=(function(){var d=new Date(Date.now()+8*3600*1000);return (d.getUTCHours()*60+d.getUTCMinutes())>=15*60;})();
+        var monTxt=afterClose
+          ? '🟡 监控中：今日未触发入场（未消耗样本）—— 未回落至计划入场价 '+r.entry+'（今日最高 '+(r.lastCheck&&r.lastCheck.high||px)+'），明日继续'
+          : '🟡 监控中：等待回落至计划入场价 '+r.entry+' 触发虚拟买入（现价 '+px+(need!=null?('，还差 '+need+'%'):'')+'）';
+        txt=monTxt+' ｜ 观察起点 '+r.openedDate+' '+ (r.entryTime?('（'+r.entryTime+' 打勾）'):'') +'· 已 '+days+' 天 / '+ntd+' 个交易日'+skTxt+'；未触发入场不计入样本';
       }else{
         var gap=(px&&r.target)?Math.round((r.target-px)/px*10000)/100:null;
         var fl=(px&&r.entry)?Math.round((px-r.entry)/r.entry*10000)/100:null;   // v11.29:实时浮动,让"跟踪中"可衡量
