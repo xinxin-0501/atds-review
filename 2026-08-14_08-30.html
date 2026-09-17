@@ -67,6 +67,33 @@
 .wl-search-input{font-size:11px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:14px;width:120px;outline:none;background:#fafafa}
 /* v11.74 池内过滤:无结果兜底提示(灰色,不抢眼,只做引导) */
 .wl-filter-empty{color:#94a3b8;font-size:12px;text-align:center;padding:16px 10px;background:#fafafa;border:1px dashed #e5e7eb;border-radius:10px;margin:8px 4px;line-height:1.6}
+/* v11.75 尾盘定调快照页(14:30) */
+.ts-idxline{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ts-idxline .ts-idx{font-size:10px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:3px 6px}
+.ts-idxline .ts-idx b{font-weight:800}
+.ts-sep-note{font-size:11px;color:#334155;background:#f1f5f9;border-left:3px solid #64748b;border-radius:4px;padding:6px 8px;margin-top:8px;line-height:1.6}
+.ts-repull-status{font-size:10px;color:#64748b;margin-left:6px}
+.ts-module{margin-bottom:12px}
+.ts-module .ts-count{margin-left:auto;font-size:10px;color:#fff;background:#94a3b8;border-radius:8px;padding:2px 7px;font-weight:700}
+.ts-module .ts-note{font-size:10px;color:#64748b;margin:2px 0 6px;line-height:1.5}
+.ts-head,.ts-row{display:flex;align-items:center;gap:5px;padding:5px 4px;border-bottom:1px solid #f1f5f9}
+.ts-head{font-size:9px;color:#94a3b8;font-weight:700;border-bottom:1px solid #e2e8f0}
+.ts-row{font-size:11px}
+.ts-head span:nth-child(1),.ts-row .ts-rank{width:22px;flex-shrink:0;text-align:center;color:#94a3b8}
+.ts-head span:nth-child(2),.ts-row .ts-main{flex:1;min-width:0}
+.ts-head span:nth-child(3),.ts-row .ts-pct{width:56px;flex-shrink:0;text-align:right}
+.ts-head span:nth-child(4),.ts-row .ts-tail{width:58px;flex-shrink:0;text-align:right;font-weight:800}
+.ts-head span:nth-child(5),.ts-row .ts-add{width:44px;flex-shrink:0}
+.ts-main{display:flex;flex-direction:column;line-height:1.35}
+.ts-name{font-weight:700;color:#0f172a;text-decoration:none}
+.ts-code{font-size:9px;color:#94a3b8}
+.ts-sig{font-size:9px;color:#7c3aed;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ts-pct{text-align:right;font-weight:700}
+.ts-tail{color:#0f172a}
+.ts-tail.up{color:#dc2626}
+.ts-tail.down{color:#16a34a}
+.ts-add{font-size:10px;padding:3px 6px;border-radius:10px}
+.ts-empty{font-size:11px;color:#94a3b8;text-align:center;padding:12px 0}
 .wl-tool{font-size:10px;padding:4px 10px;border:1px solid #e0e0e0;border-radius:14px;background:#fff;color:#555;cursor:pointer;white-space:nowrap}
 .wl-tool-red{background:#c33;color:#fff;border-color:#c33}
 .wl-table{width:100%;border-collapse:collapse;font-size:10px}
@@ -2135,7 +2162,7 @@
       <a href="index.html">首页</a><a href="2026-08-14_08-30.html" class="active">盘前</a><a href="2026-08-14_15-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:35</b>（约 22 分钟前）</div><h1 class="hero-title">2026-08-14 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:35</b>（约 68 分钟前）</div><h1 class="hero-title">2026-08-14 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-14 18:35:24</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -5638,6 +5665,105 @@ function filterWatchlist(){
   if(tip)tip.style.display=(q && matched===0)?'':'none';
 }
 window.filterWatchlist=filterWatchlist;
+/* ════════ v11.75 尾盘定调快照页(tailscan, 14:30)客户端 ════════
+   ① 尾盘表现 = 实时涨幅 − 14:30 快照涨幅(单位:百分点)。
+      数学上 = 相对昨收涨幅的变化量:正=尾盘走强(涨幅扩大),负=尾盘走弱(涨幅回落);
+      15:00 之后实时价=收盘价 ⇒ 自动变成「14:30→收盘」的定调结果,无需任何云端补任务。
+   ② repullTailscan():重新拉取云端最新快照 JSON 并重渲染(带 cache-bust,绕过 CDN 旧缓存)。
+      ⚠️ 说明:静态页无法在不嵌 PAT 的前提下触发 GitHub Actions 重算(会泄露口令,绝对不做);
+      云端重算由 10 分钟节拍自动兜底(14:30/14:40/14:50 三次,当日已采则幂等跳过)。
+   ③ 本页绝不写 localStorage 跟踪数据:模拟跟踪的入场判定只认盘中实时触发(见 §7)。 */
+function tailscanRows(){return document.querySelectorAll('.ts-row[data-code]');}
+async function refreshTailscanTail(){
+  var rows=tailscanRows();if(!rows.length)return;
+  var codes=[],seen={};
+  rows.forEach(function(r){var c=r.getAttribute('data-code');if(c&&!seen[c]){seen[c]=1;codes.push(c);}});
+  var pctByCode={};
+  for(var i=0;i<codes.length;i+=80){
+    var batch=codes.slice(i,i+80).map(function(c){var c0=c.charAt(0);return (c0==='6'||c0==='5')?'sh'+c:((c0==='4'||c0==='8'||c0==='92')?'bj'+c:'sz'+c);});
+    try{
+      var res=await fetch('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
+      if(!res.ok)continue;
+      var text=new TextDecoder('gbk').decode(await res.arrayBuffer());
+      text.split(';').forEach(function(line){
+        var m=line.trim().match(/^v_[a-z]+\d+="(.*)"$/);if(!m)return;
+        var f=m[1].split('~');if(f.length<40)return;
+        var code=String(f[2]||'').trim();var pct=parseFloat(f[32]);
+        if(code&&!isNaN(pct))pctByCode[code]=pct;
+      });
+    }catch(e){}
+  }
+  var filled=0;
+  rows.forEach(function(r){
+    var c=r.getAttribute('data-code'),snap=parseFloat(r.getAttribute('data-pct'));
+    var cell=r.querySelector('.ts-tail');if(!cell)return;
+    if(pctByCode[c]==null||isNaN(snap)){cell.textContent='--';cell.className='ts-tail';return;}
+    var tail=pctByCode[c]-snap;
+    filled++;
+    cell.textContent=(tail>=0?'+':'')+tail.toFixed(2)+'pp';
+    cell.className='ts-tail '+(tail>=0.05?'up':(tail<=-0.05?'down':''));
+    cell.title='实时 '+pctByCode[c].toFixed(2)+'% − 快照 '+snap.toFixed(2)+'% = '+tail.toFixed(2)+'pp';
+  });
+  var st=document.getElementById('ts-repull-status');
+  if(st&&filled)st.textContent='尾盘表现已更新('+filled+' 只 · '+bjTimeF()+')';
+}
+function tailscanRenderRows(list,sig){
+  var pctTxt=function(v){return (v==null||isNaN(Number(v)))?'--':((Number(v)>=0?'+':'')+Number(v).toFixed(2)+'%');};
+  return (list||[]).map(function(p,i){
+    return '<div class="ts-row" data-code="'+escHtmlF(p.code)+'" data-pct="'+(Number(p.pct)||0)+'">'
+      +'<span class="ts-rank">'+(i+1)+'</span>'
+      +'<span class="ts-main"><a class="ts-name" data-code="'+escHtmlF(p.code)+'" onclick="openStockResearch(this.dataset.code)">'+escHtmlF(p.name)+'</a><span class="ts-code">'+escHtmlF(p.code)+'</span><span class="ts-sig">'+escHtmlF(sig(p))+'</span></span>'
+      +'<span class="ts-pct '+(Number(p.pct)>=0?'up':'down')+'">'+pctTxt(p.pct)+'</span>'
+      +'<span class="ts-tail">—</span>'
+      +'<button class="wl-btn ts-add" data-code="'+escHtmlF(p.code)+'" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>'
+      +'</div>';
+  }).join('')||'<div class="ts-empty">当日无入选</div>';
+}
+async function repullTailscan(){
+  var btn=document.getElementById('ts-repull-btn'),st=document.getElementById('ts-repull-status');
+  var phone=document.querySelector('.phone[data-report-date]');
+  if(!phone)return;
+  var date=phone.getAttribute('data-report-date')||'';
+  if(!date){if(st)st.textContent='缺少报告日期,无法重拉';return;}
+  if(btn){btn.disabled=true;}
+  if(st)st.textContent='正在重新拉取…';
+  try{
+    var res=await fetch('data/reviews/'+date+'_14-30.json?t='+Date.now(),{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    var d=await res.json();
+    var sig={
+      pattern:function(p){return ((p.patterns||[]).join('+')||'形态')+' · '+p.score+'分';},
+      wave:function(p){return ((p.waveType||'')+(p.kdjDivergence?'·KDJ背离金叉':'')+' · '+p.score+'分');},
+      short:function(p){return '连板'+(p.lianban||p.ztCount||1)+(p.sealYi!=null?'·封单'+(Math.abs(p.sealYi)/1e8).toFixed(1)+'亿':'')+' · '+p.score+'分';},
+      strong:function(p){return ((p.signalType||'强势')+' · '+p.score+'分');}
+    };
+    var set=function(key,list){var box=document.querySelector('.ts-module[data-module="'+key+'"] .ts-rows');if(box)box.innerHTML=tailscanRenderRows(list,sig[key]);};
+    set('pattern',(d.marketScan||{}).picks);
+    set('wave',(d.waveDivergence||{}).list);
+    set('short',(d.shortCore||{}).list);
+    set('strong',(d.strongStock||{}).list);
+    var cnt=function(l){return (l||[]).length;};
+    document.querySelectorAll('.ts-module').forEach(function(mo){
+      var k=mo.getAttribute('data-module');
+      var n=k==='pattern'?cnt((d.marketScan||{}).picks):k==='wave'?cnt((d.waveDivergence||{}).list):k==='short'?cnt((d.shortCore||{}).list):cnt((d.strongStock||{}).list);
+      var c=mo.querySelector('.ts-count');if(c)c.textContent=n+' 只';
+    });
+    var g=(String((d.meta||{}).generatedAt||'').match(/(\d{2}:\d{2})/)||[])[1];
+    if(g){var sub=document.querySelector('.hero-sub');if(sub)sub.textContent=sub.textContent.replace(/采集于 [\d:]+/,'采集于 '+g);}
+    if(st)st.textContent='已拉取云端最新快照('+g+')';
+    await refreshTailscanTail();
+  }catch(e){
+    if(st)st.textContent='暂无更新的云端快照('+e.message+');每 10 分钟节拍会在 14:40/14:50 自动补跑';
+  }
+  if(btn){btn.disabled=false;}
+}
+window.refreshTailscanTail=refreshTailscanTail;
+window.repullTailscan=repullTailscan;
+(function(){
+  if(!document.querySelector('.ts-row[data-code]'))return;
+  setTimeout(refreshTailscanTail,1500);
+  setInterval(function(){try{refreshTailscanTail();}catch(e){}},60000);
+})();
 /* v11.72 回测表折叠(默认收起,点标题展开) —— 四处共用:
    盘前「观察池回测追踪」「手动新增股回测」 + 收盘「历史Top5」「观察池回测追踪」。
    摘要行常显(不丢汇总),只折叠 10 列明细表与口径说明。 */

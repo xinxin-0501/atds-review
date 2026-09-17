@@ -71,6 +71,33 @@
 .wl-search-input{font-size:11px;padding:4px 8px;border:1px solid #e0e0e0;border-radius:14px;width:120px;outline:none;background:#fafafa}
 /* v11.74 池内过滤:无结果兜底提示(灰色,不抢眼,只做引导) */
 .wl-filter-empty{color:#94a3b8;font-size:12px;text-align:center;padding:16px 10px;background:#fafafa;border:1px dashed #e5e7eb;border-radius:10px;margin:8px 4px;line-height:1.6}
+/* v11.75 尾盘定调快照页(14:30) */
+.ts-idxline{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ts-idxline .ts-idx{font-size:10px;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:3px 6px}
+.ts-idxline .ts-idx b{font-weight:800}
+.ts-sep-note{font-size:11px;color:#334155;background:#f1f5f9;border-left:3px solid #64748b;border-radius:4px;padding:6px 8px;margin-top:8px;line-height:1.6}
+.ts-repull-status{font-size:10px;color:#64748b;margin-left:6px}
+.ts-module{margin-bottom:12px}
+.ts-module .ts-count{margin-left:auto;font-size:10px;color:#fff;background:#94a3b8;border-radius:8px;padding:2px 7px;font-weight:700}
+.ts-module .ts-note{font-size:10px;color:#64748b;margin:2px 0 6px;line-height:1.5}
+.ts-head,.ts-row{display:flex;align-items:center;gap:5px;padding:5px 4px;border-bottom:1px solid #f1f5f9}
+.ts-head{font-size:9px;color:#94a3b8;font-weight:700;border-bottom:1px solid #e2e8f0}
+.ts-row{font-size:11px}
+.ts-head span:nth-child(1),.ts-row .ts-rank{width:22px;flex-shrink:0;text-align:center;color:#94a3b8}
+.ts-head span:nth-child(2),.ts-row .ts-main{flex:1;min-width:0}
+.ts-head span:nth-child(3),.ts-row .ts-pct{width:56px;flex-shrink:0;text-align:right}
+.ts-head span:nth-child(4),.ts-row .ts-tail{width:58px;flex-shrink:0;text-align:right;font-weight:800}
+.ts-head span:nth-child(5),.ts-row .ts-add{width:44px;flex-shrink:0}
+.ts-main{display:flex;flex-direction:column;line-height:1.35}
+.ts-name{font-weight:700;color:#0f172a;text-decoration:none}
+.ts-code{font-size:9px;color:#94a3b8}
+.ts-sig{font-size:9px;color:#7c3aed;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ts-pct{text-align:right;font-weight:700}
+.ts-tail{color:#0f172a}
+.ts-tail.up{color:#dc2626}
+.ts-tail.down{color:#16a34a}
+.ts-add{font-size:10px;padding:3px 6px;border-radius:10px}
+.ts-empty{font-size:11px;color:#94a3b8;text-align:center;padding:12px 0}
 .wl-tool{font-size:10px;padding:4px 10px;border:1px solid #e0e0e0;border-radius:14px;background:#fff;color:#555;cursor:pointer;white-space:nowrap}
 .wl-tool-red{background:#c33;color:#fff;border-color:#c33}
 .wl-table{width:100%;border-collapse:collapse;font-size:10px}
@@ -2139,7 +2166,7 @@
       <a href="index.html">首页</a><a href="2026-08-19_08-30.html">盘前</a><a href="2026-08-19_11-35.html" class="active">盘中<i class="nav-retired">已停</i></a><a href="2026-08-19_15-20.html">收盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照 · <b>数据时间 20:36</b>（约 1341 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">18:57</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 20:36），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">中温区 · 58°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照 · <b>数据时间 20:36</b>（约 1387 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">19:43</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 20:36），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">中温区 · 58°</span></div></div>
 <div class="section">
 <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-19 午盘快照 · 实时更新中</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">58°</div><div class="ce-stage">中温区 · 情绪正常</div><div class="ce-fact">主特征: 结构性机会</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">7%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">36</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">36</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈75%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">3板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">19%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">487</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">6162</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">33</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:487"></div><div class="ce-bar-flat" style="flex:33"></div><div class="ce-bar-down" style="flex:6162"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>7%</b></span><span>成交额 <b>25110亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row" data-code="000001" data-prefix="sh"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val down">-2.40%</span><span class="ce-idx-price">3894.42</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:72%"></div></div></div><div class="ce-idx-row" data-code="399001" data-prefix="sz"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val down">-5.01%</span><span class="ce-idx-price">13890.15</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:100%"></div></div></div><div class="ce-idx-row" data-code="399006" data-prefix="sz"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-6.26%</span><span class="ce-idx-price">3473.49</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:100%"></div></div></div><div class="ce-block-hint">量能维持在 2 万亿上方 (25110 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">农产品加</span><span class="ce-ml-val up">+6.9%</span></div><div class="ce-ml-row"><span class="ce-ml-name">焦炭Ⅱ</span><span class="ce-ml-val up">+5.3%</span></div><div class="ce-ml-row"><span class="ce-ml-name">房地产服</span><span class="ce-ml-val up">+5.3%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">农产品加</span><span class="ce-ml-val up">+6.9亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">焦炭Ⅱ</span><span class="ce-ml-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">房地产服</span><span class="ce-ml-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制药</span><span class="ce-ml-val up">+5.3亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card bt-card-outer"><div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换<span class="bt-time">· 11:35</span></div><div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div><div class="bt-row"><div class="bt-card bt-3"><div class="bt-lv">3板</div><div class="bt-name">金健米业</div><div class="bt-sub">三板高度</div></div><div class="bt-card bt-2"><div class="bt-lv">2板</div><div class="bt-name">日丰股份</div><div class="bt-sub">二板</div></div><div class="bt-card bt-1"><div class="bt-lv">1板</div><div class="bt-name">罗普斯金</div><div class="bt-sub">首板</div></div><div class="bt-card bt-new"><div class="bt-lv">断板</div><div class="bt-name">--</div><div class="bt-sub">断板</div></div><div class="bt-card bt-zb"><div class="bt-lv">炸板</div><div class="bt-name">--</div><div class="bt-sub">炸板</div></div></div><div class="bt-struct-note"><b>结构辨证</b>:农产品加 今日最高 3板(龙头 金健米业),板块 +10.0% / 资金 +0.0亿;农化制品 +10.0% 居次,电网设备 +15.0% 第三,焦炭Ⅱ +10.0%。梯队高度 3板,情绪 58°(中温区),注意高位分歧与一致兑现风险。</div><div class="vt-section"><div class="vt-h">② 主线研判</div><div class="vt-line"><span class="vt-rank">①</span><b>农产品加</b> — 穿越板块总龙头(<b class="up">金健米业 3板</b>)<div class="vt-desc">板块 +10.02%、资金 +0.0亿,0家涨停,龙头 金健米业 领涨,是当前情绪总龙头,注意高位分歧。</div></div><div class="vt-line"><span class="vt-rank">②</span><b>农化制品</b> — 今日次强爆发(<b class="up">红四方</b>)<div class="vt-desc">板块 +10.02%、资金 +0.0亿,0家涨停,龙头 红四方 领涨,为二线主线。</div></div><div class="vt-line"><span class="vt-rank">③</span><b>电网设备</b> — 梯队成形<div class="vt-desc">板块 +15.03%、资金 +0.0亿,0家涨停,龙头 日丰股份。</div></div><div class="vt-line"><span class="vt-rank">④</span><b>焦炭Ⅱ</b> — 资金主节奏<div class="vt-desc">板块 +10.04%、资金 +0.0亿,0家涨停,关注承接力度。</div></div></div><div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors"><li><span class="vt-tag">金健米业 3板</span>农产品加 板块 +10.0% 领涨,龙头 金健米业 表态,关注能否延续 3 板穿越</li><li><span class="vt-tag">红四方</span>农化制品 今日次强,龙头 红四方 领涨,观察明日能否接力</li><li><span class="vt-tag">日丰股份</span>电网设备 梯队成形,资金 净流入 0.0亿,关注持续性</li><li><span class="vt-tag">宝泰隆</span>焦炭Ⅱ 板块 +10.0%,资金 净流入 0.0亿,高位注意回撤</li><li><span class="vt-tag">炸板监控</span>今日炸板 12家,炸板率超 40% 需警惕情绪退潮</li><li><span class="vt-tag">量能验证</span>成交额 25110亿,关注量能能否维持</li></ul></div><div class="bd-section"><div class="bd-h">④ 板块强弱 · 3最强 · 3分歧 · 3流出</div><table class="bd-tbl"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>方向</th></tr></thead><tbody><tr class="bd-seg-h bd-seg-1"><td colspan="5"><span class="bd-seg-num">1</span><b>最强</b> · 一字带动 · 龙头确立</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">化学制药</td><td class="up">+16.65%</td><td class="up">+10.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">电网设备</td><td class="up">+15.03%</td><td class="up">+9.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">厨卫电器</td><td class="up">+13.32%</td><td class="up">+8.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr class="bd-seg-h bd-seg-2"><td colspan="5"><span class="bd-seg-num">2</span><b>分歧</b> · 资金流入但涨幅收敛</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">房地产服</td><td class="up">+10.10%</td><td class="up">+6.1亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">装修建材</td><td class="up">+10.07%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">中药Ⅱ</td><td class="up">+10.07%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr class="bd-seg-h bd-seg-3"><td colspan="5"><span class="bd-seg-num">3</span><b>流出</b> · 退潮 / 资金撤离</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">焦炭Ⅱ</td><td class="up">+10.04%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">通用设备</td><td class="up">+10.03%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">农产品加</td><td class="up">+10.02%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr></tbody></table></div><div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div><div class="msw-row"><span class="msw-tag msw-tag-def">防御</span><div class="msw-vals"><span class="up">+0.00%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-row"><span class="msw-tag msw-tag-ag">农产品加</span><div class="msw-vals"><span class="up">+10.02%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-note">今日主力净流入最强:农产品加 +0.0亿;资金承接方向切换至 农产品加 / 防御</div><div class="msw-nums"><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">农产品加</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">农化制品</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">电网设备</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">焦炭Ⅱ</div></div></div><div class="msw-foot">主力净流入(亿元)取自东财行业板块口径(真实值,非估算):农产品加、农化制品、电网设备、焦炭Ⅱ 居前;防御(防御)与农业(农产品加)为资金切换承接方向,谨防一致兑现。</div></div><div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
     
@@ -7096,6 +7123,105 @@ function filterWatchlist(){
   if(tip)tip.style.display=(q && matched===0)?'':'none';
 }
 window.filterWatchlist=filterWatchlist;
+/* ════════ v11.75 尾盘定调快照页(tailscan, 14:30)客户端 ════════
+   ① 尾盘表现 = 实时涨幅 − 14:30 快照涨幅(单位:百分点)。
+      数学上 = 相对昨收涨幅的变化量:正=尾盘走强(涨幅扩大),负=尾盘走弱(涨幅回落);
+      15:00 之后实时价=收盘价 ⇒ 自动变成「14:30→收盘」的定调结果,无需任何云端补任务。
+   ② repullTailscan():重新拉取云端最新快照 JSON 并重渲染(带 cache-bust,绕过 CDN 旧缓存)。
+      ⚠️ 说明:静态页无法在不嵌 PAT 的前提下触发 GitHub Actions 重算(会泄露口令,绝对不做);
+      云端重算由 10 分钟节拍自动兜底(14:30/14:40/14:50 三次,当日已采则幂等跳过)。
+   ③ 本页绝不写 localStorage 跟踪数据:模拟跟踪的入场判定只认盘中实时触发(见 §7)。 */
+function tailscanRows(){return document.querySelectorAll('.ts-row[data-code]');}
+async function refreshTailscanTail(){
+  var rows=tailscanRows();if(!rows.length)return;
+  var codes=[],seen={};
+  rows.forEach(function(r){var c=r.getAttribute('data-code');if(c&&!seen[c]){seen[c]=1;codes.push(c);}});
+  var pctByCode={};
+  for(var i=0;i<codes.length;i+=80){
+    var batch=codes.slice(i,i+80).map(function(c){var c0=c.charAt(0);return (c0==='6'||c0==='5')?'sh'+c:((c0==='4'||c0==='8'||c0==='92')?'bj'+c:'sz'+c);});
+    try{
+      var res=await fetch('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
+      if(!res.ok)continue;
+      var text=new TextDecoder('gbk').decode(await res.arrayBuffer());
+      text.split(';').forEach(function(line){
+        var m=line.trim().match(/^v_[a-z]+\d+="(.*)"$/);if(!m)return;
+        var f=m[1].split('~');if(f.length<40)return;
+        var code=String(f[2]||'').trim();var pct=parseFloat(f[32]);
+        if(code&&!isNaN(pct))pctByCode[code]=pct;
+      });
+    }catch(e){}
+  }
+  var filled=0;
+  rows.forEach(function(r){
+    var c=r.getAttribute('data-code'),snap=parseFloat(r.getAttribute('data-pct'));
+    var cell=r.querySelector('.ts-tail');if(!cell)return;
+    if(pctByCode[c]==null||isNaN(snap)){cell.textContent='--';cell.className='ts-tail';return;}
+    var tail=pctByCode[c]-snap;
+    filled++;
+    cell.textContent=(tail>=0?'+':'')+tail.toFixed(2)+'pp';
+    cell.className='ts-tail '+(tail>=0.05?'up':(tail<=-0.05?'down':''));
+    cell.title='实时 '+pctByCode[c].toFixed(2)+'% − 快照 '+snap.toFixed(2)+'% = '+tail.toFixed(2)+'pp';
+  });
+  var st=document.getElementById('ts-repull-status');
+  if(st&&filled)st.textContent='尾盘表现已更新('+filled+' 只 · '+bjTimeF()+')';
+}
+function tailscanRenderRows(list,sig){
+  var pctTxt=function(v){return (v==null||isNaN(Number(v)))?'--':((Number(v)>=0?'+':'')+Number(v).toFixed(2)+'%');};
+  return (list||[]).map(function(p,i){
+    return '<div class="ts-row" data-code="'+escHtmlF(p.code)+'" data-pct="'+(Number(p.pct)||0)+'">'
+      +'<span class="ts-rank">'+(i+1)+'</span>'
+      +'<span class="ts-main"><a class="ts-name" data-code="'+escHtmlF(p.code)+'" onclick="openStockResearch(this.dataset.code)">'+escHtmlF(p.name)+'</a><span class="ts-code">'+escHtmlF(p.code)+'</span><span class="ts-sig">'+escHtmlF(sig(p))+'</span></span>'
+      +'<span class="ts-pct '+(Number(p.pct)>=0?'up':'down')+'">'+pctTxt(p.pct)+'</span>'
+      +'<span class="ts-tail">—</span>'
+      +'<button class="wl-btn ts-add" data-code="'+escHtmlF(p.code)+'" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>'
+      +'</div>';
+  }).join('')||'<div class="ts-empty">当日无入选</div>';
+}
+async function repullTailscan(){
+  var btn=document.getElementById('ts-repull-btn'),st=document.getElementById('ts-repull-status');
+  var phone=document.querySelector('.phone[data-report-date]');
+  if(!phone)return;
+  var date=phone.getAttribute('data-report-date')||'';
+  if(!date){if(st)st.textContent='缺少报告日期,无法重拉';return;}
+  if(btn){btn.disabled=true;}
+  if(st)st.textContent='正在重新拉取…';
+  try{
+    var res=await fetch('data/reviews/'+date+'_14-30.json?t='+Date.now(),{cache:'no-store'});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    var d=await res.json();
+    var sig={
+      pattern:function(p){return ((p.patterns||[]).join('+')||'形态')+' · '+p.score+'分';},
+      wave:function(p){return ((p.waveType||'')+(p.kdjDivergence?'·KDJ背离金叉':'')+' · '+p.score+'分');},
+      short:function(p){return '连板'+(p.lianban||p.ztCount||1)+(p.sealYi!=null?'·封单'+(Math.abs(p.sealYi)/1e8).toFixed(1)+'亿':'')+' · '+p.score+'分';},
+      strong:function(p){return ((p.signalType||'强势')+' · '+p.score+'分');}
+    };
+    var set=function(key,list){var box=document.querySelector('.ts-module[data-module="'+key+'"] .ts-rows');if(box)box.innerHTML=tailscanRenderRows(list,sig[key]);};
+    set('pattern',(d.marketScan||{}).picks);
+    set('wave',(d.waveDivergence||{}).list);
+    set('short',(d.shortCore||{}).list);
+    set('strong',(d.strongStock||{}).list);
+    var cnt=function(l){return (l||[]).length;};
+    document.querySelectorAll('.ts-module').forEach(function(mo){
+      var k=mo.getAttribute('data-module');
+      var n=k==='pattern'?cnt((d.marketScan||{}).picks):k==='wave'?cnt((d.waveDivergence||{}).list):k==='short'?cnt((d.shortCore||{}).list):cnt((d.strongStock||{}).list);
+      var c=mo.querySelector('.ts-count');if(c)c.textContent=n+' 只';
+    });
+    var g=(String((d.meta||{}).generatedAt||'').match(/(\d{2}:\d{2})/)||[])[1];
+    if(g){var sub=document.querySelector('.hero-sub');if(sub)sub.textContent=sub.textContent.replace(/采集于 [\d:]+/,'采集于 '+g);}
+    if(st)st.textContent='已拉取云端最新快照('+g+')';
+    await refreshTailscanTail();
+  }catch(e){
+    if(st)st.textContent='暂无更新的云端快照('+e.message+');每 10 分钟节拍会在 14:40/14:50 自动补跑';
+  }
+  if(btn){btn.disabled=false;}
+}
+window.refreshTailscanTail=refreshTailscanTail;
+window.repullTailscan=repullTailscan;
+(function(){
+  if(!document.querySelector('.ts-row[data-code]'))return;
+  setTimeout(refreshTailscanTail,1500);
+  setInterval(function(){try{refreshTailscanTail();}catch(e){}},60000);
+})();
 /* v11.72 回测表折叠(默认收起,点标题展开) —— 四处共用:
    盘前「观察池回测追踪」「手动新增股回测」 + 收盘「历史Top5」「观察池回测追踪」。
    摘要行常显(不丢汇总),只折叠 10 列明细表与口径说明。 */
