@@ -6838,6 +6838,38 @@ function migrateTimeTravelF(){
                   第二目标 入场+7% 触发 → 清仓剩余(两段合成一笔,盈亏=各50%加权)
      ③ 时间止损:入场后第3个交易日(T+3)强制离场 —— 尾盘 14:50 按现价;页面没开则盘后用 T+3 定型收盘价补判
    离场原因(止盈/价格止损/时间止损)全部写入复盘归因,与波段策略分开统计胜率。 */
+// v11.95:短线2-3天【动态最终止盈】—— 按 ATR 波动率 + 上方压力位空间 + 资金流,推导 7%~50% 区间(不硬编码)。
+//   返回【相对入场价的涨幅百分比】,调用方乘以 entry 得绝对价。与 T+3 时间止损 / A股时间锁 完全解耦,只影响 tp2。
+function calcDynamicTakeProfit(s, entry, tp1){
+  s = s || {};
+  entry = Number(entry) || 0;
+  var price = Number(s.price) || entry;
+  var atr = Number((s.tech && s.tech.atr14)) || 0;
+  var atrPct = price > 0 ? (atr / price) * 100 : 0;                 // ATR 占现价百分比(波动率)
+  // ① 基础目标按 ATR:窄幅 7~10 / 中等 10~15 / 极高 15~30
+  var base;
+  if (atrPct >= 3) { base = 15 + Math.min(15, (atrPct - 3) * 2); }       // ATR≥3%:15%~30%
+  else if (atrPct >= 1.5) { base = 10 + (atrPct - 1.5) * 3.333; }        // 1.5%~3%:10%~15%
+  else { base = 7 + Math.max(0, atrPct) * 2; }                            // <1.5%:7%~10%
+  // ② 最近压力位距入场价的空间(%)
+  var press = []; ((s.tech && s.tech.pressures) || []).forEach(function(p){ var v = Number(p.price); if (v && v > entry) press.push(v); });
+  press.sort(function(a, b){ return a - b; });
+  var nearest = press.length ? press[0] : null;
+  var space = nearest ? ((nearest - entry) / entry) * 100 : 0;
+  // ③ 资金持续净流入(d1 与 d3 同时为正)
+  var d1 = Number((s.fundFlow && s.fundFlow.d1)) || 0;
+  var d3 = Number((s.fundFlow && s.fundFlow.d3)) || 0;
+  var fundIn = (d1 > 0 && d3 > 0);
+  // ④ 综合:压力位空间≥25% 且资金流入 → 目标向压力位空间 70% 靠拢(封顶 50);≥15% → 适度上调
+  var target = base;
+  if (space >= 25 && fundIn) { target = Math.min(50, Math.max(target, space * 0.7)); }
+  // ⑤ 固化下限 7%、上限 50%
+  target = Math.max(7, Math.min(50, target));
+  // ⑥ 保证最终止盈高于第一止盈(否则分批无意义)
+  if (tp1 && target <= (tp1 - entry) / entry * 100 * 1.02) { target = Math.min(50, Math.max(target, (tp1 - entry) / entry * 100 * 1.05)); }
+  return Math.round(target * 100) / 100;
+}
+
 function shortParamsF(s){
   var entry=N2F(s.strategy&&s.strategy.entry)||N2F(s.price);
   var ma20=N2F(s.tech&&s.tech.ma20);
