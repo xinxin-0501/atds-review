@@ -1637,7 +1637,7 @@ function renderShortPlanHtml(s, report) {
   const press = ((s.tech && s.tech.pressures) || []).map(p => Number(p.price)).filter(v => v && v > entry).sort((a, b) => a - b);
   const tp1 = press.length ? Math.min(press[0], entry * 1.04) : entry * 1.04;
   const tp1v = tp1 <= entry * 1.005 ? entry * 1.04 : tp1;
-  const tp2 = Math.max(entry * 1.07, tp1v * 1.02);
+  const tp2 = entry * (1 + calcDynamicTakeProfit(s, entry, tp1v) / 100);   // v11.95:动态最终止盈(7%~50%)
   const rr = Number(s.strategy && s.strategy.rr) || null;
   const idx = (report && report.indices && report.indices[0]) || null;
   const idxPct = idx ? Number(idx.changePct) : null;
