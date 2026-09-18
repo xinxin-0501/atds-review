@@ -1605,6 +1605,29 @@ const lhbHtml = lhb
 
 
 // v11.80:短线2-3天计划块(SSR)。参数=shortParamsF 同口径(前端展示),门槛=RR≥1.5+大盘风控;5项门控在盘中真实触及时执行。
+// v11.95:与客户端 shared_client.js 的 calcDynamicTakeProfit 同口径(两端镜像必须同步)
+function calcDynamicTakeProfit(s, entry, tp1) {
+  s = s || {}; entry = Number(entry) || 0;
+  const price = Number(s.price) || entry;
+  const atr = Number((s.tech && s.tech.atr14)) || 0;
+  const atrPct = price > 0 ? (atr / price) * 100 : 0;
+  let base;
+  if (atrPct >= 3) { base = 15 + Math.min(15, (atrPct - 3) * 2); }
+  else if (atrPct >= 1.5) { base = 10 + (atrPct - 1.5) * 3.333; }
+  else { base = 7 + Math.max(0, atrPct) * 2; }
+  const press = ((s.tech && s.tech.pressures) || []).map(p => Number(p.price)).filter(v => v && v > entry).sort((a, b) => a - b);
+  const nearest = press.length ? press[0] : null;
+  const space = nearest ? ((nearest - entry) / entry) * 100 : 0;
+  const d1 = Number((s.fundFlow && s.fundFlow.d1)) || 0;
+  const d3 = Number((s.fundFlow && s.fundFlow.d3)) || 0;
+  const fundIn = (d1 > 0 && d3 > 0);
+  let target = base;
+  if (space >= 25 && fundIn) { target = Math.min(50, Math.max(target, space * 0.7)); }
+  target = Math.max(7, Math.min(50, target));
+  if (tp1 && target <= (tp1 - entry) / entry * 100 * 1.02) { target = Math.min(50, Math.max(target, (tp1 - entry) / entry * 100 * 1.05)); }
+  return Math.round(target * 100) / 100;
+}
+
 function renderShortPlanHtml(s, report) {
   const entry = Number(s.strategy && s.strategy.entry) || Number(s.price) || 0;
   const ma20 = Number(s.tech && s.tech.ma20) || null;
