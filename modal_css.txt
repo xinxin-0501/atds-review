@@ -735,3 +735,13 @@
 
 /* v11.51:超短核心——该值来自盘前快照(约09:43)而非盘中实时 */
 .sc-pre{display:inline-block;margin-left:3px;font-size:8px;font-style:normal;color:#185FA5;background:#eef4ff;border:1px solid #cddffb;border-radius:5px;padding:0 3px;vertical-align:middle}
+
+/* v11.80 短线2-3天计划块 + 休市横幅 */
+.dc-closed-banner{font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;padding:5px 8px;margin-bottom:8px;font-weight:700;line-height:1.5}
+.dc-short{border-left:3px solid #7c3aed;padding-left:6px;margin-top:8px}
+.sp-gate{font-size:11px;border-radius:6px;padding:4px 8px;margin:4px 0;font-weight:700}
+.sp-gate.ok{color:#166534;background:#f0fdf4;border:1px solid #bbf7d0}
+.sp-gate.bad{color:#991b1b;background:#fef2f2;border:1px solid #fecaca}
+.sp-row{font-size:11px;color:#334155;line-height:1.6}
+.sp-row b{color:#0f172a}
+.sp-ban{font-size:10px;color:#991b1b;font-weight:800;margin-left:6px}

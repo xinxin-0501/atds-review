@@ -1580,12 +1580,13 @@ const lhbHtml = lhb
       <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤${s.marketRegime ? s.marketRegime.capPct : 50}%（${s.marketRegime ? esc(s.marketRegime.label) : '震荡'}市）· 单笔风险0.5%-1%</div>
       <div class="dc-line">置信度构成：趋势${conf.trendScore}/30 + 资金${conf.fundScore}/25 + 题材${conf.themeScore}/20 + 关键位${conf.keyScore}/15 + 盈亏比${conf.rrScore}/10</div>
     </div>
-    <div class="dc-block dc-review" data-review-code="${esc(code)}" data-name="${esc(s.name)}" data-price="${price}" data-high="${Number(s.high) || price}" data-low="${Number(s.low) || price}" data-entry="${Number(p.entry).toFixed(2)}" data-stop="${Number(p.stop).toFixed(2)}" data-target="${Number(p.target).toFixed(2)}"><div class="dc-h">📊 盘后复盘（当日验证）</div>
+    <div class="dc-block dc-review" data-review-code="${esc(code)}" data-name="${esc(s.name)}" data-price="${price}" data-high="${Number(s.high) || price}" data-low="${Number(s.low) || price}" data-entry="${Number(p.entry).toFixed(2)}" data-stop="${Number(p.stop).toFixed(2)}" data-target="${Number(p.target).toFixed(2)}" data-tdate="${esc(s.tradeDate || "")}"><div class="dc-h">📊 盘后复盘（当日验证）</div>
       <div class="dc-line">关键位验证：最高${f2(s.high)} ${(preStrong && s.high >= preStrong.price) ? '触及压力' + f2(preStrong.price) : '未触及压力'} · 最低${f2(s.low)} ${(supStrong && s.low <= supStrong.price) ? '触及支撑' + f2(supStrong.price) : '未触及支撑'}</div>
       ${patternHtml}
       <div class="dc-line">资金验证：${fundVerify}</div>
       <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="${esc(code)}" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="${esc(code)}" onclick="recordTTrade(this)">记做T</button></div>
       <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="${esc(code)}" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
+      <div class="dc-block dc-short" data-short-code="${esc(code)}"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div>${renderShortPlanHtml(s, report)}</div>
       <div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
       <div class="dc-line dc-trace" data-trace-code="${esc(code)}"></div>
       <div class="dc-line dc-next-day">🎯 明日核心观察点：${nextDayFocus}</div>
@@ -1595,6 +1596,42 @@ const lhbHtml = lhb
 }
 
 
+
+// v11.80:短线2-3天计划块(SSR)。参数=shortParamsF 同口径(前端展示),门槛=RR≥1.5+大盘风控;5项门控在盘中真实触及时执行。
+function renderShortPlanHtml(s, report) {
+  const entry = Number(s.strategy && s.strategy.entry) || Number(s.price) || 0;
+  const ma20 = Number(s.tech && s.tech.ma20) || null;
+  const openP = Number(s.open) || null;
+  const stops = [ma20, openP ? openP * 0.97 : null].filter(v => v != null && v < entry);
+  const priceStop = stops.length ? Math.max(...stops) : entry * 0.95;
+  const press = ((s.tech && s.tech.pressures) || []).map(p => Number(p.price)).filter(v => v && v > entry).sort((a, b) => a - b);
+  const tp1 = press.length ? Math.min(press[0], entry * 1.04) : entry * 1.04;
+  const tp1v = tp1 <= entry * 1.005 ? entry * 1.04 : tp1;
+  const tp2 = Math.max(entry * 1.07, tp1v * 1.02);
+  const rr = Number(s.strategy && s.strategy.rr) || null;
+  const idx = (report && report.indices && report.indices[0]) || null;
+  const idxPct = idx ? Number(idx.changePct) : null;
+  const regimeBan = !!(s.marketRegime && /禁|反转向下/.test(String(s.marketRegime.label || '')));
+  const mktBan = regimeBan || (idxPct != null && idxPct <= -2.5);
+  const banned = (rr != null && rr < 1.5) || mktBan;
+  const why = (rr != null && rr < 1.5) ? ('赔率不佳(RR ' + rr.toFixed(2) + ' < 1.5)，短线计划禁用')
+    : regimeBan ? ('大盘风控触发(' + ((s.marketRegime && s.marketRegime.label) || '反转向下') + ')，短线计划禁用')
+    : mktBan ? ('大盘风控触发(上证 ' + (idxPct != null ? idxPct.toFixed(2) : '--') + '% ≤ -2.5%)，短线计划禁用') : '';
+  const f2 = (v) => (v == null || isNaN(Number(v))) ? '--' : Number(v).toFixed(2);
+  const ff = s.fundFlow || {};
+  const evNear = ((s.events || [])[0]) || null;
+  const t3 = '第3个交易日 14:50';
+  return '<div class="sp-gate ' + (banned ? 'bad' : 'ok') + '">' + (banned
+    ? ('⛔ ' + why)
+    : ('✓ 门槛通过：RR ' + f2(rr) + ' ≥ 1.5 · 大盘风控正常' + (idxPct != null ? ('(上证 ' + idxPct.toFixed(2) + '%)') : ''))) + '</div>' +
+    '<div class="dc-line sp-row">入场：<b>' + f2(entry) + '</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div>' +
+    '<div class="dc-line sp-row">价格止损：<b>' + f2(priceStop) + '</b>（MA20' + (ma20 ? ' ' + f2(ma20) : '') + ' / 今开-3% 先触发者），无条件清仓</div>' +
+    '<div class="dc-line sp-row">时间止损：<b>' + t3 + '</b> 强制按最新价清仓，绝不扛单（短线变长线克星）</div>' +
+    '<div class="dc-line sp-row">分批止盈：①<b>' + f2(tp1v) + '</b>(+4%或前压力' + (press.length ? ' ' + f2(press[0]) : '') + ')减仓50%·止损上移至成本 ②<b>' + f2(tp2) + '</b>(+7%)清仓剩余</div>' +
+    '<div class="dc-line sp-row">资金量能：主力净流入 ' + f2(ff.d1) + '亿(d3 ' + f2(ff.d3) + ') · 量比 ' + f2(s.volRatio) + '</div>' +
+    '<div class="dc-line sp-row">逻辑催化：' + esc(String(s.logic || '--').slice(0, 60)) + (evNear ? (' · 最近事件:' + esc(String(evNear.type || '') + ' ' + String(evNear.date || ''))) : '') + '</div>' +
+    '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="' + esc(String(s.code)) + '" onchange="toggleShortTrack(this)"' + (banned ? ' disabled' : '') + '> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label>' + (banned ? '<span class="sp-ban">⛔ 已禁用</span>' : '') + '</div>';
+}
 
 function renderWatchlist(report) {
   const list = report.watchlist || [];
