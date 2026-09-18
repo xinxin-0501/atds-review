@@ -2376,7 +2376,6 @@ function renderPremarketReport(report, nav) {
 <div class="phone">
 ${renderHeader(report, nav)}
 ${renderHero(report)}
-${renderTailscanBanner(nav)}
 ${renderFollowerRiskBanner(report)}
 <div class="section">
   ${renderWatchlist(report)}
