@@ -755,6 +755,25 @@
 .sp-row{font-size:11px;color:#334155;line-height:1.6}
 .sp-row b{color:#0f172a}
 .sp-ban{font-size:10px;color:#991b1b;font-weight:800;margin-left:6px}
+/* v11.82 盘前「今日已入场」悬浮弹窗(只读) */
+.entry-fab{position:fixed;right:14px;bottom:84px;z-index:9990;background:#1d4ed8;color:#fff;border:none;border-radius:22px;padding:10px 14px;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(29,78,216,.4);cursor:pointer;touch-action:none;user-select:none;max-width:60vw}
+.entry-fab.has{background:#dc2626}
+.entry-pop{position:fixed;left:0;right:0;bottom:0;z-index:9991;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.18);max-height:70vh;display:none;flex-direction:column}
+.entry-pop.show{display:flex}
+.entry-pop-h{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eef2f7;font-size:15px;font-weight:800;color:#0f172a}
+.entry-pop-close{font-size:12px;color:#64748b;cursor:pointer;padding:2px 8px;border:1px solid #e2e8f0;border-radius:12px}
+.entry-pop-body{overflow-y:auto;padding:8px 12px}
+.entry-item{position:relative;border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;margin-bottom:8px;cursor:pointer;background:#fafbfc}
+.entry-item-main{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.entry-name{font-size:14px;font-weight:800;color:#0f172a}
+.entry-code{font-size:10px;color:#94a3b8}
+.entry-price{font-size:14px;font-weight:800;margin-left:auto}
+.entry-pct{font-size:12px;font-weight:700}
+.entry-item-sub{font-size:11px;color:#475569;margin-top:3px;line-height:1.5;padding-right:52px}
+.entry-fl{position:absolute;right:10px;top:8px;font-size:14px;font-weight:900}
+.entry-fl-up{color:#dc2626}.entry-fl-down{color:#16a34a}
+.entry-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
+.wl-stock.entry-flash{outline:3px solid #f59e0b;outline-offset:-3px}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -2176,7 +2195,7 @@
       <a href="index.html">首页</a><a href="2026-08-19_08-30.html">盘前</a><a href="2026-08-19_15-20.html" class="active">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘 · <b>数据时间 20:42</b>（约 1416 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">16:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-warn">⚠️ 延迟补采（实际数据时点 20:42），非当日 16:20 收盘快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">中温区 · 58°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘 · <b>数据时间 20:42</b>（约 2 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">16:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-warn">⚠️ 延迟补采（实际数据时点 20:42），非当日 16:20 收盘快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">中温区 · 58°</span></div></div>
 <div class="section">
 <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-19 收盘复盘 · 数据截至 16:20</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">58°</div><div class="ce-stage">中温区 · 情绪正常</div><div class="ce-fact">主特征: 结构性机会</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">7%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">36</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">36</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈75%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">3板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">19%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">487</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">6162</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">33</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:487"></div><div class="ce-bar-flat" style="flex:33"></div><div class="ce-bar-down" style="flex:6162"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>7%</b></span><span>成交额 <b>25110亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row" data-code="000001" data-prefix="sh"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val down">-2.40%</span><span class="ce-idx-price">3894.42</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:72%"></div></div></div><div class="ce-idx-row" data-code="399001" data-prefix="sz"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val down">-5.01%</span><span class="ce-idx-price">13890.15</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:100%"></div></div></div><div class="ce-idx-row" data-code="399006" data-prefix="sz"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-6.26%</span><span class="ce-idx-price">3473.49</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:100%"></div></div></div><div class="ce-block-hint">量能维持在 2 万亿上方 (25110 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">农产品加</span><span class="ce-ml-val up">+6.9%</span></div><div class="ce-ml-row"><span class="ce-ml-name">焦炭Ⅱ</span><span class="ce-ml-val up">+5.3%</span></div><div class="ce-ml-row"><span class="ce-ml-name">房地产服</span><span class="ce-ml-val up">+5.3%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">农产品加</span><span class="ce-ml-val up">+6.9亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">焦炭Ⅱ</span><span class="ce-ml-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">房地产服</span><span class="ce-ml-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制药</span><span class="ce-ml-val up">+5.3亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title">04 情绪高度(连板梯队)</div><div class="ce-ladder"><span class="ce-ladder-pill">3板 · 金健米业</span><span class="ce-ladder-pill">2板 · 日丰股份</span><span class="ce-ladder-pill">1板 · 罗普斯金</span></div></div><div class="card"><div class="card-title">05 明日观察锚点</div><div class="ce-anchor-grid"><div class="ce-anchor-card"><div class="ce-anchor-h">🎯 主线持续性</div><div class="ce-anchor-desc">观察 农产品加 龙头 金健米业 能否继续表态</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">⚠️ 情绪退潮阈值</div><div class="ce-anchor-desc">今日炸板 12 家 · 晋级率 19%,炸板率 &gt; 40% 或晋级率 &lt; 50% 需警惕</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">📊 量能验证</div><div class="ce-anchor-desc">成交额 25110亿 基础上能否重拾放量</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">🛡️ 高位风险</div><div class="ce-anchor-desc">金健米业 3 板,关注与所属板块是否背离</div></div></div></div><div class="card tw-card-outer"><div class="card-title"><span class="tw-eyebrow">06</span> 明日看什么</div><div class="tw-tabs"></div><div class="tw-details"></div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
     
@@ -4495,6 +4514,7 @@ async function refreshWatchlistQuotes(){
     var timeEl=document.querySelector('.wl-time');
     if(timeEl){timeEl.textContent='行情 '+bjNowStrF();timeEl.className='wl-time';timeEl.title='最近一次行情刷新成功时刻';}
     window.__atdsLastQuoteOk=bjNowStrF();
+    try{ if(typeof updateEntryFAB==='function') updateEntryFAB(); }catch(e){}   // v11.82:今日已入场弹窗 5s 同步
     // v11.21:行情刷新后评估模拟跟踪(当日最高/最低触达止盈/止损即自动结算),60s 限频防抖动
     var nowS=Date.now();
     if(nowS-Number(window.__atdsSettleTs||0)>60000){
@@ -7571,6 +7591,126 @@ window.recordTrade=recordTrade;
 window.recordTTrade=recordTTrade;
 window.getManualTags=getManualTags;
 window.setManualTag=setManualTag;
+
+/* ════════ v11.82 盘前「今日已入场」悬浮弹窗(只读) ════════
+   实时聚焦当日(entryDate===今天)真实触发入场的个股;只读(无勾选/无编辑);
+   与主列表共用 atds_shadow + 实时行情 DOM,5s 刷新同步(挂 refreshWatchlistQuotes)。
+   A股时间锁联动:入场只可能发生在 09:30-14:50(tradingPhaseF 已保证),故 entryDate===今天 即"今日入场",
+   盘前(<09:15)天然为 0。 */
+var __entryFAB = { open: false };
+function todayEntryCodesF(){
+  var sm = getShadowMap(), out = [], today = bjTodayF();
+  for (var c in sm) { var r = sm[c];
+    if (r && r.enabled && r.entryHit && String(r.entryDate) === today) out.push(c);
+  }
+  return out;
+}
+function ensureEntryUI(){
+  if (document.getElementById('entry-fab')) return;
+  if (!document.querySelector('.wl-stock[data-stock-code]')) return;   // 仅盘前观察池页
+  var fab = document.createElement('button');
+  fab.id = 'entry-fab'; fab.className = 'entry-fab'; fab.textContent = '📌 今日已入场 (0)';
+  document.body.appendChild(fab);
+  fab.addEventListener('click', function (e) { if (window.__entryFABDrag) return; toggleEntryPop(); });
+  // 可拖动(pointer 兼容鼠标+触屏),位置持久化到 localStorage
+  (function () {
+    var sx = 0, sy = 0, ox = 0, oy = 0, dragging = false;
+    fab.addEventListener('mousedown', function (e) { startDrag(e); });
+    fab.addEventListener('touchstart', function (e) { startDrag(e); }, { passive: true });
+    function startDrag(e) {
+      var p = (e.touches && e.touches[0]) || e;
+      sx = p.clientX; sy = p.clientY;
+      var r = fab.getBoundingClientRect(); ox = r.left; oy = r.top;
+      dragging = false; window.__entryFABDrag = false;
+      var mv = function (ev) {
+        var q = (ev.touches && ev.touches[0]) || ev;
+        var dx = q.clientX - sx, dy = q.clientY - sy;
+        if (Math.abs(dx) + Math.abs(dy) > 6) dragging = true;
+        if (dragging) {
+          window.__entryFABDrag = true;
+          fab.style.left = Math.min(window.innerWidth - 64, Math.max(0, ox + dx)) + 'px';
+          fab.style.top = Math.min(window.innerHeight - 48, Math.max(0, oy + dy)) + 'px';
+        }
+      };
+      var up = function () {
+        document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up);
+        document.removeEventListener('touchmove', mv); document.removeEventListener('touchend', up);
+        setTimeout(function () { window.__entryFABDrag = false; }, 0);
+        try { localStorage.setItem('atds_entry_fab_pos', fab.style.left + '|' + fab.style.top); } catch (e2) {}
+      };
+      document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
+      document.addEventListener('touchmove', mv); document.addEventListener('touchend', up);
+    }
+  })();
+  var pop = document.createElement('div');
+  pop.id = 'entry-pop'; pop.className = 'entry-pop';
+  pop.innerHTML = '<div class="entry-pop-h"><span>📌 今日已入场</span><span class="entry-pop-close" onclick="toggleEntryPop()">收起</span></div><div class="entry-pop-body"></div>';
+  document.body.appendChild(pop);
+  try { var pos = localStorage.getItem('atds_entry_fab_pos'); if (pos) { var xy = pos.split('|'); fab.style.left = xy[0]; fab.style.top = xy[1]; } } catch (e2) {}
+}
+function toggleEntryPop(){
+  var pop = document.getElementById('entry-pop'); if (!pop) return;
+  __entryFAB.open = !__entryFAB.open;
+  pop.classList.toggle('show', __entryFAB.open);
+  if (__entryFAB.open) renderEntryPop();
+}
+function entryLiveRowF(code){
+  var row = document.querySelector('.wl-stock-row[data-code="' + code + '"]');
+  var priceEl = row && row.querySelector('.wl-cell-price .price');
+  var pctEl = row && row.querySelector('.wl-cell-pct');
+  var nameEl = row && row.querySelector('.wl-name');
+  var price = priceEl ? parseFloat(priceEl.textContent) || 0 : 0;
+  var pct = pctEl ? parseFloat(pctEl.textContent) || 0 : 0;
+  return { price: price, pct: pct, name: nameEl ? nameEl.textContent : code };
+}
+function renderEntryPop(){
+  var pop = document.getElementById('entry-pop'); if (!pop) return;
+  var body = pop.querySelector('.entry-pop-body'); if (!body) return;
+  var sm = getShadowMap(), today = bjTodayF(), items = [];
+  for (var c in sm) { var r = sm[c];
+    if (!(r && r.enabled && r.entryHit && String(r.entryDate) === today)) continue;
+    var lv = entryLiveRowF(c);
+    var fl = (lv.price && r.entry) ? Math.round((lv.price - r.entry) / r.entry * 10000) / 100 : null;
+    items.push({ code: c, name: lv.name, price: lv.price, pct: lv.pct, entry: r.entry, stop: r.stop, target: r.target, fl: fl, at: r.touchAt || r.entryTime || '' });
+  }
+  items.sort(function (a, b) { return String(a.at) < String(b.at) ? -1 : 1; });
+  if (!items.length) { body.innerHTML = '<div class="entry-empty">今日暂无触发标的，耐心等待信号</div>'; return; }
+  var h = '';
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    var flCls = (it.fl == null) ? '' : (it.fl >= 0 ? 'entry-fl-up' : 'entry-fl-down');
+    h += '<div class="entry-item" data-code="' + escHtmlF(it.code) + '" onclick="entryItemJump(this)">' +
+      '<div class="entry-item-main"><span class="entry-name">' + escHtmlF(it.name) + '</span><span class="entry-code">' + escHtmlF(it.code) + '</span>' +
+      '<span class="entry-price ' + (it.pct >= 0 ? 'up' : 'down') + '">' + it.price.toFixed(2) + '</span>' +
+      '<span class="entry-pct ' + (it.pct >= 0 ? 'up' : 'down') + '">' + (it.pct >= 0 ? '+' : '') + it.pct.toFixed(2) + '%</span></div>' +
+      '<div class="entry-item-sub">今日入场 · ' + (it.at || '--') + ' 触发 · 入场 ' + it.entry + ' · 止损 ' + it.stop + ' · 止盈 ' + it.target + '</div>' +
+      '<div class="entry-fl ' + flCls + '">' + (it.fl == null ? '--' : ((it.fl >= 0 ? '+' : '') + it.fl + '%')) + '</div>' +
+      '</div>';
+  }
+  body.innerHTML = h;
+}
+function entryItemJump(el){
+  var code = el.getAttribute('data-code');
+  var pop = document.getElementById('entry-pop'); if (pop) pop.classList.remove('show');
+  __entryFAB.open = false;
+  var card = document.querySelector('.wl-stock[data-stock-code="' + code + '"]');
+  if (card) {
+    try { card.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { card.scrollIntoView(); }
+    card.classList.add('entry-flash'); setTimeout(function () { card.classList.remove('entry-flash'); }, 3000);
+  }
+}
+function updateEntryFAB(){
+  var fab = document.getElementById('entry-fab'); if (!fab) return;
+  var n = todayEntryCodesF().length;
+  fab.textContent = '📌 今日已入场 (' + n + ')';
+  if (n > 0) fab.classList.add('has'); else fab.classList.remove('has');
+  var pop = document.getElementById('entry-pop');
+  if (pop && pop.classList.contains('show')) renderEntryPop();
+}
+window.toggleEntryPop = toggleEntryPop;
+window.entryItemJump = entryItemJump;
+window.updateEntryFAB = updateEntryFAB;
+(function () { setTimeout(function () { try { ensureEntryUI(); updateEntryFAB(); } catch (e) {} }, 900); })();
 if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initWatchlistProUI,700);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initWatchlistProUI,700);});}
 </script>
 <script>
