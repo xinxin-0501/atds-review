@@ -3219,8 +3219,13 @@ function renderPerStockArchive(){
     if(!it.last||String(e.settleDate||e.date||'')>String(it.last.settleDate||it.last.date||''))it.last=e;
   }
   var keys=Object.keys(g).sort(function(a,b){return (g[b].win+g[b].loss)-(g[a].win+g[a].loss);});
-  if(!keys.length)return '<div class="jrn-disc">个股档案：暂无（勾选个股「系统模拟跟踪」后，每笔虚拟买入/结算都会按股票永久归档在这里）</div>';
-  var h='<div class="jrn-disc"><b>📁 个股历史档案</b>（按股票聚合 · 删除个股/取消勾选/清空跟踪都不会丢，仅「清空复盘数据」可清）<br>';
+  // v11.83:可折叠(默认收起,点标题才展开);表头带 N 只计数与 caret
+  var head = '📁 个股历史档案 <span class="jrn-arc-cnt">' + keys.length + ' 只</span> <span class="jrn-arc-caret">▸</span>';
+  var body;
+  if(!keys.length){
+    body = '<div class="jrn-disc">个股档案：暂无（勾选个股「系统模拟跟踪」后，每笔虚拟买入/结算都会按股票永久归档在这里）</div>';
+  } else {
+    var h = '<div class="jrn-disc">（按股票聚合 · 删除个股/取消勾选/清空跟踪都不会丢，仅「清空复盘数据」可清）';
   for(var i2=0;i2<keys.length;i2++){
     var it2=g[keys[i2]];
     var wr=(it2.win+it2.loss)?(Math.round(it2.win/(it2.win+it2.loss)*100)+'%'):'—';
@@ -3228,8 +3233,18 @@ function renderPerStockArchive(){
       +(it2.cancelled?(' · 取消归档 '+it2.cancelled):'')+(it2.missed?(' · 未触发 '+it2.missed):'')+(it2.invalid?(' · 失效 '+it2.invalid):'')+(it2.open?(' · <b>监控中</b>'):'')
       +(it2.last?('　最近：'+escHtmlF(String(it2.last.settleDate||it2.last.date||'—'))+' '+(it2.last.pnl!=null?((it2.last.pnl>0?'+':'')+it2.last.pnl+'%'):'—')):'')+'</div>';
   }
-  return h+'</div>';
+    body = h + '</div>';
+  }
+  return '<div class="jrn-archive" id="jrn-archive">' +
+    '<div class="jrn-archive-head" onclick="toggleJournalArchive()">' + head + '</div>' +
+    '<div class="jrn-archive-body">' + body + '</div></div>';
 }
+function toggleJournalArchive(){
+  var el = document.getElementById('jrn-archive'); if (!el) return;
+  var opened = el.classList.toggle('open');
+  var c = el.querySelector('.jrn-arc-caret'); if (c) c.textContent = opened ? '▾' : '▸';
+}
+window.toggleJournalArchive = toggleJournalArchive;
 // v11.35:样本备份/恢复 —— 样本是唯一不可重建的资产(换机/清浏览器数据即永久丢失)。
 var backupOpen=false;
 function toggleBackupPanel(){ backupOpen=!backupOpen; renderJournalStats(); }

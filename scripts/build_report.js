@@ -119,6 +119,13 @@ function lateCaptureNote(m) {
   return '<div class="hero-warn">⚠️ ' + s.kind + '（实际数据时点 ' + genHM + '），非当日 ' + s.slot + '</div>';
 }
 
+// v11.83:当同日已有「14:30 尾盘定调快照」时,在盘前/收盘页顶部给出醒目入口
+//   (此前快照是独立页,用户在收盘页看不到入口,误以为 14:30 没推送数据)
+function renderTailscanBanner(nav){
+  if(!nav||!nav.tailscan)return '';
+  return '<a class="ts-banner" href="'+esc(nav.tailscan)+'">📋 14:30 尾盘定调快照已生成（四大选股 · 盘中未定型 · 非最终结果）→ 立即查看</a>';
+}
+
 function renderHero(report) {
   const m = report && report.meta || {};
   const ce = report && report.closeEmotion || {};
@@ -2369,6 +2376,7 @@ function renderPremarketReport(report, nav) {
 <div class="phone">
 ${renderHeader(report, nav)}
 ${renderHero(report)}
+${renderTailscanBanner(nav)}
 ${renderFollowerRiskBanner(report)}
 <div class="section">
   ${renderWatchlist(report)}
@@ -2640,6 +2648,7 @@ function renderReport(report, nav) {
 <div class="phone">
 ${renderHeader(report, nav)}
 ${renderHero(report)}
+${renderTailscanBanner(nav)}
 <div class="section">
 ${renderCloseEmotion(report)}
     ${/* v11.67:回测追踪表此前只定义未调用(死代码),现接到打板卡之后 */''}

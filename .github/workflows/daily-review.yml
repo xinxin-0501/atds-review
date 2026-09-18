@@ -78,7 +78,7 @@ jobs:
             #   触发点取 14:20(10分钟节拍)而非 14:30:四大全市场扫描约需 8~10 分钟,
             #   14:20 启动 ≈ 14:30 完成,正好赶上尾盘 30 分钟;14:30/14:40/14:50 的触发会被
             #   「当日报告已存在」闸门幂等跳过,不会重复采集。
-            elif [ "$HOUR" -ge 1420 ] && [ "$HOUR" -le 1459 ]; then echo "type=tailscan" >> "$GITHUB_OUTPUT";
+            elif [ "$HOUR" -ge 1410 ] && [ "$HOUR" -le 1459 ]; then echo "type=tailscan" >> "$GITHUB_OUTPUT";
             # v11.61:盘中槽位(midday/11-35)已停用 —— 盘中数据全部由收盘页承载。
             #   原逻辑 elif [ "$HOUR" -lt 1500 ] → midday,会在 09:55~14:59 每 10 分钟刷一次盘中快照;
             #   用户 2026-09-15 决策"盘中可以全部转移收盘"。此处改为:未到收盘窗口一律按 close 处理
@@ -104,7 +104,7 @@ jobs:
           case "$TYPE" in
             premarket) [ "$HOUR" -ge 936 ] && [ "$HOUR" -le 1014 ] && OK=1 ;;
             # v11.75:尾盘定调快照窗口(14:20 触发 → ~14:30 完成;15:00 后今日K线定型,不能再叫盘中快照)
-            tailscan) [ "$HOUR" -ge 1420 ] && [ "$HOUR" -le 1459 ] && OK=1 ;;
+            tailscan) [ "$HOUR" -ge 1410 ] && [ "$HOUR" -le 1459 ] && OK=1 ;;
             auction) [ "$HOUR" -ge 925 ] && [ "$HOUR" -le 935 ] && OK=1 ;;
             close) [ "$HOUR" -ge 1610 ] && [ "$HOUR" -le 1730 ] && OK=1 ;;
             midday)

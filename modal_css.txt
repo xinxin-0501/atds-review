@@ -764,3 +764,14 @@
 .entry-fl-up{color:#dc2626}.entry-fl-down{color:#16a34a}
 .entry-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
 .wl-stock.entry-flash{outline:3px solid #f59e0b;outline-offset:-3px}
+
+/* v11.83 尾盘定调快照入口横幅 */
+.ts-banner{display:block;margin:10px 12px 0;padding:10px 12px;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 2px 8px rgba(249,115,22,.35);line-height:1.5}
+
+/* v11.83 个股历史档案折叠(默认收起,点标题展开) */
+.jrn-archive{border:1px solid #e2e8f0;border-radius:10px;margin:6px 0;overflow:hidden}
+.jrn-archive-head{display:flex;align-items:center;gap:6px;padding:9px 12px;font-size:13px;font-weight:800;color:#0f172a;cursor:pointer;user-select:none;background:#f8fafc}
+.jrn-arc-cnt{font-size:11px;color:#fff;background:#94a3b8;border-radius:9px;padding:1px 7px;font-weight:700}
+.jrn-arc-caret{font-size:11px;color:#64748b;margin-left:auto}
+.jrn-archive-body{display:none;padding:8px 12px}
+.jrn-archive.open .jrn-archive-body{display:block}
