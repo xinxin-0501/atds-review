@@ -1638,6 +1638,7 @@ function renderShortPlanHtml(s, report) {
   const tp1 = press.length ? Math.min(press[0], entry * 1.04) : entry * 1.04;
   const tp1v = tp1 <= entry * 1.005 ? entry * 1.04 : tp1;
   const tp2 = entry * (1 + calcDynamicTakeProfit(s, entry, tp1v) / 100);   // v11.95:动态最终止盈(7%~50%)
+  const tp2pct = Math.round(calcDynamicTakeProfit(s, entry, tp1v));   // v11.97:展示标签同步动态百分比(此前写死 +7% 误导)
   const rr = Number(s.strategy && s.strategy.rr) || null;
   const idx = (report && report.indices && report.indices[0]) || null;
   const idxPct = idx ? Number(idx.changePct) : null;
@@ -1657,7 +1658,7 @@ function renderShortPlanHtml(s, report) {
     '<div class="dc-line sp-row">入场：<b>' + f2(entry) + '</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div>' +
     '<div class="dc-line sp-row">价格止损：<b>' + f2(priceStop) + '</b>（MA20' + (ma20 ? ' ' + f2(ma20) : '') + ' / 今开-3% 先触发者），无条件清仓</div>' +
     '<div class="dc-line sp-row">时间止损：<b>' + t3 + '</b> 强制按最新价清仓，绝不扛单（短线变长线克星）</div>' +
-    '<div class="dc-line sp-row">分批止盈：①<b>' + f2(tp1v) + '</b>(+4%或前压力' + (press.length ? ' ' + f2(press[0]) : '') + ')减仓50%·止损上移至成本 ②<b>' + f2(tp2) + '</b>(+7%)清仓剩余</div>' +
+    '<div class="dc-line sp-row">分批止盈：①<b>' + f2(tp1v) + '</b>(+4%或前压力' + (press.length ? ' ' + f2(press[0]) : '') + ')减仓50%·止损上移至成本 ②<b>' + f2(tp2) + '</b>(+' + tp2pct + '%)清仓剩余</div>' +
     '<div class="dc-line sp-row">资金量能：主力净流入 ' + f2(ff.d1) + '亿(d3 ' + f2(ff.d3) + ') · 量比 ' + f2(s.volRatio) + '</div>' +
     '<div class="dc-line sp-row">逻辑催化：' + esc(String(s.logic || '--').slice(0, 60)) + (evNear ? (' · 最近事件:' + esc(String(evNear.type || '') + ' ' + String(evNear.date || ''))) : '') + '</div>' +
     '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="' + esc(String(s.code)) + '" onchange="toggleShortTrack(this)"' + (banned ? ' disabled' : '') + '> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label>' + (banned ? '<span class="sp-ban">⛔ 已禁用</span>' : '') + '</div>';
