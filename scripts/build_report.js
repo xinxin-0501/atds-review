@@ -2371,7 +2371,7 @@ function renderPremarketReport(report, nav) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>ATDS PRO · 盘前简报</title>
-</head>
+<script>window.addEventListener('DOMContentLoaded',function(){var t=Date.now();document.querySelectorAll('a[href]').forEach(function(a){var h=a.getAttribute('href')||'';if(/\.html$/.test(h)&&h.indexOf('?')<0){a.setAttribute('href',h+'?nc='+t);}});});</script></head>
 <body>
 <div class="phone">
 ${renderHeader(report, nav)}
@@ -2642,7 +2642,7 @@ function renderReport(report, nav) {
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ATDS PRO · 复盘报告</title>
-</head>
+<script>window.addEventListener('DOMContentLoaded',function(){var t=Date.now();document.querySelectorAll('a[href]').forEach(function(a){var h=a.getAttribute('href')||'';if(/\.html$/.test(h)&&h.indexOf('?')<0){a.setAttribute('href',h+'?nc='+t);}});});</script></head>
 <body>
 <div class="phone">
 ${renderHeader(report, nav)}
@@ -2690,7 +2690,7 @@ function renderMainRankPage(report, nav) {
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ATDS PRO · 主线实时校准</title>
-</head>
+<script>window.addEventListener('DOMContentLoaded',function(){var t=Date.now();document.querySelectorAll('a[href]').forEach(function(a){var h=a.getAttribute('href')||'';if(/\.html$/.test(h)&&h.indexOf('?')<0){a.setAttribute('href',h+'?nc='+t);}});});</script></head>
 <body>
 <div class="phone">
 ${renderHeader(report, nav)}
@@ -2757,6 +2757,7 @@ function renderIndex(reports) {
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ATDS PRO · A 股每日复盘</title>
+<script>window.addEventListener('DOMContentLoaded',function(){var t=Date.now();document.querySelectorAll('a[href]').forEach(function(a){var h=a.getAttribute('href')||'';if(/\.html$/.test(h)&&h.indexOf('?')<0){a.setAttribute('href',h+'?nc='+t);}});});</script>
 </head>
 <body>
 <div class="phone">
@@ -2846,7 +2847,7 @@ function renderTailscanReport(report, nav) {
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ATDS PRO · 14:30 尾盘定调快照</title>
-</head>
+<script>window.addEventListener('DOMContentLoaded',function(){var t=Date.now();document.querySelectorAll('a[href]').forEach(function(a){var h=a.getAttribute('href')||'';if(/\.html$/.test(h)&&h.indexOf('?')<0){a.setAttribute('href',h+'?nc='+t);}});});</script></head>
 <body>
 <div class="phone" data-report-date="${esc(m.date || '')}" data-snap-time="${esc(m.time || '14:30')}">
 ${renderHeader(report, nav)}
