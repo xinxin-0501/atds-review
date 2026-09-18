@@ -2520,7 +2520,7 @@ async function handleSearchStock(){var input=document.getElementById("search-inp
     var data=await fetchStockData(raw);if(!data){showToast("未找到股票代码 "+raw,"warn");return;}
     closeAllModals();
     if(!document.querySelector('.wl-stock-row[data-code="'+data.code+'"]')){try{await addFetchedToWatchlist(data.code);}catch(e){}}
-    showDynamicResearch(data);input.value="";if(typeof filterWatchlist==="function")filterWatchlist();return;
+    input.value="";if(typeof filterWatchlist==="function")filterWatchlist();showAddConfirm(data.name,data.code,function(){showDynamicResearch(data);});return;
   }
   // 名称/拼音搜索 → 候选列表
   var cands=await searchStockByName(raw);
@@ -2529,7 +2529,7 @@ async function handleSearchStock(){var input=document.getElementById("search-inp
     var d=await fetchStockData(cands[0].code);if(!d){showToast("未找到股票代码 "+cands[0].code,"warn");return;}
     closeAllModals();
     if(!document.querySelector('.wl-stock-row[data-code="'+d.code+'"]')){try{await addFetchedToWatchlist(d.code);}catch(e){}}
-    showDynamicResearch(d);input.value="";if(typeof filterWatchlist==="function")filterWatchlist();return;
+    input.value="";if(typeof filterWatchlist==="function")filterWatchlist();showAddConfirm(d.name,d.code,function(){showDynamicResearch(d);});return;
   }
   showStockCandidates(cands,raw);
 }catch(e){showToast("网络异常："+e.message,"warn");}}
@@ -2545,7 +2545,7 @@ function showStockCandidates(cands,q){
   box.innerHTML='<div style="font-weight:700;font-size:15px;margin-bottom:6px;">🔍 搜索结果：<span style="color:#7c3aed;">'+escHtmlF(q)+'</span></div><div style="color:#94a3b8;font-size:12px;margin-bottom:8px;">点击候选加入观察池并显示最新行情</div>'+rows;
   mask.appendChild(box);document.body.appendChild(mask);
   box.querySelectorAll(".cand-row").forEach(function(row){
-    row.onclick=function(){var code=row.getAttribute("data-code");if(mask.parentNode)mask.parentNode.removeChild(mask);(async function(){var d=await fetchStockData(code);if(!d){showToast("未找到股票代码 "+code,"warn");return;}closeAllModals();if(!document.querySelector('.wl-stock-row[data-code="'+d.code+'"]')){try{await addFetchedToWatchlist(d.code);}catch(e){}}showDynamicResearch(d);var inp=document.getElementById("search-input");if(inp)inp.value="";if(typeof filterWatchlist==="function")filterWatchlist();})();};
+    row.onclick=function(){var code=row.getAttribute("data-code");if(mask.parentNode)mask.parentNode.removeChild(mask);(async function(){var d=await fetchStockData(code);if(!d){showToast("未找到股票代码 "+code,"warn");return;}closeAllModals();if(!document.querySelector('.wl-stock-row[data-code="'+d.code+'"]')){try{await addFetchedToWatchlist(d.code);}catch(e){}}var inp=document.getElementById("search-input");if(inp)inp.value="";if(typeof filterWatchlist==="function")filterWatchlist();showAddConfirm(d.name,d.code,function(){showDynamicResearch(d);});})();};
   });
 }
 function closeAllModals(){var list=document.querySelectorAll(".modal-mask.show");for(var i=0;i<list.length;i++){list[i].classList.remove("show");}document.body.style.overflow="";}
@@ -6678,6 +6678,28 @@ function updateReviewProgress(){
 }
 
 // 绿色 Toast 反馈(复用单例,避免反复建 DOM)
+// v11.92:手动添加成功后的【确认弹窗】(页面内 modal,不依赖系统 alert,手机浏览器不拦截;用户明确要"弹窗提醒")
+function showAddConfirm(name, code, onClose){
+  try{
+    var old=document.getElementById('add-confirm-modal'); if(old&&old.parentNode)old.parentNode.removeChild(old);
+    var mask=document.createElement('div');
+    mask.id='add-confirm-modal'; mask.className='modal-mask';
+    mask.style.cssText='display:flex;align-items:center;justify-content:center;z-index:10001;';
+    mask.innerHTML='<div class="modal" style="max-width:320px;width:88%;text-align:center;padding:26px 18px;border-radius:16px;">'+
+      '<div style="font-size:42px;line-height:1;margin-bottom:10px;">✅</div>'+
+      '<div style="font-size:17px;font-weight:800;color:#0f172a;margin-bottom:6px;">已加入观察池</div>'+
+      '<div style="font-size:15px;color:#334155;margin-bottom:3px;">'+escHtmlF(name||'')+' <span style="color:#94a3b8;font-size:12px;">'+escHtmlF(code||'')+'</span></div>'+
+      '<div style="font-size:12px;color:#94a3b8;margin-bottom:18px;">已保存到观察池，可立即在下方列表查看</div>'+
+      '<button id="add-confirm-ok" style="background:#1d4ed8;color:#fff;border:none;border-radius:10px;padding:11px 36px;font-size:14px;font-weight:700;">确定</button>'+
+      '</div>';
+    document.body.appendChild(mask);
+    mask.addEventListener('click',function(e){ if(e.target===mask){ mask.remove(); if(typeof onClose==='function')onClose(); } });
+    var ok=mask.querySelector('#add-confirm-ok');
+    if(ok)ok.addEventListener('click',function(){ mask.remove(); if(typeof onClose==='function')onClose(); });
+  }catch(e){}
+}
+window.showAddConfirm=showAddConfirm;
+
 function showToast(msg,type){
   try{
     var t=document.getElementById('atds-toast');
