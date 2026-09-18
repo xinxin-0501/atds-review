@@ -2268,7 +2268,7 @@ async function openStockResearch(code){
   if(!data){alert("未找到股票代码 "+code);return;}
   showDynamicResearch(data);
   var atds=70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
-  if(atds>=85 && !document.querySelector('.wl-stock-row[data-code="'+code+'"]')){try{await addFetchedToWatchlist(code);}catch(e){addToWatchlistUI(data);saveWatchlist();}}
+  if(atds>=85 && !document.querySelector('.wl-stock-row[data-code="'+code+'"]')){try{await addFetchedToWatchlist(code);}catch(e){addToWatchlistUI(data);saveWatchlist(code);}}
 }
 async function addFetchedToWatchlist(code){
   code=String(code||"").trim();
@@ -2364,7 +2364,7 @@ async function addFetchedToWatchlist(code){
   try{updateReviewProgress();}catch(e){}   // v11.21:新加入的个股立即刷新"策略执行/归因"文本
   // 保存全量数据(供退出重登时立即渲染,不依赖网络)
   saveWatchlistStockData(String(code), data);
-  saveWatchlist();
+  saveWatchlist(code);
   // 添加后立即强制刷新一次,确保显示最新实时行情(不等待 60s 定时)
   setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 200);
   var el=document.querySelector('.wl-stock-row[data-code="'+code+'"]');
@@ -3388,9 +3388,10 @@ function seedConfigStockData(){
     }
   }catch(e){}
 }
-function saveWatchlist(){
-  // 合并保存:DOM 收集的 codes + 之前 localStorage 中额外手动添加的 codes
+function saveWatchlist(extraCode){
+  // 合并保存:DOM 收集的 codes + 之前 localStorage 中额外手动添加的 codes + 本次显式新增的 code
   // (避免全量覆盖丢失用户手动添加的股票)
+  // v11.87:extraCode 用于收盘页等【无观察池卡片】的页面 —— DOM 收集为空时,单点加入的 code 也会被保存(此前丢失)
   try{
     var codes=[];
     document.querySelectorAll(".wl-stock-row[data-code]").forEach(function(r){var cd=r.getAttribute("data-code");if(cd)codes.push(cd);});
@@ -3399,6 +3400,7 @@ function saveWatchlist(){
     try{prevCodes=JSON.parse(prev)||[];}catch(e){}
     var merged=codes.slice();
     prevCodes.forEach(function(c){if(merged.indexOf(c)<0&&/^\d{6}$/.test(String(c)))merged.push(c);});
+    if(extraCode&&/^\d{6}$/.test(String(extraCode))&&merged.indexOf(String(extraCode))<0)merged.push(String(extraCode));
     localStorage.setItem("atds_watchlist",JSON.stringify(merged));
   }catch(e){}
 }
