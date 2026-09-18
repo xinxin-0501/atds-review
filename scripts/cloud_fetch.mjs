@@ -1425,8 +1425,10 @@ function calcTechFromKline(arr) {
   const supports = [], pressures = [];
   const addLvl = (price, label, weight) => {
     if (price == null || isNaN(price)) return;
-    const item = { price: r2(price), label, weight };
-    if (price < last) supports.push(item); else if (price > last) pressures.push(item);
+    // v11.84:先舍入再比较归属(与客户端 calcDecisionTech 同口径),避免 MA 与现价差<0.005 时多出 price==现价 的边界项
+    const p = r2(price), lp = r2(last);
+    if (p < lp) supports.push({ price: p, label, weight });
+    else if (p > lp) pressures.push({ price: p, label, weight });
   };
   addLvl(ma5, 'MA5', 'weak'); addLvl(ma10, 'MA10', 'weak');
   addLvl(ma20, 'MA20', 'strong'); addLvl(ma60, 'MA60', 'strong');
