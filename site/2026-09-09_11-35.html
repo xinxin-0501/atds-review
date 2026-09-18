@@ -745,6 +745,16 @@
 
 /* v11.51:超短核心——该值来自盘前快照(约09:43)而非盘中实时 */
 .sc-pre{display:inline-block;margin-left:3px;font-size:8px;font-style:normal;color:#185FA5;background:#eef4ff;border:1px solid #cddffb;border-radius:5px;padding:0 3px;vertical-align:middle}
+
+/* v11.80 短线2-3天计划块 + 休市横幅 */
+.dc-closed-banner{font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;padding:5px 8px;margin-bottom:8px;font-weight:700;line-height:1.5}
+.dc-short{border-left:3px solid #7c3aed;padding-left:6px;margin-top:8px}
+.sp-gate{font-size:11px;border-radius:6px;padding:4px 8px;margin:4px 0;font-weight:700}
+.sp-gate.ok{color:#166534;background:#f0fdf4;border:1px solid #bbf7d0}
+.sp-gate.bad{color:#991b1b;background:#fef2f2;border:1px solid #fecaca}
+.sp-row{font-size:11px;color:#334155;line-height:1.6}
+.sp-row b{color:#0f172a}
+.sp-ban{font-size:10px;color:#991b1b;font-weight:800;margin-left:6px}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -2166,7 +2176,7 @@
       <a href="index.html">首页</a><a href="2026-09-09_09-40.html">盘前</a><a href="2026-09-09_11-35.html" class="active">盘中<i class="nav-retired">已停</i></a><a href="2026-09-09_16-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘中快照 · <b>数据时间 19:00</b>（约 1291 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">16:31</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 19:00），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 75°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘中快照 · <b>数据时间 19:00</b>（约 78 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">20:18</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 19:00），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 75°</span></div></div>
 <div class="section">
 <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-09-09 盘中快照 · 实时更新中</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">75°</div><div class="ce-stage">高温区 · 情绪高涨</div><div class="ce-fact">主特征: 情绪高涨,接力效应强</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">32%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">48</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">48</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈64%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">5板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">31%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">2139</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">4408</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">142</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:2139"></div><div class="ce-bar-flat" style="flex:142"></div><div class="ce-bar-down" style="flex:4408"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>32%</b></span><span>成交额 <b>18556亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row" data-code="000001" data-prefix="sh"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val up">+0.28%</span><span class="ce-idx-price">3951.51</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:8.4%"></div></div></div><div class="ce-idx-row" data-code="399001" data-prefix="sz"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val up">+0.15%</span><span class="ce-idx-price">13723.32</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:4.5%"></div></div></div><div class="ce-idx-row" data-code="399006" data-prefix="sz"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-0.14%</span><span class="ce-idx-price">3354.97</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:4.2%"></div></div></div><div class="ce-block-hint">量能 1.86 万亿 (18556 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">农产品加</span><span class="ce-ml-val up">+7.6%</span></div><div class="ce-ml-row"><span class="ce-ml-name">一般零售</span><span class="ce-ml-val up">+8.5%</span></div><div class="ce-ml-row"><span class="ce-ml-name">航运港口</span><span class="ce-ml-val up">+5.3%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">农产品加</span><span class="ce-ml-val up">+7.6亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">一般零售</span><span class="ce-ml-val up">+8.5亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">航运港口</span><span class="ce-ml-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">电网设备</span><span class="ce-ml-val up">+5.3亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card bt-card-outer"><div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换<span class="bt-time">· 11:35</span></div><div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div><div class="bt-row"><div class="bt-card bt-5"><div class="bt-lv">5板</div><div class="bt-name">百大集团</div><div class="bt-sub">五板高度</div></div><div class="bt-card bt-4"><div class="bt-lv">4板</div><div class="bt-name">--</div><div class="bt-sub">四板高度</div></div><div class="bt-card bt-3"><div class="bt-lv">3板</div><div class="bt-name">金正大</div><div class="bt-sub">三板高度</div></div><div class="bt-card bt-2"><div class="bt-lv">2板</div><div class="bt-name">红棉股份</div><div class="bt-sub">二板</div></div><div class="bt-card bt-new"><div class="bt-lv">断板</div><div class="bt-name">--</div><div class="bt-sub">断板</div></div></div><div class="bt-struct-note"><b>结构辨证</b>:一般零售 今日最高 5板(龙头 百大集团),板块 +10.0% / 资金 +2.3亿;农产品加 +10.0% 居次,通信设备 +10.0% 第三,农化制品 +9.9%。梯队高度 5板,情绪 75°(高温区),注意高位分歧与一致兑现风险。</div><div class="vt-section"><div class="vt-h">② 主线研判</div><div class="vt-line"><span class="vt-rank">①</span><b>一般零售</b> — 穿越板块总龙头(<b class="up">百大集团 5板</b>)<div class="vt-desc">板块 +9.97%、资金 +2.3亿,3家涨停,龙头 百大集团 领涨,是当前情绪总龙头,注意高位分歧。</div></div><div class="vt-line"><span class="vt-rank">②</span><b>农产品加</b> — 今日次强爆发(<b class="up">中粮科技</b>)<div class="vt-desc">板块 +10.01%、资金 +3.3亿,4家涨停,龙头 中粮科技 领涨,为二线主线。</div></div><div class="vt-line"><span class="vt-rank">③</span><b>通信设备</b> — 梯队成形<div class="vt-desc">板块 +9.99%、资金 +2.4亿,2家涨停,龙头 华脉科技。</div></div><div class="vt-line"><span class="vt-rank">④</span><b>农化制品</b> — 资金主节奏<div class="vt-desc">板块 +9.91%、资金 +1.8亿,2家涨停,关注承接力度。</div></div></div><div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors"><li><span class="vt-tag">百大集团 5板</span>一般零售 板块 +10.0% 领涨,龙头 百大集团 表态,关注能否延续 5 板穿越</li><li><span class="vt-tag">中粮科技</span>农产品加 今日次强,龙头 中粮科技 领涨,观察明日能否接力</li><li><span class="vt-tag">华脉科技</span>通信设备 梯队成形,资金 净流入 2.4亿,关注持续性</li><li><span class="vt-tag">金正大</span>农化制品 板块 +9.9%,资金 净流入 1.8亿,高位注意回撤</li><li><span class="vt-tag">炸板监控</span>今日炸板 27家,炸板率超 40% 需警惕情绪退潮</li><li><span class="vt-tag">量能验证</span>成交额 18556亿,关注量能能否维持</li></ul></div><div class="bd-section"><div class="bd-h">④ 板块强弱 · 3最强 · 3分歧 · 3流出</div><table class="bd-tbl"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>方向</th></tr></thead><tbody><tr class="bd-seg-h bd-seg-1"><td colspan="5"><span class="bd-seg-num">1</span><b>最强</b> · 一字带动 · 龙头确立</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">农产品加</td><td class="up">+10.01%</td><td class="up">+3.3亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">航运港口</td><td class="up">+10.01%</td><td class="up">+2.5亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">电网设备</td><td class="up">+10.00%</td><td class="up">+2.4亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr class="bd-seg-h bd-seg-2"><td colspan="5"><span class="bd-seg-num">2</span><b>分歧</b> · 资金流入但涨幅收敛</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">一般零售</td><td class="up">+9.97%</td><td class="up">+2.3亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">通信设备</td><td class="up">+9.99%</td><td class="up">+2.4亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">综合Ⅱ</td><td class="up">+10.10%</td><td class="up">+3.5亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr class="bd-seg-h bd-seg-3"><td colspan="5"><span class="bd-seg-num">3</span><b>流出</b> · 退潮 / 资金撤离</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">汽车零部</td><td class="up">+9.88%</td><td class="up">+1.9亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">农化制品</td><td class="up">+9.91%</td><td class="up">+1.8亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">家居用品</td><td class="up">+10.00%</td><td class="up">+1.6亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr></tbody></table></div><div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div><div class="msw-row"><span class="msw-tag msw-tag-def">贵金属</span><div class="msw-vals"><span class="up">+10.02%</span> · <span class="up">资金 +0.1亿</span></div></div><div class="msw-row"><span class="msw-tag msw-tag-ag">农产品加</span><div class="msw-vals"><span class="up">+10.01%</span> · <span class="up">资金 +3.3亿</span></div></div><div class="msw-note">今日主力净流入最强:综合Ⅱ +3.5亿;资金承接方向切换至 农产品加 / 贵金属</div><div class="msw-nums"><div class="msw-num"><div class="msw-num-v up">+3.5亿</div><div class="msw-num-l">综合Ⅱ</div></div><div class="msw-num"><div class="msw-num-v up">+3.3亿</div><div class="msw-num-l">农产品加</div></div><div class="msw-num"><div class="msw-num-v up">+2.5亿</div><div class="msw-num-l">航运港口</div></div><div class="msw-num"><div class="msw-num-v up">+2.4亿</div><div class="msw-num-l">通信设备</div></div></div><div class="msw-foot">主力净流入(亿元)取自东财行业板块口径(真实值,非估算):综合Ⅱ、农产品加、航运港口、通信设备 居前;防御(贵金属)与农业(农产品加)为资金切换承接方向,谨防一致兑现。</div></div><div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
     
@@ -4509,7 +4519,7 @@ function buildDecisionCardHtml(s){
       '<div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤'+mr.capPct+'%（'+escHtmlF(mr.label)+'市）· 单笔风险0.5%-1%</div>'+
       '<div class="dc-line">置信度构成：趋势'+trendScore+'/30 + 资金'+fundScore+'/25 + 题材'+themeScore+'/20 + 关键位'+keyScore+'/15 + 盈亏比'+rrScore+'/10</div>'+
     '</div>'+
-    '<div class="dc-block dc-review" data-review-code="'+escHtmlF(s.code)+'" data-name="'+escHtmlF(s.name)+'" data-price="'+price+'" data-high="'+(Number(s.high)||price)+'" data-low="'+(Number(s.low)||price)+'" data-entry="'+Number(p.entry).toFixed(2)+'" data-stop="'+Number(p.stop).toFixed(2)+'" data-target="'+Number(p.target).toFixed(2)+'"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
+    '<div class="dc-block dc-review" data-review-code="'+escHtmlF(s.code)+'" data-name="'+escHtmlF(s.name)+'" data-price="'+price+'" data-high="'+(Number(s.high)||price)+'" data-low="'+(Number(s.low)||price)+'" data-entry="'+Number(p.entry).toFixed(2)+'" data-stop="'+Number(p.stop).toFixed(2)+'" data-target="'+Number(p.target).toFixed(2)+'" data-tdate="'+escHtmlF(s.tradeDate||'')+'"><div class="dc-h">📊 盘后复盘（当日验证）</div>'+
       '<div class="dc-line">关键位验证：'+keyVerify+'</div>'+patternHtml+
       '<div class="dc-line">资金验证：'+fundVerify+'</div>'+
       '<div class="dc-line dc-trade-status">交易状态：'+
@@ -4519,6 +4529,9 @@ function buildDecisionCardHtml(s){
         '<button class="ts-btn ts-t-btn" data-code="'+escHtmlF(s.code)+'" onclick="recordTTrade(this)">记做T</button>'+
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
+      '<div class="dc-block dc-short" data-short-code="'+escHtmlF(s.code)+'"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div>'+
+      buildShortPlanHtml(s,_moP,_shortBan)+'</div>'+
+
       '<div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 入场需【两道条件同时满足】—— (a) 当日最低回落至计划入场价；(b) 【前收门控】五项全过：周K方向(周MA5≥周MA10)、MACD(DIF≥DEA)、KDJ(K≤85 不超买)、BOLL(收盘不站上轨)、量比(≥0.8)；门控未过则记「⏸ 门控未通过·未入场」并继续等待（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满 10 个交易日未触及则判为未触发入场）② 【A股 T+1：入场当日不可卖出】⇒ 入场日一律【不结算】，只用【1 分钟分时】(取不到时用 15 分钟K)记录「入场之后」的区间与曾否触达止盈/止损价(排除入场前价格，故不得用当日最低判止损)；结算自【入场次一交易日】起，用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-trace" data-trace-code="'+escHtmlF(s.code)+'"></div>'+
       '<div class="dc-line dc-next-day">🎯 明日核心观察点：'+nextDayFocus+'</div>'+
@@ -4553,6 +4566,11 @@ function dcBadges(s){
   var _moP={entry:entry,stop:stop,target:target,rr:rr,rrNow:rrNow};
   applyManualOverrideF(_moP,price,s);
   entry=_moP.entry; stop=_moP.stop; target=_moP.target; rr=_moP.rr; rrNow=_moP.rrNow;
+  // v11.80:短线2-3天前置门槛 —— RR≥1.5 且 大盘风控未触发(上证当日跌幅≤2.5% 且 非禁开新仓)
+  var _idxPct=(typeof window!=='undefined'&&window.__atdsIdxPct!=null)?window.__atdsIdxPct:null;
+  var _mktBan=(s.marketRegime&&/禁|反转向下/.test(String(s.marketRegime.label||'')));
+  var _shortBan=(rr<1.5)||_mktBan||(_idxPct!=null&&_idxPct<=-2.5);
+  var _shortBanWhy=(rr<1.5)?('赔率不佳(RR '+rr.toFixed(2)+'<1.5)，短线计划禁用'):_mktBan?'大盘风控触发(市场状态:'+((s.marketRegime&&s.marketRegime.label)||'—')+')，短线计划禁用':(_idxPct!=null&&_idxPct<=-2.5)?('大盘风控触发(上证 '+_idxPct.toFixed(2)+'%≤-2.5%)，短线计划禁用'):'';
   function rrTone(r){return r>=2?'good':r>=1.5?'ok':r>=1?'warn':'bad';}
   var trendScore=t.trend==='up'?30:t.trend==='repair'?20:t.trend==='flat'?12:5;
   var fundScore=12;if((ff.d1||0)>0)fundScore+=6;if((ff.d3||0)>0)fundScore+=4;
@@ -5299,8 +5317,17 @@ function bulkAddStrongStockToWatchlist(){
 function pad2F(n){return (n<10?'0':'')+n;}
 function bjTimeF(d){d=d||new Date();return pad2F(d.getHours())+':'+pad2F(d.getMinutes());}
 async function refreshCoreQuotes(){
+  // v11.80:顺手记录上证实时涨跌幅(短线计划的大盘风控判断用)
   // v11.40:同时支持两套标记 —— .index-item(旧) 与 .ce-idx-row(盘中/收盘页实际使用)
   var items=document.querySelectorAll('.index-item[data-code], .ce-idx-row[data-code]');
+  try{
+    var _idxEls=document.querySelectorAll('[data-code="1.000001"],[data-code="sh000001"]');
+    _idxEls.forEach(function(el){
+      var t=el.textContent||'';
+      var pm=t.match(/([+\-]?[\d.]+)%/);
+      if(pm)window.__atdsIdxPct=parseFloat(pm[1]);
+    });
+  }catch(e){}
   if(!items.length)return;
   var codes=[];var map={};
   items.forEach(function(it){
@@ -6597,8 +6624,9 @@ function archiveShadowPositionF(code,rec,reason){
   var pnl=(price&&rec.entry)?Math.round((price-rec.entry)/rec.entry*10000)/100:0;
   var note=(reason||'取消')+'，按现价了结（未触发止盈/止损，不计入胜率）';
   var planKey=[code,rec.entry,rec.stop,rec.target,'cancelled'].join('|');
+  try{ if(getJournal().some(function(x){return x.planKey===planKey;}))return; }catch(e){}   // v11.80:同一持仓只归档一次
   addJournalEntry({code:code,name:rec.name||code,date:bjTodayF(),entry:rec.entry,stop:rec.stop,target:rec.target,close:price,pnl:pnl,shadow:true,
-    result:'cancelled',note:note,openedDate:rec.openedDate||'',entryDate:rec.entryDate||rec.openedDate||'',settleDate:bjTodayF(),settlePrice:price,
+    result:'cancelled',note:note,openedDate:rec.openedDate||'',entryDate:rec.entryDate||rec.openedDate||'',settleDate:bjTodayF(),settlePrice:price,mode:rec.mode||'swing',exitReason:'手动取消',settledAt:bjNowStrF(),
     v:28,planKey:planKey,strategy:'swing',entryType:rec.entryType||'',entryConds:rec.entryConds||''});
   archiveHistoryCopyF(code,{entry:rec.entry,entryDate:rec.entryDate||rec.openedDate,stop:rec.stop,target:rec.target,result:'cancelled',pnl:pnl,settleDate:bjTodayF(),settlePrice:price,note:reason||'取消'});
   showToast('已归档 '+code+' 的模拟跟踪记录（按现价 '+(pnl>0?'+':'')+pnl+'% 了结，历史保留在复盘模块）');
@@ -6611,6 +6639,32 @@ function lhbStaleF(d){ return tradingDaysBetweenF(d,bjTodayF())>20; }
 function r2fF(v){var n=parseFloat(v);return isNaN(n)?null:(Math.round(n*100)/100);}
 function bjTodayF(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,10); }
 function bjNowHM(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(11,16); }
+/* ════════ v11.80【A股时间锁】全局强制 ════════
+   所有模拟跟踪的入场/止盈/止损判定,必须落在正确的交易时段内,坚决杜绝非交易时间触发
+   (实测 Bug:09-18 07:41 系统用 09-17 静态最高 20.20 判定"09-18 止盈@20.09" ⇒ 数据穿越)。
+   时段规则(馨馨定):
+     08:00-09:15  盘前     仅展示计划与昨日复盘,禁止任何触发
+     09:15-09:25  集合竞价  仅情绪观察,不按竞价虚价成交
+     09:25-09:30  待开盘    禁止触发
+     09:30-11:30  连续竞价   真实动态监控(可触发)          ┐
+     13:00-14:50  连续竞价   真实动态监控(可触发)          ┘ 唯一可结算时段
+     14:50-15:00  尾盘风控  新触发一律停止;【例外】短线模式的时间止损(T+3纪律)在此执行
+     15:00 之后   盘后复盘  只允许用【定型日K】结算(K路径);卡片实时字段(路径②)一律禁用
+   周末整日 closed。节假日无法本地识别(接受残余风险,由 K 线数据自然缺日兜底)。 */
+function tradingPhaseF(){
+  var d = new Date(Date.now() + 8 * 3600 * 1000);
+  var dow = d.getUTCDay();
+  var hm = d.getUTCHours() * 60 + d.getUTCMinutes();
+  if (dow === 0 || dow === 6) return { phase: 'closed', canSettle: false, klineReview: true, allowTimeStop: false, label: '周末休市' };
+  if (hm < 9 * 60 + 15) return { phase: 'pre', canSettle: false, klineReview: false, allowTimeStop: false, label: '休市期间(盘前)' };
+  if (hm < 9 * 60 + 25) return { phase: 'call', canSettle: false, klineReview: false, allowTimeStop: false, label: '集合竞价(仅观察,不成交)' };
+  if (hm < 9 * 60 + 30) return { phase: 'pre', canSettle: false, klineReview: false, allowTimeStop: false, label: '竞价结束待开盘' };
+  if (hm <= 11 * 60 + 30) return { phase: 'open', canSettle: true, klineReview: true, allowTimeStop: false, label: '连续竞价(上午)' };
+  if (hm < 13 * 60) return { phase: 'lunch', canSettle: false, klineReview: false, allowTimeStop: false, label: '午间休市' };
+  else if (hm <= 14 * 60 + 50) return { phase: 'open', canSettle: true, klineReview: true, allowTimeStop: false, label: '连续竞价(下午)' };
+  else if (hm < 15 * 60) return { phase: 'tail', canSettle: false, klineReview: false, allowTimeStop: true, label: '尾盘风控(14:50后停止新触发,仅执行T+3时间止损)' };
+  return { phase: 'review', canSettle: false, klineReview: true, allowTimeStop: false, label: '盘后复盘(定型日K)' };
+}
 // v11.56:快照必须自述时点 —— 决策卡上的"时间"以前是**渲染时刻**,离线/弱网首屏用缓存渲染时,
 //   会把几天前的价格配上一个"现在"的时间(与 v11.39 修报告标头、v11.55 修K线同一类错误)。
 function bjNowStrF(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(0,16).replace('T',' '); }
@@ -6660,7 +6714,16 @@ function renderJournalStats(){
       if(!a&&!b)return '';
       return '<div class="jrn-types">入场方式胜率：回踩支撑 <b>'+(a||'样本不足3笔')+'</b> ｜ 现价入场 <b>'+(b||'样本不足3笔')+'</b></div>';
     })();
+  // v11.80:短线2-3天策略独立胜率(与波段分开) + 离场原因占比(时间止损占比越高 ⇒ 越需优化选股/入场)
+  var shortLine='';
+  if(c.short&&(c.short.w+c.short.loss)>0){
+    var sw=c.short.w,sl=c.short.loss,swr=Math.round(sw/(sw+sl)*100);
+    var se=c.shortExit||{};var seParts=[];
+    Object.keys(se).forEach(function(k){seParts.push(k+' '+se[k]+'笔');});
+    shortLine='<div class="jrn-types">⏱ <b>短线2-3天策略胜率 <b>'+swr+'%</b>（'+(sw+sl)+'笔·'+sw+'胜'+sl+'负）</b>'+(seParts.length?('　离场原因:'+seParts.join(' / ')):'')+'</div>';
+  }
   var ex=[];
+  if(c.timeTravel)ex.push('时间穿越作废 '+c.timeTravel+' 笔（非交易时段产出，已剔除胜率并重判）');
   if(c.legacy)ex.push('早期未校验 '+c.legacy+' 笔（无入场门控，不计入胜率）');
   if(c.missed)ex.push('未触发入场 '+c.missed+' 笔（不计入胜率）');
   if(c.invalid)ex.push('计划失效 '+c.invalid+' 笔（起点已破位，不计入胜率）');
@@ -6706,7 +6769,7 @@ function renderJournalStats(){
     // v11.29:口径声明 —— 把理想化假设显式写出来,比假装数据精确更可信。
     rows+='<div class="jrn-disc">口径说明：<b>① 入场门控（多周期多指标）</b> —— 需<b>价格回落至计划入场价</b> 且 <b>前收门控五项全过</b>：周K方向(周MA5≥周MA10)、MACD(DIF≥DEA)、KDJ(K≤85 不超买)、BOLL(收盘不站上轨)、量比(≥0.8)；全部用<b>入场日前一根已完成K线</b>计算（<b>无未来函数</b>），未过则记「⏸ 门控未通过·未入场」并继续等待（不消耗观察期）。<b>② 【A股 T+1】买入当日不可卖出</b>，故<b>入场日一律不结算</b>（只按 <b>1 分钟分时</b>，取不到时用 15 分钟K，记录「<b>入场之后</b>」的区间与曾否触达止盈/止损价；当日最低可能出现在入场之前，故不得用日K当日最低判入场日；取不到分钟K则当日不留判定）；<b>结算自入场次一交易日起</b>，用<b>当日最高/最低</b>判定（日线无法还原日内先后，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率；<b>入场当日即结算的历史样本违反 T+1，已单列标记、不计入胜率</b>。<b>入场方式按"勾选时入场价相对现价"划分（回踩支撑=需回落才入场；现价入场=勾选价即入场价）；同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
   }
-  el.innerHTML=head+warn+perStock+rows;
+  el.innerHTML=head+warn+shortLine+perStock+rows;
 }
 // v11.76:个股历史档案视图(按股票聚合 journal 中该股的全部模拟跟踪记录)。
 //   ⭐ 独立于观察池:个股被删除/取消勾选/清空跟踪后,这里的档案**永久保留**(除非「清空复盘数据」)。
@@ -7029,6 +7092,76 @@ function setTradeStatus(btn,status){
   try{renderJournalStats();}catch(e){}
 }
 
+// v11.80:短线2-3天计划块(客户端重建用,与 SSR renderShortPlanHtml 同口径)
+function buildShortPlanHtml(s, plan, banned) {
+  var entry = plan.entry, stop = plan.stop;
+  var ma20 = N2F(s.tech && s.tech.ma20), openP = N2F(s.open);
+  var stops = [ma20, openP ? openP * 0.97 : null].filter(function(v){return v!=null&&v<entry;});
+  var priceStop = stops.length ? Math.max.apply(null, stops) : entry * 0.95;
+  var press = []; ((s.tech && s.tech.pressures) || []).forEach(function(p){ var v = N2F(p.price); if (v && v > entry) press.push(v); });
+  press.sort(function(a,b){return a-b;});
+  var tp1 = press.length ? Math.min(press[0], entry * 1.04) : entry * 1.04;
+  if (tp1 <= entry * 1.005) tp1 = entry * 1.04;
+  var tp2 = Math.max(entry * 1.07, tp1 * 1.02);
+  var r2 = function(v){return Math.round(v*100)/100;};
+  var f2 = function(v){return (v==null||isNaN(Number(v)))?'--':Number(v).toFixed(2);};
+  var idxPct = (typeof window!=='undefined'&&window.__atdsIdxPct != null) ? window.__atdsIdxPct : null;
+  var mktBan = !!(s.marketRegime && /禁|反转向下/.test(String(s.marketRegime.label||'')));
+  var isBan = banned || mktBan || (idxPct != null && idxPct <= -2.5);
+  var why = banned ? '赔率不佳(RR ' + f2(plan.rr) + ' < 1.5)，短线计划禁用'
+    : mktBan ? ('大盘风控触发(' + ((s.marketRegime && s.marketRegime.label) || '反转向下') + ')，短线计划禁用')
+    : (idxPct != null && idxPct <= -2.5) ? ('大盘风控触发(上证 ' + idxPct.toFixed(2) + '% ≤ -2.5%)，短线计划禁用') : '';
+  var ff = s.fundFlow || {};
+  var evNear = ((s.events || [])[0]) || null;
+  return '<div class="sp-gate ' + (isBan ? 'bad' : 'ok') + '">' + (isBan ? ('⛔ ' + why) : ('✓ 门槛通过：RR ' + f2(plan.rr) + ' ≥ 1.5 · 大盘风控正常' + (idxPct != null ? ('(上证 ' + idxPct.toFixed(2) + '%)') : ''))) + '</div>' +
+    '<div class="dc-line sp-row">入场：<b>' + f2(entry) + '</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div>' +
+    '<div class="dc-line sp-row">价格止损：<b>' + f2(r2(priceStop)) + '</b>（MA20 / 今开-3% 先触发者），无条件清仓</div>' +
+    '<div class="dc-line sp-row">时间止损：<b>第3个交易日 14:50</b> 强制按最新价清仓，绝不扛单</div>' +
+    '<div class="dc-line sp-row">分批止盈：①<b>' + f2(r2(tp1)) + '</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>' + f2(r2(tp2)) + '</b>(+7%)清仓剩余</div>' +
+    '<div class="dc-line sp-row">资金量能：主力净流入 ' + f2(ff.d1) + '亿(d3 ' + f2(ff.d3) + ') · 量比 ' + f2(s.volRatio) + '</div>' +
+    '<div class="dc-line sp-row">逻辑催化：' + escHtmlF(String(s.logic || '--').slice(0, 60)) + (evNear ? (' · 最近事件:' + escHtmlF(String(evNear.type || '') + ' ' + String(evNear.date || ''))) : '') + '</div>' +
+    '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="' + escHtmlF(s.code) + '" onchange="toggleShortTrack(this)"' + (isBan ? ' disabled' : '') + '> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label>' + (isBan ? '<span class="sp-ban">⛔ 已禁用</span>' : '') + '</div>';
+}
+// v11.80:短线跟踪开关 —— 与波段互斥;参数=shortParamsF 同口径;入场语义与波段一致(打勾=候选,盘中真实触及才入场)
+function toggleShortTrack(cb){
+  var code = cb.getAttribute('data-code');
+  var block = cb.closest('.dc-short') && cb.closest('.dc-short').parentElement ? cb.closest('.dc-short').parentElement.querySelector('.dc-review[data-review-code="' + code + '"]') : null;
+  var reviewBlock = block || cb.closest('.dc-review');
+  var m = getShadowMap();
+  if (cb.checked) {
+    var swingRec = m[code];
+    if (swingRec && swingRec.entryHit && !swingRec.settled) { cb.checked = false; showToast('已有波段持仓在跟踪，不可切换短线模式（先等其结束或取消勾选）', 'warn'); return; }
+    var dcr = reviewBlock || cb.closest('.dc-review');
+    if (!dcr) { cb.checked = false; return; }
+    var _entry = N2F(dcr.getAttribute('data-entry')) || N2F(dcr.getAttribute('data-price'));
+    var fakeS = { strategy: { entry: _entry }, tech: null, open: null, price: N2F(dcr.getAttribute('data-price')) };
+    // 技术字段从 localStorage 缓存取(与决策卡同源)
+    var cached = loadWatchlistStockData(code) || {};
+    fakeS.tech = cached.tech || null; fakeS.open = N2F(cached.open); fakeS.fundFlow = cached.fundFlow || null; fakeS.marketRegime = cached.marketRegime || null; fakeS.events = cached.events || null;
+    var sp = shortParamsF(fakeS);
+    if (sp.entry == null) { cb.checked = false; showToast('计划参数缺失，无法启用短线模式', 'warn'); return; }
+    // 若同股已有波段 rec → 直接转换模式(未入场状态);已入场见上
+    m[code] = { enabled: true, mode: 'short', status: 'monitoring', name: dcr.getAttribute('data-name') || code,
+      entry: sp.entry, planEntry: sp.entry, priceStop: sp.priceStop, tp1: sp.tp1, tp2: sp.tp2, stop: sp.priceStop, target: sp.tp2,
+      openedDate: bjTodayF(), settled: false, entryHit: false, entryType: 'short', refPrice: N2F(dcr.getAttribute('data-price')), entryTime: bjNowHM() };
+    try { localStorage.setItem('sim_track_' + code, 'true'); } catch (e) {}
+    setShadowMap(m);
+    var swingCb = dcr.querySelector('.ts-shadow-check');
+    if (swingCb) swingCb.checked = false;
+    showToast('已启用短线2-3天跟踪（入场 ' + sp.entry + ' · 止损 ' + sp.priceStop + ' · T+3 时间止损 · 分批止盈 ' + sp.tp1 + '/' + sp.tp2 + '）');
+    updateReviewProgress();
+  } else {
+    var rec2 = m[code];
+    if (rec2 && rec2.mode === 'short') {
+      if (rec2.entryHit && !rec2.settled) { try { archiveShadowPositionF(code, rec2, '取消短线跟踪'); } catch (e) {} }
+      delete m[code];
+      try { localStorage.removeItem('sim_track_' + code); } catch (e) {}
+      setShadowMap(m);
+      updateReviewProgress();
+    }
+  }
+}
+
 function toggleShadowTrack(cb){
   var code=cb.getAttribute('data-code');
   var block=cb.closest('.dc-review');
@@ -7057,7 +7190,7 @@ function toggleShadowTrack(cb){
     }else{
       entry=_en;stop=_stop;target=_tg;
     }
-    m[code]={enabled:true,status:'monitoring',name:block.getAttribute('data-name')||code,entry:entry,planEntry:_en,stop:stop,target:target,openedDate:bjTodayF(),settled:false,entryHit:false,entryType:_et,refPrice:_px,entryTime:bjNowHM()};
+    m[code]={enabled:true,mode:'swing',status:'monitoring',name:block.getAttribute('data-name')||code,entry:entry,planEntry:_en,stop:stop,target:target,openedDate:bjTodayF(),settled:false,entryHit:false,entryType:_et,refPrice:_px,entryTime:bjNowHM()};
     setShadowMap(m);   // ⚠️ 必须先落盘再 return(漏写会让勾选不持久)
     try{localStorage.setItem('sim_track_'+code,'true');}catch(e){}
     showToast(_et==='pullback'
@@ -7286,12 +7419,27 @@ function settleShadowTrade(code,klines,minBars){
   var low=parseFloat(block.getAttribute('data-low'))||0;
   if(!high)high=price;
   if(!low)low=price;
+  var today=bjTodayF();
+  // v11.80【A股时间锁·全局强制】非交易时段一律不结算(实测 09-18 07:41 用昨日静态最高判止盈=数据穿越)。
+  var ph=tradingPhaseF();
+  if(!ph.canSettle && !ph.klineReview){
+    rec.lastCheck={date:today,price:price,high:high,low:low,phaseNote:ph.label+'，不产生任何结算'};
+    setShadowMap(sm);
+    return;
+  }
+  // v11.80:路径②(卡片实时高低)只允许在连续竞价时段使用;盘后/尾盘只走 K 路径(定型日K)。
+  //   且卡片数据必须属于今天 —— 07:41 的卡片还挂着昨日 high(百亚 20.20 被当成 09-18 最高)⇒ 必须拦截。
+  var allowPath2=ph.canSettle && String(block.getAttribute('data-tdate')||'')===today;
+  var isTickDay=(String(rec.openedDate)===today);   // v11.76:打勾当日(当日最低可能发生在打勾之前,不可用于判入场)
+  // v11.80:短线2-3天模式走专用状态机(时间止损/分批止盈/离场原因归因)
+  if(rec.mode==='short'){
+    try{ settleShortTradeF(code,rec,sm,klines,minBars,block,ph,today); }catch(e){ console.warn('[settleShortTradeF]',code,e.message); }
+    return;
+  }
   var entry=rec.entry,stop=rec.stop,target=rec.target;
   // 防御1:计划参数必须合法(止盈>入场>止损)。非法计划一律不参与判定。
   if(!entry||!stop||!target||!(target>entry&&entry>stop))return;
   if(!(price>0))return;
-  var today=bjTodayF();
-  var isTickDay=(String(rec.openedDate)===today);   // v11.76:打勾当日(当日最低可能发生在打勾之前,不可用于判入场)
   var pct=function(v){return Math.round((v-entry)/entry*10000)/100;};
   var doSettle=function(result,pnl,settlePrice,note,settleDate){
     var sd=settleDate||today;
@@ -7301,7 +7449,7 @@ function settleShadowTrade(code,klines,minBars){
     rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=sd;rec.settlePrice=settlePrice;rec.settleNote=note||'';
     if(!dup){
       addJournalEntry({code:code,name:rec.name||code,date:sd,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',
-        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing',entryType:rec.entryType||'',
+        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing',mode:'swing',exitReason:(result==='win'?'止盈':(result==='loss'?'价格止损':result)),settledAt:bjNowStrF(),entryType:rec.entryType||'',
         entryConds:rec.entryConds||''});   // v11.65:本次触发满足的门控条件(归因用)
       try{ archiveHistoryCopyF(code,{entry:entry,entryDate:rec.entryDate||rec.openedDate,stop:stop,target:target,result:result,pnl:pnl,settleDate:sd,settlePrice:settlePrice,note:note||''}); }catch(e){}
     }
@@ -7336,7 +7484,7 @@ function settleShadowTrade(code,klines,minBars){
   //     但旧逻辑在数据源抖动/缓存串值时就会用 36.69 判定"已入场" ⇒ 偷价)。
   //    打勾当日只认【打勾时刻之后】的分钟级真实触及(l≤入场价≤h,即该分钟真实成交区间覆盖入场价);
   //    分钟K不可得 ⇒ 保持「监控中」,不判定、不产生样本。
-  if(!kUsed){
+  if(!kUsed && allowPath2){   // v11.80:路径②仅限连续竞价时段且卡片数据属于今天(防静态数据穿越)
     if(!(high>0&&low>0&&high>=low))return;
     if((high-low)/low>0.5){
       rec.lastCheck={date:today,price:price,high:high,low:low,skip:'振幅异常('+Math.round((high-low)/low*100)+'%)，疑似数据异常/除权，本次不判定'};
@@ -7437,9 +7585,176 @@ function migrateT1InvalidF(){
     return cnt;
   }catch(e){return 0;}
 }
+/* v11.80【穿越记录作废迁移】时间锁上线前,结算记录没有 settledAt(结算时刻)字段,
+   无法证明来路合法(实测:09-18 07:41 用 09-17 静态最高判定了"09-18 止盈")。
+   规则:①近期(≤5自然日)的 win/loss shadow 结算且【无 settledAt】 ⇒ 标记 timeTravel:true
+   (剔除胜率、单列可追溯),并把对应 shadow 记录重置为未结算 ⇒ 交易时段内用当日真实数据重新判定;
+   ②重判后新记录带 settledAt,来路可审计。幂等:靠 settledAt 与 timeTravel 标记双重判断。
+   存量正当记录会被"作废重判"一次,数据不变、来路变干净 —— 这是可接受的代价。 */
+function migrateTimeTravelF(){
+  try{
+    // v11.80b:一次性闸 —— 只在首次加载时执行(否则顺序用例的重复结算会被反复作废)
+    try{ if(localStorage.getItem('atds_timetravel_migrated'))return 0; }catch(e){}
+    var today=bjTodayF();
+    var cut=(function(){var d=new Date(Date.now()+8*3600*1000);d.setUTCDate(d.getUTCDate()-5);return d.toISOString().slice(0,10);})();
+    var j=getJournal(),cnt=0,resetCodes={};
+    for(var i=0;i<j.length;i++){
+      var e=j[i];
+      if(!e||!e.shadow||e.settledAt||e.timeTravel)continue;               // 新记录(带settledAt)或已标记 → 跳过
+      if(e.result!=='win'&&e.result!=='loss')continue;                     // missed/invalid/cancelled 不在穿越风险内
+      if(!e.settleDate||String(e.settleDate)!==String(today))continue;      // v11.80b:只作废【今天】产的(更早的是用户已见过的历史)
+      e.timeTravel=true;cnt++;resetCodes[String(e.code)]=true;             // 作废:剔除胜率,可追溯
+    }
+    if(cnt)localStorage.setItem('atds_trade_journal',JSON.stringify(j));
+    var sm=getShadowMap(),changed=false;
+    for(var k in resetCodes){
+      var r=sm[k];
+      if(r&&r.settled){ r.settled=false;delete r.result;delete r.pnl;delete r.settleDate;delete r.settlePrice;delete r.settleNote;changed=true; }
+    }
+    if(changed)setShadowMap(sm);
+    // v11.80b:一次性闸 —— 迁移只跑一次,避免反复作废-重判造成记录翻倍
+    try{localStorage.setItem('atds_timetravel_migrated',String(today));}catch(e){}
+    return cnt;
+  }catch(e){return 0;}
+}
+/* ════════ v11.80 短线2-3天(T+1~T+3)模式 ════════
+   与波段(swing)共用入场语义(打勾=候选 → 盘中真实触及才入场 + 5项门控),离场规则不同:
+     ① 价格止损:跌破关键支撑(min(MA20,今开×0.97) 中【先触发者】=更高者,且必须低于入场价) → 无条件清仓
+     ② 分批止盈:第一目标 min(最近压力位,入场+4%) 触发 → 减仓50% + 止损上移至成本(保本单)
+                  第二目标 入场+7% 触发 → 清仓剩余(两段合成一笔,盈亏=各50%加权)
+     ③ 时间止损:入场后第3个交易日(T+3)强制离场 —— 尾盘 14:50 按现价;页面没开则盘后用 T+3 定型收盘价补判
+   离场原因(止盈/价格止损/时间止损)全部写入复盘归因,与波段策略分开统计胜率。 */
+function shortParamsF(s){
+  var entry=N2F(s.strategy&&s.strategy.entry)||N2F(s.price);
+  var ma20=N2F(s.tech&&s.tech.ma20);
+  var open=N2F(s.open);
+  var stops=[ma20,open?open*0.97:null].filter(function(v){return v!=null&&v<entry;});
+  var priceStop=stops.length?Math.max.apply(null,stops):entry*0.95;   // 先触发者=更高者
+  var press=[];((s.tech&&s.tech.pressures)||[]).forEach(function(p){var v=N2F(p.price);if(v&&v>entry)press.push(v);});
+  press.sort(function(a,b){return a-b;});
+  var tp1=press.length?Math.min(press[0],entry*1.04):entry*1.04;
+  if(tp1<=entry*1.005)tp1=entry*1.04;
+  var tp2=Math.max(entry*1.07,tp1*1.02);
+  var r2=function(v){return Math.round(v*100)/100;};
+  return {entry:r2(entry),priceStop:r2(priceStop),tp1:r2(tp1),tp2:r2(tp2)};
+}
+function N2F(v){var n=parseFloat(v);return isNaN(n)?null:n;}
+// 短线入场检测:与 swing 同语义(打勾当日=打勾后分钟触及;次日=日K区间覆盖),但【强制过5项门控】
+function shortEntryDetectF(rec,klines,minBars,today){
+  var entry=Number(rec.entry);
+  var suite=klines&&klines.length?calcIndicatorSuiteF(klines):null;
+  var isTickDay=String(rec.openedDate)===today;
+  var tryGate=function(barDate){
+    if(!suite)return {ok:true,fails:[],conds:''};
+    var g=gateAtF(suite,barDate);
+    if(g&&!g.ok)return {ok:false,fails:g.fails};
+    return {ok:true,fails:[],conds:entryGateTextF(rec,g)};
+  };
+  if(isTickDay){
+    var m=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);
+    if(!m||!m.touched)return null;
+    var g1=tryGate(today);
+    if(!g1.ok)return {blocked:g1.fails};
+    return {entered:true,date:today,conds:g1.conds,at:m.at};
+  }
+  for(var i=0;i<klines.length;i++){
+    var k=klines[i];if(!k)continue;
+    var d=String(k[0]||'').slice(0,10);
+    var hi=parseFloat(k[3]),lo=parseFloat(k[4]);
+    if(!d||!(hi>0)||!(lo>0))continue;
+    if(d<=rec.openedDate||d>today)continue;
+    if(lo<=entry&&hi>=entry){
+      var g2=tryGate(d);
+      if(!g2.ok)return {blocked:g2.fails};
+      return {entered:true,date:d,conds:g2.conds};
+    }
+  }
+  return null;
+}
+// 短线状态机(独立于 swing,互不干扰)
+function settleShortTradeF(code,rec,sm,klines,minBars,block,ph,today){
+  var price=parseFloat(block.getAttribute('data-price'))||0;
+  var high=parseFloat(block.getAttribute('data-high'))||0;
+  var low=parseFloat(block.getAttribute('data-low'))||0;
+  if(!high)high=price; if(!low)low=price;
+  var entry=rec.entry;
+  // v11.80:stop 归一化 —— 兼容仅有 priceStop 字段的记录(缺 stop 会让"low<=rec.stop"恒 false,止损静默失效)
+  var stop=N2F(rec.stop)||N2F(rec.priceStop)||entry*0.95;
+  rec.stop=stop;
+  var tp1=rec.tp1,tp2=rec.tp2;
+  if(!entry||!stop||!tp1||!tp2||!(tp2>tp1&&tp1>entry&&entry>=stop))return;   // v11.80:entry>=stop —— 保本单(stage≥1)时 stop==entry 合法
+  if(!(price>0))return;
+  var pct=function(v){return Math.round((v-entry)/entry*10000)/100;};
+  var doSettle=function(pnl,settlePrice,note,exitReason,settleDate){
+    var sd=settleDate||today;
+    var planKey=[code,entry,stop,tp1,tp2,sd,exitReason].join('|'),dup=false;
+    try{dup=getJournal().some(function(x){return x.planKey===planKey;});}catch(e){}
+    rec.settled=true;rec.result=pnl>=0?'win':'loss';rec.pnl=pnl;rec.settleDate=sd;rec.settlePrice=settlePrice;rec.settleNote=note;rec.exitReason=exitReason;
+    if(!dup){
+      addJournalEntry({code:code,name:rec.name||code,date:sd,entry:entry,stop:stop,target:tp2,close:price,pnl:pnl,shadow:true,result:rec.result,note:note,
+        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'short',mode:'short',
+        exitReason:exitReason,settledAt:bjNowStrF(),entryType:rec.entryType||'',entryConds:rec.entryConds||''});
+      archiveHistoryCopyF(code,{entry:entry,entryDate:rec.entryDate||rec.openedDate,stop:stop,tp1:tp1,tp2:tp2,result:rec.result,pnl:pnl,settleDate:sd,settlePrice:settlePrice,exitReason:exitReason,note:note});
+    }
+    setShadowMap(sm);
+  };
+  var pushTrace=function(o){ if(!rec.trace||!rec.trace.length)rec.trace=[]; var kept=[]; for(var q=0;q<rec.trace.length;q++){if(rec.trace[q].d!==o.d)kept.push(rec.trace[q]);} kept.push(o); rec.trace=kept.slice(-12); };
+  // 入场判定(短线强制 5 项门控)
+  if(!rec.entryHit){
+    var det=shortEntryDetectF(rec,klines,minBars,today);
+    if(det&&det.entered){ rec.entryHit=true;rec.entryDate=det.date;rec.entryPrice=entry;rec.touchAt=det.at||null;rec.entryConds=det.conds||''; }
+    else{
+      rec.lastCheck={date:today,price:price,high:high,low:low,phaseNote:(det&&det.blocked)?('已触入场价但门控未过:'+(det.blocked||[]).join('/')):(ph.label+'，短线等待真实触及 '+entry)};
+      setShadowMap(sm);return;
+    }
+  }
+  // T+1:入场当日不结算(只记轨迹)
+  if(rec.entryDate===today){
+    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.touchAt||rec.entryTime);
+    if(mj)pushTrace({d:today,hi:Math.round(mj.hi*100)/100,lo:Math.round(mj.lo*100)/100,ev:'hold',afterEntry:true,t1:true});
+    rec.lastCheck={date:today,price:price,src:'m1',t1:true};
+    setShadowMap(sm);return;
+  }
+  var held=tradingDaysBetweenF(rec.entryDate,today);
+  // ③ 时间止损(T+3):第3个交易日的 14:50 按现价强制离场;页面没开则盘后用 T+3 定型收盘价补判。
+  //    ⚠️ 时段规则:tail(14:50-15:00)只执行时间止损(既定纪律,非新触发);open 阶段未到 14:50 则继续正常监控。
+  if(held>=3){
+    var t3date=today,exitPrice=price;
+    if(!(held===3&&ph.allowTimeStop)&&klines&&klines.length){
+      var cnt=0;
+      for(var i=0;i<klines.length;i++){var k=klines[i];if(!k)continue;var d=String(k[0]||'').slice(0,10);
+        if(d>rec.entryDate&&d<=today){cnt++;if(cnt===3){t3date=d;exitPrice=parseFloat(k[2])||price;break;}}}
+    }
+    if(held===3&&ph.allowTimeStop||held>3||t3date!==today){
+      doSettle(pct(exitPrice),exitPrice,'时间止损:买入后第3个交易日('+t3date+')强制离场，绝不扛单','时间止损',t3date);
+      return;
+    }
+  }
+  // ② 价格止损(保本后为止损线上移后的值)—— 仅连续竞价时段执行;尾盘/盘后不新增触发
+  if(ph.canSettle&&low<=rec.stop){
+    doSettle(pct(rec.stop),rec.stop,rec.stage>=1?'保本单:第一止盈后止损上移至成本,回踩成本离场':'价格止损:跌破关键支撑(MA20/开盘价-3%)','价格止损');
+    return;
+  }
+  // ① 分批止盈
+  if((rec.stage==null||rec.stage===0)&&high>=tp1){
+    rec.stage=1;rec.stop=Math.max(rec.stop,entry);   // 止损上移至成本(保本单)
+    pushTrace({d:today,hi:high,lo:low,ev:'tp1',px:tp1});
+    rec.lastCheck={date:today,price:price,shortNote:'第一止盈 '+tp1+' 触发:减仓50%,止损上移至成本 '+entry+'(保本)'};
+    setShadowMap(sm);return;
+  }
+  if(rec.stage===1&&high>=tp2){
+    var blended=Math.round((((tp1-entry)*0.5+(tp2-entry)*0.5)/entry)*10000)/100;
+    doSettle(blended,tp2,'分批止盈:第一目标'+tp1+'减仓50%·保本,第二目标'+tp2+'清仓剩余','止盈');
+    return;
+  }
+  pushTrace({d:today,hi:high,lo:low,ev:'hold',stage:rec.stage||0,gapT:Math.round((tp1-high)/high*10000)/100});
+  rec.lastCheck={date:today,price:price,high:high,low:low,shortNote:'短线持有中(T+'+held+');价格止损 '+rec.stop+(rec.stage>=1?'(已保本)':'')+' · 第一止盈 '+tp1+' · 时间止损 T+3'};
+  setShadowMap(sm);
+}
 // v11.31:改为异步 —— 先并行取各跟踪个股日K,再逐只判定(未打开页面的交易日由日K回补)
 async function settleAllShadowTrades(){
   migrateT1InvalidF();   // v11.63:T+1 迁移必须先跑(重开被误结算的记录,否则它们不会被重判)
+  migrateTimeTravelF();  // v11.80:时间锁前产的【无 settledAt】结算记录作废重判(数据穿越防御)
   var sm=getShadowMap();
   var codes=[];
   for(var c in sm){ if(sm[c]&&sm[c].enabled&&!sm[c].settled)codes.push(c); }
@@ -7527,6 +7842,7 @@ function reviewClassification(){
     // v11.63【T+1】入场当日即结算的样本违反 A股 T+1(当日买入不可卖出)→ 单列、不计入胜率。
     //   不删除用户数据,只标记并隔离(可追溯),同时把对应跟踪记录重置为未结算、按新口径重判。
     if(e.shadow&&e.t1Invalid){ s.t1++; continue; }
+    if(e.shadow&&e.timeTravel){ s.timeTravel=(s.timeTravel||0)+1; continue; }   // v11.80:时间穿越作废样本(来路不合法,剔除胜率,可追溯)
     if(rs==='win'||rs==='loss'||rs==='expired'){
       s.valid++;
       if(!isNaN(p))s.sum+=p;
@@ -7536,6 +7852,14 @@ function reviewClassification(){
         var et=e.entryType||'unknown';
         if(!s.byType[et])s.byType[et]={w:0,l:0};
         if(rs==='win')s.byType[et].w++;else s.byType[et].l++;
+      }
+      // v11.80:短线2-3天策略独立统计(与波段分开,客观评估短线打法是否有效)
+      if(e.mode==='short'&&(rs==='win'||rs==='loss')){
+        if(!s.short) s.short={w:0,l:0};
+        if(rs==='win')s.short.w++; else s.short.l++;
+        var xr=e.exitReason||'—';
+        if(!s.shortExit) s.shortExit={};
+        s.shortExit[xr]=(s.shortExit[xr]||0)+1;
       }
     } else if(rs==='missed'){ s.missed++; }
     else if(rs==='invalid'){ s.invalid++; }   // v11.29:观察起点已破位的作废样本,不计入胜率
@@ -7551,14 +7875,42 @@ function updateReviewProgress(){
   var c=reviewClassification();
   var openCnt=0;
   for(var cc in sm){ if(sm[cc]&&sm[cc].enabled&&!sm[cc].settled)openCnt++; }
+  // v11.80:休市标识 —— 非连续竞价时段,决策卡顶部强制显示"不产生任何结算"
+  var _ph=tradingPhaseF();
+  var _closedTxt=(_ph.canSettle||_ph.phase==='review')?null:('⚠️ 休市期间（'+_ph.label+'），数据为昨日静态参考，不产生任何结算');
   var blocks=document.querySelectorAll('.dc-review');
   for(var b=0;b<blocks.length;b++){
+    if(_closedTxt){
+      var _blk=blocks[b];
+      if(!_blk.querySelector('.dc-closed-banner')){
+        var _bn=document.createElement('div');_bn.className='dc-closed-banner';_bn.textContent=_closedTxt;
+        _blk.insertBefore(_bn,_blk.firstChild);
+      }
+    } else {
+      var _bn2=blocks[b].querySelector('.dc-closed-banner'); if(_bn2)_bn2.remove();
+    }
     var code=blocks[b].getAttribute('data-review-code');
     var attr=blocks[b].querySelector('.ts-attr');
     if(!attr)continue;
     var r=sm[code],txt;
     var px=Number(blocks[b].getAttribute('data-price'))||0;
     var ntd=(r&&r.trace&&r.trace.length)?r.trace.length:0;   // v11.32:已跟踪的交易日数(取自日K逐日轨迹)
+    if(r&&r.enabled&&!r.settled&&r.mode==='short'){
+      var days=bjDaysBetweenF(r.openedDate,bjTodayF());
+      var held2=r.entryHit?tradingDaysBetweenF(r.entryDate,bjTodayF()):0;
+      if(!r.entryHit){
+        txt='⏱ 短线2-3天监控中：等待盘中真实触及 '+r.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+r.priceStop+' · 分批止盈 '+r.tp1+'/'+r.tp2+' · 时间止损 T+3 14:50。未触发不计样本';
+      } else if(r.stage!=null&&r.stage>=1){
+        var fl2=(px&&r.entry)?Math.round((px-r.entry)/r.entry*10000)/100:null;
+        txt='⏱ 短线持有中(T+'+held2+'，已保本)：现价'+px+'，浮动'+(fl2!=null?((fl2>=0?'+':'')+fl2+'%'):'--')+'。剩余仓位止损上移至成本 '+r.entry+'；第二止盈 '+r.tp2+'；T+3 14:50 时间止损强制离场';
+      } else {
+        var fl3=(px&&r.entry)?Math.round((px-r.entry)/r.entry*10000)/100:null;
+        txt='⏱ 短线持有中(T+'+held2+')：现价'+px+'，浮动'+(fl3!=null?((fl3>=0?'+':'')+fl3+'%'):'--')+'。价格止损 '+r.priceStop+' · 第一止盈 '+r.tp1+'(减仓50%·保本) · T+3 14:50 时间止损';
+      }
+      attr.textContent=txt;
+      try{ renderShadowTrace(blocks[b],code,r||null); }catch(e){}
+      continue;
+    }
     if(r&&r.enabled&&!r.settled){
       var days=bjDaysBetweenF(r.openedDate,bjTodayF());
       if(!r.entryHit){
@@ -7654,6 +8006,13 @@ function applyReviewState(block){
     var enabled=sh[code]&&sh[code].enabled;
     if(!enabled){ try{ enabled=localStorage.getItem('sim_track_'+code)==='true'; }catch(e){} }
     cb.checked=!!enabled;
+  }
+  var scb=block.querySelector('.ts-short-check');
+  if(scb){
+    var sh2=getShadowMap();
+    scb.checked=!!(sh2[code]&&sh2[code].enabled&&sh2[code].mode==='short');
+    var swingCb=block.querySelector('.ts-shadow-check');
+    if(scb.checked&&swingCb)swingCb.checked=false;
   }
   bindReviewHoverPause(block);   // 重建后的块重新挂悬停暂停,避免刷新打断交互
 }
