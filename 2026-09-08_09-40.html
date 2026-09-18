@@ -770,6 +770,17 @@
 .entry-fl-up{color:#dc2626}.entry-fl-down{color:#16a34a}
 .entry-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
 .wl-stock.entry-flash{outline:3px solid #f59e0b;outline-offset:-3px}
+
+/* v11.83 尾盘定调快照入口横幅 */
+.ts-banner{display:block;margin:10px 12px 0;padding:10px 12px;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 2px 8px rgba(249,115,22,.35);line-height:1.5}
+
+/* v11.83 个股历史档案折叠(默认收起,点标题展开) */
+.jrn-archive{border:1px solid #e2e8f0;border-radius:10px;margin:6px 0;overflow:hidden}
+.jrn-archive-head{display:flex;align-items:center;gap:6px;padding:9px 12px;font-size:13px;font-weight:800;color:#0f172a;cursor:pointer;user-select:none;background:#f8fafc}
+.jrn-arc-cnt{font-size:11px;color:#fff;background:#94a3b8;border-radius:9px;padding:1px 7px;font-weight:700}
+.jrn-arc-caret{font-size:11px;color:#64748b;margin-left:auto}
+.jrn-archive-body{display:none;padding:8px 12px}
+.jrn-archive.open .jrn-archive-body{display:block}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -2191,7 +2202,8 @@
       <a href="index.html">首页</a><a href="2026-09-08_09-40.html" class="active">盘前</a><a href="2026-09-08_16-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:05</b>（约 1419 分钟前）</div><h1 class="hero-title">2026-09-08 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:05），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 86°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:05</b>（约 2 分钟前）</div><h1 class="hero-title">2026-09-08 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:05），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 86°</span></div></div>
+<a class="ts-banner" href="2026-09-18_14-30.html">📋 14:30 尾盘定调快照已生成（四大选股 · 盘中未定型 · 非最终结果）→ 立即查看</a>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-08 21:05:19</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -6676,8 +6688,13 @@ function renderPerStockArchive(){
     if(!it.last||String(e.settleDate||e.date||'')>String(it.last.settleDate||it.last.date||''))it.last=e;
   }
   var keys=Object.keys(g).sort(function(a,b){return (g[b].win+g[b].loss)-(g[a].win+g[a].loss);});
-  if(!keys.length)return '<div class="jrn-disc">个股档案：暂无（勾选个股「系统模拟跟踪」后，每笔虚拟买入/结算都会按股票永久归档在这里）</div>';
-  var h='<div class="jrn-disc"><b>📁 个股历史档案</b>（按股票聚合 · 删除个股/取消勾选/清空跟踪都不会丢，仅「清空复盘数据」可清）<br>';
+  // v11.83:可折叠(默认收起,点标题才展开);表头带 N 只计数与 caret
+  var head = '📁 个股历史档案 <span class="jrn-arc-cnt">' + keys.length + ' 只</span> <span class="jrn-arc-caret">▸</span>';
+  var body;
+  if(!keys.length){
+    body = '<div class="jrn-disc">个股档案：暂无（勾选个股「系统模拟跟踪」后，每笔虚拟买入/结算都会按股票永久归档在这里）</div>';
+  } else {
+    var h = '<div class="jrn-disc">（按股票聚合 · 删除个股/取消勾选/清空跟踪都不会丢，仅「清空复盘数据」可清）';
   for(var i2=0;i2<keys.length;i2++){
     var it2=g[keys[i2]];
     var wr=(it2.win+it2.loss)?(Math.round(it2.win/(it2.win+it2.loss)*100)+'%'):'—';
@@ -6685,8 +6702,18 @@ function renderPerStockArchive(){
       +(it2.cancelled?(' · 取消归档 '+it2.cancelled):'')+(it2.missed?(' · 未触发 '+it2.missed):'')+(it2.invalid?(' · 失效 '+it2.invalid):'')+(it2.open?(' · <b>监控中</b>'):'')
       +(it2.last?('　最近：'+escHtmlF(String(it2.last.settleDate||it2.last.date||'—'))+' '+(it2.last.pnl!=null?((it2.last.pnl>0?'+':'')+it2.last.pnl+'%'):'—')):'')+'</div>';
   }
-  return h+'</div>';
+    body = h + '</div>';
+  }
+  return '<div class="jrn-archive" id="jrn-archive">' +
+    '<div class="jrn-archive-head" onclick="toggleJournalArchive()">' + head + '</div>' +
+    '<div class="jrn-archive-body">' + body + '</div></div>';
 }
+function toggleJournalArchive(){
+  var el = document.getElementById('jrn-archive'); if (!el) return;
+  var opened = el.classList.toggle('open');
+  var c = el.querySelector('.jrn-arc-caret'); if (c) c.textContent = opened ? '▾' : '▸';
+}
+window.toggleJournalArchive = toggleJournalArchive;
 // v11.35:样本备份/恢复 —— 样本是唯一不可重建的资产(换机/清浏览器数据即永久丢失)。
 var backupOpen=false;
 function toggleBackupPanel(){ backupOpen=!backupOpen; renderJournalStats(); }
