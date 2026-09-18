@@ -2204,7 +2204,7 @@
       <a href="index.html">首页</a><a href="2026-09-07_08-30.html" class="active">盘前</a><a href="2026-09-07_16-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:06</b>（约 16 分钟前）</div><h1 class="hero-title">2026-09-07 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:06），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">低温区 · °</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:06</b>（约 47 分钟前）</div><h1 class="hero-title">2026-09-07 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:06），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">低温区 · °</span></div></div>
 <a class="ts-banner" href="2026-09-18_14-30.html">📋 14:30 尾盘定调快照已生成（四大选股 · 盘中未定型 · 非最终结果）→ 立即查看</a>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
@@ -5435,8 +5435,10 @@ function calcDecisionTech(klines){
   var supports=[],pressures=[];
   function addLvl(price,label,weight){
     if(price==null||isNaN(price))return;
-    var item={price:r2(price),label:label,weight:weight};
-    if(price<last)supports.push(item);else if(price>last)pressures.push(item);
+    // v11.84:先舍入再比较归属 —— 否则 MA 与现价差<0.005 时会因"判断用原始值/存储用舍入值"多出一个 price==现价 的边界项(支撑/压力里出现现价本身)
+    var p=r2(price),lp=r2(last);
+    if(p<lp)supports.push({price:p,label:label,weight:weight});
+    else if(p>lp)pressures.push({price:p,label:label,weight:weight});
   }
   addLvl(ma5,'MA5','weak');addLvl(ma10,'MA10','weak');
   addLvl(ma20,'MA20','strong');addLvl(ma60,'MA60','strong');
@@ -5453,11 +5455,28 @@ function calcDecisionTech(klines){
   var wkLast=weeklyCloses[weeklyCloses.length-1];
   var wk5=weeklyCloses.length>=5?weeklyCloses.slice(-5).reduce(function(a,b){return a+b;},0)/5:null;
   var weeklyTrend=(wkLast!=null&&wk5!=null)?(wkLast>wk5*1.005?'up':wkLast<wk5*0.995?'down':'flat'):'flat';
+  // v11.84:补齐与服务端 calcTechFromKline 同口径的 4 个字段(手动股此前缺,技术指标展示不全)
+  //   KDJ(8,2,2)金叉:1/2 平滑,末根 prevK<=prevD 且 K>D
+  var kdjGold=false,kk=50,dd=50,pk=null,pd=null;
+  for(var ki=0;ki<n;ki++){
+    var kseg=closes.slice(Math.max(0,ki-7),ki+1);
+    var khi=Math.max.apply(null,kseg),klo=Math.min.apply(null,kseg);
+    var rsv=khi>klo?(closes[ki]-klo)/(khi-klo)*100:50;
+    kk=1/2*kk+1/2*rsv;dd=1/2*dd+1/2*kk;
+    if(ki===n-1&&pk!=null&&pk<=pd&&kk>dd)kdjGold=true;
+    pk=kk;pd=dd;
+  }
+  var r60c=closes.slice(-60);
+  var r60hi=Math.max.apply(null,r60c),r60lo=Math.min.apply(null,r60c);
+  var range60=r60hi>r60lo?(last-r60lo)/(r60hi-r60lo)*100:50;
+  var pct5=n>=6?(last/closes[n-6]-1)*100:0;
+  var bias10=ma10?Math.round((last/ma10-1)*1000)/10:null;
   return {price:r2(last),ma5:r2(ma5),ma10:r2(ma10),ma20:r2(ma20),ma60:r2(ma60),ma20Slope:ma20Slope,trend:trend,
     atr14:r2(atr14),high60:r2(high60),low60:r2(low60),gapUp:gapUp,gapDown:gapDown,supports:supports,pressures:pressures,
     weeklyTrend:weeklyTrend,volRatio:volRatio!=null?Math.round(volRatio*100)/100:null,
     volChgPct:volChgPct,volToday:volToday,volYesterday:volYesterday,
-    bias20:ma20?Math.round((last/ma20-1)*1000)/10:null,
+    bias10:bias10,bias20:ma20?Math.round((last/ma20-1)*1000)/10:null,
+    pct5:Math.round(pct5*100)/100,range60:Math.round(range60),kdjGold:kdjGold,
     // v11.55:把"这根末K属于哪个交易日/是否当日未完成"钉在画像上,供卡片披露(镜像云端 klineStampS)
     klineStamp:klineStampF(klines,bjTodayF(),bjNowHM())};
 }
