@@ -785,6 +785,8 @@
 .jrn-arc-caret{font-size:11px;color:#64748b;margin-left:auto}
 .jrn-archive-body{display:none;padding:8px 12px}
 .jrn-archive.open .jrn-archive-body{display:block}
+
+.entry-sort{font-size:11px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:2px 9px;cursor:pointer;user-select:none;font-weight:700}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -6765,7 +6767,7 @@ window.setManualTag=setManualTag;
    与主列表共用 atds_shadow + 实时行情 DOM,5s 刷新同步(挂 refreshWatchlistQuotes)。
    A股时间锁联动:入场只可能发生在 09:30-14:50(tradingPhaseF 已保证),故 entryDate===今天 即"今日入场",
    盘前(<09:15)天然为 0。 */
-var __entryFAB = { open: false };
+var __entryFAB = { open: false, sort: 'fl' };   // sort: fl=浮盈降序(默认,优先表现最好) / time=入场时间升序
 function todayEntryCodesF(){
   var sm = getShadowMap(), out = [], today = bjTodayF();
   for (var c in sm) { var r = sm[c];
@@ -6812,7 +6814,7 @@ function ensureEntryUI(){
   })();
   var pop = document.createElement('div');
   pop.id = 'entry-pop'; pop.className = 'entry-pop';
-  pop.innerHTML = '<div class="entry-pop-h"><span>📌 今日已入场</span><span class="entry-pop-close" onclick="toggleEntryPop()">收起</span></div><div class="entry-pop-body"></div>';
+  pop.innerHTML = '<div class="entry-pop-h"><span>📌 今日已入场</span><span class="entry-sort" onclick="toggleEntrySort()" title="切换排序:浮盈高低 / 入场时间">排序:💰浮盈</span><span class="entry-pop-close" onclick="toggleEntryPop()">收起</span></div><div class="entry-pop-body"></div>';
   document.body.appendChild(pop);
   try { var pos = localStorage.getItem('atds_entry_fab_pos'); if (pos) { var xy = pos.split('|'); fab.style.left = xy[0]; fab.style.top = xy[1]; } } catch (e2) {}
 }
@@ -6841,7 +6843,8 @@ function renderEntryPop(){
     var fl = (lv.price && r.entry) ? Math.round((lv.price - r.entry) / r.entry * 10000) / 100 : null;
     items.push({ code: c, name: lv.name, price: lv.price, pct: lv.pct, entry: r.entry, stop: r.stop, target: r.target, fl: fl, at: r.touchAt || r.entryTime || '' });
   }
-  items.sort(function (a, b) { return String(a.at) < String(b.at) ? -1 : 1; });
+  if (__entryFAB.sort === 'time') { items.sort(function (a, b) { return String(a.at) < String(b.at) ? -1 : 1; }); }
+  else { items.sort(function (a, b) { var fa = (a.fl == null) ? -Infinity : a.fl; var fb = (b.fl == null) ? -Infinity : b.fl; return fb - fa; }); }
   if (!items.length) { body.innerHTML = '<div class="entry-empty">今日暂无触发标的，耐心等待信号</div>'; return; }
   var h = '';
   for (var i = 0; i < items.length; i++) {
@@ -6867,6 +6870,12 @@ function entryItemJump(el){
     card.classList.add('entry-flash'); setTimeout(function () { card.classList.remove('entry-flash'); }, 3000);
   }
 }
+function toggleEntrySort(){
+  __entryFAB.sort = (__entryFAB.sort === 'time') ? 'fl' : 'time';
+  var el = document.querySelector('.entry-sort');
+  if (el) el.textContent = (__entryFAB.sort === 'time') ? '排序:⏱时间' : '排序:💰浮盈';
+  renderEntryPop();
+}
 function updateEntryFAB(){
   var fab = document.getElementById('entry-fab'); if (!fab) return;
   var n = todayEntryCodesF().length;
@@ -6878,6 +6887,7 @@ function updateEntryFAB(){
 window.toggleEntryPop = toggleEntryPop;
 window.entryItemJump = entryItemJump;
 window.updateEntryFAB = updateEntryFAB;
+window.toggleEntrySort = toggleEntrySort;
 (function () { setTimeout(function () { try { ensureEntryUI(); updateEntryFAB(); } catch (e) {} }, 900); })();
 if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initWatchlistProUI,700);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initWatchlistProUI,700);});}
 </script>

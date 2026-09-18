@@ -781,6 +781,8 @@
 .jrn-arc-caret{font-size:11px;color:#64748b;margin-left:auto}
 .jrn-archive-body{display:none;padding:8px 12px}
 .jrn-archive.open .jrn-archive-body{display:block}
+
+.entry-sort{font-size:11px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:2px 9px;cursor:pointer;user-select:none;font-weight:700}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -2202,7 +2204,7 @@
       <a href="index.html">首页</a><a href="2026-09-11_09-45.html" class="active">盘前</a><a href="2026-09-11_16-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:47</b>（约 680 分钟前）</div><h1 class="hero-title">2026-09-11 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 60°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:47</b>（约 695 分钟前）</div><h1 class="hero-title">2026-09-11 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 60°</span></div></div>
 <a class="ts-banner" href="2026-09-18_14-30.html">📋 14:30 尾盘定调快照已生成（四大选股 · 盘中未定型 · 非最终结果）→ 立即查看</a>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
@@ -8004,7 +8006,7 @@ window.setManualTag=setManualTag;
    与主列表共用 atds_shadow + 实时行情 DOM,5s 刷新同步(挂 refreshWatchlistQuotes)。
    A股时间锁联动:入场只可能发生在 09:30-14:50(tradingPhaseF 已保证),故 entryDate===今天 即"今日入场",
    盘前(<09:15)天然为 0。 */
-var __entryFAB = { open: false };
+var __entryFAB = { open: false, sort: 'fl' };   // sort: fl=浮盈降序(默认,优先表现最好) / time=入场时间升序
 function todayEntryCodesF(){
   var sm = getShadowMap(), out = [], today = bjTodayF();
   for (var c in sm) { var r = sm[c];
@@ -8051,7 +8053,7 @@ function ensureEntryUI(){
   })();
   var pop = document.createElement('div');
   pop.id = 'entry-pop'; pop.className = 'entry-pop';
-  pop.innerHTML = '<div class="entry-pop-h"><span>📌 今日已入场</span><span class="entry-pop-close" onclick="toggleEntryPop()">收起</span></div><div class="entry-pop-body"></div>';
+  pop.innerHTML = '<div class="entry-pop-h"><span>📌 今日已入场</span><span class="entry-sort" onclick="toggleEntrySort()" title="切换排序:浮盈高低 / 入场时间">排序:💰浮盈</span><span class="entry-pop-close" onclick="toggleEntryPop()">收起</span></div><div class="entry-pop-body"></div>';
   document.body.appendChild(pop);
   try { var pos = localStorage.getItem('atds_entry_fab_pos'); if (pos) { var xy = pos.split('|'); fab.style.left = xy[0]; fab.style.top = xy[1]; } } catch (e2) {}
 }
@@ -8080,7 +8082,8 @@ function renderEntryPop(){
     var fl = (lv.price && r.entry) ? Math.round((lv.price - r.entry) / r.entry * 10000) / 100 : null;
     items.push({ code: c, name: lv.name, price: lv.price, pct: lv.pct, entry: r.entry, stop: r.stop, target: r.target, fl: fl, at: r.touchAt || r.entryTime || '' });
   }
-  items.sort(function (a, b) { return String(a.at) < String(b.at) ? -1 : 1; });
+  if (__entryFAB.sort === 'time') { items.sort(function (a, b) { return String(a.at) < String(b.at) ? -1 : 1; }); }
+  else { items.sort(function (a, b) { var fa = (a.fl == null) ? -Infinity : a.fl; var fb = (b.fl == null) ? -Infinity : b.fl; return fb - fa; }); }
   if (!items.length) { body.innerHTML = '<div class="entry-empty">今日暂无触发标的，耐心等待信号</div>'; return; }
   var h = '';
   for (var i = 0; i < items.length; i++) {
@@ -8106,6 +8109,12 @@ function entryItemJump(el){
     card.classList.add('entry-flash'); setTimeout(function () { card.classList.remove('entry-flash'); }, 3000);
   }
 }
+function toggleEntrySort(){
+  __entryFAB.sort = (__entryFAB.sort === 'time') ? 'fl' : 'time';
+  var el = document.querySelector('.entry-sort');
+  if (el) el.textContent = (__entryFAB.sort === 'time') ? '排序:⏱时间' : '排序:💰浮盈';
+  renderEntryPop();
+}
 function updateEntryFAB(){
   var fab = document.getElementById('entry-fab'); if (!fab) return;
   var n = todayEntryCodesF().length;
@@ -8117,6 +8126,7 @@ function updateEntryFAB(){
 window.toggleEntryPop = toggleEntryPop;
 window.entryItemJump = entryItemJump;
 window.updateEntryFAB = updateEntryFAB;
+window.toggleEntrySort = toggleEntrySort;
 (function () { setTimeout(function () { try { ensureEntryUI(); updateEntryFAB(); } catch (e) {} }, 900); })();
 if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initWatchlistProUI,700);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initWatchlistProUI,700);});}
 </script>
