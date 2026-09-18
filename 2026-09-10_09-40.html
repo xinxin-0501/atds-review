@@ -2204,7 +2204,7 @@
       <a href="index.html">首页</a><a href="2026-09-10_09-40.html" class="active">盘前</a><a href="2026-09-10_16-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:33</b>（约 238 分钟前）</div><h1 class="hero-title">2026-09-10 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:33），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:33</b>（约 363 分钟前）</div><h1 class="hero-title">2026-09-10 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:33），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-10 18:33:21</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -4096,6 +4096,11 @@ function buildDecisionCardHtml(s){
   var p={entry:entry,stop:stop,target:target,rr:rr,rrNow:rrNow,stopPct:stopPct,sup:sup,pre:pre,atr:atr};
   // v11.69:人工覆盖安全阀 —— 在置信度/状态机计算【之前】应用,保证卡片头部、计划表、复盘卡、模拟跟踪用的都是同一套价位
   var moWarn=applyManualOverrideF(p,price,s);
+  // v11.86:短线2-3天前置门槛(RR≥1.5 + 大盘风控)。注意必须用覆盖后的 p.rr,且变量必须在 buildDecisionCardHtml 函数体内定义
+  //   (v11.83 曾误把短线块引用的 _moP/_shortBan 定义在 dcBadges 里,导致本函数 ReferenceError → 手动股决策卡渲染失败、添加失效)
+  var _idxPct=(typeof window!=='undefined'&&window.__atdsIdxPct!=null)?window.__atdsIdxPct:null;
+  var _mktBan=(s.marketRegime&&/禁|反转向下/.test(String(s.marketRegime.label||'')));
+  var _shortBan=(p.rr<1.5)||_mktBan||(_idxPct!=null&&_idxPct<=-2.5);
   function rrTone(r){return r>=2?'good':r>=1.5?'ok':r>=1?'warn':'bad';}
   // 置信度(趋势30/资金25/题材20/关键位15/盈亏比10)
   var trendScore=t.trend==='up'?30:t.trend==='repair'?20:t.trend==='flat'?12:5;
@@ -4433,7 +4438,7 @@ function buildDecisionCardHtml(s){
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
       '<div class="dc-block dc-short" data-short-code="'+escHtmlF(s.code)+'"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div>'+
-      buildShortPlanHtml(s,_moP,_shortBan)+'</div>'+
+      buildShortPlanHtml(s,p,_shortBan)+'</div>'+
 
       '<div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 入场需【两道条件同时满足】—— (a) 当日最低回落至计划入场价；(b) 【前收门控】五项全过：周K方向(周MA5≥周MA10)、MACD(DIF≥DEA)、KDJ(K≤85 不超买)、BOLL(收盘不站上轨)、量比(≥0.8)；门控未过则记「⏸ 门控未通过·未入场」并继续等待（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满 10 个交易日未触及则判为未触发入场）② 【A股 T+1：入场当日不可卖出】⇒ 入场日一律【不结算】，只用【1 分钟分时】(取不到时用 15 分钟K)记录「入场之后」的区间与曾否触达止盈/止损价(排除入场前价格，故不得用当日最低判止损)；结算自【入场次一交易日】起，用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-trace" data-trace-code="'+escHtmlF(s.code)+'"></div>'+
@@ -4469,11 +4474,6 @@ function dcBadges(s){
   var _moP={entry:entry,stop:stop,target:target,rr:rr,rrNow:rrNow};
   applyManualOverrideF(_moP,price,s);
   entry=_moP.entry; stop=_moP.stop; target=_moP.target; rr=_moP.rr; rrNow=_moP.rrNow;
-  // v11.80:短线2-3天前置门槛 —— RR≥1.5 且 大盘风控未触发(上证当日跌幅≤2.5% 且 非禁开新仓)
-  var _idxPct=(typeof window!=='undefined'&&window.__atdsIdxPct!=null)?window.__atdsIdxPct:null;
-  var _mktBan=(s.marketRegime&&/禁|反转向下/.test(String(s.marketRegime.label||'')));
-  var _shortBan=(rr<1.5)||_mktBan||(_idxPct!=null&&_idxPct<=-2.5);
-  var _shortBanWhy=(rr<1.5)?('赔率不佳(RR '+rr.toFixed(2)+'<1.5)，短线计划禁用'):_mktBan?'大盘风控触发(市场状态:'+((s.marketRegime&&s.marketRegime.label)||'—')+')，短线计划禁用':(_idxPct!=null&&_idxPct<=-2.5)?('大盘风控触发(上证 '+_idxPct.toFixed(2)+'%≤-2.5%)，短线计划禁用'):'';
   function rrTone(r){return r>=2?'good':r>=1.5?'ok':r>=1?'warn':'bad';}
   var trendScore=t.trend==='up'?30:t.trend==='repair'?20:t.trend==='flat'?12:5;
   var fundScore=12;if((ff.d1||0)>0)fundScore+=6;if((ff.d3||0)>0)fundScore+=4;
