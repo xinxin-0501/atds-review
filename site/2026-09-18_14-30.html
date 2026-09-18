@@ -2743,7 +2743,7 @@ function fetchWithTimeout(url, opt, ms){
 async function fetchStockData(raw){
   if(!/^\d{6}$/.test(String(raw)))return null;
   var c0=String(raw).charAt(0);var sc;
-  if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
+  if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="9"){sc="bj";}else{sc="sz";}
   for(var attempt=0;attempt<3;attempt++){
     try{
       var res=await fetchWithTimeout("https://qt.gtimg.cn/q="+sc+raw,{cache:"no-store"});
@@ -4018,7 +4018,7 @@ function restoreSavedWatchlist(){
     for(var i=0;i<extraCodes.length;i++){
       var rawCode=String(extraCodes[i]);
       var existing=document.querySelector('.wl-stock[data-stock-code="'+rawCode+'"]');
-      var c0=rawCode.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
+      var c0=rawCode.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="9"){sc="bj";}else{sc="sz";}
       var data=null;
       try{
         var res=await fetchWithTimeout("https://qt.gtimg.cn/q="+sc+rawCode);
@@ -4039,7 +4039,7 @@ function restoreSavedWatchlist(){
         data={code:rawCode,name:rawCode+' (加载中)',price:0,pct:0,amount:'--亿',turnover:'--',setcode:sc,prevClose:0,open:0,high:0,low:0,amplitude:0,volRatio:0,avgPrice:0,floatMcap:0,totalMcap:0};
       }
       // 补齐缺失字段(K线/资金流/龙虎榜/事件/封单/分钟线)——v11.1 手机端缺模块根因
-      try{var full=(c0==="6"||c0==="5")?("sh"+rawCode):((c0==="4"||c0==="8"||c0==="92")?("bj"+rawCode):("sz"+rawCode));var kl=await fetchKlineF(full,90);if(kl&&kl.length>=30){data.tech=calcDecisionTech(kl);}}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'K线失败:',e.message);}
+      try{var full=(c0==="6"||c0==="5")?("sh"+rawCode):((c0==="4"||c0==="8"||c0==="9")?("bj"+rawCode):("sz"+rawCode));var kl=await fetchKlineF(full,90);if(kl&&kl.length>=30){data.tech=calcDecisionTech(kl);}}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'K线失败:',e.message);}
       try{var ff=await fetchStockFundFlowF(rawCode);if(ff)data.fundFlow=ff;}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, '资金流失败:',e.message);}
       try{var evRes=await fetchEventsF(rawCode);if(evRes){if(Array.isArray(evRes.events)&&evRes.events.length)data.events=evRes.events;data.eventsStatus={cninfo:evRes.cninfoStatus||(evRes.status==='ok'?'ok':'fail'),srcUsed:evRes.srcUsed||''};}}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, '事件失败:',e.message);}
       try{var lhb=await fetchLhbDetailF(rawCode);if(lhb)data.lhb=lhb;}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, '龙虎榜失败:',e.message);}
@@ -4109,7 +4109,7 @@ async function refreshWatchlistQuotes(){
   try{
     // 批量腾讯行情:sh/sz/bj 前缀区分,一次请求多个
     var batch=[];
-    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==='92'){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
+    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==="9"){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
     var res=await fetchWithTimeout('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
     if(!res.ok)throw new Error('HTTP '+res.status);
     var buf=await res.arrayBuffer();
@@ -4205,7 +4205,7 @@ async function refreshWatchlistQuotes(){
           // v11.11:配置股同样允许重建(已通过 data-stock 播种全量数据,不再丢失题材/逻辑文案)
           try{
             var c0=c.charAt(0);
-            var full=(c0==="6"||c0==="5")?("sh"+c):((c0==="4"||c0==="8"||c0==="92")?("bj"+c):("sz"+c));
+            var full=(c0==="6"||c0==="5")?("sh"+c):((c0==="4"||c0==="8"||c0==="9")?("bj"+c):("sz"+c));
             var kl=await fetchKlineF(full,90);
             if(!kl||kl.length<30)continue;
             var t=calcDecisionTech(kl);
@@ -4269,7 +4269,7 @@ async function refreshWaveQuotes(){
   items.forEach(function(it){var c=it.getAttribute('data-code');if(c){codes.push(c);map[c]=it;}});
   try{
     var batch=[];
-    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==='92'){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
+    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==="9"){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
     var res=await fetchWithTimeout('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
     if(!res.ok)throw new Error('HTTP '+res.status);
     var buf=await res.arrayBuffer();
@@ -6146,7 +6146,7 @@ async function refreshTailscanTail(){
   rows.forEach(function(r){var c=r.getAttribute('data-code');if(c&&!seen[c]){seen[c]=1;codes.push(c);}});
   var pctByCode={};
   for(var i=0;i<codes.length;i+=80){
-    var batch=codes.slice(i,i+80).map(function(c){var c0=c.charAt(0);return (c0==='6'||c0==='5')?'sh'+c:((c0==='4'||c0==='8'||c0==='92')?'bj'+c:'sz'+c);});
+    var batch=codes.slice(i,i+80).map(function(c){var c0=c.charAt(0);return (c0==='6'||c0==='5')?'sh'+c:((c0==='4'||c0==='8'||c0==="9")?'bj'+c:'sz'+c);});
     try{
       var res=await fetchWithTimeout('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
       if(!res.ok)continue;

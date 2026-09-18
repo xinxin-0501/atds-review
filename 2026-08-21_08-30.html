@@ -2204,7 +2204,7 @@
       <a href="index.html">首页</a><a href="2026-08-21_08-30.html" class="active">盘前</a><a href="2026-08-21_16-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 20:36</b>（约 377 分钟前）</div><h1 class="hero-title">2026-08-21 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 20:36），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 20:36</b>（约 393 分钟前）</div><h1 class="hero-title">2026-08-21 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 20:36），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-21 20:36:34</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -3101,7 +3101,7 @@ function fetchWithTimeout(url, opt, ms){
 async function fetchStockData(raw){
   if(!/^\d{6}$/.test(String(raw)))return null;
   var c0=String(raw).charAt(0);var sc;
-  if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
+  if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="9"){sc="bj";}else{sc="sz";}
   for(var attempt=0;attempt<3;attempt++){
     try{
       var res=await fetchWithTimeout("https://qt.gtimg.cn/q="+sc+raw,{cache:"no-store"});
@@ -4376,7 +4376,7 @@ function restoreSavedWatchlist(){
     for(var i=0;i<extraCodes.length;i++){
       var rawCode=String(extraCodes[i]);
       var existing=document.querySelector('.wl-stock[data-stock-code="'+rawCode+'"]');
-      var c0=rawCode.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="92"){sc="bj";}else{sc="sz";}
+      var c0=rawCode.charAt(0);var sc;if(c0==="6"){sc="sh";}else if(c0==="4"||c0==="8"||c0==="9"){sc="bj";}else{sc="sz";}
       var data=null;
       try{
         var res=await fetchWithTimeout("https://qt.gtimg.cn/q="+sc+rawCode);
@@ -4397,7 +4397,7 @@ function restoreSavedWatchlist(){
         data={code:rawCode,name:rawCode+' (加载中)',price:0,pct:0,amount:'--亿',turnover:'--',setcode:sc,prevClose:0,open:0,high:0,low:0,amplitude:0,volRatio:0,avgPrice:0,floatMcap:0,totalMcap:0};
       }
       // 补齐缺失字段(K线/资金流/龙虎榜/事件/封单/分钟线)——v11.1 手机端缺模块根因
-      try{var full=(c0==="6"||c0==="5")?("sh"+rawCode):((c0==="4"||c0==="8"||c0==="92")?("bj"+rawCode):("sz"+rawCode));var kl=await fetchKlineF(full,90);if(kl&&kl.length>=30){data.tech=calcDecisionTech(kl);}}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'K线失败:',e.message);}
+      try{var full=(c0==="6"||c0==="5")?("sh"+rawCode):((c0==="4"||c0==="8"||c0==="9")?("bj"+rawCode):("sz"+rawCode));var kl=await fetchKlineF(full,90);if(kl&&kl.length>=30){data.tech=calcDecisionTech(kl);}}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, 'K线失败:',e.message);}
       try{var ff=await fetchStockFundFlowF(rawCode);if(ff)data.fundFlow=ff;}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, '资金流失败:',e.message);}
       try{var evRes=await fetchEventsF(rawCode);if(evRes){if(Array.isArray(evRes.events)&&evRes.events.length)data.events=evRes.events;data.eventsStatus={cninfo:evRes.cninfoStatus||(evRes.status==='ok'?'ok':'fail'),srcUsed:evRes.srcUsed||''};}}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, '事件失败:',e.message);}
       try{var lhb=await fetchLhbDetailF(rawCode);if(lhb)data.lhb=lhb;}catch(e){console.warn('[restoreSavedWatchlist]', rawCode, '龙虎榜失败:',e.message);}
@@ -4467,7 +4467,7 @@ async function refreshWatchlistQuotes(){
   try{
     // 批量腾讯行情:sh/sz/bj 前缀区分,一次请求多个
     var batch=[];
-    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==='92'){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
+    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==="9"){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
     var res=await fetchWithTimeout('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
     if(!res.ok)throw new Error('HTTP '+res.status);
     var buf=await res.arrayBuffer();
@@ -4563,7 +4563,7 @@ async function refreshWatchlistQuotes(){
           // v11.11:配置股同样允许重建(已通过 data-stock 播种全量数据,不再丢失题材/逻辑文案)
           try{
             var c0=c.charAt(0);
-            var full=(c0==="6"||c0==="5")?("sh"+c):((c0==="4"||c0==="8"||c0==="92")?("bj"+c):("sz"+c));
+            var full=(c0==="6"||c0==="5")?("sh"+c):((c0==="4"||c0==="8"||c0==="9")?("bj"+c):("sz"+c));
             var kl=await fetchKlineF(full,90);
             if(!kl||kl.length<30)continue;
             var t=calcDecisionTech(kl);
@@ -4627,7 +4627,7 @@ async function refreshWaveQuotes(){
   items.forEach(function(it){var c=it.getAttribute('data-code');if(c){codes.push(c);map[c]=it;}});
   try{
     var batch=[];
-    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==='92'){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
+    codes.forEach(function(raw){var c0=raw.charAt(0);if(c0==='6'){batch.push('sh'+raw);}else if(c0==='4'||c0==='8'||c0==="9"){batch.push('bj'+raw);}else{batch.push('sz'+raw);}});
     var res=await fetchWithTimeout('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
     if(!res.ok)throw new Error('HTTP '+res.status);
     var buf=await res.arrayBuffer();
@@ -6504,7 +6504,7 @@ async function refreshTailscanTail(){
   rows.forEach(function(r){var c=r.getAttribute('data-code');if(c&&!seen[c]){seen[c]=1;codes.push(c);}});
   var pctByCode={};
   for(var i=0;i<codes.length;i+=80){
-    var batch=codes.slice(i,i+80).map(function(c){var c0=c.charAt(0);return (c0==='6'||c0==='5')?'sh'+c:((c0==='4'||c0==='8'||c0==='92')?'bj'+c:'sz'+c);});
+    var batch=codes.slice(i,i+80).map(function(c){var c0=c.charAt(0);return (c0==='6'||c0==='5')?'sh'+c:((c0==='4'||c0==='8'||c0==="9")?'bj'+c:'sz'+c);});
     try{
       var res=await fetchWithTimeout('https://qt.gtimg.cn/q='+batch.join(','),{cache:'no-store'});
       if(!res.ok)continue;
