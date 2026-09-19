@@ -603,7 +603,14 @@ function deriveCloseEmotion(ztList, dragonPool, marketStats, breadth, sectorsIn)
   const secAll = Array.isArray(sectorsIn) ? sectorsIn : [];
   const mainLines = secAll.filter(x => x && x.changePct != null)
     .slice().sort((a, b) => b.changePct - a.changePct).slice(0, 3)
-    .map((x, i) => ({ rank: i + 1, name: x.name, changePct: Math.round(x.changePct * 100) / 100, leader: (ztList.find(z => z.hybk === x.name) || {}).name || (ztList.find(z => z.reason === x.name) || {}).name || '--' }));
+    .map((x, i) => ({ rank: i + 1, name: x.name, changePct: Math.round(x.changePct * 100) / 100, leader: (function () {
+      // v11.99:领涨龙头 —— 从涨停池匹配(精确同名 → 模糊包含)。分类体系差异(东财细分板块 vs 申万行业)
+      //   导致旧精确匹配恒失败 → leader 全是 '--' 占位。改模糊匹配 + 空串兜底(前端非空才展示,不再显示 '--')。
+      const exact = ztList.find(z => z.hybk === x.name || z.reason === x.name);
+      if (exact && exact.name) return exact.name;
+      const fuzzy = ztList.find(z => { const h = z.hybk || z.reason || ''; return h && x.name && (x.name.includes(h) || h.includes(x.name)); });
+      return fuzzy && fuzzy.name ? fuzzy.name : '';
+    })() }));
   // 主力净流入 Top4:按真实 f62 排序;并做名称去重(避免"通信"与"通信设备"这类同族重复占位)
   const _mi = [];
   for (const x of secAll.slice().sort((a, b) => (b.inflow || 0) - (a.inflow || 0))) {
