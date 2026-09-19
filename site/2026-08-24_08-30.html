@@ -2204,7 +2204,7 @@
       <a href="index.html">首页</a><a href="2026-08-24_08-30.html" class="active">盘前</a><a href="2026-08-24_16-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:49</b>（约 1406 分钟前）</div><h1 class="hero-title">2026-08-24 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:49），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 74°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:49</b>（约 38 分钟前）</div><h1 class="hero-title">2026-08-24 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:49），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 74°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-24 19:49:26</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -3133,6 +3133,44 @@ async function openStockResearch(code){
   var atds=70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
   if(atds>=85 && !document.querySelector('.wl-stock-row[data-code="'+code+'"]')){try{await addFetchedToWatchlist(code);}catch(e){addToWatchlistUI(data);saveWatchlist(code);}}
 }
+// v11.101:北交所拦截 —— 92/83/87/88 开头(北交所)禁止加入观察池(缺历史K线,无法算MA/ATR,与短线严格风控错配)
+function isBJCode(c){ return /^(92|83|87|88)/.test(String(c || '')); }
+function showBJBlock(code){
+  try{
+    var old=document.getElementById('bj-block-modal'); if(old&&old.parentNode)old.parentNode.removeChild(old);
+    var mask=document.createElement('div');
+    mask.id='bj-block-modal'; mask.className='modal-mask';
+    mask.style.cssText='display:flex;align-items:center;justify-content:center;z-index:10002;';
+    mask.innerHTML='<div class="modal" style="max-width:320px;width:88%;text-align:center;padding:24px 18px;border-radius:16px;">'+
+      '<div style="font-size:40px;line-height:1;margin-bottom:10px;">⚠️</div>'+
+      '<div style="font-size:16px;font-weight:800;color:#0f172a;margin-bottom:10px;line-height:1.5;">暂不支持北交所股票</div>'+
+      '<div style="font-size:13px;color:#334155;line-height:1.7;text-align:left;margin-bottom:16px;">北交所个股缺乏历史 K 线数据，无法计算 MA/ATR 等关键指标，为保障策略安全，系统已禁用添加。</div>'+
+      '<button id="bj-block-ok" style="background:#b45309;color:#fff;border:none;border-radius:10px;padding:11px 36px;font-size:14px;font-weight:700;">知道了</button>'+
+      '</div>';
+    document.body.appendChild(mask);
+    mask.addEventListener('click',function(e){ if(e.target===mask)mask.remove(); });
+    var ok=mask.querySelector('#bj-block-ok'); if(ok)ok.addEventListener('click',function(){mask.remove();});
+  }catch(e){}
+}
+window.showBJBlock=showBJBlock;
+// v11.101:清理北交所脏数据 —— 扫描本地存储,移除 92/83/87/88 开头的自选/跟踪/样本/档案,避免污染双策略胜率
+function purgeBJData(){
+  try{
+    var cleaned=[], isBJ=isBJCode;
+    var wl=[]; try{wl=JSON.parse(localStorage.getItem('atds_watchlist')||'[]');}catch(e){}
+    if(Array.isArray(wl)){ var wl2=wl.filter(function(c){return !isBJ(c);}); if(wl2.length!==wl.length){ localStorage.setItem('atds_watchlist',JSON.stringify(wl2)); cleaned.push('自选'+(wl.length-wl2.length)); } }
+    var wd=null; try{wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'null');}catch(e){}
+    if(wd&&typeof wd==='object'){ var wd2={},rw=0; for(var k in wd){ if(isBJ(k))rw++; else wd2[k]=wd[k]; } if(rw>0){ localStorage.setItem('atds_watchlist_data',JSON.stringify(wd2)); cleaned.push('个股数据'+rw); } }
+    var hd=[]; try{hd=JSON.parse(localStorage.getItem('atds_watchlist_hidden')||'[]');}catch(e){}
+    if(Array.isArray(hd)){ var hd2=hd.filter(function(c){return !isBJ(c);}); if(hd2.length!==hd.length){ localStorage.setItem('atds_watchlist_hidden',JSON.stringify(hd2)); cleaned.push('隐藏标记'); } }
+    var sw=getShadowMap(), r1=0; for(var c1 in sw){ if(isBJ(c1)){ delete sw[c1]; r1++; } } if(r1>0){ setShadowMap(sw); cleaned.push('波段跟踪'+r1); }
+    var sh=getShortMap(), r2=0; for(var c2 in sh){ if(isBJ(c2)){ delete sh[c2]; r2++; } } if(r2>0){ setShortMap(sh); cleaned.push('短线跟踪'+r2); }
+    var j=getJournal(); if(Array.isArray(j)){ var j2=j.filter(function(e){return !isBJ(e.code);}); if(j2.length!==j.length){ localStorage.setItem('atds_trade_journal',JSON.stringify(j2)); cleaned.push('复盘样本'+(j.length-j2.length)); } }
+    var rh=0; for(var key in localStorage){ if(localStorage.hasOwnProperty(key)){ if(key.indexOf('sim_track_history_')===0){ var c=key.slice('sim_track_history_'.length); if(isBJ(c)){ localStorage.removeItem(key); rh++; } } else if(key.indexOf('sim_track_')===0){ var c2=key.slice('sim_track_'.length); if(isBJ(c2)){ localStorage.removeItem(key); } } } }
+    if(rh>0)cleaned.push('个股档案'+rh);
+    if(cleaned.length)console.log('[purgeBJData] 清理北交所脏数据:',cleaned.join('、'));
+  }catch(e){ console.warn('[purgeBJData]',e.message); }
+}
 async function addFetchedToWatchlist(code){
   code=String(code||"").trim();
   if(!/^\d{6}$/.test(code)){
@@ -3145,6 +3183,7 @@ async function addFetchedToWatchlist(code){
     }
   }
   if(!/^\d{6}$/.test(code)){showToast("无效股票代码: "+code,"warn");return;}
+  if(isBJCode(code)){ showBJBlock(code); return; }   // v11.101:北交所硬性拦截,禁止加入观察池
   console.log('[addFetchedToWatchlist] 进入, code=', JSON.stringify(code), '类型=', typeof code);
   // v11.4:如果 code 在 atds_watchlist_hidden 里(用户曾删除过原配置股),从 hidden 移除——用户重新搜索加入即"恢复",下次刷新不会再被 hidden 过滤掉
   try{
@@ -4452,7 +4491,7 @@ function restoreSavedWatchlist(){
     }
   })();
 }
-if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
+if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
 
 /* ============ 观察池实时行情刷新(电脑关机后手机端仍可刷新) ============ */
 function escHtmlR(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -4655,6 +4694,7 @@ async function bulkAddToWatchlist(codes, label){
   for (var i = 0; i < codes.length; i++) {
     var code = String(codes[i] || '').trim();
     if (!/^\d{6}$/.test(code)) continue;
+    if (isBJCode(code)) continue;   // v11.101:批量导入过滤剔除北交所
     if (document.querySelector('.wl-stock[data-stock-code="'+code+'"]')) continue;
     added++;
     // v11.88:为每只股后台拉基础行情并保存到 atds_watchlist_data(并发,不阻塞),
@@ -4674,7 +4714,7 @@ async function bulkAddToWatchlist(codes, label){
   try {
     var existing = loadSavedWatchlist();
     var merged = existing.slice();
-    codes.forEach(function(c){ if (/^\d{6}$/.test(String(c)) && merged.indexOf(String(c)) < 0) merged.push(String(c)); });
+    codes.forEach(function(c){ if (/^\d{6}$/.test(String(c)) && !isBJCode(c) && merged.indexOf(String(c)) < 0) merged.push(String(c)); });
     localStorage.setItem('atds_watchlist', JSON.stringify(merged));
   } catch(e){}
   showToast('已加入 ' + added + ' 只' + (label || '') + '到观察池' + (hasCard ? '' : '（午盘已隐藏观察池卡片，收盘复盘中可查看）'));
@@ -6307,6 +6347,7 @@ function renderJournalStats(){
     rows='<div class="jrn-wrap">';
     for(var i=j.length-1;i>=0;i--){
       var e=j[i];
+      if(isBJCode(e.code))continue;   // v11.101:结算明细过滤北交所
       var legacy=!!(e.shadow&&e.v!==28);
       var excluded=legacy||e.result==='missed'||e.result==='invalid';
       var rn={win:'止盈',loss:'止损',expired:'过期按现价',missed:'未触发入场',invalid:'计划失效'}[e.result]||(e.result||'—');
@@ -6343,6 +6384,7 @@ function renderPerStockArchive(){
   var j=getJournal(),g={};
   for(var i=0;i<j.length;i++){
     var e=j[i];if(!e||!e.shadow)continue;
+    if(isBJCode(e.code))continue;   // v11.101:个股档案过滤北交所
     var k=String(e.code);
     if(!g[k])g[k]={name:e.name||k,n:0,win:0,loss:0,cancelled:0,missed:0,invalid:0,open:0,last:null,sw:{w:0,l:0},sh:{w:0,l:0}};
     var it=g[k];it.n++;
