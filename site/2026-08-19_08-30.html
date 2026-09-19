@@ -769,6 +769,11 @@
 .entry-fl{position:absolute;right:10px;top:8px;font-size:14px;font-weight:900}
 .entry-fl-up{color:#dc2626}.entry-fl-down{color:#16a34a}
 .entry-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
+.entry-sec-h{font-size:12px;font-weight:800;color:#334155;margin:10px 2px 6px;padding-left:6px;border-left:3px solid #94a3b8}
+.entry-sec-h.win{border-left-color:#dc2626;color:#dc2626}
+.entry-sec-h.loss{border-left-color:#16a34a;color:#16a34a}
+.entry-tag-short{font-style:normal;font-size:9px;color:#fff;background:#b45309;border-radius:4px;padding:1px 4px;margin-left:4px}
+.entry-tag-swing{font-style:normal;font-size:9px;color:#fff;background:#1d4ed8;border-radius:4px;padding:1px 4px;margin-left:4px}
 .wl-stock.entry-flash{outline:3px solid #f59e0b;outline-offset:-3px}
 
 /* v11.83 尾盘定调快照入口横幅 */
@@ -2204,7 +2209,7 @@
       <a href="index.html">首页</a><a href="2026-08-19_08-30.html" class="active">盘前</a><a href="2026-08-19_15-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 20:34</b>（约 1433 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 20:34），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 66°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 20:34</b>（约 20 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 20:34），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 66°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-19 20:34:51</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -7820,9 +7825,20 @@ window.setManualTag=setManualTag;
    盘前(<09:15)天然为 0。 */
 var __entryFAB = { open: false, sort: 'fl' };   // sort: fl=浮盈降序(默认,优先表现最好) / time=入场时间升序
 function todayEntryCodesF(){
-  var sm = getShadowMap(), out = [], today = bjTodayF();
+  var sm = getShadowMap(), sh = getShortMap(), out = [], today = bjTodayF();
   for (var c in sm) { var r = sm[c];
     if (r && r.enabled && r.entryHit && String(r.entryDate) === today) out.push(c);
+  }
+  for (var c in sh) { var r = sh[c];
+    if (r && r.enabled && r.entryHit && String(r.entryDate) === today) out.push(c);
+  }
+  return out;
+}
+// v11.102:当日止盈/止损结算列表(来自 journal,shadow 且 settleDate===今天)
+function todaySettleListF(result){
+  var j = getJournal(), out = [], today = bjTodayF();
+  for (var i = 0; i < j.length; i++) { var e = j[i];
+    if (e && e.shadow && e.result === result && String(e.settleDate || e.date) === today) out.push(e);
   }
   return out;
 }
@@ -7887,29 +7903,75 @@ function entryLiveRowF(code){
 function renderEntryPop(){
   var pop = document.getElementById('entry-pop'); if (!pop) return;
   var body = pop.querySelector('.entry-pop-body'); if (!body) return;
-  var sm = getShadowMap(), today = bjTodayF(), items = [];
+  var today = bjTodayF();
+  // ① 今日新入场(波段 swing + 短线 short 都算)
+  var sm = getShadowMap(), sh = getShortMap(), items = [];
   for (var c in sm) { var r = sm[c];
     if (!(r && r.enabled && r.entryHit && String(r.entryDate) === today)) continue;
     var lv = entryLiveRowF(c);
     var fl = (lv.price && r.entry) ? Math.round((lv.price - r.entry) / r.entry * 10000) / 100 : null;
-    items.push({ code: c, name: lv.name, price: lv.price, pct: lv.pct, entry: r.entry, stop: r.stop, target: r.target, fl: fl, at: r.touchAt || r.entryTime || '' });
+    items.push({ code: c, name: lv.name, price: lv.price, pct: lv.pct, entry: r.entry, stop: r.stop, target: r.target, fl: fl, at: r.touchAt || r.entryTime || '', mode: 'swing' });
+  }
+  for (var c2 in sh) { var r2 = sh[c2];
+    if (!(r2 && r2.enabled && r2.entryHit && String(r2.entryDate) === today)) continue;
+    var lv2 = entryLiveRowF(c2);
+    var fl2 = (lv2.price && r2.entry) ? Math.round((lv2.price - r2.entry) / r2.entry * 10000) / 100 : null;
+    items.push({ code: c2, name: lv2.name, price: lv2.price, pct: lv2.pct, entry: r2.entry, stop: r2.stop || r2.priceStop, target: r2.target || r2.tp2, fl: fl2, at: r2.touchAt || r2.entryTime || '', mode: 'short' });
   }
   if (__entryFAB.sort === 'time') { items.sort(function (a, b) { return String(a.at) < String(b.at) ? -1 : 1; }); }
   else { items.sort(function (a, b) { var fa = (a.fl == null) ? -Infinity : a.fl; var fb = (b.fl == null) ? -Infinity : b.fl; return fb - fa; }); }
-  if (!items.length) { body.innerHTML = '<div class="entry-empty">今日暂无触发标的，耐心等待信号</div>'; return; }
+  // ②③ 当日止盈 / 当日止损(结算)
+  var wins = todaySettleListF('win');
+  var losses = todaySettleListF('loss');
+
   var h = '';
-  for (var i = 0; i < items.length; i++) {
-    var it = items[i];
-    var flCls = (it.fl == null) ? '' : (it.fl >= 0 ? 'entry-fl-up' : 'entry-fl-down');
-    h += '<div class="entry-item" data-code="' + escHtmlF(it.code) + '" onclick="entryItemJump(this)">' +
-      '<div class="entry-item-main"><span class="entry-name">' + escHtmlF(it.name) + '</span><span class="entry-code">' + escHtmlF(it.code) + '</span>' +
-      '<span class="entry-price ' + (it.pct >= 0 ? 'up' : 'down') + '">' + it.price.toFixed(2) + '</span>' +
-      '<span class="entry-pct ' + (it.pct >= 0 ? 'up' : 'down') + '">' + (it.pct >= 0 ? '+' : '') + it.pct.toFixed(2) + '%</span></div>' +
-      '<div class="entry-item-sub">今日入场 · ' + (it.at || '--') + ' 触发 · 入场 ' + it.entry + ' · 止损 ' + it.stop + ' · 止盈 ' + it.target + '</div>' +
-      '<div class="entry-fl ' + flCls + '">' + (it.fl == null ? '--' : ((it.fl >= 0 ? '+' : '') + it.fl + '%')) + '</div>' +
-      '</div>';
+  // 分区1:今日新入场
+  h += '<div class="entry-sec-h">🟢 今日新入场 <b>' + items.length + '</b></div>';
+  if (!items.length) h += '<div class="entry-empty">暂无</div>';
+  else {
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      var flCls = (it.fl == null) ? '' : (it.fl >= 0 ? 'entry-fl-up' : 'entry-fl-down');
+      h += '<div class="entry-item" data-code="' + escHtmlF(it.code) + '" onclick="entryItemJump(this)">' +
+        '<div class="entry-item-main"><span class="entry-name">' + escHtmlF(it.name) + '</span><span class="entry-code">' + escHtmlF(it.code) + (it.mode === 'short' ? '<em class="entry-tag-short">短线</em>' : '<em class="entry-tag-swing">波段</em>') + '</span>' +
+        '<span class="entry-price ' + (it.pct >= 0 ? 'up' : 'down') + '">' + it.price.toFixed(2) + '</span>' +
+        '<span class="entry-pct ' + (it.pct >= 0 ? 'up' : 'down') + '">' + (it.pct >= 0 ? '+' : '') + it.pct.toFixed(2) + '%</span></div>' +
+        '<div class="entry-item-sub">今日入场 · ' + (it.at || '--') + ' 触发 · 入场 ' + it.entry + ' · 止损 ' + it.stop + ' · 止盈 ' + it.target + '</div>' +
+        '<div class="entry-fl ' + flCls + '">' + (it.fl == null ? '--' : ((it.fl >= 0 ? '+' : '') + it.fl + '%')) + '</div>' +
+        '</div>';
+    }
+  }
+  // 分区2:当日止盈
+  h += '<div class="entry-sec-h win">✅ 当日止盈 <b>' + wins.length + '</b></div>';
+  if (!wins.length) h += '<div class="entry-empty">暂无</div>';
+  else {
+    for (var k = 0; k < wins.length; k++) {
+      var w = wins[k];
+      h += settleRowF(w, 'win');
+    }
+  }
+  // 分区3:当日止损
+  h += '<div class="entry-sec-h loss">🔴 当日止损 <b>' + losses.length + '</b></div>';
+  if (!losses.length) h += '<div class="entry-empty">暂无</div>';
+  else {
+    for (var m2 = 0; m2 < losses.length; m2++) {
+      var ls = losses[m2];
+      h += settleRowF(ls, 'loss');
+    }
   }
   body.innerHTML = h;
+}
+// v11.102:结算行(止盈/止损)渲染
+function settleRowF(e, kind){
+  var pnl = (e.pnl == null) ? '--' : ((e.pnl > 0 ? '+' : '') + e.pnl + '%');
+  var cls = kind === 'win' ? 'entry-fl-up' : 'entry-fl-down';
+  return '<div class="entry-item" data-code="' + escHtmlF(String(e.code)) + '" onclick="entryItemJump(this)">' +
+    '<div class="entry-item-main"><span class="entry-name">' + escHtmlF(String(e.name || e.code)) + '</span><span class="entry-code">' + escHtmlF(String(e.code)) + (e.mode === 'short' ? '<em class="entry-tag-short">短线</em>' : '<em class="entry-tag-swing">波段</em>') + '</span>' +
+    '<span class="entry-price">' + escHtmlF(kind === 'win' ? '止盈' : '止损') + '</span>' +
+    '<span class="entry-pct ' + (kind === 'win' ? 'up' : 'down') + '">' + escHtmlF(String(e.settlePrice != null ? e.settlePrice : '')) + '</span></div>' +
+    '<div class="entry-item-sub">' + escHtmlF(String(e.entryDate || e.openedDate || '') + ' 入场@' + e.entry + ' → ' + String(e.settleDate || '') + ' 结算' + (e.exitReason ? ('（' + e.exitReason + '）') : '')) + '</div>' +
+    '<div class="entry-fl ' + cls + '">' + pnl + '</div>' +
+    '</div>';
 }
 function entryItemJump(el){
   var code = el.getAttribute('data-code');
@@ -7929,11 +7991,27 @@ function toggleEntrySort(){
 }
 function updateEntryFAB(){
   var fab = document.getElementById('entry-fab'); if (!fab) return;
-  var n = todayEntryCodesF().length;
-  fab.textContent = '📌 今日已入场 (' + n + ')';
+  var nEnt = todayEntryCodesF().length;
+  var nWin = todaySettleListF('win').length;
+  var nLoss = todaySettleListF('loss').length;
+  var n = nEnt + nWin + nLoss;
+  fab.textContent = '📌 今日战况 (' + n + ')';
   if (n > 0) fab.classList.add('has'); else fab.classList.remove('has');
   var pop = document.getElementById('entry-pop');
   if (pop && pop.classList.contains('show')) renderEntryPop();
+  // v11.102:交易日 + 有新数据 + 当天未自动弹过 → 自动弹出一次(避免每次刷新打扰)
+  try{
+    if(n > 0){
+      var ph = tradingPhaseF();
+      if(ph && ph.canSettle){
+        var key = 'atds_entry_pop_auto_' + bjTodayF();
+        if(localStorage.getItem(key) !== '1'){
+          localStorage.setItem(key, '1');
+          if(pop){ __entryFAB.open = true; pop.classList.add('show'); renderEntryPop(); }
+        }
+      }
+    }
+  }catch(e){}
 }
 window.toggleEntryPop = toggleEntryPop;
 window.entryItemJump = entryItemJump;
