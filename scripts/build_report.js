@@ -1920,8 +1920,8 @@ function renderStrongStock(report) {
 // v11.103:天眼地量区块(MA20上行+MA5回抽眼睛+地量+浅回调;独立于强势股)
 function renderEyeHeaven(report) {
   const eh = report.eyeHeaven;
-  if (!eh || !Array.isArray(eh.list) || !eh.list.length) return '';
-  const list = eh.list;
+  if (!eh) return '';   // 历史报告无此字段(天眼地量接入前采集) → 不渲染;字段存在但 0 入选时仍显示空态区块
+  const list = Array.isArray(eh.list) ? eh.list : [];
   const idx0 = ((report.indices || [])[0]) || null;
   const idxPct = idx0 ? Number(idx0.changePct) : null;
   const badMkt = (idxPct != null && idxPct <= -2.5);   // 大盘当日跌幅>2.5%
@@ -1955,7 +1955,7 @@ function renderEyeHeaven(report) {
       <span class="wave-scan-info">${esc(eh.source || '全A扫描')}</span>
       <button id="eye-open-btn" class="wl-btn wl-btn-primary" onclick="openEyeHeavenModal()">📋 打开天眼地量名单</button>
     </div>
-    <div class="sc-hint">MA20上行趋势中的缩量回踩「眼睛」形态 · 形成当日即为观察信号 · 快照为采集时点数据</div>
+    <div class="sc-hint">${list.length ? 'MA20上行趋势中的缩量回踩「眼睛」形态 · 形成当日即为观察信号 · 快照为采集时点数据' : '当日暂无满足天眼地量形态的标的（宁缺毋滥，不放宽阈值凑数）'}</div>
   </div>`;
   const modal = `<div class="modal-mask" id="eye-heaven-modal" onclick="if(event.target===this)closeEyeHeavenModal()">
     <div class="modal" onclick="event.stopPropagation()">
@@ -1971,7 +1971,7 @@ function renderEyeHeaven(report) {
         </div>
         <div class="ss-list">
           <div class="ss-row ss-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span></div>
-          ${rows}
+          ${rows || '<div class="ts-empty" style="padding:20px 10px;text-align:center;color:#94a3b8;font-size:13px;">当日无入选（宁缺毋滥）</div>'}
         </div>
         <div class="sc-hint">缩量率=今日量/30日最高量(越低越好) · 形态天数=距30日高点交易日数 · 点击个股行可查看深度分析</div>
       </div>
