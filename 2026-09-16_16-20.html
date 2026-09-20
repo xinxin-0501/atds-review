@@ -778,6 +778,7 @@
 .entry-sec-h.loss{border-left-color:#16a34a;color:#16a34a}
 .entry-tag-short{font-style:normal;font-size:9px;color:#fff;background:#b45309;border-radius:4px;padding:1px 4px;margin-left:4px}
 .entry-tag-swing{font-style:normal;font-size:9px;color:#fff;background:#1d4ed8;border-radius:4px;padding:1px 4px;margin-left:4px}
+.eye-warn{margin:8px 12px;padding:8px 10px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:12px;font-weight:800;border-radius:8px}
 .wl-stock.entry-flash{outline:3px solid #f59e0b;outline-offset:-3px}
 
 /* v11.83 尾盘定调快照入口横幅 */
@@ -4710,6 +4711,7 @@
       </div>
     </div>
   </div>
+  
   <div class="card da-card">
     <div class="card-title">AI 数据分析 · 八步复盘</div>
     <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
@@ -6728,6 +6730,28 @@ function bulkAddStrongStockToWatchlist(){
   document.querySelectorAll('#strong-stock-modal .ss-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
   bulkAddToWatchlist(codes, ' 强势股个股');
 }
+/* v11.103:天眼地量 弹窗/一键加入 */
+function openEyeHeavenModal(){
+  var m = document.getElementById('eye-heaven-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeEyeHeavenModal(){
+  var m = document.getElementById('eye-heaven-modal');
+  if (!m) return;
+  m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+function bulkAddEyeHeavenToWatchlist(){
+  var codes = [];
+  document.querySelectorAll('#eye-heaven-modal .eye-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
+  if (!codes.length) { showToast('当前天眼地量名单为空', 'warn'); return; }
+  bulkAddToWatchlist(codes, ' 天眼地量个股');
+}
+window.openEyeHeavenModal = openEyeHeavenModal;
+window.closeEyeHeavenModal = closeEyeHeavenModal;
+window.bulkAddEyeHeavenToWatchlist = bulkAddEyeHeavenToWatchlist;
 
 /* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
 (function bindWatchlistScrollSync(){
