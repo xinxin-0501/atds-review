@@ -3221,13 +3221,19 @@ async function scanEyeHeaven() {
     } catch (e) { /* skip */ }
     if (i + BATCH < symbols.length) await new Promise(r => setTimeout(r, 120));
   }
-  // 地量股候选:放宽成交额(地量本身缩量),换手上限放宽
-  const cands = quotes.filter(x => {
+  // 地量股候选:成交额≥3000万(地量=30日最高量×20%,故30日最高量至少1.5亿,短线可操作);换手上限放宽
+  //   v11.103c【防超时】:候选池硬上限 1500 只(按成交额降序截断),避免天眼候选远大于其他模块导致 K 线拉取超 3~5 分钟时限
+  let cands = quotes.filter(x => {
     const pct = Number(x.pct) || 0;
     const turn = Number(x.turnover) || 0;
     const amt = Number(x.amountWan) || 0;
-    return pct > -4 && pct <= 9.9 && turn >= 0.3 && turn <= 20 && amt >= 1500;
+    return pct > -4 && pct <= 9.9 && turn >= 0.3 && turn <= 20 && amt >= 3000;
   });
+  const CAND_LIMIT = 1500;
+  if (cands.length > CAND_LIMIT) {
+    cands.sort((a, b) => (Number(b.amountWan) || 0) - (Number(a.amountWan) || 0));
+    cands = cands.slice(0, CAND_LIMIT);
+  }
   const results = [];
   const CONC = 16;
   let done = 0;
