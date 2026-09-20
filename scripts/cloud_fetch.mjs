@@ -3130,6 +3130,148 @@ async function scanStrongStock() {
   return { total: quotes.length, scanned: cands.length, list, source: '全A ' + quotes.length + ' 只剔除ST → 活跃候选 ' + cands.length + ' 只' };
 }
 
+/* ==================== 天眼地量选股(v11.103,独立于强势股,严格布尔判定) ====================
+   天眼:MA20持续上行(今日>昨日) + 近3~5日MA5曾跌破MA20 + 当前MA5重新上穿MA20且拐头向上
+   地量:今日成交量 < 30日最高量×20% 且为近10日最低
+   形态:自30日最高收盘回调<15% 且 距高点≤30交易日;今日收阳或下影线占比>0.3
+   防御:北交所(bj前缀)直接跳过;K线<35根(新股)直接不匹配;全计算只用截至当日K线,无未来函数。 */
+function eyeHeavenScore(klines) {
+  if (!Array.isArray(klines) || klines.length < 35) return null;
+  const C = klines.map(k => parseFloat(k[2]));
+  const O = klines.map(k => parseFloat(k[1]));
+  const H = klines.map(k => parseFloat(k[3]));
+  const L = klines.map(k => parseFloat(k[4]));
+  const V = klines.map(k => parseFloat(k[5]) || 0);
+  const n = C.length;
+  if (n < 35) return null;
+  const ma5Arr = [], ma20Arr = [];
+  for (let i = 0; i < n; i++) {
+    ma5Arr.push(i >= 4 ? C.slice(i - 4, i + 1).reduce((a, b) => a + b, 0) / 5 : null);
+    ma20Arr.push(i >= 19 ? C.slice(i - 19, i + 1).reduce((a, b) => a + b, 0) / 20 : null);
+  }
+  const iL = n - 1, iP = n - 2;
+  const ma5T = ma5Arr[iL], ma5P = ma5Arr[iP], ma20T = ma20Arr[iL], ma20P = ma20Arr[iP];
+  if (ma5T == null || ma20T == null || ma5P == null || ma20P == null) return null;
+  // ① 天眼:MA20 持续上行
+  if (!(ma20T > ma20P)) return null;
+  // MA5 拐头向上 + 当前在 MA20 上方
+  if (!(ma5T > ma5P)) return null;
+  if (!(ma5T > ma20T)) return null;
+  // 近 3~5 日内 MA5 曾跌破 MA20(下穿后的坑)
+  let pit = false;
+  for (let i = n - 5; i <= n - 1; i++) {
+    if (i < 1) continue;
+    if (ma5Arr[i] != null && ma20Arr[i] != null && ma5Arr[i] < ma20Arr[i]) { pit = true; break; }
+  }
+  if (!pit) return null;
+  // ② 地量:今日量 < 30日最高量×20%,且为近10日最低
+  const vols30 = V.slice(-30);
+  const maxVol30 = Math.max(...vols30);
+  const vT = V[iL];
+  if (!(maxVol30 > 0) || !(vT > 0)) return null;
+  const shrinkRate = vT / maxVol30;
+  if (shrinkRate >= 0.2) return null;
+  const vols10 = V.slice(-10);
+  if (vT > Math.min(...vols10)) return null;
+  // ③ 回调:30日最高收盘回调 <15%,距高点 ≤30 交易日
+  const closes30 = C.slice(-30);
+  const hi30 = Math.max(...closes30);
+  const hiIdx = closes30.lastIndexOf(hi30);
+  const patternDays = (closes30.length - 1) - hiIdx;
+  const drawdown = (hi30 - C[iL]) / hi30 * 100;
+  if (drawdown < 0 || drawdown >= 15) return null;
+  if (patternDays > 30) return null;
+  // ④ 今日K线:收阳 或 下影线占比>0.3
+  const oT = O[iL], cT = C[iL], hT = H[iL], lT = L[iL];
+  if (!(hT > lT)) return null;
+  const yang = cT > oT;
+  const lowerShadow = (cT - lT) / (hT - lT);
+  if (!(yang || lowerShadow > 0.3)) return null;
+  // 评分(展示用):缩量越极致/MA20斜率越陡/回调越浅 加分越高
+  let score = 40;
+  score += Math.max(0, (0.2 - shrinkRate) / 0.2) * 25;
+  score += Math.min(15, Math.abs(ma20P) > 0 ? Math.abs((ma20T - ma20P) / ma20P * 100) * 30 : 0);
+  score += Math.max(0, (15 - drawdown)) / 15 * 10;
+  score = Math.min(100, Math.round(score));
+  return {
+    score,
+    shrinkRate: Math.round(shrinkRate * 1000) / 10,        // 缩量率(%)
+    ma20Slope: Math.round((ma20T - ma20P) / ma20P * 10000) / 100,  // MA20 斜率(%)
+    patternDays,                                            // 距30日高点天数
+    drawdown: Math.round(drawdown * 10) / 10,               // 回调幅度(%)
+    ma5: Math.round(ma5T * 100) / 100, ma20: Math.round(ma20T * 100) / 100
+  };
+}
+
+async function scanEyeHeaven() {
+  let symbols = [];
+  try {
+    const raw = fs.readFileSync(path.join(ROOT, 'data/stock_list.json'), 'utf8');
+    const j = JSON.parse(raw);
+    symbols = Array.isArray(j.symbols) ? j.symbols : [];
+  } catch (e) { symbols = []; }
+  if (!symbols.length) return { total: 0, list: [], scanned: 0, source: '无股票列表' };
+  const quotes = [];
+  const BATCH = 80;
+  for (let i = 0; i < symbols.length; i += BATCH) {
+    const batch = symbols.slice(i, i + BATCH);
+    try {
+      const data = await fetchTencent(batch);
+      if (data && data.length) quotes.push(...data);
+    } catch (e) { /* skip */ }
+    if (i + BATCH < symbols.length) await new Promise(r => setTimeout(r, 120));
+  }
+  // 地量股候选:放宽成交额(地量本身缩量),换手上限放宽
+  const cands = quotes.filter(x => {
+    const pct = Number(x.pct) || 0;
+    const turn = Number(x.turnover) || 0;
+    const amt = Number(x.amountWan) || 0;
+    return pct > -4 && pct <= 9.9 && turn >= 0.3 && turn <= 20 && amt >= 1500;
+  });
+  const results = [];
+  const CONC = 16;
+  let done = 0;
+  const fullCode = (raw) => {
+    const c = String(raw || '');
+    if (/^(sh|sz|bj)/i.test(c)) return c.toLowerCase();
+    const c0 = c.charAt(0);
+    if (c0 === '6') return 'sh' + c;
+    if (c0 === '4' || c0 === '8' || c0 === '92') return 'bj' + c;
+    return 'sz' + c;
+  };
+  for (let i = 0; i < cands.length; i += CONC) {
+    const slice = cands.slice(i, i + CONC);
+    const batchRes = await Promise.all(slice.map(async x => {
+      try {
+        const fc = fullCode(x.code);
+        if (/^bj/.test(fc)) return null;   // v11.101 决策:北交所不参与(缺K线+风控错配)
+        const kl = await fetchKline(fc, 60);
+        if (!kl || kl.length < 35) return null;
+        const es = eyeHeavenScore(kl);
+        if (!es || es.score < 50) return null;
+        return { ...x, ...es };
+      } catch (e) { return null; }
+    }));
+    for (const r of batchRes) if (r) results.push(r);
+    done += slice.length;
+    if (done % 300 === 0) console.log(`  天眼地量扫描进度: ${done}/${cands.length}, 命中 ${results.length}`);
+  }
+  results.sort((a, b) => b.score - a.score);
+  const list = results.slice(0, 20).map((x, i) => ({
+    rank: i + 1,
+    code: x.code.replace(/^(sh|sz|bj)/, ''),
+    name: x.name,
+    price: x.price,
+    pct: x.pct,
+    amount: fmtAmount(x.amountWan),
+    turnover: x.turnover,
+    score: Math.min(100, Math.round(x.score)),
+    shrinkRate: x.shrinkRate, ma20Slope: x.ma20Slope, patternDays: x.patternDays, drawdown: x.drawdown,
+    ma5: x.ma5, ma20: x.ma20
+  }));
+  return { total: quotes.length, scanned: cands.length, list, source: '全A剔除ST/北交所 → 候选 ' + cands.length + ' 只' };
+}
+
 // 形态识别(基于腾讯K线: [[date, open, close, high, low, vol], ...])
 function detectPatterns(klines) {
   if (!Array.isArray(klines) || klines.length < 65) return null;
@@ -3641,6 +3783,8 @@ async function main() {
   let shortCore = null;
   // 强势股选股(仅午盘):全A扫描剔除ST,优先排序TOP30
   let strongStock = null;
+  // 天眼地量选股(v11.103):MA20上行+MA5下穿回抽+地量+浅回调,独立于强势股
+  let eyeHeaven = null;
   if (type === 'midday' || type === 'close' || type === 'tailscan') {
     // v11.61:盘中槽位停用("盘中可以全部转移收盘") —— 原只在 midday 采集的
     //   「超短核心 / 强势股 / 波背离」改为 midday + close 都采集,使其在收盘页可见。
@@ -3663,6 +3807,9 @@ async function main() {
     console.log('开始强势股全市场扫描(' + type + ')...');
     strongStock = await scanStrongStock();
     console.log('强势股扫描完成:', strongStock ? strongStock.list.length : 0, '只');
+    console.log('开始天眼地量全市场扫描(' + type + ')...');
+    eyeHeaven = await scanEyeHeaven();
+    console.log('天眼地量扫描完成:', eyeHeaven ? eyeHeaven.list.length : 0, '只');
     // 题材辨识交叉集合:强势股+超短核心命中代码(战法加权用,避免波背离只出纯形态套利)
     const themeCodes = new Set();
     for (const s of (shortCore && shortCore.list) || []) themeCodes.add(String(s.code));
@@ -3708,6 +3855,7 @@ async function main() {
     waveDivergence,
     shortCore,
     strongStock,
+    eyeHeaven,
     mainRank,
     dragonPool,
     intlMkt,
@@ -3733,6 +3881,7 @@ async function main() {
       waveDivergence,    // 波背离 TOP20
       shortCore,         // 超短核心 TOP20
       strongStock,       // 强势股 TOP20
+      eyeHeaven,         // 天眼地量 TOP20(v11.103)
       mainRank,          // 板块强度榜(给四大模块提供"板块"上下文)
       notes: '14:30 尾盘定调快照:四大选股模块为【盘中未定型】指标,仅供尾盘筛选次日观察池候选;16:20 收盘复盘会用定型数据重新采集覆盖。仅做行情展示,不构成投资建议。'
     };

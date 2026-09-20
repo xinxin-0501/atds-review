@@ -1632,6 +1632,12 @@ function renderShortPlanHtml(s, report) {
   const entry = Number(s.strategy && s.strategy.entry) || Number(s.price) || 0;
   const ma20 = Number(s.tech && s.tech.ma20) || null;
   const openP = Number(s.open) || null;
+  // v11.103:天眼地量形态支持提示 —— 入选股的短线计划入场价贴近 MA20 回踩位时,提示形态与计划互洽
+  const inEye = !!(report && report.eyeHeaven && Array.isArray(report.eyeHeaven.list) && report.eyeHeaven.list.some(x => String(x.code) === String(s.code)));
+  const ma20Near = !!(ma20 && entry && Math.abs(entry - ma20) / ma20 < 0.03);
+  const eyeHint = (inEye && ma20Near)
+    ? '<div class="dc-line sp-row" style="color:#1d4ed8;font-weight:700;">👁️ 天眼地量形态支持：该股为 MA20 上行缩量回踩结构，计划入场价贴近 MA20 回踩位，形态与计划互洽</div>'
+    : '';
   const stops = [ma20, openP ? openP * 0.97 : null].filter(v => v != null && v < entry);
   const priceStop = stops.length ? Math.max(...stops) : entry * 0.95;
   const press = ((s.tech && s.tech.pressures) || []).map(p => Number(p.price)).filter(v => v && v > entry).sort((a, b) => a - b);
@@ -1652,7 +1658,7 @@ function renderShortPlanHtml(s, report) {
   const ff = s.fundFlow || {};
   const evNear = ((s.events || [])[0]) || null;
   const t3 = '第3个交易日 14:50';
-  return '<div class="sp-gate ' + (banned ? 'bad' : 'ok') + '">' + (banned
+  return eyeHint + '<div class="sp-gate ' + (banned ? 'bad' : 'ok') + '">' + (banned
     ? ('⛔ ' + why)
     : ('✓ 门槛通过：RR ' + f2(rr) + ' ≥ 1.5 · 大盘风控正常' + (idxPct != null ? ('(上证 ' + idxPct.toFixed(2) + '%)') : ''))) + '</div>' +
     '<div class="dc-line sp-row">入场：<b>' + f2(entry) + '</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div>' +
@@ -1853,8 +1859,7 @@ function renderShortCore(report) {
 
 function renderStrongStock(report) {
   const ss = report.strongStock;
-  if (!ss || !Array.isArray(ss.list) || !ss.list.length) return '';
-  const list = ss.list;
+  if (!ss || !Array.isArray(ss.list) || !ss.list.length) return '';  const list = ss.list;
   const rows = list.map(x => {
     const cls = upDownClass(x.pct);
     return `<div class="ss-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
@@ -1911,6 +1916,69 @@ function renderStrongStock(report) {
   return card + modal;
 }
 
+
+// v11.103:天眼地量区块(MA20上行+MA5回抽眼睛+地量+浅回调;独立于强势股)
+function renderEyeHeaven(report) {
+  const eh = report.eyeHeaven;
+  if (!eh || !Array.isArray(eh.list) || !eh.list.length) return '';
+  const list = eh.list;
+  const idx0 = ((report.indices || [])[0]) || null;
+  const idxPct = idx0 ? Number(idx0.changePct) : null;
+  const badMkt = (idxPct != null && idxPct <= -2.5);   // 大盘当日跌幅>2.5%
+  const warn = badMkt ? '<div class="eye-warn">⚠️ 大盘环境恶劣，形态可能失效，仅作观察</div>' : '';
+  const rows = list.map(x => {
+    const cls = upDownClass(x.pct);
+    return `<div class="ss-item eye-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+      <div class="ss-row">
+        <span class="ss-rank">${x.rank}</span>
+        <span class="ss-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
+        <span class="ss-price ${cls}">${fmtNum(x.price)}</span>
+        <span class="ss-pct ${cls}">${fmtPct(x.pct)}</span>
+        <span class="ss-score">${x.score}</span>
+      </div>
+      <div class="ss-meta">
+        <span>缩量率 <b class="ok">${x.shrinkRate}%</b></span>
+        <span>MA20斜率 <b class="${x.ma20Slope > 0 ? 'ok' : 'no'}">+${x.ma20Slope}%</b></span>
+        <span>形态天数 <b>${x.patternDays}日</b></span>
+        <span>回调 <b>${x.drawdown}%</b></span>
+        <span>MA5/20 <b>${x.ma5}/${x.ma20}</b></span>
+      </div>
+    </div>`;
+  }).join('');
+  const card = `<div class="card ss-card eye-card">
+    <div class="wave-header">
+      <div class="wave-title">👁️ 天眼地量 TOP20</div>
+      <div class="wave-sub">天眼:MA20持续上行 + MA5下穿MA20后重新上穿且拐头向上 · 地量:今日量<30日最高量20%且近10日最低<br><span class="ss-note">⚠ 形态:自30日高点回调<15%且回调≤30日;今日收阳或下影线占比>0.3。全A剔除ST/北交所 · 严禁未来函数</span></div>
+    </div>
+    ${warn}
+    <div class="wave-tools">
+      <span class="wave-scan-info">${esc(eh.source || '全A扫描')}</span>
+      <button id="eye-open-btn" class="wl-btn wl-btn-primary" onclick="openEyeHeavenModal()">📋 打开天眼地量名单</button>
+    </div>
+    <div class="sc-hint">MA20上行趋势中的缩量回踩「眼睛」形态 · 形成当日即为观察信号 · 快照为采集时点数据</div>
+  </div>`;
+  const modal = `<div class="modal-mask" id="eye-heaven-modal" onclick="if(event.target===this)closeEyeHeavenModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">👁️ 天眼地量 TOP20 · 全A剔除ST/北交所</div>
+        <span class="modal-close" onclick="closeEyeHeavenModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：${esc(eh.source || '全A剔除ST')}</div>
+        ${warn}
+        <div class="sc-tools">
+          <button class="wl-btn wl-btn-primary" onclick="bulkAddEyeHeavenToWatchlist()">⚡ 一键全部加入观察池</button>
+        </div>
+        <div class="ss-list">
+          <div class="ss-row ss-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span></div>
+          ${rows}
+        </div>
+        <div class="sc-hint">缩量率=今日量/30日最高量(越低越好) · 形态天数=距30日高点交易日数 · 点击个股行可查看深度分析</div>
+      </div>
+    </div>
+  </div>`;
+  return card + modal;
+}
 
 function renderPremarketStrategy(report, opts) {
   const o = opts || {};
@@ -2683,6 +2751,7 @@ ${renderCloseEmotion(report)}
   ${_isMidR ? '' : renderWaveDivergence(report)}
   ${_carryOver ? renderShortCore(report) : ''}
   ${_carryOver ? renderStrongStock(report) : ''}
+  ${_carryOver ? renderEyeHeaven(report) : ''}
   ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderIntlMkt(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderTechAnalysis(report)}
@@ -2830,6 +2899,7 @@ function renderTailscanReport(report, nav) {
   const wave = report.waveDivergence || { list: [] };
   const shortC = report.shortCore || { list: [] };
   const strong = report.strongStock || { list: [] };
+  const eye = report.eyeHeaven || { list: [] };
   const f2 = (v) => (v == null || isNaN(Number(v))) ? '--' : Number(v).toFixed(2);
   const pctTxt = (v) => (v == null || isNaN(Number(v))) ? '--' : ((Number(v) >= 0 ? '+' : '') + Number(v).toFixed(2) + '%');
   const sealTxt = (v) => (v == null || isNaN(Number(v))) ? '' : '封单' + (Math.abs(v) / 1e8).toFixed(1) + '亿';
@@ -2840,6 +2910,7 @@ function renderTailscanReport(report, nav) {
     wave: (p) => ((p.waveType || '') + (p.kdjDivergence ? '·KDJ背离金叉' : '') + ' · ' + p.score + '分'),
     short: (p) => ('连板' + (p.lianban || p.ztCount || 1) + (p.sealYi != null ? '·' + sealTxt(p.sealYi) : '') + ' · ' + p.score + '分'),
     strong: (p) => ((p.signalType || '强势') + ' · ' + p.score + '分'),
+    eye: (p) => ('缩量' + p.shrinkRate + '% · 距高点' + p.patternDays + '日 · ' + p.score + '分'),
   };
   const rowOf = (p, i, sig) => `<div class="ts-row" data-code="${esc(p.code)}" data-pct="${Number(p.pct) || 0}">
     <span class="ts-rank">${i + 1}</span>
@@ -2860,6 +2931,8 @@ function renderTailscanReport(report, nav) {
     module('wave', '波背离 TOP20 · 14:30 尾盘定调', '前期强势→调整→缩量→KDJ背离金叉 · 盘中未定型', wave.list || [], sigOf.wave),
     module('short', '超短核心 TOP20 · 14:30 尾盘定调', '涨停基因/连板+竞价/封单强度 · 盘中未定型(收盘定型版见 16:20)', shortC.list || [], sigOf.short),
     module('strong', '强势股 TOP20 · 14:30 尾盘定调', '缺口/黄金坑/突破起爆 · 盘中未定型', strong.list || [], sigOf.strong),
+    // v11.103:天眼地量独立标签(尾盘快照)
+    module('eye', '👁️ 天眼地量 TOP20 · 14:30 尾盘定调', 'MA20上行+MA5回抽眼睛+地量+浅回调 · 盘中未定型(收盘定型版见 16:20)', eye.list || [], sigOf.eye),
   ].join('');
 
   const idxLine = (report.indices || []).map(i => '<span class="ts-idx">' + esc(i.name) + ' <b>' + fmtNum(i.price) + '</b> ' + fmtPct(i.changePct) + '</span>').join('');

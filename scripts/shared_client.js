@@ -1770,6 +1770,28 @@ function bulkAddStrongStockToWatchlist(){
   document.querySelectorAll('#strong-stock-modal .ss-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
   bulkAddToWatchlist(codes, ' 强势股个股');
 }
+/* v11.103:天眼地量 弹窗/一键加入 */
+function openEyeHeavenModal(){
+  var m = document.getElementById('eye-heaven-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeEyeHeavenModal(){
+  var m = document.getElementById('eye-heaven-modal');
+  if (!m) return;
+  m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+function bulkAddEyeHeavenToWatchlist(){
+  var codes = [];
+  document.querySelectorAll('#eye-heaven-modal .eye-item[data-code]').forEach(function(it){ codes.push(it.getAttribute('data-code')); });
+  if (!codes.length) { showToast('当前天眼地量名单为空', 'warn'); return; }
+  bulkAddToWatchlist(codes, ' 天眼地量个股');
+}
+window.openEyeHeavenModal = openEyeHeavenModal;
+window.closeEyeHeavenModal = closeEyeHeavenModal;
+window.bulkAddEyeHeavenToWatchlist = bulkAddEyeHeavenToWatchlist;
 
 /* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
 (function bindWatchlistScrollSync(){
