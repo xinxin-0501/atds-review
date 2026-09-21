@@ -1920,8 +1920,7 @@ function renderStrongStock(report) {
 // v11.103:天眼地量区块(MA20上行+MA5回抽眼睛+地量+浅回调;独立于强势股)
 function renderEyeHeaven(report) {
   const eh = report.eyeHeaven;
-  if (!eh) return '';   // 历史报告无此字段(天眼地量接入前采集) → 不渲染;字段存在但 0 入选时仍显示空态区块
-  const list = Array.isArray(eh.list) ? eh.list : [];
+  const list = (eh && Array.isArray(eh.list)) ? eh.list : [];   // v11.104:入口始终可见(无字段/无数据显示空态),与选股入口区一致
   const idx0 = ((report.indices || [])[0]) || null;
   const idxPct = idx0 ? Number(idx0.changePct) : null;
   const badMkt = (idxPct != null && idxPct <= -2.5);   // 大盘当日跌幅>2.5%
@@ -1952,7 +1951,7 @@ function renderEyeHeaven(report) {
     </div>
     ${warn}
     <div class="wave-tools">
-      <span class="wave-scan-info">${esc(eh.source || '全A扫描')}</span>
+      <span class="wave-scan-info">${esc((eh && eh.source) || '天眼地量选股')}</span>
       <button id="eye-open-btn" class="wl-btn wl-btn-primary" onclick="openEyeHeavenModal()">📋 打开天眼地量名单</button>
     </div>
     <div class="sc-hint">${list.length ? 'MA20上行趋势中的缩量回踩「眼睛」形态 · 形成当日即为观察信号 · 快照为采集时点数据' : '当日暂无满足天眼地量形态的标的（宁缺毋滥，不放宽阈值凑数）'}</div>
@@ -1964,7 +1963,7 @@ function renderEyeHeaven(report) {
         <span class="modal-close" onclick="closeEyeHeavenModal()">×</span>
       </div>
       <div class="modal-body">
-        <div class="nh-summary">扫描范围：${esc(eh.source || '全A剔除ST')}</div>
+        <div class="nh-summary">扫描范围：${esc((eh && eh.source) || '天眼地量选股（全A剔除ST/北交所）')}</div>
         ${warn}
         <div class="sc-tools">
           <button class="wl-btn wl-btn-primary" onclick="bulkAddEyeHeavenToWatchlist()">⚡ 一键全部加入观察池</button>
