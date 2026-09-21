@@ -756,7 +756,7 @@
 .sp-row b{color:#0f172a}
 .sp-ban{font-size:10px;color:#991b1b;font-weight:800;margin-left:6px}
 /* v11.82 盘前「今日已入场」悬浮弹窗(只读) */
-.entry-fab{position:fixed;right:14px;bottom:84px;z-index:9990;background:#1d4ed8;color:#fff;border:none;border-radius:22px;padding:10px 14px;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(29,78,216,.4);cursor:pointer;touch-action:none;user-select:none;max-width:60vw}
+.entry-fab{position:fixed;right:14px;bottom:84px;z-index:9990;background:#1d4ed8;color:#fff;border:none;border-radius:22px;padding:10px 16px;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(29,78,216,.4);cursor:pointer;touch-action:none;user-select:none;max-width:70vw;white-space:nowrap;width:auto;min-width:0}
 .entry-fab.has{background:#dc2626}
 .entry-pop{position:fixed;left:0;right:0;bottom:0;z-index:9991;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.18);max-height:70vh;display:none;flex-direction:column}
 .entry-pop.show{display:flex}
@@ -3264,7 +3264,7 @@ function buildDecisionCardHtml(s){
     '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div><div class="dc-line dc-src-note">'+evNote+'</div></div>'+
     '<div class="dc-block dc-plan '+(shouldCollapsePlan?'dc-plan-collapsed':'')+'">'+
       '<div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">'+(shouldCollapsePlan?'▸':'▾')+'</span>'+(shouldCollapsePlan?'<span class="dc-plan-lock">'+collapseLabel+'</span><span class="dc-plan-expand">👆 点击展开</span>':'')+'</div>'+
-      '<div class="dc-plan-body">'+planTable+tRRBadWarn+nowWarn+
+      '<div class="dc-plan-body">'+planTable+'<div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 '+Number(p.entry).toFixed(2)+'）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>'+tRRBadWarn+nowWarn+
       '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>'+(pos.capped?'（受单股上限压制，实际最高仓位15%）':'（单股≤15%、单题材≤30%）')+'</div>'+
       '<div class="dc-line dc-disc">执行纪律：跌破'+f2(p.stop)+'无条件止损 · 到达'+f2(p.target)+'无条件止盈 · 日内做T当日必须平T不隔夜</div>'+
       '</div>'+
@@ -6965,10 +6965,28 @@ function updateReviewProgress(){
     var px=Number(blocks[b].getAttribute('data-price'))||0;
     var ntd=(r&&r.trace&&r.trace.length)?r.trace.length:0;   // v11.32:已跟踪的交易日数(取自日K逐日轨迹)
     if(sr&&sr.enabled&&!sr.settled){
+      // v11.116:短线 rec 参数完整性自愈 —— entry 有值但 priceStop/tp1/tp2 缺失(旧记录/数据损坏) ⇒ 从今日计划卡 data-s-* 补齐
+      if(sr.priceStop==null||sr.tp1==null||sr.tp2==null){
+        var _spwF=blocks[b].querySelector('.sp-wrap');
+        var _eF=_spwF?(parseFloat(_spwF.getAttribute('data-s-entry'))||0):0;
+        var _sF=_spwF?(parseFloat(_spwF.getAttribute('data-s-stop'))||0):0;
+        var _t1F=_spwF?(parseFloat(_spwF.getAttribute('data-s-tp1'))||0):0;
+        var _t2F=_spwF?(parseFloat(_spwF.getAttribute('data-s-tp2'))||0):0;
+        if(_eF>0&&_sF>0&&_t1F>_eF&&_t2F>_eF){
+          if(sr.priceStop==null)sr.priceStop=_sF;
+          if(sr.tp1==null)sr.tp1=_t1F;
+          if(sr.tp2==null)sr.tp2=_t2F;
+          if(sr.stop==null)sr.stop=_sF;
+          if(sr.target==null)sr.target=_t2F;
+          if(sr.entry==null)sr.entry=_eF;
+          setShortMap(sc);
+        }
+      }
       var days=bjDaysBetweenF(sr.openedDate,bjTodayF());
       var held2=sr.entryHit?tradingDaysBetweenF(sr.entryDate,bjTodayF()):0;
+      var _f2d=function(v){return (v==null||isNaN(Number(v)))?'—':Number(v);};
       if(!sr.entryHit){
-        txt='⏱ 执行层｜短线：监控中 —— 等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+sr.priceStop+' · 分批止盈 '+sr.tp1+'/'+sr.tp2+' · 时间止损 T+3 14:50。未触发不计样本';
+        txt='⏱ 执行层｜短线：监控中 —— 等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+_f2d(sr.priceStop)+' · 分批止盈 '+_f2d(sr.tp1)+'/'+_f2d(sr.tp2)+' · 时间止损 T+3 14:50。未触发不计样本';
         var _sLow=parseFloat(blocks[b].getAttribute('data-low'))||0;
         if(_sLow>0&&_sLow<sr.entry){ txt+='；⚠ 打勾前盘中曾低至 '+_sLow+'（早于打勾时刻，防偷价口径不计入）'; }
         var _sLcs=(sr.lastCheck&&sr.lastCheck.skip)||'';

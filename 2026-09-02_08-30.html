@@ -752,7 +752,7 @@
 .sp-row b{color:#0f172a}
 .sp-ban{font-size:10px;color:#991b1b;font-weight:800;margin-left:6px}
 /* v11.82 盘前「今日已入场」悬浮弹窗(只读) */
-.entry-fab{position:fixed;right:14px;bottom:84px;z-index:9990;background:#1d4ed8;color:#fff;border:none;border-radius:22px;padding:10px 14px;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(29,78,216,.4);cursor:pointer;touch-action:none;user-select:none;max-width:60vw}
+.entry-fab{position:fixed;right:14px;bottom:84px;z-index:9990;background:#1d4ed8;color:#fff;border:none;border-radius:22px;padding:10px 16px;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(29,78,216,.4);cursor:pointer;touch-action:none;user-select:none;max-width:70vw;white-space:nowrap;width:auto;min-width:0}
 .entry-fab.has{background:#dc2626}
 .entry-pop{position:fixed;left:0;right:0;bottom:0;z-index:9991;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.18);max-height:70vh;display:none;flex-direction:column}
 .entry-pop.show{display:flex}
@@ -2244,7 +2244,7 @@
       <a href="index.html">首页</a><a href="2026-09-02_08-30.html" class="active">盘前</a><a href="2026-09-02_16-20.html">收盘</a><a href="2026-09-21_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 11:37</b>（约 398 分钟前）</div><h1 class="hero-title">2026-09-02 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 11:37），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 72°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 11:37</b>（约 427 分钟前）</div><h1 class="hero-title">2026-09-02 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 11:37），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 72°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-02 11:37:58</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -2320,6 +2320,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 65.56 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 65.56）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破63.51无条件止损 · 到达71.70无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -2416,6 +2417,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 21.18 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 21.18）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破20.52无条件止损 · 到达23.16无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -2512,6 +2514,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 60.49 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 60.49）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破58.60无条件止损 · 到达66.16无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -2608,6 +2611,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 790.12 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 790.12）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破765.43无条件止损 · 到达864.19无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -2704,6 +2708,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 25.02 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 25.02）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破24.24无条件止损 · 到达27.36无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -2800,6 +2805,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 31.49 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 31.49）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破30.50无条件止损 · 到达34.44无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -2896,6 +2902,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 33.66 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 33.66）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破32.61无条件止损 · 到达36.81无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -2992,6 +2999,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 3.20 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 3.20）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破3.10无条件止损 · 到达3.50无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -3088,6 +3096,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 3.64 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 3.64）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破3.52无条件止损 · 到达3.98无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -3184,6 +3193,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 14.48 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 14.48）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破14.02无条件止损 · 到达15.83无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -3280,6 +3290,7 @@
   </tr>
     
   </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 3.47 再执行,当前仅观察。</div>
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 3.47）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
       <div class="dc-line dc-disc">执行纪律：跌破3.36无条件止损 · 到达3.79无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -4507,7 +4518,7 @@ function buildDecisionCardHtml(s){
     '<div class="dc-block"><div class="dc-h">📅 事件风险</div><div class="dc-line dc-events">'+evHtml+'</div><div class="dc-line dc-src-note">'+evNote+'</div></div>'+
     '<div class="dc-block dc-plan '+(shouldCollapsePlan?'dc-plan-collapsed':'')+'">'+
       '<div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">'+(shouldCollapsePlan?'▸':'▾')+'</span>'+(shouldCollapsePlan?'<span class="dc-plan-lock">'+collapseLabel+'</span><span class="dc-plan-expand">👆 点击展开</span>':'')+'</div>'+
-      '<div class="dc-plan-body">'+planTable+tRRBadWarn+nowWarn+
+      '<div class="dc-plan-body">'+planTable+'<div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 '+Number(p.entry).toFixed(2)+'）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>'+tRRBadWarn+nowWarn+
       '<div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损'+pos.stopPct+'% → 建议仓位 <b>'+pos.low+'%-'+pos.high+'%</b>'+(pos.capped?'（受单股上限压制，实际最高仓位15%）':'（单股≤15%、单题材≤30%）')+'</div>'+
       '<div class="dc-line dc-disc">执行纪律：跌破'+f2(p.stop)+'无条件止损 · 到达'+f2(p.target)+'无条件止盈 · 日内做T当日必须平T不隔夜</div>'+
       '</div>'+
@@ -8208,10 +8219,28 @@ function updateReviewProgress(){
     var px=Number(blocks[b].getAttribute('data-price'))||0;
     var ntd=(r&&r.trace&&r.trace.length)?r.trace.length:0;   // v11.32:已跟踪的交易日数(取自日K逐日轨迹)
     if(sr&&sr.enabled&&!sr.settled){
+      // v11.116:短线 rec 参数完整性自愈 —— entry 有值但 priceStop/tp1/tp2 缺失(旧记录/数据损坏) ⇒ 从今日计划卡 data-s-* 补齐
+      if(sr.priceStop==null||sr.tp1==null||sr.tp2==null){
+        var _spwF=blocks[b].querySelector('.sp-wrap');
+        var _eF=_spwF?(parseFloat(_spwF.getAttribute('data-s-entry'))||0):0;
+        var _sF=_spwF?(parseFloat(_spwF.getAttribute('data-s-stop'))||0):0;
+        var _t1F=_spwF?(parseFloat(_spwF.getAttribute('data-s-tp1'))||0):0;
+        var _t2F=_spwF?(parseFloat(_spwF.getAttribute('data-s-tp2'))||0):0;
+        if(_eF>0&&_sF>0&&_t1F>_eF&&_t2F>_eF){
+          if(sr.priceStop==null)sr.priceStop=_sF;
+          if(sr.tp1==null)sr.tp1=_t1F;
+          if(sr.tp2==null)sr.tp2=_t2F;
+          if(sr.stop==null)sr.stop=_sF;
+          if(sr.target==null)sr.target=_t2F;
+          if(sr.entry==null)sr.entry=_eF;
+          setShortMap(sc);
+        }
+      }
       var days=bjDaysBetweenF(sr.openedDate,bjTodayF());
       var held2=sr.entryHit?tradingDaysBetweenF(sr.entryDate,bjTodayF()):0;
+      var _f2d=function(v){return (v==null||isNaN(Number(v)))?'—':Number(v);};
       if(!sr.entryHit){
-        txt='⏱ 执行层｜短线：监控中 —— 等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+sr.priceStop+' · 分批止盈 '+sr.tp1+'/'+sr.tp2+' · 时间止损 T+3 14:50。未触发不计样本';
+        txt='⏱ 执行层｜短线：监控中 —— 等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+_f2d(sr.priceStop)+' · 分批止盈 '+_f2d(sr.tp1)+'/'+_f2d(sr.tp2)+' · 时间止损 T+3 14:50。未触发不计样本';
         var _sLow=parseFloat(blocks[b].getAttribute('data-low'))||0;
         if(_sLow>0&&_sLow<sr.entry){ txt+='；⚠ 打勾前盘中曾低至 '+_sLow+'（早于打勾时刻，防偷价口径不计入）'; }
         var _sLcs=(sr.lastCheck&&sr.lastCheck.skip)||'';
