@@ -2244,7 +2244,7 @@
       <a href="index.html">首页</a><a href="2026-09-11_09-45.html" class="active">盘前</a><a href="2026-09-11_16-20.html">收盘</a><a href="2026-09-21_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:47</b>（约 333 分钟前）</div><h1 class="hero-title">2026-09-11 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 60°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:47</b>（约 357 分钟前）</div><h1 class="hero-title">2026-09-11 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 60°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-11 09:47:00</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -4925,6 +4925,44 @@ if(document.readyState==="complete"||document.readyState==="interactive"){setTim
 /* ============ 观察池实时行情刷新(电脑关机后手机端仍可刷新) ============ */
 function escHtmlR(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function deriveSigR(v){if(v>=5)return{name:'强势突破',tone:'break'};if(v>=2)return{name:'强势承接',tone:'strong'};if(v>=0.5)return{name:'震荡上行',tone:'up'};if(v>=-1)return{name:'等待确认',tone:'wait'};if(v>=-3)return{name:'走势承压',tone:'press'};return{name:'弱势回调',tone:'weak'};}
+/* ════════ v11.113 计划当日锁定 ════════
+   根因(瑞达002961):detail 重建(buildDecisionCardHtml)用最新行情重算 strategy ⇒ 计划价盘中漂移
+   (21.50→20.10),用户看到"系统自己改计划",偏移检测基准也被洗掉。修复:策略参数当日锁定(SSR 首次值),
+   行情刷新只更新现价/涨跌,计划价次日盘前才更新。 */
+function planLockCapture(code){
+  try{
+    var blk=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+    if(!blk)return null;
+    var lock={e:blk.getAttribute('data-entry'),s:blk.getAttribute('data-stop'),t:blk.getAttribute('data-target')};
+    var sw=blk.querySelector('.sp-wrap');
+    if(sw){lock.se=sw.getAttribute('data-s-entry');lock.ss=sw.getAttribute('data-s-stop');lock.s1=sw.getAttribute('data-s-tp1');lock.s2=sw.getAttribute('data-s-tp2');}
+    return lock;
+  }catch(e){return null;}
+}
+function planLockApply(code,lock){
+  try{
+    if(!lock)return;
+    var blk=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+    if(!blk)return;
+    if(lock.e)blk.setAttribute('data-entry',lock.e);
+    if(lock.s)blk.setAttribute('data-stop',lock.s);
+    if(lock.t)blk.setAttribute('data-target',lock.t);
+    var sw=blk.querySelector('.sp-wrap');
+    if(sw&&lock.se){sw.setAttribute('data-s-entry',lock.se);sw.setAttribute('data-s-stop',lock.ss);sw.setAttribute('data-s-tp1',lock.s1);sw.setAttribute('data-s-tp2',lock.s2);}
+  }catch(e){}
+}
+function planLockGet(code){
+  try{
+    var all=JSON.parse(localStorage.getItem('atds_plan_lock_'+bjTodayF())||'{}');
+    return all[code]||null;
+  }catch(e){return null;}
+}
+function planLockSave(code,lock){
+  try{
+    var all=JSON.parse(localStorage.getItem('atds_plan_lock_'+bjTodayF())||'{}');
+    all[code]=lock;localStorage.setItem('atds_plan_lock_'+bjTodayF(),JSON.stringify(all));
+  }catch(e){}
+}
 async function refreshWatchlistQuotes(){
   var rows=document.querySelectorAll('.wl-stock-row[data-code]');
   if(!rows.length)return;
@@ -4980,8 +5018,12 @@ async function refreshWatchlistQuotes(){
         var rrEl=r.querySelector('.wl-cell-sig .rr');
         if(rrEl){rrEl.className='rr rr-'+bd.rrTone;rrEl.textContent=bd.rrTxt;}
         var isAuto=d.classList.contains('auto-detail');
+        // v11.113:计划当日锁定 —— 重建前取当日锁定值(首次从 SSR DOM 捕获),注入 sObj.strategy 使重建用锁定计划价
+        var _lk=planLockGet(code)||planLockCapture(code);
+        if(_lk){ planLockSave(code,_lk); if(_lk.e) sObj.strategy={entry:parseFloat(_lk.e),stop:parseFloat(_lk.s),target:parseFloat(_lk.t)}; }
         if(isAuto){
           d.innerHTML=buildDecisionCardHtml(sObj);
+          planLockApply(code,_lk);
           restoreReviewUI(d.querySelector('.dc-review'));   // 重建后恢复勾选/交易状态,避免刷新清空
         }else{
           var lastPrice=d.getAttribute('data-last-price');
@@ -4994,6 +5036,7 @@ async function refreshWatchlistQuotes(){
             d.setAttribute('data-rebuild-ts',String(nowTs));
             d.setAttribute('data-last-price',curPrice);
             d.innerHTML=buildDecisionCardHtml(sObj);
+            planLockApply(code,_lk);
             restoreReviewUI(d.querySelector('.dc-review'));
           }
         }
