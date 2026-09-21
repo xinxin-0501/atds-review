@@ -817,6 +817,13 @@
 .sr-score{font-size:12px;font-weight:800;color:#7c3aed;min-width:40px;text-align:right}
 .sr-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
 .sr-note{font-size:11px;color:#94a3b8;font-weight:400}
+
+/* v11.112 计划偏移同步提示(橙色) */
+.plan-sync-warn{margin:6px 0;padding:8px 10px;background:#fff7ed;border:1px solid #fdba74;border-radius:10px;font-size:12px;color:#9a3412;line-height:1.6}
+.psw-row{margin:2px 0}
+.psw-btn{border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;margin-left:6px;cursor:pointer}
+.psw-sync{background:#ea580c;color:#fff}
+.plan-sync-warn .psw-btn:not(.psw-sync){background:#fff;color:#9a3412;border:1px solid #fdba74}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -4602,6 +4609,50 @@ window.openSignalRadarModal = openSignalRadarModal;
 window.closeSignalRadarModal = closeSignalRadarModal;
 window.filterSignalRadar = filterSignalRadar;
 window.sortSignalRadar = sortSignalRadar;
+/* v11.112:计划偏移同步 —— 执行层切到今日计划价,清空旧入场状态并立即按今日数据重判(样本自动补录) */
+function syncPlanPrice(code){
+  var sm=getShadowMap(),rec=sm[code];
+  var block=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+  if(!rec||!block)return;
+  var pe=parseFloat(block.getAttribute('data-entry'))||0,ps=parseFloat(block.getAttribute('data-stop'))||0,pt=parseFloat(block.getAttribute('data-target'))||0;
+  if(!(pe>0&&ps>0&&pt>pe&&pe>ps)){showToast('今日计划参数非法，无法同步','warn');return;}
+  rec.entry=pe;rec.stop=ps;rec.target=pt;
+  rec.entryHit=false;delete rec.entryDate;delete rec.entryPrice;delete rec.touchAt;delete rec.entryConds;
+  rec.planSynced=true;rec.planSyncDate=bjTodayF();
+  setShadowMap(sm);
+  showToast('波段已同步今日计划价 '+pe+'，将按今日盘中数据重新判定触发','ok');
+  try{ if(typeof settleAllShadowTrades==='function') settleAllShadowTrades(); }catch(e){}
+  updateReviewProgress();
+}
+function keepOldPlanPrice(code){
+  var sm=getShadowMap(),rec=sm[code];if(!rec)return;
+  rec.keepOldPrice=true;
+  setShadowMap(sm);showToast('已保持旧价 '+rec.entry+'，今日计划价不参与跟踪','ok');
+  updateReviewProgress();
+}
+function syncShortPlanPrice(code){
+  var sm=getShortMap(),rec=sm[code];
+  var block=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+  var sw=block?block.querySelector('.sp-wrap'):null;
+  if(!rec||!sw){showToast('未找到短线记录或计划卡','warn');return;}
+  var e=parseFloat(sw.getAttribute('data-s-entry'))||0,st=parseFloat(sw.getAttribute('data-s-stop'))||0,t1=parseFloat(sw.getAttribute('data-s-tp1'))||0,t2=parseFloat(sw.getAttribute('data-s-tp2'))||0;
+  if(!(e>0&&st>0&&t1>e&&t2>e)){showToast('短线计划参数非法，无法同步','warn');return;}
+  rec.entry=e;rec.priceStop=st;rec.stop=st;rec.tp1=t1;rec.tp2=t2;rec.target=t2;
+  rec.entryHit=false;delete rec.entryDate;delete rec.stage;delete rec.touchAt;
+  rec.planSynced=true;rec.planSyncDate=bjTodayF();
+  setShortMap(sm);
+  showToast('短线已同步今日计划价 '+e+'，将立即重新判定','ok');
+  try{ if(typeof settleAllShadowTrades==='function') settleAllShadowTrades(); }catch(e2){}
+  updateReviewProgress();
+}
+function keepOldShortPlanPrice(code){
+  var sm=getShortMap(),rec=sm[code];if(!rec)return;
+  rec.keepOldPrice=true;
+  setShortMap(sm);showToast('已保持旧价 '+rec.entry,'ok');
+  updateReviewProgress();
+}
+window.syncPlanPrice=syncPlanPrice; window.keepOldPlanPrice=keepOldPlanPrice;
+window.syncShortPlanPrice=syncShortPlanPrice; window.keepOldShortPlanPrice=keepOldShortPlanPrice;
 
 /* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
 (function bindWatchlistScrollSync(){
@@ -7411,7 +7462,10 @@ function updateReviewProgress(){
         // v11.76:状态机重构 —— 打勾=监控中(候选队列),绝不显示"已入场"。
         //   收盘后(15:00)未触发 ⇒ 明示「今日未触发（未消耗样本）」;盘中 ⇒ 显示还需回落多少。
         var afterClose=(function(){var d=new Date(Date.now()+8*3600*1000);return (d.getUTCHours()*60+d.getUTCMinutes())>=15*60;})();
-        // v11.109:状态分层 —— 明确"执行层"(勾选时锁定)与"计划层"(今日重算方案)两条线并行,消除价格跳变误导
+        // v11.112:计划偏移检测 —— 执行层锁定价 vs 今日计划价,偏离>3% ⇒ 橙色同步提示(摒弃"并行不悖",防样本永久停滞)
+        var _planE=parseFloat(blocks[b].getAttribute('data-entry'))||0;
+        var _dl=parseFloat(blocks[b].getAttribute('data-low'))||0;
+        var _dev=(px>0&&_planE>0)?Math.abs(r.entry-_planE)/px:0;
         var monTxt;
         if(afterClose){
           monTxt='🟡 执行层｜波段：监控中 —— 今日未触发入场（未消耗样本），未回落至计划入场价 '+r.entry+'（今日最高 '+(r.lastCheck&&r.lastCheck.high||px)+'），明日继续';
@@ -7420,11 +7474,8 @@ function updateReviewProgress(){
         } else {
           monTxt='🟡 执行层｜波段：监控中 —— 等待回落至 '+r.entry+' 触发虚拟买入（现价 '+px+'，距触发还需下跌 '+(need!=null?need+'%':'--')+'）';
         }
-        // 计划层注记:今日计划(量化)方案已触达 ≠ 执行层触发(执行层始终按勾选时锁定价跟踪)
-        var _planE=parseFloat(blocks[b].getAttribute('data-entry'))||0;
-        var _dl=parseFloat(blocks[b].getAttribute('data-low'))||0;
-        if(_planE && Math.abs(_planE-r.entry)>0.001 && _dl>0 && _dl<=_planE){
-          monTxt+='；📋 今日计划（量化）已触达 '+_planE+'，但执行层始终按勾选时锁定的 '+r.entry+' 跟踪，两条线并行不悖';
+        if(_planE && _dev<=0.03 && Math.abs(_planE-r.entry)>0.001 && _dl>0 && _dl<=_planE){
+          monTxt+='；📋 今日计划（量化）已触达 '+_planE+'（与执行层价差属正常重算区间）';
         }
         // v11.106:漏判标记(不能隐瞒)—— 分时数据缺失时打勾当日触发判定被跳过,必须明示并说明会自动补判
         var _lcs=(r.lastCheck&&r.lastCheck.skip)||'';
@@ -7463,6 +7514,41 @@ function updateReviewProgress(){
       }
     }
     swTxt=txt; if(!traceRec)traceRec=r||null;
+// v11.112:计划偏移检测(波段+短线)——执行层锁定价 vs 今日计划价偏离>3% ⇒ 橙色同步提示;keepOldPrice ⇒ 明示不参与
+    var _syncHtml='';
+    var _pe=parseFloat(blocks[b].getAttribute('data-entry'))||0;
+    var _dlw=parseFloat(blocks[b].getAttribute('data-low'))||0;
+    if(r&&r.enabled&&!r.settled&&_pe>0&&px>0){
+      var _d1=Math.abs(r.entry-_pe)/px;
+      if(_d1>0.03&&!r.keepOldPrice){
+        _syncHtml+='<div class="psw-row">⚠️ <b>波段</b>：今日计划入场价由 <b>'+r.entry+'</b> 更新为 <b>'+_pe+'</b>（偏移 '+(_d1*100).toFixed(1)+'%）'+(_dlw>0&&_dlw<=_pe?'，今日计划价已触达（最低 '+_dlw+'）':'')+'，执行层仍在跟踪旧价格。<button class="psw-btn psw-sync" onclick="syncPlanPrice(\''+code+'\')">点击同步</button><button class="psw-btn" onclick="keepOldPlanPrice(\''+code+'\')">保持旧价</button></div>';
+        if(swTxt)swTxt+='（⚠ 计划价已变更，见上方同步提示）';
+      } else if(r.keepOldPrice&&_d1>0.03&&swTxt){
+        swTxt='执行层跟踪历史深度回调价 '+r.entry+'，今日计划价 '+_pe+' 不参与模拟跟踪。'+swTxt;
+      }
+    }
+    if(sr&&sr.enabled&&!sr.settled){
+      var _spw=blocks[b].querySelector('.sp-wrap');
+      var _spe=_spw?(parseFloat(_spw.getAttribute('data-s-entry'))||0):0;
+      if(_spe>0&&px>0){
+        var _d2=Math.abs(sr.entry-_spe)/px;
+        if(_d2>0.03&&!sr.keepOldPrice){
+          _syncHtml+='<div class="psw-row">⚠️ <b>短线</b>：今日计划入场价由 <b>'+sr.entry+'</b> 更新为 <b>'+_spe+'</b>（偏移 '+(_d2*100).toFixed(1)+'%），执行层仍在跟踪旧价格。<button class="psw-btn psw-sync" onclick="syncShortPlanPrice(\''+code+'\')">点击同步</button><button class="psw-btn" onclick="keepOldShortPlanPrice(\''+code+'\')">保持旧价</button></div>';
+          if(shTxt)shTxt+='（⚠ 计划价已变更，见上方同步提示）';
+        } else if(sr.keepOldPrice&&_d2>0.03&&shTxt){
+          shTxt='执行层跟踪历史价 '+sr.entry+'，今日计划价 '+_spe+' 不参与模拟跟踪。'+shTxt;
+        }
+      }
+    }
+    var _attrEl=blocks[b].querySelector('.ts-attr');
+    if(_attrEl){
+      var _box=blocks[b].querySelector('.plan-sync-warn');
+      if(_syncHtml){
+        if(!_box){_box=document.createElement('div');_box.className='plan-sync-warn';_attrEl.parentNode.parentNode.insertBefore(_box,_attrEl.parentNode);}
+        _box.innerHTML=_syncHtml;
+      } else if(_box){_box.parentNode.removeChild(_box);}
+    }
+    
     if(shTxt&&swTxt){
       attr.innerHTML='<b style="color:#1d4ed8">【波段】</b>'+escHtmlF(swTxt)+'<br><b style="color:#b45309">【短线】</b>'+escHtmlF(shTxt);
     } else if(shTxt){ attr.textContent='【短线】'+shTxt; }
