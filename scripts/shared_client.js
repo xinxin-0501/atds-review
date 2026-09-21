@@ -2137,7 +2137,8 @@ function gateAtF(suite,dateStr){
   //   波段: g.fails.join('/') 崩溃→判定被吞→触及后永久卡"监控中"; 短线: 恒 blocked 永不入场。
   //   修复:返回前一根已完成K线的【门控结果】ind.gate。
   var ind=suite.byDate[suite.dates[idx-1]];
-  return (ind&&ind.gate)||null;
+  // v11.108:返回【门控结果】并附带 prevDate(保留"取第k-1日指标"的无未来函数语义,测试与归因都用它)
+  return (ind&&ind.gate)?Object.assign({},ind.gate,{date:ind.date}):null;
 }
 function calcDecisionTech(klines){
   if(!Array.isArray(klines)||klines.length<30)return null;
