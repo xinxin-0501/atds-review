@@ -697,7 +697,7 @@
 .ff-missing{font-style:normal;font-weight:600;color:#b8860b;background:#fff8e1;border-radius:3px;padding:0 4px;margin-left:2px;font-size:10px}
 .ff-cache{font-style:normal;font-weight:600;color:#1a5c8a;background:#e3f2fd;border-radius:3px;padding:0 4px;margin-left:3px;font-size:10px}
 /* 全局绿色 Toast 提示(模拟跟踪勾选反馈) */
-.atds-toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(16px);background:#2e7d32;color:#fff;font-size:12px;font-weight:600;padding:10px 18px;border-radius:22px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:all .3s ease;z-index:9999;max-width:86%;text-align:center;line-height:1.4}
+.atds-toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(16px);background:#2e7d32;color:#fff;font-size:12px;font-weight:600;padding:10px 18px;border-radius:22px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:all .3s ease;z-index:10001;max-width:86%;text-align:center;line-height:1.4}
 .atds-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 /* 盘前跟风股风险提示横幅 */
 .risk-banner{background:linear-gradient(90deg,#fff0f0,#fff8f0);border:1px solid #f0b0b0;border-left:4px solid #c62828}
@@ -2249,7 +2249,7 @@
       <a href="index.html">首页</a><a href="2026-09-21_09-45.html" class="active">盘前</a><a href="2026-09-21_16-20.html">收盘</a><a href="2026-09-21_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:41</b>（约 632 分钟前）</div><h1 class="hero-title">2026-09-21 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:41</b>（约 648 分钟前）</div><h1 class="hero-title">2026-09-21 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-21 09:41:01</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -3830,10 +3830,13 @@ async function addFetchedToWatchlist(code){
   } catch (e) {}
   // 分钟趋势 + 封单 + 龙虎榜 + 事件(真实,并发拉取,失败不阻塞)
   try {
-    var ext = await Promise.all([
+    var ext = await Promise.race([
+      Promise.all([
       fetchMinuteTrendF(code, 'm60'), fetchMinuteTrendF(code, 'm15'),
       fetchLimitUpSealF(code), fetchLhbDetailF(code), fetchEventsF(code),
       fetchStockProfileF(code)
+      ]),
+      new Promise(function(res){ setTimeout(function(){ res(null); }, 8000); })
     ]);
     if (ext[5] && ext[5].industry) data.industry = ext[5].industry;   // v11.19:行业名 → autoGenStrategy 生成 business 文案
     // 分钟线兜底:双源失败(如浏览器CORS拦截腾讯/新浪)时用日线MA5/MA20斜率近似,坚决不显示"暂缺"
@@ -3895,7 +3898,7 @@ async function fetchKlineF(code, count) {
   count = count || 70;
   try {
     const url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + code + ',day,,,' + count + ',qfq';
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, 9000);
     const txt = await res.text();
     const j = JSON.parse(txt);
     const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
