@@ -453,7 +453,366 @@
 .ss-meta .ok{color:#2e7d32}
 .ss-meta .no{color:#c33}
 /* v17: 盘前主线方向 + 个股研究摘要 */
-.md-list,
+.md-list,.sr-list{display:flex;flex-direction:column;gap:8px}
+.md-item,.sr-item{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #f0f0f0;border-radius:8px;padding:8px}
+.sr-item{cursor:pointer}
+.sr-item:active{background:#fff8f8}
+.md-rank,.sr-rank{width:20px;font-size:12px;color:#94a3b8;text-align:center;flex-shrink:0}
+.sr-rank{background:#c33}
+.md-main,.md-name{font-size:12px;font-weight:700;color:#333;display:flex;align-items:center;gap:6px}
+.md-status{font-size:9px;padding:1px 5px;border-radius:4px}
+.md-status.ok{background:#e8f5e9;color:#2e7d32}
+.md-status.no{background:#fff3e0;color:#e65100}
+.md-sub{font-size:9px;color:#888;margin-top:2px}
+.md-pct{font-size:12px;font-weight:700;flex-shrink:0}
+.sr-line1 .sr-name{font-size:14px;font-weight:800;color:#0f172a;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:96px;flex-shrink:1}
+.sr-name small{font-size:9px;color:#999;font-weight:400}
+.sr-reason{font-size:9px;color:#888;margin-top:2px}
+.sr-line1 .sr-pct{font-size:12px;font-weight:700;white-space:nowrap;min-width:48px;text-align:right;flex-shrink:0}
+/* v17b: 盘前驾驶舱 + 策略状态数据化 */
+.cp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.cp-item{background:#fafafa;border-radius:8px;padding:8px}
+.cp-k{font-size:9px;color:#888;margin-bottom:2px}
+.cp-v{font-size:11px;font-weight:700;color:#333}
+.str-block{margin-top:8px}
+.str-h{font-size:10px;font-weight:700;color:#c33;margin-bottom:4px}
+.str-line{font-size:10px;color:#444;line-height:1.7;background:#fafafa;border-radius:6px;padding:5px 8px;margin-bottom:4px}
+.str-line b{color:#333}
+.str-line.pit b{color:#c33}
+
+/* 交易复盘 / 行为复盘 入口卡 */
+.trade-review-entry{margin-top:12px}
+.trade-review-title{font-size:14px;font-weight:700;color:#111}
+.trade-review-sub{font-size:11px;color:#888;margin-top:4px;line-height:1.6}
+.modal-score-stars.ok{color:#2e7d32}
+.modal-score-stars.mid{color:#e65100}
+.modal-score-stars.no{color:#c62828}
+/* ===== v18 观察池交易决策卡(主卡片+复盘卡,去重/量化/可验证/可复盘) ===== */
+.up{color:#c33}
+.down{color:#185FA5}
+.conf,.rr{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;line-height:1.4;white-space:nowrap}
+.conf-good{background:#e8f5e9;color:#2e7d32}
+.conf-ok{background:#fff7e6;color:#d49000}
+.conf-warn{background:#f5f5f5;color:#888}
+.conf-down{background:#f2f2f2;color:#aaa;text-decoration:line-through}
+.rr-good{background:#e8f5e9;color:#2e7d32}
+.rr-ok{background:#e0f2f1;color:#00695c}
+.rr-warn{background:#fff7e6;color:#d49000}
+.rr-bad{background:#fee;color:#c33}
+.rr-muted{background:#f2f2f2;color:#aaa}
+.lv{display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:600;margin:1px 2px 1px 0;line-height:1.5;white-space:nowrap}
+.lv i{font-style:normal;font-size:8px;color:#999;margin-left:3px;font-weight:400}
+.lv-s{background:#e8f5e9;color:#2e7d32}
+.lv-p{background:#fff0f0;color:#c33}
+.lv-strong{font-weight:800;border:1px solid currentColor}
+.dc-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:9px 10px;background:linear-gradient(135deg,#fff5f5 0%,#fff 60%);border-bottom:1px solid #f0f0f0}
+.dc-pri{color:#d49000;font-weight:800;font-size:11px}
+.dc-name{font-weight:700;color:#333;font-size:12px}
+.dc-name i{font-style:normal;color:#999;font-size:9px;font-weight:400;margin-left:3px}
+.dc-status{display:inline-block;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700;background:#fff7e6;color:#d49000}
+.dc-status.up{background:#e8f5e9;color:#2e7d32}
+.dc-status.down{background:#f5f5f5;color:#888}
+.dc-conf{font-size:9px;color:#666;font-weight:600}
+.dc-conf-down{color:#bbb;text-decoration:line-through}
+.dc-rr{font-size:9px;font-weight:700}
+.dc-time{margin-left:auto;font-size:9px;color:#999}
+/* v11.56:卡片上的时间=行情快照抓取时刻;跨日快照要一眼看出来(原先是渲染时刻,会冒充"现在") */
+.dc-time-stale{color:#8a5a00;background:#fff8e1;border:1px solid #ffca28;border-radius:4px;padding:0 4px;font-weight:700}
+.dc-tags{display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;border-bottom:1px dashed #f5f5f5}
+.dc-tag{background:#f5f5f7;color:#555;font-size:9px;padding:2px 7px;border-radius:4px}
+.dc-block{padding:8px 10px;border-top:1px solid #f5f5f5}
+.dc-h{font-size:11px;font-weight:700;color:#333;margin-bottom:6px}
+.dc-line{font-size:10px;color:#555;line-height:1.7;margin-top:3px}
+.dc-line b{color:#333}
+.dc-line .up{color:#c33}
+.dc-line .down{color:#185FA5}
+.dc-grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media (max-width:380px){.dc-grid2{grid-template-columns:1fr}}
+.dc-review{background:#fafafa;border-top:1px solid #eee}
+.tp-table{width:100%;border-collapse:collapse;font-size:9px;margin-top:4px;table-layout:fixed}
+.tp-table th{text-align:left;color:#999;font-weight:600;padding:4px 3px;border-bottom:1px solid #eee;font-size:8px;white-space:nowrap}
+.tp-table td{padding:5px 3px;border-bottom:1px dashed #f5f5f5;color:#444;vertical-align:top;word-break:break-all}
+.tp-name{font-weight:700;color:#333;white-space:nowrap}
+.tp-trig{color:#666}
+.tp-num{text-align:right;font-weight:600;white-space:nowrap}
+.tp-num.stop{color:#c33}
+.tp-rr{text-align:right;font-weight:700;white-space:nowrap}
+.tp-warn{font-size:9px;color:#d49000;background:#fff7e6;border:1px solid #ffe6c2;border-radius:4px;padding:4px 6px;margin-top:4px;line-height:1.5}
+.tp-warn.tp-ok{color:#2e7d32;background:#e8f5e9;border-color:#c8e6c9}
+/* v11.69 人工参数安全阀:橙色=正在使用人工自定义参数(需用户自行确认);红色=人工参数被拒绝并已回退自动值 */
+.dc-manual-warn{font-size:11px;font-weight:800;color:#b45309;background:rgba(245,158,11,0.14);border-left:4px solid #f59e0b;border-radius:4px;padding:5px 8px;margin:0 0 6px;line-height:1.55}
+.dc-manual-invalid{font-size:11px;font-weight:800;color:#b91c1c;background:rgba(220,38,38,0.10);border-left:4px solid #dc2626;border-radius:4px;padding:5px 8px;margin:0 0 6px;line-height:1.55}
+/* v11.70 第4个安全阀:盈亏比<1(赚小亏大) → 禁止建仓,红色高亮且一刀切(人工参数不可绕过) */
+.dc-rrban{font-size:12px;font-weight:900;color:#fff;background:linear-gradient(90deg,#dc2626,#b91c1c);border-left:4px solid #7f1d1d;border-radius:4px;padding:7px 9px;margin:0 0 6px;line-height:1.5;letter-spacing:0.2px;box-shadow:0 2px 6px rgba(220,38,38,0.35)}
+.dc-rrban b{color:#fff;font-weight:900;text-decoration:underline}
+/* v11.72 回测表折叠:默认收起(.bt-fold 不带 .open),点标题展开;汇总行常显,只折叠明细表与口径说明 */
+.bt-fold-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.bt-fold-caret{font-size:12px;color:#64748b;margin-left:auto;flex-shrink:0}
+.bt-fold-tip{font-size:10px;color:#94a3b8;font-weight:400}
+.bt-fold .bt-fold-body{display:none}
+.bt-fold.open .bt-fold-body{display:block}
+/* 事件风险标签(财报/业绩预告/解禁):等级控制底色,方向控制文字色 */
+.dc-events{display:flex;flex-wrap:wrap;gap:5px}
+.ev{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:600;background:#f5f5f7;color:#555;border:1px solid #eee;white-space:nowrap}
+.ev-h{background:#fff0f0;border-color:#f0c0c0;color:#c62828}
+.ev-m{background:#fff8e1;border-color:#ffe0b2;color:#e65100}
+.ev-l{background:#fafafa;border-color:#e0e0e0;color:#757575}
+.ev-good{background:#e8f5e9;border-color:#c8e6c9;color:#2e7d32}
+.ev-bad{color:#c62828}
+/* 3天内高影响事件标红预警(覆盖等级/方向底色)+来源小标 */
+.ev-red-alert{background:#c62828;border-color:#b71c1c;color:#fff;font-weight:700;animation:ev-pulse 1.2s ease-in-out infinite}
+.ev-src{font-style:normal;font-weight:400;opacity:.78;font-size:8px}
+@keyframes ev-pulse{0%,100%{box-shadow:0 0 0 0 rgba(198,40,40,.45)}50%{box-shadow:0 0 0 3px rgba(198,40,40,0)}}
+/* v11.0 事件源不可用提示(降级显示,不显示"近期无重大事件公告"敷衍用户) */
+.ev-loading{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:9px;background:#fff7e6;border:1px dashed #f59e0b;color:#b45309}
+.ev-loading::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;animation:ev-load-pulse 1s ease-in-out infinite}
+@keyframes ev-load-pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+/* v11.6 事件风险新结构:完整标题 + 巨潮原文链接 */
+.ev-item{display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:7px;font-size:10px;background:#f8f9fb;border:1px solid #e5e7eb;width:100%;box-sizing:border-box}
+.ev-item.ev-h{background:#fff0f0;border-color:#f0c0c0}
+.ev-item.ev-m{background:#fff8e1;border-color:#ffe0b2}
+.ev-item.ev-l{background:#fafafa;border-color:#e0e0e0}
+.ev-item.ev-red-alert{background:#fff0f0;border-color:#c62828;animation:ev-pulse 1.5s ease-in-out infinite}
+.ev-head{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:9px}
+.ev-type{font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,0.06);color:#333}
+.ev-item.ev-h .ev-type{background:#c62828;color:#fff}
+.ev-item.ev-m .ev-type{background:#e65100;color:#fff}
+.ev-dir{padding:1px 5px;border-radius:4px;font-weight:600;font-size:8px}
+.ev-dir-good{background:#e8f5e9;color:#2e7d32}
+.ev-dir-bad{background:#ffebee;color:#c62828}
+.ev-cnt{color:#6b7280;font-size:9px}
+.ev-src{opacity:.7;font-size:8px;color:#9ca3af}
+.ev-title{color:#1f2937;font-size:11px;line-height:1.45;font-weight:500;word-break:break-all}
+.ev-link{display:inline-flex;align-items:center;gap:2px;padding:3px 8px;border-radius:5px;background:#2563eb;color:#fff;font-size:9px;font-weight:600;text-decoration:none;align-self:flex-start;margin-top:2px}
+.ev-link:hover{background:#1d4ed8;text-decoration:none}
+.ev-link:active{background:#1e40af}
+
+/* ==================== 观察池 Pro 交互层样式(第十二轮) ==================== */
+/* 控制条 */
+.wl-pro-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:7px 10px;background:linear-gradient(90deg,#fff7f0,#fff);border-bottom:1px solid #f0e6d8;font-size:11px}
+.wl-pro-title{font-weight:800;color:#b3541e;font-size:12px;margin-right:2px}
+.wl-pro-btn{font-size:10px;font-weight:600;color:#fff;background:#e08a3c;border:none;border-radius:12px;padding:4px 9px;cursor:pointer;line-height:1.2}
+.wl-pro-btn:hover{background:#c9722a}
+.wl-pro-countdown{display:inline-flex;align-items:center;gap:4px;margin-left:auto;font-size:9px;color:#999}
+.wl-refresh-bar{display:inline-block;width:52px;height:5px;background:#4caf50;border-radius:3px;vertical-align:middle;transition:width .1s linear}
+.wl-journal-stats{width:100%;font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:5px;padding:3px 7px;margin-top:3px;box-sizing:border-box;line-height:1.6;overflow-wrap:anywhere}
+/* v11.28:每笔明细(入场/结算日期与价格可核对) */
+.jrn-btn{display:inline-block;font-size:10px;font-weight:600;color:#8a6d3b;background:#fff;border:1px solid #e6d3a3;border-radius:10px;padding:4px 10px;min-height:26px;cursor:pointer;line-height:1.2;margin-left:4px}
+.jrn-btn.jrn-del{color:#b23;border-color:#e9b7b7}
+.jrn-warn{margin-top:3px;padding-top:3px;border-top:1px dashed #ecdca8}
+.jrn-wrap{margin-top:4px;padding-top:4px;border-top:1px solid #f0e3bd}
+.jrn-row{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:flex-start;padding:3px 0;border-bottom:1px dashed #f2e7c8}
+.jrn-row:last-child{border-bottom:0}
+.jrn-code{font-weight:700;color:#3a3a3a;flex:0 0 auto}
+.jrn-flow{flex:1 1 150px;min-width:0;color:#6b5b2e;overflow-wrap:anywhere}
+.jrn-num{flex:0 0 auto;font-weight:700;text-align:right}
+.jrn-pos .jrn-num{color:#c33}
+.jrn-neg .jrn-num{color:#2e7d32}
+/* v11.29:口径声明(把理想化假设写在界面上,不假装精确) */
+.jrn-disc{margin-top:4px;padding-top:4px;border-top:1px dashed #ecdca8;color:#8a7a4e;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+.jrn-disc b{color:#7a6a3e}
+/* v11.30:样本不足警示(醒目黄底) */
+.jrn-warn-chip{display:inline-block;background:#fff3cd;color:#8a6d3b;border:1px solid #f0d68a;border-radius:8px;padding:2px 6px;font-weight:600;line-height:1.5}
+/* v11.32:跟踪轨迹(逐交易日判定记录) */
+.dc-trace{margin-top:-2px}
+.tr-btn{font-size:9px;padding:3px 8px;min-height:24px;margin-left:0}
+.tr-wrap{margin-top:3px;border-left:2px solid #e6d3a3;padding-left:6px}
+.tr-row{display:flex;flex-wrap:wrap;gap:2px 6px;font-size:9px;line-height:1.5;padding:1px 0;color:#6b5b2e;border-bottom:1px dashed #f5eddb}
+.tr-row:last-child{border-bottom:0}
+.tr-d{flex:0 0 auto;font-weight:700;color:#8a6d3b}
+.tr-hl{flex:0 0 auto;color:#999}
+.tr-ev{flex:1 1 130px;min-width:0;overflow-wrap:anywhere;color:#3f3a2a}
+/* v11.35:入场方式分组统计 + 样本备份/恢复 */
+.jrn-types{margin-top:3px;color:#6b5b2e}
+.jrn-types b{color:#8a6d3b}
+.jrn-bk{margin-top:4px;padding-top:4px;border-top:1px dashed #ecdca8}
+.jrn-bk-hint{color:#8a7a4e;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+.jrn-ta{width:100%;box-sizing:border-box;height:64px;margin-top:3px;font-size:9px;line-height:1.4;color:#555;background:#fff;border:1px solid #e6d3a3;border-radius:5px;padding:4px 6px;resize:vertical;font-family:monospace;overflow-wrap:anywhere}
+.jrn-bk-btns{margin-top:3px;display:flex;gap:6px;flex-wrap:wrap}
+/* 手动标签编辑器 */
+.dc-tag-editor{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:5px 0;font-size:9px;border-bottom:1px dashed #eee}
+.dc-te-label{color:#999;font-weight:600}
+.dc-te-select{font-size:9px;border:1px solid #ddd;border-radius:4px;padding:2px 3px;color:#555;background:#fff}
+/* 量化风险信号 + 冲突提示 */
+.dc-risk{display:flex;flex-wrap:wrap;gap:4px}
+.risk-alert{display:inline-block;font-size:9px;font-weight:700;color:#c62828;background:#fff0f0;border:1px solid #f0b0b0;border-radius:4px;padding:2px 6px}
+.risk-conflict{color:#e65100;background:#fff8e1;border-color:#ffe0b2}
+/* 风控告警动作指引(跌破MA5/MA20的减仓/清仓建议) */
+.risk-guide{font-style:normal;font-weight:400;color:#b71c1c;background:#fff;border-radius:3px;padding:0 4px;margin-left:4px;font-size:8px;white-space:nowrap}
+/* 未触发方案:整行淡化 + 盈亏比置灰显示"未触发" */
+.tp-notrig{opacity:.62}
+.tp-notrig .tp-num,.tp-notrig .tp-trig,.tp-notrig .tp-name{color:#999}
+.tp-rr-muted{color:#aaa;background:#f2f2f2;border-radius:3px;padding:1px 4px;font-weight:700;font-size:8px}
+/* 情绪总纲建议(高难度逆势标的提示条) */
+.dc-summary{background:linear-gradient(90deg,#fff0f0,#fff5f5);border:1px solid #f0b0b0;border-bottom:1px dashed #f0b0b0;color:#b71c1c;font-size:10px;font-weight:700;padding:6px 10px;line-height:1.5}
+/* 执行纪律 */
+.dc-disc{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:3px 6px}
+/* 做T盈亏比不合格标红 + 建议放弃警告 */
+.tp-rr.rr-bad{color:#c62828;background:#ffebee;border-radius:3px;padding:1px 4px;font-weight:800}
+.tp-warn.tp-warn-bad{color:#b71c1c;background:#ffebee;border-color:#f0b0b0;font-weight:700}
+/* 今日交易计划折叠(强烈建议不参与时默认折叠,点击标题二次确认展开) */
+.dc-plan-toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.dc-plan-toggle:hover{color:#b71c1c}
+.dc-plan-caret{font-size:11px;color:#999}
+.dc-plan-lock{font-size:9px;font-weight:700;color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0;border-radius:4px;padding:1px 6px}
+.dc-plan-expand{font-size:9px;font-weight:700;color:#1565c0;background:#e3f2fd;border:1px solid #90caf9;border-radius:4px;padding:1px 6px;animation:dc-pulse 1.6s ease-in-out infinite}
+@keyframes dc-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.dc-plan-collapsed .dc-plan-body{display:none}
+/* 盘后复盘:交易状态按钮 + 系统模拟跟踪 + 胜率进度提示 */
+.dc-trade-status{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.ts-btn{font-size:11px;font-weight:600;color:#666;background:#fff;border:1px solid #ddd;border-radius:14px;padding:6px 12px;min-height:30px;cursor:pointer;line-height:1.2;transition:all .15s;-webkit-tap-highlight-color:transparent}
+/* v11.27:移动端点击目标过小(实测 47×19px,远低于 44px 建议值,手机易点错) → 增大字号/内边距/最小高度 */
+.ts-btn:hover{border-color:#999;color:#333}
+.ts-btn.ts-active[data-status="bought"]{background:#e8f5e9;border-color:#2e7d32;color:#2e7d32;font-weight:800}
+.ts-btn.ts-active[data-status="not_bought"]{background:#fff7e6;border-color:#d49000;color:#d49000;font-weight:800}
+.ts-btn.ts-active[data-status="sold"]{background:#eceff1;border-color:#607d8b;color:#455a64;font-weight:800}
+.dc-shadow{font-size:9px;color:#666}
+.ts-shadow{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:5px 0;min-height:30px}
+.ts-shadow-check{accent-color:#e08a3c;cursor:pointer;width:18px;height:18px}   /* v11.27:13px→18px,增大手机点击区 */
+.ts-hint{display:inline-block;width:14px;height:14px;line-height:14px;text-align:center;background:#eee;color:#888;border-radius:50%;font-size:10px;font-weight:700;cursor:help;margin:0 2px;vertical-align:middle}
+.ts-progress-badge{font-size:9px;color:#999}
+.ts-progress{color:#b3541e;font-weight:800}
+.ts-winrate{font-size:9px;color:#2e7d32;font-weight:700}
+.ts-attr{font-weight:700;color:#0f766e}
+.ts-attr-bad{color:#c62828}
+.ts-t-btn{color:#6a1b9a;border-color:#ce93d8}
+.ts-t-btn:hover{border-color:#8e24aa;color:#6a1b9a}
+.dc-next-day{font-size:9px;color:#1a5c8a;background:#e3f2fd;border:1px solid #bbdefb;border-radius:4px;padding:3px 7px;margin-top:3px;font-weight:600}
+/* 复盘形态判定(长上影线/冲高回落等) */
+.dc-pattern{font-size:9px;color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0;border-radius:4px;padding:3px 7px;margin-top:3px;font-weight:700}
+/* 分钟级近似趋势气泡提示 */
+.min-approx{position:relative;display:inline-flex;align-items:center;cursor:help;border-bottom:1px dashed #bbb}
+.min-approx-ico{font-style:normal;font-size:10px;color:#8a6d3b;margin-left:3px}
+/* KNOWLEDGE SYNC 手动导出说明 */
+.knowledge-note{font-size:9px;color:#8a6d3b;background:#fffbe6;border:1px solid #f5e6c8;border-radius:4px;padding:4px 7px;margin:6px 0 2px;line-height:1.5}
+/* 数据完整性校验标签 */
+.dc-integrity{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;margin-left:4px;display:inline-block;line-height:1.3}
+.dc-integrity.ok{color:#2e7d32;background:#e8f5e9;border:1px solid #c8e6c9}
+.dc-integrity.warn{color:#b71c1c;background:#fff0f0;border:1px solid #f0b0b0}
+.dc-integrity.loading{color:#1a5c8a;background:#e3f2fd;border:1px solid #90caf9;animation:dc-pulse 1.6s ease-in-out infinite}
+/* v11.55:个股K线时点披露(关键价位由这根末K算出,必须让用户知道它属于哪一天) */
+.dc-kline-src{font-size:10px;line-height:1.5;color:#1a5c8a;background:#eef6fd;border-left:3px solid #90caf9;border-radius:0 5px 5px 0;padding:5px 8px;margin:6px 0 2px}
+.dc-kline-src.warn{color:#8a5a00;background:#fff8e1;border-left-color:#ffca28}
+/* 资金流数据暂缺/缓存标记(d1/d3/d5 为 null → 显示"数据暂缺"而非 --亿) */
+.ff-missing{font-style:normal;font-weight:600;color:#b8860b;background:#fff8e1;border-radius:3px;padding:0 4px;margin-left:2px;font-size:10px}
+.ff-cache{font-style:normal;font-weight:600;color:#1a5c8a;background:#e3f2fd;border-radius:3px;padding:0 4px;margin-left:3px;font-size:10px}
+/* 全局绿色 Toast 提示(模拟跟踪勾选反馈) */
+.atds-toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(16px);background:#2e7d32;color:#fff;font-size:12px;font-weight:600;padding:10px 18px;border-radius:22px;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;pointer-events:none;transition:all .3s ease;z-index:9999;max-width:86%;text-align:center;line-height:1.4}
+.atds-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* 盘前跟风股风险提示横幅 */
+.risk-banner{background:linear-gradient(90deg,#fff0f0,#fff8f0);border:1px solid #f0b0b0;border-left:4px solid #c62828}
+.risk-banner-title{font-size:12px;font-weight:800;color:#b71c1c;margin-bottom:3px}
+.risk-banner-body{font-size:11px;color:#8a3b3b;font-weight:600;line-height:1.5}
+/* 移动端紧凑排版:默认全展开(每只股8区决策卡无须点击直接可见),压缩间距降低页面总高 */
+@media (max-width:768px){
+  .dc-head{cursor:default;padding:7px 9px;gap:4px}
+  .dc-head::after{content:''}
+  .dc-tags{padding:4px 9px;gap:3px}
+  .dc-block{padding:6px 9px;border-top:1px solid #f5f5f5}
+  .dc-h{font-size:10px;margin-bottom:4px}
+  .dc-line{font-size:10px;line-height:1.6;margin-top:2px}
+  .wl-detail{font-size:10px}
+}
+/* 事件风险数据源受限提示 */
+.dc-src-note{font-size:8px;color:#b0b0b0;line-height:1.4;margin-top:2px}
+
+/* v11.37:龙虎榜为事件驱动数据,超期(>20个交易日未上榜)时的降级提示 */
+.lhb-stale{display:block;margin-top:2px;color:#a0866a;font-size:9px;line-height:1.5;background:#fdf7ec;border-left:2px solid #e6d3a3;padding:2px 5px;overflow-wrap:anywhere}
+
+/* v11.39:区分「槽位时间」与「本机当前时间」,避免把跳动时钟误读为数据时间 */
+.hero-clock{margin-left:8px;font-size:11px;font-weight:600;color:#8a6d3b;background:#fff7e6;border:1px solid #f0d68a;border-radius:8px;padding:1px 6px;white-space:nowrap}
+.hero-clock b{color:#a05a00}
+
+/* v11.43:闸门"盘中不判定"中性态(原盘中恒红,属口径错配) */
+.gate-status.gate-pending{background:#fff8e6;border-color:#f0d68a;color:#8a6d3b}
+.gate-value.neu{color:#8a6d3b}
+.gate-diff.neu{color:#a0866a}
+.gate-when{color:#a0866a;font-size:9px}
+
+/* v11.46:强势股模块排序口径提示(消除"不强势也上榜"的误解) */
+.ss-note{display:inline-block;margin-top:3px;font-size:9px;color:#8a6d3b;background:#fff8e6;border:1px solid #f0d68a;border-radius:6px;padding:2px 6px;line-height:1.5;overflow-wrap:anywhere}
+.ss-note b{color:#a05a00}
+
+/* v11.50:涨停标的可能无法成交(战法"做不到最强的做第二强的套利") */
+.sc-limit{display:inline-block;margin-left:4px;font-size:8px;color:#a05a00;background:#fff3cd;border:1px solid #f0d68a;border-radius:6px;padding:1px 4px;white-space:nowrap}
+/* v11.61:炸板过的涨停 = 盘中可成交,与"一直封死"区分开(前者是机会,后者只是观察)。 */
+.sc-limit-zb{color:#0a6b3d;background:#e8f7ee;border-color:#a8ddc0}
+
+/* v11.51:超短核心——该值来自盘前快照(约09:43)而非盘中实时 */
+.sc-pre{display:inline-block;margin-left:3px;font-size:8px;font-style:normal;color:#185FA5;background:#eef4ff;border:1px solid #cddffb;border-radius:5px;padding:0 3px;vertical-align:middle}
+
+/* v11.80 短线2-3天计划块 + 休市横幅 */
+.dc-closed-banner{font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;padding:5px 8px;margin-bottom:8px;font-weight:700;line-height:1.5}
+.dc-short{border-left:3px solid #7c3aed;padding-left:6px;margin-top:8px}
+.sp-gate{font-size:11px;border-radius:6px;padding:4px 8px;margin:4px 0;font-weight:700}
+.sp-gate.ok{color:#166534;background:#f0fdf4;border:1px solid #bbf7d0}
+.sp-gate.bad{color:#991b1b;background:#fef2f2;border:1px solid #fecaca}
+.sp-row{font-size:11px;color:#334155;line-height:1.6}
+.sp-row b{color:#0f172a}
+.sp-ban{font-size:10px;color:#991b1b;font-weight:800;margin-left:6px}
+/* v11.82 盘前「今日已入场」悬浮弹窗(只读) */
+.entry-fab{position:fixed;right:14px;bottom:84px;z-index:9990;background:#1d4ed8;color:#fff;border:none;border-radius:22px;padding:10px 16px;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(29,78,216,.4);cursor:pointer;touch-action:none;user-select:none;max-width:70vw;white-space:nowrap;width:auto;min-width:0}
+.entry-fab.has{background:#dc2626}
+.entry-pop{position:fixed;left:0;right:0;bottom:0;z-index:9991;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.18);max-height:70vh;display:none;flex-direction:column}
+.entry-pop.show{display:flex}
+.entry-pop-h{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eef2f7;font-size:15px;font-weight:800;color:#0f172a}
+.entry-pop-close{font-size:12px;color:#64748b;cursor:pointer;padding:2px 8px;border:1px solid #e2e8f0;border-radius:12px}
+.entry-pop-body{overflow-y:auto;padding:8px 12px}
+.entry-item{position:relative;border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;margin-bottom:8px;cursor:pointer;background:#fafbfc}
+.entry-item-main{display:flex;align-items:baseline;gap:6px;flex-wrap:nowrap;overflow:hidden}
+.entry-name{font-size:14px;font-weight:800;color:#0f172a}
+.entry-code{font-size:10px;color:#94a3b8}
+.entry-price{font-size:14px;font-weight:800;margin-left:auto;white-space:nowrap}
+.entry-pct{font-size:12px;font-weight:700;white-space:nowrap;min-width:50px;text-align:right}
+.entry-item-sub{font-size:11px;color:#475569;margin-top:3px;line-height:1.5}
+.entry-fl{font-size:13px;font-weight:900;white-space:nowrap;min-width:46px;text-align:right}
+.entry-fl-up{color:#dc2626}.entry-fl-down{color:#16a34a}
+.entry-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
+.entry-sec-h{font-size:12px;font-weight:800;color:#334155;margin:10px 2px 6px;padding-left:6px;border-left:3px solid #94a3b8}
+.entry-sec-h.win{border-left-color:#dc2626;color:#dc2626}
+.entry-sec-h.loss{border-left-color:#16a34a;color:#16a34a}
+.entry-tag-short{font-style:normal;font-size:9px;color:#fff;background:#b45309;border-radius:4px;padding:1px 4px;margin-left:4px}
+.entry-tag-swing{font-style:normal;font-size:9px;color:#fff;background:#1d4ed8;border-radius:4px;padding:1px 4px;margin-left:4px}
+.eye-warn{margin:8px 12px;padding:8px 10px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:12px;font-weight:800;border-radius:8px}
+.wl-stock.entry-flash{outline:3px solid #f59e0b;outline-offset:-3px}
+
+/* v11.83 尾盘定调快照入口横幅 */
+.ts-banner{display:block;margin:10px 12px 0;padding:10px 12px;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 2px 8px rgba(249,115,22,.35);line-height:1.5}
+
+/* v11.83 个股历史档案折叠(默认收起,点标题展开) */
+.jrn-archive{border:1px solid #e2e8f0;border-radius:10px;margin:6px 0;overflow:hidden}
+.jrn-archive-head{display:flex;align-items:center;gap:6px;padding:9px 12px;font-size:13px;font-weight:800;color:#0f172a;cursor:pointer;user-select:none;background:#f8fafc}
+.jrn-arc-cnt{font-size:11px;color:#fff;background:#94a3b8;border-radius:9px;padding:1px 7px;font-weight:700}
+.jrn-arc-caret{font-size:11px;color:#64748b;margin-left:auto}
+.jrn-archive-body{display:none;padding:8px 12px}
+.jrn-archive.open .jrn-archive-body{display:block}
+
+.entry-sort{font-size:11px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:2px 9px;cursor:pointer;user-select:none;font-weight:700}
+
+/* v11.111 全市场信号雷达(盘前弹窗) */
+.sr-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.sr-tabs{display:flex;gap:4px}
+.sr-tab{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer}
+.sr-tab.on{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.sr-sort{display:flex;align-items:center;gap:4px;font-size:12px;color:#64748b}
+.sr-sort-btn{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 8px;font-size:12px;cursor:pointer}
+.sr-sort-btn.on{background:#f1f5f9;font-weight:800}
+.sr-list{display:flex;flex-direction:column;gap:6px}
+.sr-row{border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;background:#fafbfc}
+.sr-rank{width:22px;font-size:12px;color:#94a3b8;text-align:center}
+.sr-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.sr-name{font-size:14px;font-weight:800;color:#0f172a;cursor:pointer}
+.sr-code{font-size:10px;color:#94a3b8;white-space:nowrap;flex-shrink:0}
+.sr-tag-swing{font-style:normal;font-size:9px;color:#fff;background:#1d4ed8;border-radius:4px;padding:1px 4px;margin-left:4px}
+.sr-tag-short{font-style:normal;font-size:9px;color:#fff;background:#b45309;border-radius:4px;padding:1px 4px;margin-left:4px}
+.sr-tag-both{font-style:normal;font-size:9px;color:#fff;background:#7c3aed;border-radius:4px;padding:1px 4px;margin-left:4px}
+.sr-meta{font-size:11px;color:#475569;margin-top:2px}
+.sr-line1 .sr-price{margin-left:auto;font-size:14px;font-weight:800;white-space:nowrap;flex-shrink:0}
+.sr-pct{font-size:12px;font-weight:700;min-width:48px;text-align:right}
+.sr-line1 .sr-score{font-size:12px;font-weight:800;color:#7c3aed;white-space:nowrap;min-width:38px;text-align:right;flex-shrink:0}
+.sr-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
+.sr-note{font-size:11px;color:#94a3b8;font-weight:400}
+
 /* v11.112 计划偏移同步提示(橙色) */
 .plan-sync-warn{margin:6px 0;padding:8px 10px;background:#fff7ed;border:1px solid #fdba74;border-radius:10px;font-size:12px;color:#9a3412;line-height:1.6}
 .psw-row{margin:2px 0}
@@ -461,27 +820,12 @@
 .psw-sync{background:#ea580c;color:#fff}
 .plan-sync-warn .psw-btn:not(.psw-sync){background:#fff;color:#9a3412;border:1px solid #fdba74}
 
-/* v11.117 信号雷达两行式(适配409px,无竖排/重叠) */
-.sr-list{display:flex;flex-direction:column;gap:8px}
-.sr-row{border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;background:#fafbfc}
+/* v11.117 信号雷达两行式(适配409px) */
 .sr-line1{display:flex;align-items:center;gap:5px;min-width:0}
-.sr-rank{width:20px;font-size:12px;color:#94a3b8;text-align:center;flex-shrink:0}
-.sr-line1 .sr-name{font-size:14px;font-weight:800;color:#0f172a;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:96px;flex-shrink:1}
-.sr-code{font-size:10px;color:#94a3b8;white-space:nowrap;flex-shrink:0}
-.sr-line1 .sr-price{margin-left:auto;font-size:14px;font-weight:800;white-space:nowrap;flex-shrink:0}
-.sr-line1 .sr-pct{font-size:12px;font-weight:700;white-space:nowrap;min-width:48px;text-align:right;flex-shrink:0}
-.sr-line1 .sr-score{font-size:12px;font-weight:800;color:#7c3aed;white-space:nowrap;min-width:38px;text-align:right;flex-shrink:0}
+.sr-line1 .sr-tag-swing,.sr-line1 .sr-tag-short,.sr-line1 .sr-tag-both{flex-shrink:0}
 .sr-line2{display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px dashed #e2e8f0}
 .sr-line2 .sr-meta{flex:1;font-size:11px;color:#475569;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sr-line2 .ts-add{flex-shrink:0;padding:3px 10px;font-size:12px}
-.sr-tag-swing,.sr-tag-short,.sr-tag-both{flex-shrink:0}
-.sr-note{font-size:11px;color:#94a3b8;font-weight:400}
-/* v11.117 今日已入场卡片:price/pct/浮动 三列右对齐,不再重叠 */
-.entry-item-main{display:flex;align-items:baseline;gap:6px;flex-wrap:nowrap;overflow:hidden}
-.entry-price{font-size:14px;font-weight:800;margin-left:auto;white-space:nowrap}
-.entry-pct{font-size:12px;font-weight:700;white-space:nowrap;min-width:50px;text-align:right}
-.entry-fl{font-size:13px;font-weight:900;white-space:nowrap;min-width:46px;text-align:right}
-.entry-item-sub{font-size:11px;color:#475569;margin-top:3px;line-height:1.5}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -1903,7 +2247,7 @@
       <a href="index.html">首页</a><a href="2026-09-07_08-30.html" class="active">盘前</a><a href="2026-09-07_16-20.html">收盘</a><a href="2026-09-21_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:06</b>（约 1360 分钟前）</div><h1 class="hero-title">2026-09-07 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:06），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">低温区 · °</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:06</b>（约 1372 分钟前）</div><h1 class="hero-title">2026-09-07 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:06），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">低温区 · °</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-07 21:06:24</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
