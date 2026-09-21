@@ -1507,12 +1507,13 @@ async function refreshWatchlistQuotes(){
         var rrEl=r.querySelector('.wl-cell-sig .rr');
         if(rrEl){rrEl.className='rr rr-'+bd.rrTone;rrEl.textContent=bd.rrTxt;}
         var isAuto=d.classList.contains('auto-detail');
-        // v11.113:计划当日锁定 —— 重建前取当日锁定值(首次从 SSR DOM 捕获),注入 sObj.strategy 使重建用锁定计划价
-        var _lk=planLockGet(code)||planLockCapture(code);
-        if(_lk){ planLockSave(code,_lk); if(_lk.e) sObj.strategy={entry:parseFloat(_lk.e),stop:parseFloat(_lk.s),target:parseFloat(_lk.t)}; }
+        // v11.113b:计划当日锁定(修正捕获时机)——当日首次用【新价】算计划再捕获锁定,而非捕获缓存价渲染的旧DOM;
+        //   之后每次重建注入锁定 strategy 保持当日计划价稳定(次日自动换新)。
+        var _lk=planLockGet(code);
+        if(_lk&&_lk.e){ sObj.strategy={entry:parseFloat(_lk.e),stop:parseFloat(_lk.s),target:parseFloat(_lk.t)}; }
         if(isAuto){
           d.innerHTML=buildDecisionCardHtml(sObj);
-          planLockApply(code,_lk);
+          if(_lk){ planLockApply(code,_lk); } else { var _n=planLockCapture(code); if(_n)planLockSave(code,_n); }
           restoreReviewUI(d.querySelector('.dc-review'));   // 重建后恢复勾选/交易状态,避免刷新清空
         }else{
           var lastPrice=d.getAttribute('data-last-price');
@@ -1525,7 +1526,7 @@ async function refreshWatchlistQuotes(){
             d.setAttribute('data-rebuild-ts',String(nowTs));
             d.setAttribute('data-last-price',curPrice);
             d.innerHTML=buildDecisionCardHtml(sObj);
-            planLockApply(code,_lk);
+            if(_lk){ planLockApply(code,_lk); } else { var _n2=planLockCapture(code); if(_n2)planLockSave(code,_n2); }
             restoreReviewUI(d.querySelector('.dc-review'));
           }
         }
