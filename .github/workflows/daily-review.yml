@@ -202,6 +202,8 @@ jobs:
 
       - name: Fetch market data
         if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && github.event_name != 'push'
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
         run: |
           TYPE="${{ steps.win.outputs.catchup }}"
           if [ -z "$TYPE" ]; then TYPE="${{ steps.type.outputs.type }}"; else echo "补采缺失槽位: $TYPE"; fi
