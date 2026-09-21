@@ -3034,7 +3034,7 @@ function build() {
     // v11.116:盘前报告 signalRadar 缺失 ⇒ 继承最近一份收盘报告的扫描结果(前日收盘预扫描),当天即可见
     try {
       if (rep.meta && rep.meta.type === 'premarket' && !(rep.signalRadar && Array.isArray(rep.signalRadar.list) && rep.signalRadar.list.length)) {
-        const days = fs.readdirSync(DATA_DIR).filter(x => /_\d{2}-\d{2}-\d{2}\.json$/.test(x) && x.includes('_16-20')).sort().reverse();
+        const days = fs.readdirSync(DATA_DIR).filter(x => /_\d{2}-\d{2}\.json$/.test(x) && x.includes('_16-20')).sort().reverse();
         for (const df of days) {
           try {
             const dj = JSON.parse(fs.readFileSync(path.join(DATA_DIR, df), 'utf8'));
