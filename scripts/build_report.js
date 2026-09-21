@@ -1998,8 +1998,8 @@ function renderSignalRadar(report) {
     if (x.ma20 != null) meta.push('MA20 ' + x.ma20);
     if (x.entry != null) meta.push('入场 ' + x.entry);
     return `<div class="sr-row" data-code="${esc(x.code)}" data-score="${x.finalScore}" data-firstdate="${esc(x.firstDate || '')}" data-type="${esc(x.signalType)}">
-      <div class="sr-line1"><span class="sr-rank">${x.rank}</span>${tag}<span class="sr-name" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">${esc(x.name)}</span><span class="sr-code">${esc(x.code)}</span><span class="sr-price ${cls}">${fmtNum(x.price)}</span><span class="sr-pct ${cls}">${fmtPct(x.pct)}</span><span class="sr-score">${x.finalScore}分</span></div>
-      <div class="sr-line2"><span class="sr-meta">触发 ${esc(x.firstDate || '--')} · ${esc(meta.join(' · '))}</span><button class="wl-btn ts-add" data-code="${esc(x.code)}" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
+      <div class="sr-line1"><span class="sr-rank">${x.rank}</span>${tag}<span class="sr-name" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">${esc(x.name)}</span><span class="sr-code">${esc(x.code)}</span><span class="sr-price ${cls}">${fmtNum(x.price)}</span><span class="sr-pct ${cls}">${fmtPct(x.pct)}</span></div>
+      <div class="sr-line2"><span class="sr-meta">${esc(meta.join(' · '))}</span><span class="sr-score">${x.finalScore}分</span><button class="wl-btn ts-add" data-code="${esc(x.code)}" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
     </div>`;
   }).join('');
   const modal = `<div class="modal-mask" id="signal-radar-modal" onclick="if(event.target===this)closeSignalRadarModal()">
