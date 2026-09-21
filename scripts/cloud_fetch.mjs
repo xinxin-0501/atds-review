@@ -3336,14 +3336,17 @@ function signalRadarJudgeF(t, quote, today, idxPct){
   var todayK = null;
   // 波段:门控粗筛 + 回踩MA20
   var swingOk = t.ma20Slope==='up' && (t.trend==='up'||t.trend==='repair') && t.weeklyTrend==='up' && (volRatio!=null && volRatio>=0.8);
-  // 短线:RR≥1.5
-  var priceStop = Math.min(ma20, open>0 ? open*0.97 : ma20*0.95);
-  var press = (t.pressures && t.pressures[0] && t.pressures[0].price>entry) ? t.pressures[0].price : null;
-  var tp1 = Math.min(press || entry*1.04, entry*1.04);
-  if(tp1<=entry)tp1=entry*1.04;
-  var tp2 = Math.max(entry*1.07, tp1*1.02);
-  var rr = priceStop<entry ? (tp1-entry)/(entry-priceStop) : 0;
-  var shortOk = (rr>=1.5) && !(idxPct!=null && idxPct<=-2.5);
+  // 短线:v11.120 口径与观察池决策卡完全一致(entry=回踩位min(支撑,现价);stop=entry−max(ATR,3%);target=压力位或×1.06)
+  //   旧口径 entry=现价 + stop=min(MA20,今开×0.97) 使 MA20 贴近现价时分母极小⇒RR 虚高(电光科技雷达 RR 2.95 vs 观察池 0.21 的根因)
+  var supPrice = (t.supports && t.supports[0] && Number(t.supports[0].price) < entry) ? Number(t.supports[0].price) : null;
+  var planEntry = (supPrice && supPrice < entry) ? supPrice : entry;
+  var atr14 = Number(t.atr14) || (planEntry * 0.03);
+  var priceStop = planEntry - Math.max(atr14, planEntry * 0.03);
+  var press = (t.pressures && t.pressures[0] && Number(t.pressures[0].price) > planEntry) ? Number(t.pressures[0].price) : null;
+  var tp1 = (press && press > planEntry) ? press : (planEntry * 1.06);
+  var tp2 = Math.max(planEntry * 1.07, tp1 * 1.02);
+  var rr = priceStop < planEntry ? (tp1 - planEntry) / (planEntry - priceStop) : 0;
+  var shortOk = (rr >= 1.5) && !(idxPct != null && idxPct <= -2.5);
   // 强度分
   var score=0, sigType=null, detail={};
   if(swingOk){
@@ -3358,7 +3361,7 @@ function signalRadarJudgeF(t, quote, today, idxPct){
     if(ss>=score){score=ss; sigType=(sigType==='swing')?'both':'short'; detail.rr=Math.round(rr*100)/100; detail.tp1=Math.round(tp1*100)/100; detail.priceStop=Math.round(priceStop*100)/100;}
   }
   if(!sigType)return null;
-  return {signalType:sigType, score:score, rr:(detail.rr!=null?detail.rr:null), entry:Math.round(entry*100)/100,
+  return {signalType:sigType, score:score, rr:(detail.rr!=null?detail.rr:null), entry:Math.round(planEntry*100)/100,
     volRatio:volRatio!=null?Math.round(volRatio*100)/100:null, ma20:Math.round(ma20*100)/100,
     priceStop:(detail.priceStop!=null?detail.priceStop:null), tp1:(detail.tp1!=null?detail.tp1:null)};
 }
