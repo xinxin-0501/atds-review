@@ -6385,7 +6385,7 @@ async function renderWlManualBacktestF() {
   var entered = w + l + h;
   host.innerHTML = '<div class="bt-fold">' +
     '<div class="card-title bt-fold-head" style="margin-top:10px" onclick="toggleBtFold(this)">手动新增股回测 · 次日复核<span class="bt-fold-tip">👆 点击展开明细</span><span class="bt-fold-caret">▸</span></div>' +
-    '<div class="hint" style="margin-bottom:4px">已验证 <b>' + v.length + '</b> 条 · 触发入场 <b>' + entered + '</b> 条' +
+    '<div class="hint" style="margin-bottom:4px">已验证 <b>' + v.length + '</b> 条 · 预测触达 <b>' + entered + '</b> 条（预测口径，非模拟跟踪入场）' +
     (v.length ? ('（' + Math.round(entered / v.length * 100) + '%）') : '') +
     ' · 止盈 <b>' + w + '</b> / 止损 <b>' + l + '</b>' + (h ? (' / 持有中 <b>' + h + '</b>') : '') + (ne ? (' · 未触入场价 ' + ne) : '') +
     '　<span class="tb-slot">样本存在本机浏览器，换机/清缓存即丢失</span></div>' +
