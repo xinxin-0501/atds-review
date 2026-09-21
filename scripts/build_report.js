@@ -2752,7 +2752,7 @@ ${renderCloseEmotion(report)}
   ${_isMidR ? '' : renderWaveDivergence(report)}
   ${_carryOver ? renderShortCore(report) : ''}
   ${_carryOver ? renderStrongStock(report) : ''}
-  ${_carryOver ? renderEyeHeaven(report) : ''}
+  ${_isCloseR ? renderEyeHeaven(report) : ''}
   ${report.meta && report.meta.type === 'midday' ? '' : renderDataAnalysis(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderIntlMkt(report)}
   ${report.meta && report.meta.type === 'close' ? '' : renderTechAnalysis(report)}

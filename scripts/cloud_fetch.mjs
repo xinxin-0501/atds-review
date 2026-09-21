@@ -3813,9 +3813,13 @@ async function main() {
     console.log('开始强势股全市场扫描(' + type + ')...');
     strongStock = await scanStrongStock();
     console.log('强势股扫描完成:', strongStock ? strongStock.list.length : 0, '只');
-    console.log('开始天眼地量全市场扫描(' + type + ')...');
-    eyeHeaven = await scanEyeHeaven();
-    console.log('天眼地量扫描完成:', eyeHeaven ? eyeHeaven.list.length : 0, '只');
+    // v11.107:天眼地量只在【尾盘14:30 + 收盘16:20】采集 —— 午盘11:35用"半天成交量"对比"30日全天最高量",
+    //   地量口径天然失真(半天量远小于全天最高量),且盘中量持续累积导致判定不稳定。用户 v11.103 也只要求 14:30+收盘。
+    if (type === 'close' || type === 'tailscan') {
+      console.log('开始天眼地量全市场扫描(' + type + ')...');
+      eyeHeaven = await scanEyeHeaven();
+      console.log('天眼地量扫描完成:', eyeHeaven ? eyeHeaven.list.length : 0, '只');
+    }
     // 题材辨识交叉集合:强势股+超短核心命中代码(战法加权用,避免波背离只出纯形态套利)
     const themeCodes = new Set();
     for (const s of (shortCore && shortCore.list) || []) themeCodes.add(String(s.code));
