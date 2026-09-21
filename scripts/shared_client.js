@@ -1792,6 +1792,54 @@ function bulkAddEyeHeavenToWatchlist(){
 window.openEyeHeavenModal = openEyeHeavenModal;
 window.closeEyeHeavenModal = closeEyeHeavenModal;
 window.bulkAddEyeHeavenToWatchlist = bulkAddEyeHeavenToWatchlist;
+/* v11.111:全市场信号雷达(盘前弹窗) —— 排序/筛选/加入(加入复用 addFetchedToWatchlist,不另起实现) */
+function openSignalRadarModal(){
+  var m = document.getElementById('signal-radar-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeSignalRadarModal(){
+  var m = document.getElementById('signal-radar-modal');
+  if (!m) return;
+  m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+var __srFilter = 'all';
+function filterSignalRadar(btn){
+  __srFilter = btn.getAttribute('data-type') || 'all';
+  document.querySelectorAll('.sr-tab').forEach(function(t){ t.classList.toggle('on', t === btn); });
+  var rows = document.querySelectorAll('#sr-list .sr-row[data-code]');
+  var n = 0;
+  rows.forEach(function(r){
+    var t = r.getAttribute('data-type');
+    var show = (__srFilter === 'all') || (t === __srFilter) || (__srFilter === 'both' && t === 'both');
+    r.style.display = show ? '' : 'none';
+    if (show) n++;
+  });
+  var empty = document.getElementById('sr-list-empty');
+  if (!empty && n === 0) { empty = document.createElement('div'); empty.id = 'sr-list-empty'; empty.className = 'sr-empty'; empty.textContent = '该筛选下暂无信号'; document.getElementById('sr-list').appendChild(empty); }
+  else if (empty && n > 0) { empty.remove(); }
+}
+function sortSignalRadar(btn){
+  var mode = btn.getAttribute('data-sort') || 'score';
+  document.querySelectorAll('.sr-sort-btn').forEach(function(b){ b.classList.toggle('on', b === btn); });
+  var list = document.getElementById('sr-list');
+  if (!list) return;
+  var rows = Array.prototype.slice.call(list.querySelectorAll('.sr-row[data-code]'));
+  rows.sort(function(a, b){
+    if (mode === 'time') {
+      var fa = a.getAttribute('data-firstdate') || '', fb = b.getAttribute('data-firstdate') || '';
+      if (fb !== fa) return fb < fa ? -1 : 1;
+    }
+    return (Number(b.getAttribute('data-score')) || 0) - (Number(a.getAttribute('data-score')) || 0);
+  });
+  rows.forEach(function(r){ list.appendChild(r); });
+}
+window.openSignalRadarModal = openSignalRadarModal;
+window.closeSignalRadarModal = closeSignalRadarModal;
+window.filterSignalRadar = filterSignalRadar;
+window.sortSignalRadar = sortSignalRadar;
 
 /* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
 (function bindWatchlistScrollSync(){

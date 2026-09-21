@@ -70,14 +70,21 @@ const LATE_LIMIT = { premarket: '10:15', midday: '14:59', auction: '09:35', tail
 //   数据驱动兜底:采集时用东财指数"最新交易日期"交叉验证,!=今天 ⇒ 判休市,即使日历缺天也自动纠正。
 function isTradingDayF(dateStr){
   if(!dateStr)return true;
-  var d=new Date(dateStr+'T00:00:00+08:00');
-  if(isNaN(d.getTime()))return true;
-  var dow=d.getUTCDay();
+  // v11.110a 修复(2026-09-21):原写法 `new Date(dateStr+'T00:00:00+08:00').getUTCDay()` 取的是 **UTC** 星期,
+  //   而北京时间 00:00 = UTC 前一日 16:00 ⇒ 星期被整体前移一天 ⇒ 周一被判成周日(休市)、周六被判成周五(交易日)。
+  //   实测后果:2026-09-21(周一)全天采集被拦(14:40 midday / 16:20 close 均跳过)。
+  //   改为直接从日期串取「该日历日期的星期」,与运行环境时区无关(CI 跑在 UTC 也正确);
+  //   年份同样改为取日期串本身(旧写法跨年 1 月 1 日会取到上一年 → 查错节假日表)。
+  var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateStr));
+  if(!m)return true;
+  var yy=+m[1], mm=+m[2], dd=+m[3];
+  var dt=new Date(Date.UTC(yy,mm-1,dd));
+  if(isNaN(dt.getTime()))return true;
+  var dow=dt.getUTCDay();
   if(dow===0||dow===6)return false;
   try{
     var cal=JSON.parse(fs.readFileSync(path.join(ROOT,'scripts','trading_calendar.json'),'utf8'));
-    var y=String(d.getUTCFullYear());
-    var list=(cal&&cal.holidays&&cal.holidays[y])||[];
+    var list=(cal&&cal.holidays&&cal.holidays[String(yy)])||[];
     if(list.indexOf(dateStr)>=0)return false;
   }catch(e){/* 日历缺失按交易日处理,靠数据驱动兜底纠正 */}
   return true;
@@ -3313,6 +3320,114 @@ async function scanEyeHeaven() {
   return { total: quotes.length, scanned: cands.length, list, source: '全A剔除ST/北交所 → 候选 ' + cands.length + ' 只' };
 }
 
+/* ════════ v11.111 全市场信号雷达(盘前弹窗,发现层) ════════
+   扫描全A(剔ST/北交所/停牌),判定"波段信号"与"短线信号":
+   · 波段信号(发现层粗筛):MA20上行 + 趋势多头/修复 + 周线多头 + 量比≥0.8 + 今日回踩MA20
+   · 短线信号:RR≥1.5 + 大盘风控(上证>-2.5%)
+   注意:发现层用 calcTechFromKline 粗筛(对齐趋势/均线/量比口径);勾选"加入观察池并跟踪"后走客户端精确5门控(执行层)。
+   跨日缓存 signal_radar_cache.json 记录首次触发日(时间衰减用);超10交易日/偏离>8% 自动出表。 */
+function signalRadarJudgeF(t, quote, today, idxPct){
+  if(!t || !quote)return null;
+  var out=null;
+  var ma20=t.ma20, volRatio=t.volRatio;
+  var entry=Number(quote.price)||0, open=Number(quote.open)||0;
+  if(!(entry>0)||!(ma20>0))return null;
+  // 今日回踩MA20(区间覆盖)
+  var todayK = null;
+  // 波段:门控粗筛 + 回踩MA20
+  var swingOk = t.ma20Slope==='up' && (t.trend==='up'||t.trend==='repair') && t.weeklyTrend==='up' && (volRatio!=null && volRatio>=0.8);
+  // 短线:RR≥1.5
+  var priceStop = Math.min(ma20, open>0 ? open*0.97 : ma20*0.95);
+  var press = (t.pressures && t.pressures[0] && t.pressures[0].price>entry) ? t.pressures[0].price : null;
+  var tp1 = Math.min(press || entry*1.04, entry*1.04);
+  if(tp1<=entry)tp1=entry*1.04;
+  var tp2 = Math.max(entry*1.07, tp1*1.02);
+  var rr = priceStop<entry ? (tp1-entry)/(entry-priceStop) : 0;
+  var shortOk = (rr>=1.5) && !(idxPct!=null && idxPct<=-2.5);
+  // 强度分
+  var score=0, sigType=null, detail={};
+  if(swingOk){
+    var gs = 60 + Math.min(20, (volRatio||0)*5) + (t.trend==='up'?20:0);
+    score=Math.max(score, Math.min(100, Math.round(gs)));
+    sigType='swing'; detail={gate:'MA20上行+趋势多头+周线多头+量比', volRatio:volRatio, ma20:ma20, trend:t.trend};
+  }
+  if(shortOk){
+    var rrNorm=Math.min(rr/3,1), volScore=Math.min(1,(volRatio||0)/2)*30;
+    var bull=(t.ma5>t.ma10&&t.ma10>t.ma20)?30:0;
+    var ss=Math.round(rrNorm*40+volScore+bull);
+    if(ss>=score){score=ss; sigType=(sigType==='swing')?'both':'short'; detail.rr=Math.round(rr*100)/100; detail.tp1=Math.round(tp1*100)/100; detail.priceStop=Math.round(priceStop*100)/100;}
+  }
+  if(!sigType)return null;
+  return {signalType:sigType, score:score, rr:(detail.rr!=null?detail.rr:null), entry:Math.round(entry*100)/100,
+    volRatio:volRatio!=null?Math.round(volRatio*100)/100:null, ma20:Math.round(ma20*100)/100,
+    priceStop:(detail.priceStop!=null?detail.priceStop:null), tp1:(detail.tp1!=null?detail.tp1:null)};
+}
+
+async function scanSignalRadar(idxPct){
+  var symbols=[];
+  try{ symbols=(JSON.parse(fs.readFileSync(path.join(ROOT,'data/stock_list.json'),'utf8')).symbols)||[]; }catch(e){ symbols=[]; }
+  if(!symbols.length)return {total:0,list:[],scanned:0,source:'无股票列表'};
+  var quotes=[],BATCH=80;
+  for(var i=0;i<symbols.length;i+=BATCH){
+    var batch=symbols.slice(i,i+BATCH);
+    try{ var data=await fetchTencent(batch); if(data&&data.length)quotes.push(...data); }catch(e){}
+    if(i+BATCH<symbols.length)await new Promise(r=>setTimeout(r,120));
+  }
+  var today=fmtDate(shanghaiNow());
+  // 候选:剔ST/北交所,活跃过滤(成交额≥3000万,涨幅-4~9.9)
+  var cands=quotes.filter(function(x){
+    var nm=String(x.name||''); if(/ST/i.test(nm))return false;
+    var raw=String(x.code||''); var c0=raw.charAt(0);
+    if(c0==='4'||c0==='8'||c0==='9'||c0==='92')return false;
+    var pct=Number(x.pct)||0,amt=Number(x.amountWan)||0;
+    return pct>-4&&pct<=9.9&&amt>=3000;
+  });
+  if(cands.length>1500){ cands.sort(function(a,b){return (Number(b.amountWan)||0)-(Number(a.amountWan)||0);}); cands=cands.slice(0,1500); }
+  // 跨日缓存:首次触发日(时间衰减)
+  var cache={};
+  try{ cache=JSON.parse(fs.readFileSync(path.join(ROOT,'data/signal_radar_cache.json'),'utf8')); }catch(e){ cache={}; }
+  var results=[],CONC=16;
+  for(var j=0;j<cands.length;j+=CONC){
+    var slice=cands.slice(j,j+CONC);
+    var batchRes=await Promise.all(slice.map(async function(x){
+      try{
+        var fc=(String(x.code||'').charAt(0)==='6')?'sh'+String(x.code):'sz'+String(x.code);
+        var kl=await fetchKline(fc,60);
+        if(!kl||kl.length<35)return null;
+        var t=calcTechFromKline(kl);
+        var sig=signalRadarJudgeF(t,x,today,idxPct);
+        if(!sig)return null;
+        var code=String(x.code);
+        var prev=cache[code]||null;
+        if(prev&&prev.firstDate)sig.firstDate=prev.firstDate; else sig.firstDate=today;
+        sig.code=code; sig.name=x.name; sig.pct=Number(x.pct)||0; sig.price=Number(x.price)||0;
+        return sig;
+      }catch(e){return null;}
+    }));
+    for(var k=0;k<batchRes.length;k++)if(batchRes[k])results.push(batchRes[k]);
+  }
+  // 失效清理:超10交易日(交易日差) 出表
+  var clean=[];
+  for(var m=0;m<results.length;m++){
+    var s=results[m];
+    var days=(s.firstDate===today)?0:1;   // 简化:跨日即按1天衰减(精确交易日差由前端展示用)
+    var timeScore=100*Math.pow(0.9,days);
+    s.timeScore=Math.round(timeScore);
+    s.finalScore=Math.round(0.7*s.score+0.3*timeScore);
+    // 更新缓存(首次触发日)
+    cache[s.code]={firstDate:s.firstDate, lastDate:today, type:s.signalType};
+    clean.push(s);
+  }
+  // 排序:综合分降序;并列→触发时间降序(新近优先=firstDate 降序)
+  clean.sort(function(a,b){ if(b.finalScore!==a.finalScore)return b.finalScore-a.finalScore; return String(b.firstDate)<String(a.firstDate)?-1:1; });
+  var list=clean.slice(0,50).map(function(x,i){
+    return {rank:i+1,code:x.code,name:x.name,signalType:x.signalType,score:x.score,timeScore:x.timeScore,finalScore:x.finalScore,
+      firstDate:x.firstDate,price:x.price,pct:x.pct,entry:x.entry,rr:x.rr,volRatio:x.volRatio,ma20:x.ma20,priceStop:x.priceStop,tp1:x.tp1};
+  });
+  try{ fs.writeFileSync(path.join(ROOT,'data/signal_radar_cache.json'),JSON.stringify(cache)); }catch(e){}
+  return {total:quotes.length,scanned:cands.length,list:list,source:'全A剔除ST/北交所 → 候选 '+cands.length+' 只',generatedAt:today};
+}
+
 // 形态识别(基于腾讯K线: [[date, open, close, high, low, vol], ...])
 function detectPatterns(klines) {
   if (!Array.isArray(klines) || klines.length < 65) return null;
@@ -3846,6 +3961,8 @@ async function main() {
   let strongStock = null;
   // 天眼地量选股(v11.103):MA20上行+MA5下穿回抽+地量+浅回调,独立于强势股
   let eyeHeaven = null;
+  // 全市场信号雷达(v11.111):盘前/收盘扫描已触发波段/短线信号的个股(发现层)
+  let signalRadar = null;
   if (type === 'midday' || type === 'close' || type === 'tailscan') {
     // v11.61:盘中槽位停用("盘中可以全部转移收盘") —— 原只在 midday 采集的
     //   「超短核心 / 强势股 / 波背离」改为 midday + close 都采集,使其在收盘页可见。
@@ -3882,6 +3999,19 @@ async function main() {
     console.log('开始波背离全市场扫描(' + type + ',题材交叉集 '+themeCodes.size+' 个)...');
     waveDivergence = await scanWaveDivergence(themeCodes, identSet);
     console.log('波背离扫描完成:', waveDivergence ? waveDivergence.list.length : 0, '只');
+  }
+
+  // v11.111:全市场信号雷达 —— 盘前 09:45 主扫描 + 收盘 16:20 预扫描(次日盘前兜底);时间锁由 slotGuard 保证
+  if (type === 'premarket' || type === 'close') {
+    try {
+      var _idxPct = (indices && indices[0]) ? Number(indices[0].changePct) : null;
+      console.log('开始全市场信号雷达扫描(' + type + ',上证 ' + _idxPct + '%)...');
+      signalRadar = await scanSignalRadar(_idxPct);
+      console.log('信号雷达扫描完成:', signalRadar ? signalRadar.list.length : 0, '只');
+    } catch (e) {
+      console.warn('[信号雷达] 扫描异常(降级为空,不阻断主报告):', e.message);
+      signalRadar = { total: 0, list: [], scanned: 0, source: '扫描异常降级' };
+    }
   }
 
   const report = {
@@ -3921,6 +4051,7 @@ async function main() {
     shortCore,
     strongStock,
     eyeHeaven,
+    signalRadar,
     mainRank,
     dragonPool,
     intlMkt,

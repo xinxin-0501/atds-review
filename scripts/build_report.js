@@ -1981,6 +1981,53 @@ function renderEyeHeaven(report) {
   return card + modal;
 }
 
+// v11.111:全市场信号雷达(盘前弹窗,发现层) —— 展示已触发波段/短线信号的个股,供二次筛选
+function renderSignalRadar(report) {
+  const sr = report.signalRadar;
+  if (!sr || !Array.isArray(sr.list)) return '';
+  const list = sr.list || [];
+  const rows = list.map(x => {
+    const cls = upDownClass(x.pct);
+    const tag = x.signalType === 'both' ? '<em class="sr-tag-both">波段+短线</em>'
+      : x.signalType === 'short' ? '<em class="sr-tag-short">短线</em>' : '<em class="sr-tag-swing">波段</em>';
+    const meta = [];
+    if (x.rr != null) meta.push('RR ' + x.rr);
+    if (x.volRatio != null) meta.push('量比 ' + x.volRatio);
+    if (x.ma20 != null) meta.push('MA20 ' + x.ma20);
+    if (x.entry != null) meta.push('入场 ' + x.entry);
+    return `<div class="sr-row" data-code="${esc(x.code)}" data-score="${x.finalScore}" data-firstdate="${esc(x.firstDate || '')}" data-type="${esc(x.signalType)}">
+      <span class="sr-rank">${x.rank}</span>
+      <span class="sr-main"><span class="sr-name" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">${esc(x.name)}</span><span class="sr-code">${esc(x.code)}</span>${tag}</span>
+      <span class="sr-meta">${esc(meta.join(' · '))}</span>
+      <span class="sr-price ${cls}">${fmtNum(x.price)}</span>
+      <span class="sr-pct ${cls}">${fmtPct(x.pct)}</span>
+      <span class="sr-score">${x.finalScore}分</span>
+      <button class="wl-btn ts-add" data-code="${esc(x.code)}" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+    </div>`;
+  }).join('');
+  const fab = `<button id="signal-radar-fab" class="signal-radar-fab" onclick="openSignalRadarModal()">🎯 信号雷达<span id="sr-fab-cnt" class="sr-fab-cnt">${list.length}</span></button>`;
+  const modal = `<div class="modal-mask" id="signal-radar-modal" onclick="if(event.target===this)closeSignalRadarModal()">
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:94%;width:94%;max-height:88vh;display:flex;flex-direction:column;">
+      <div class="modal-header">
+        <div class="modal-eyebrow">🎯 全市场信号雷达 · 已触发波段/短线入场信号 <span class="sr-note">(${esc(sr.source || '')})</span></div>
+        <span class="modal-close" onclick="closeSignalRadarModal()">×</span>
+      </div>
+      <div class="modal-body" style="overflow-y:auto;flex:1;">
+        <div class="sr-tools">
+          <div class="sr-tabs"><button class="sr-tab on" data-type="all" onclick="filterSignalRadar(this)">全部</button><button class="sr-tab" data-type="swing" onclick="filterSignalRadar(this)">波段</button><button class="sr-tab" data-type="short" onclick="filterSignalRadar(this)">短线</button><button class="sr-tab" data-type="both" onclick="filterSignalRadar(this)">波段+短线</button></div>
+          <div class="sr-sort"><span>排序：</span><button class="sr-sort-btn on" data-sort="score" onclick="sortSignalRadar(this)">综合分</button><button class="sr-sort-btn" data-sort="time" onclick="sortSignalRadar(this)">触发时间</button></div>
+        </div>
+        <div class="sr-list" id="sr-list">
+          <div class="sr-row sr-head"><span>#</span><span>标的/信号</span><span>关键指标</span><span>现价</span><span>涨跌</span><span>评分</span><span></span></div>
+          ${rows || '<div class="sr-empty">当日无触发信号（宁缺毋滥）</div>'}
+        </div>
+        <div class="sc-hint">发现层粗筛(趋势+均线+量比+RR) · 点击「加入」复用模拟跟踪执行层(精确5门控)。排序=0.7×信号强度+0.3×时间衰减;偏离>8%或超10交易日出表</div>
+      </div>
+    </div>
+  </div>`;
+  return fab + modal;
+}
+
 function renderPremarketStrategy(report, opts) {
   const o = opts || {};
   const mr = (report.mainRank || []).slice(0, 3);     // A/B/C 三块
@@ -2473,6 +2520,7 @@ ${renderFollowerRiskBanner(report)}
 <div class="section">
   ${renderWatchlist(report)}
   ${renderWatchlistBacktest(report)}
+  ${renderSignalRadar(report)}
   ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report, { title: '盘前参与策略', subtitle: '盘前接力判断 · 板块联动确认 · 强势股池筛选' })}
   ${renderBoardTierBlock(report, { isPre: true, slot: 'premarket' })}

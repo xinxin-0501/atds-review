@@ -789,6 +789,33 @@
 .jrn-archive.open .jrn-archive-body{display:block}
 
 .entry-sort{font-size:11px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:2px 9px;cursor:pointer;user-select:none;font-weight:700}
+
+/* v11.111 全市场信号雷达(盘前弹窗) */
+.signal-radar-fab{position:fixed;left:14px;bottom:140px;z-index:9990;background:#7c3aed;color:#fff;border:none;border-radius:22px;padding:10px 14px;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(124,58,237,.4);cursor:pointer}
+.sr-fab-cnt{display:inline-block;min-width:18px;height:18px;line-height:18px;background:#fff;color:#7c3aed;border-radius:9px;font-size:11px;text-align:center;margin-left:5px;padding:0 4px}
+.sr-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.sr-tabs{display:flex;gap:4px}
+.sr-tab{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer}
+.sr-tab.on{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.sr-sort{display:flex;align-items:center;gap:4px;font-size:12px;color:#64748b}
+.sr-sort-btn{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 8px;font-size:12px;cursor:pointer}
+.sr-sort-btn.on{background:#f1f5f9;font-weight:800}
+.sr-list{display:flex;flex-direction:column;gap:6px}
+.sr-row{display:flex;align-items:center;gap:6px;border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;background:#fafbfc}
+.sr-row.sr-head{background:#f8fafc;font-size:11px;color:#94a3b8;font-weight:700}
+.sr-rank{width:22px;font-size:12px;color:#94a3b8;text-align:center}
+.sr-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.sr-name{font-size:14px;font-weight:800;color:#0f172a;cursor:pointer}
+.sr-code{font-size:10px;color:#94a3b8}
+.sr-tag-swing{font-style:normal;font-size:9px;color:#fff;background:#1d4ed8;border-radius:4px;padding:1px 4px;margin-left:4px}
+.sr-tag-short{font-style:normal;font-size:9px;color:#fff;background:#b45309;border-radius:4px;padding:1px 4px;margin-left:4px}
+.sr-tag-both{font-style:normal;font-size:9px;color:#fff;background:#7c3aed;border-radius:4px;padding:1px 4px;margin-left:4px}
+.sr-meta{font-size:11px;color:#475569;margin-top:2px}
+.sr-price{font-size:13px;font-weight:800;min-width:52px;text-align:right}
+.sr-pct{font-size:12px;font-weight:700;min-width:48px;text-align:right}
+.sr-score{font-size:12px;font-weight:800;color:#7c3aed;min-width:40px;text-align:right}
+.sr-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
+.sr-note{font-size:11px;color:#94a3b8;font-weight:400}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -2207,10 +2234,10 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">首页</a><a href="2026-09-14_09-45.html" class="active">盘前</a><a href="2026-09-14_16-20.html">收盘</a><a href="2026-09-21_14-30.html">尾盘</a>
+      <a href="index.html">首页</a><a href="2026-09-14_09-45.html" class="active">盘前</a><a href="2026-09-14_16-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:43</b>（约 290 分钟前）</div><h1 class="hero-title">2026-09-14 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 65°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:43</b>（约 307 分钟前）</div><h1 class="hero-title">2026-09-14 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 65°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-14 09:43:04</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -3287,6 +3314,7 @@ tags: [ATDS, 交易复盘]
 - 亚盛集团 (600108): 4.27 -9.73%
 </pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
   <div class="card"><div class="card-title">观察池回测追踪 · 次日复核</div><div id="wl-backtest-host"></div><div class="hint">暂无历史样本。</div></div>
+  
   <div class="card">
     <div class="card-title">盘前交易驾驶舱</div>
     <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">65° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">23 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">闽东电力</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">10 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">14 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">汽车零部 / 电力</div></div></div>
@@ -5268,6 +5296,54 @@ function bulkAddEyeHeavenToWatchlist(){
 window.openEyeHeavenModal = openEyeHeavenModal;
 window.closeEyeHeavenModal = closeEyeHeavenModal;
 window.bulkAddEyeHeavenToWatchlist = bulkAddEyeHeavenToWatchlist;
+/* v11.111:全市场信号雷达(盘前弹窗) —— 排序/筛选/加入(加入复用 addFetchedToWatchlist,不另起实现) */
+function openSignalRadarModal(){
+  var m = document.getElementById('signal-radar-modal');
+  if (!m) return;
+  m.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeSignalRadarModal(){
+  var m = document.getElementById('signal-radar-modal');
+  if (!m) return;
+  m.classList.remove('show');
+  document.body.style.overflow = '';
+}
+var __srFilter = 'all';
+function filterSignalRadar(btn){
+  __srFilter = btn.getAttribute('data-type') || 'all';
+  document.querySelectorAll('.sr-tab').forEach(function(t){ t.classList.toggle('on', t === btn); });
+  var rows = document.querySelectorAll('#sr-list .sr-row[data-code]');
+  var n = 0;
+  rows.forEach(function(r){
+    var t = r.getAttribute('data-type');
+    var show = (__srFilter === 'all') || (t === __srFilter) || (__srFilter === 'both' && t === 'both');
+    r.style.display = show ? '' : 'none';
+    if (show) n++;
+  });
+  var empty = document.getElementById('sr-list-empty');
+  if (!empty && n === 0) { empty = document.createElement('div'); empty.id = 'sr-list-empty'; empty.className = 'sr-empty'; empty.textContent = '该筛选下暂无信号'; document.getElementById('sr-list').appendChild(empty); }
+  else if (empty && n > 0) { empty.remove(); }
+}
+function sortSignalRadar(btn){
+  var mode = btn.getAttribute('data-sort') || 'score';
+  document.querySelectorAll('.sr-sort-btn').forEach(function(b){ b.classList.toggle('on', b === btn); });
+  var list = document.getElementById('sr-list');
+  if (!list) return;
+  var rows = Array.prototype.slice.call(list.querySelectorAll('.sr-row[data-code]'));
+  rows.sort(function(a, b){
+    if (mode === 'time') {
+      var fa = a.getAttribute('data-firstdate') || '', fb = b.getAttribute('data-firstdate') || '';
+      if (fb !== fa) return fb < fa ? -1 : 1;
+    }
+    return (Number(b.getAttribute('data-score')) || 0) - (Number(a.getAttribute('data-score')) || 0);
+  });
+  rows.forEach(function(r){ list.appendChild(r); });
+}
+window.openSignalRadarModal = openSignalRadarModal;
+window.closeSignalRadarModal = closeSignalRadarModal;
+window.filterSignalRadar = filterSignalRadar;
+window.sortSignalRadar = sortSignalRadar;
 
 /* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
 (function bindWatchlistScrollSync(){
