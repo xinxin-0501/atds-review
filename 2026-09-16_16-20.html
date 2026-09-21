@@ -8053,7 +8053,7 @@ async function fetchTodayMinuteF(code){
   var out=[];
   try{
     var url='https://ifzq.gtimg.cn/appstock/app/minute/query?code='+full;
-    var res=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://gu.qq.com/'}});
+    var res=await fetchWithTimeout(url,{headers:{'User-Agent':'Mozilla/5.0','Referer':'https://gu.qq.com/'}});   // v11.106:加6s超时,防手机端阻塞挂起拖死整个判定链
     var j=await res.json();
     var blk=((j&&j.data&&j.data[full])||{}).data||{};
     var rows=blk.data||[];
@@ -9551,6 +9551,8 @@ function updateReviewProgress(){
         txt='⏱ 短线2-3天监控中：等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+sr.priceStop+' · 分批止盈 '+sr.tp1+'/'+sr.tp2+' · 时间止损 T+3 14:50。未触发不计样本';
         var _sLow=parseFloat(blocks[b].getAttribute('data-low'))||0;
         if(_sLow>0&&_sLow<sr.entry){ txt+='；⚠ 打勾前盘中曾低至 '+_sLow+'（早于打勾时刻，防偷价口径不计入）'; }
+        var _sLcs=(sr.lastCheck&&sr.lastCheck.skip)||'';
+        if(_sLcs.indexOf('分钟K不可得')>=0){ txt='⚠️ 判定数据缺失：分钟分时未取到，打勾('+ (sr.entryTime||'—') +')之后的触发判定本时段被跳过；下次刷新拉到分时会自动补判。'+txt; }
       } else if(sr.stage!=null&&sr.stage>=1){
         var fl2=(px&&sr.entry)?Math.round((px-sr.entry)/sr.entry*10000)/100:null;
         txt='⏱ 短线持有中(T+'+held2+'，已保本)：现价'+px+'，浮动'+(fl2!=null?((fl2>=0?'+':'')+fl2+'%'):'--')+'。剩余仓位止损上移至成本 '+sr.entry+'；第二止盈 '+sr.tp2+'；T+3 14:50 时间止损强制离场';
@@ -9578,6 +9580,9 @@ function updateReviewProgress(){
         var monTxt=afterClose
           ? '🟡 监控中：今日未触发入场（未消耗样本）—— 未回落至计划入场价 '+r.entry+'（今日最高 '+(r.lastCheck&&r.lastCheck.high||px)+'），明日继续'
           : '🟡 监控中：等待回落至计划入场价 '+r.entry+' 触发虚拟买入（现价 '+px+(need!=null?('，还差 '+need+'%'):'')+'）';
+        // v11.106:漏判标记(不能隐瞒)—— 分时数据缺失时打勾当日触发判定被跳过,必须明示并说明会自动补判
+        var _lcs=(r.lastCheck&&r.lastCheck.skip)||'';
+        if(_lcs.indexOf('分钟K不可得')>=0){ monTxt='⚠️ 判定数据缺失：分钟分时未取到，打勾('+ (r.entryTime||'—') +')之后的触发判定本时段被跳过；下次刷新拉到分时会自动补判（含此前触及）。'+monTxt; }
         // v11.105:防误导 —— 当日最低已低于入场价但未触发 ⇒ 低点必然发生在打勾前(打勾后触及早已入场),明示防偷价口径
         var _dayLow=parseFloat(blocks[b].getAttribute('data-low'))||0;
         if(_dayLow>0&&_dayLow<r.entry){ monTxt+='；⚠ 打勾前盘中曾低至 '+_dayLow+'（早于打勾时刻，防偷价口径不计入）'; }
