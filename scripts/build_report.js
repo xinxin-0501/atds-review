@@ -1575,6 +1575,7 @@ const lhbHtml = lhb
     <div class="dc-block dc-plan ${shouldCollapsePlan ? 'dc-plan-collapsed' : ''}">
       <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">${shouldCollapsePlan ? '▸' : '▾'}</span>${shouldCollapsePlan ? '<span class="dc-plan-lock">' + collapseLabel + '</span><span class="dc-plan-expand">👆 点击展开</span>' : ''}</div>
       <div class="dc-plan-body">${planTable}${tRRBadWarn}${nowWarn}
+      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 ${Number(p.entry).toFixed(2)}）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
       <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损${pos.stopPct}% → 建议仓位 <b>${pos.low}%-${pos.high}%</b>${pos.capped ? '（受单股上限压制，实际最高仓位15%）' : '（单股≤15%、单题材≤30%）'}</div>
       <div class="dc-line dc-disc">执行纪律：跌破${f2(p.stop)}无条件止损 · 到达${f2(p.target)}无条件止盈 · 日内做T当日必须平T不隔夜</div>
       </div>
@@ -2689,7 +2690,7 @@ function renderWatchlistBacktest(report) {
   const ne = v.filter(x => x.result === 'noentry').length;
   const entered = w + l + h;
   const summary = v.length
-    ? ('已验证 <b>' + v.length + '</b> / ' + rows.length + ' 条 · 触发入场 <b>' + entered + '</b> 条（' + Math.round(entered / v.length * 100) + '%）· 止盈 <b>' + w + '</b> / 止损 <b>' + l + '</b>' + (h ? (' / 持有中 <b>' + h + '</b>') : '') + (ne ? (' · 未触入场价 ' + ne) : ''))
+    ? ('已验证 <b>' + v.length + '</b> / ' + rows.length + ' 条 · 预测触达 <b>' + entered + '</b> 条（' + Math.round(entered / v.length * 100) + '%）· 止盈 <b>' + w + '</b> / 止损 <b>' + l + '</b>' + (h ? (' / 持有中 <b>' + h + '</b>') : '') + (ne ? (' · 未触入场价 ' + ne) : ''))
     : ('暂无已验证样本（' + rows.length + ' 条待下一交易日收盘后复核）');
   // v11.72:表格默认收起(点标题展开)——409px 手机屏上这几张 10 列宽表占掉数屏,
   //   汇总行(已验证/止盈/止损计数)常显,明细表与口径说明折叠。
@@ -3029,7 +3030,23 @@ function build() {
   for (const f of files) {
     const full = path.resolve(f);
     if (!fs.existsSync(full)) { console.error('文件不存在:', full); continue; }
-    reports.push(JSON.parse(fs.readFileSync(full, 'utf8')));
+    const rep = JSON.parse(fs.readFileSync(full, 'utf8'));
+    // v11.116:盘前报告 signalRadar 缺失 ⇒ 继承最近一份收盘报告的扫描结果(前日收盘预扫描),当天即可见
+    try {
+      if (rep.meta && rep.meta.type === 'premarket' && !(rep.signalRadar && Array.isArray(rep.signalRadar.list) && rep.signalRadar.list.length)) {
+        const days = fs.readdirSync(DATA_DIR).filter(x => /_\d{2}-\d{2}-\d{2}\.json$/.test(x) && x.includes('_16-20')).sort().reverse();
+        for (const df of days) {
+          try {
+            const dj = JSON.parse(fs.readFileSync(path.join(DATA_DIR, df), 'utf8'));
+            if (dj.signalRadar && Array.isArray(dj.signalRadar.list) && dj.signalRadar.list.length) {
+              rep.signalRadar = Object.assign({}, dj.signalRadar, { source: '前日收盘预扫描（' + df.replace('.json', '') + '）· 今日盘前正式扫描结果以 09:45 更新为准' });
+              break;
+            }
+          } catch (e) { /* 跳过坏文件 */ }
+        }
+      }
+    } catch (e) { /* 继承失败不影响主流程 */ }
+    reports.push(rep);
   }
   reports.sort((a, b) => {
     const ka = `${a.meta.date}_${a.meta.time}`;
