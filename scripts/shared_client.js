@@ -5144,9 +5144,9 @@ function renderEntryPop(){
       h += '<div class="entry-item" data-code="' + escHtmlF(it.code) + '" onclick="entryItemJump(this)">' +
         '<div class="entry-item-main"><span class="entry-name">' + escHtmlF(it.name) + '</span><span class="entry-code">' + escHtmlF(it.code) + (it.mode === 'short' ? '<em class="entry-tag-short">短线</em>' : '<em class="entry-tag-swing">波段</em>') + '</span>' +
         '<span class="entry-price ' + (it.pct >= 0 ? 'up' : 'down') + '">' + it.price.toFixed(2) + '</span>' +
-        '<span class="entry-pct ' + (it.pct >= 0 ? 'up' : 'down') + '">' + (it.pct >= 0 ? '+' : '') + it.pct.toFixed(2) + '%</span></div>' +
+        '<span class="entry-pct ' + (it.pct >= 0 ? 'up' : 'down') + '">' + (it.pct >= 0 ? '+' : '') + it.pct.toFixed(2) + '%</span>' +
+        '<span class="entry-fl ' + flCls + '">' + (it.fl == null ? '--' : ((it.fl >= 0 ? '+' : '') + it.fl + '%')) + '</span></div>' +
         '<div class="entry-item-sub">今日入场 · ' + (it.at || '--') + ' 触发 · 入场 ' + it.entry + ' · 止损 ' + it.stop + ' · 止盈 ' + it.target + '</div>' +
-        '<div class="entry-fl ' + flCls + '">' + (it.fl == null ? '--' : ((it.fl >= 0 ? '+' : '') + it.fl + '%')) + '</div>' +
         '</div>';
     }
   }
