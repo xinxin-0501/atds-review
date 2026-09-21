@@ -3425,6 +3425,8 @@ async function scanSignalRadar(idxPct){
       firstDate:x.firstDate,price:x.price,pct:x.pct,entry:x.entry,rr:x.rr,volRatio:x.volRatio,ma20:x.ma20,priceStop:x.priceStop,tp1:x.tp1};
   });
   try{ fs.writeFileSync(path.join(ROOT,'data/signal_radar_cache.json'),JSON.stringify(cache)); }catch(e){}
+  // v11.111:缓存完整 list(次日盘前降级兜底用)
+  try{ fs.writeFileSync(path.join(ROOT,'data/signal_radar_last.json'),JSON.stringify({generatedAt:today,list:list})); }catch(e){}
   return {total:quotes.length,scanned:cands.length,list:list,source:'全A剔除ST/北交所 → 候选 '+cands.length+' 只',generatedAt:today};
 }
 
@@ -4009,8 +4011,13 @@ async function main() {
       signalRadar = await scanSignalRadar(_idxPct);
       console.log('信号雷达扫描完成:', signalRadar ? signalRadar.list.length : 0, '只');
     } catch (e) {
-      console.warn('[信号雷达] 扫描异常(降级为空,不阻断主报告):', e.message);
-      signalRadar = { total: 0, list: [], scanned: 0, source: '扫描异常降级' };
+      console.warn('[信号雷达] 扫描异常(降级读前一日预扫描,不阻断主报告):', e.message);
+      try {
+        var _last = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/signal_radar_last.json'), 'utf8'));
+        signalRadar = { total: (_last.list || []).length, list: _last.list || [], scanned: 0, source: '前一日预扫描(降级)', generatedAt: _last.generatedAt || '' };
+      } catch (e2) {
+        signalRadar = { total: 0, list: [], scanned: 0, source: '扫描异常且无预扫描可降级' };
+      }
     }
   }
 
