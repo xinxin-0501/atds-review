@@ -37,13 +37,23 @@ copy /y site\index.html flat\ >nul
 copy /y site\main-rank.html flat\ >nul
 for %%f in (site\2026-*.html) do copy /y "%%f" flat\ >nul
 
-echo [4/4] 正在推送 GitHub...
-git add -A
-git commit -m "ATDS manual update %date% %time%"
-git push
+echo [3.5/4] 同步云端缓存(防止把本地陈旧缓存覆盖到云端)...
+node scripts\sync_cloud_caches.mjs
+
+echo [4/4] 正在推送 GitHub(白名单 REST 推送:只推源码/样式/当日报告,绝不碰 data\*_cache.json)...
+set GH_TOKEN=
+if exist "%~dp0gh_token.txt" set /p GH_TOKEN=<"%~dp0gh_token.txt"
+if "%GH_TOKEN%"=="" (
+  echo.
+  echo  [!] 未找到 gh_token.txt。请在项目文件夹新建 gh_token.txt 并把 Token 粘进去。
+  pause
+  exit /b 1
+)
+node .workbuddy\push_3files.mjs "ATDS manual update %date% %time%"
+node .workbuddy\push_flat_safe.mjs "ATDS manual update %date% %time%"
 if errorlevel 1 (
   echo.
-  echo  [!] 推送失败,请检查 git 凭据/网络。
+  echo  [!] 推送失败,请检查 Token/网络。
   pause
   exit /b 1
 )

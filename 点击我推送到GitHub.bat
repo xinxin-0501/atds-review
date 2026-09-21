@@ -38,7 +38,15 @@ echo.
 
 "%GIT%" remote remove origin 2>nul
 "%GIT%" remote add origin "https://xinxin-0501:%TOKEN%@github.com/xinxin-0501/atds-review.git"
-echo 使用强制推送(-f)以解决远程历史分叉,以本地完整快照为准
+echo [安全] 先把云端自维护的缓存同步到本地(避免用陈旧缓存在线覆盖云端)...
+node scripts\sync_cloud_caches.mjs
+echo.
+echo  警告:下面使用【强制推送(-f)整份本地快照】,它会:
+echo    . 丢弃云端 Actions 期间产生的提交(可能删掉线上独有的报告/页面)
+echo    . 若本地快照不全,远程多出的文件会被删除
+echo  日常"手机上自动更新"并不需要本脚本(云端 Actions 已全自动)。
+echo  仅在明确需要"以本地为准覆盖远程"时使用。
+echo.
 "%GIT%" push -f -u origin HEAD:main
 
 if errorlevel 1 (
