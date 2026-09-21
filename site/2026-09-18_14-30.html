@@ -4867,7 +4867,12 @@ function gateAtF(suite,dateStr){
   var idx=-1;
   for(var i=0;i<suite.dates.length;i++){ if(suite.dates[i]===String(dateStr)){idx=i;break;} }
   if(idx<=0)return null;
-  return suite.byDate[suite.dates[idx-1]]||null;
+  // v11.108【重大修复】:此前返回 byDate[prev] 是【指标快照 ind】(含 date/close/ma5...),而两个调用方
+  //   都期望 {ok,fails,pass}(entryGateF 结果)。ind.ok=undefined ⇒ "!g.ok" 恒 true ⇒
+  //   波段: g.fails.join('/') 崩溃→判定被吞→触及后永久卡"监控中"; 短线: 恒 blocked 永不入场。
+  //   修复:返回前一根已完成K线的【门控结果】ind.gate。
+  var ind=suite.byDate[suite.dates[idx-1]];
+  return (ind&&ind.gate)||null;
 }
 function calcDecisionTech(klines){
   if(!Array.isArray(klines)||klines.length<30)return null;
@@ -6707,7 +6712,7 @@ function shadowJudgeKlinesF(rec,klines,today){
         //   取不到前一根(如序列起点)时按"不拦"处理,避免数据不足导致永久不触发。
         var g=suite?gateAtF(suite,s.d):null;
         if(g&&!g.ok){
-          trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'skip',px:entry,skip:g.fails.join('/')});
+          trace.push({d:s.d,hi:s.hi,lo:s.lo,ev:'skip',px:entry,skip:Array.isArray(g.fails)?g.fails.join('/'):String(g.fails||'—')});
           continue;
         }
         entered=true;entryDate=s.d;
@@ -6997,7 +7002,7 @@ function shortEntryDetectF(rec,klines,minBars,today){
   var tryGate=function(barDate){
     if(!suite)return {ok:true,fails:[],conds:''};
     var g=gateAtF(suite,barDate);
-    if(g&&!g.ok)return {ok:false,fails:g.fails};
+    if(g&&!g.ok)return {ok:false,fails:Array.isArray(g.fails)?g.fails:[String(g.fails||'门控未过')]};
     return {ok:true,fails:[],conds:entryGateTextF(rec,g)};
   };
   if(isTickDay){
