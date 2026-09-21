@@ -2210,7 +2210,7 @@
       <a href="index.html">首页</a><a href="2026-08-14_08-30.html" class="active">盘前</a><a href="2026-08-14_15-20.html">收盘</a><a href="2026-09-18_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:35</b>（约 1102 分钟前）</div><h1 class="hero-title">2026-08-14 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:35</b>（约 1138 分钟前）</div><h1 class="hero-title">2026-08-14 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-14 18:35:24</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -7070,7 +7070,7 @@ function updateReviewProgress(){
       var days=bjDaysBetweenF(sr.openedDate,bjTodayF());
       var held2=sr.entryHit?tradingDaysBetweenF(sr.entryDate,bjTodayF()):0;
       if(!sr.entryHit){
-        txt='⏱ 短线2-3天监控中：等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+sr.priceStop+' · 分批止盈 '+sr.tp1+'/'+sr.tp2+' · 时间止损 T+3 14:50。未触发不计样本';
+        txt='⏱ 执行层｜短线：监控中 —— 等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+sr.priceStop+' · 分批止盈 '+sr.tp1+'/'+sr.tp2+' · 时间止损 T+3 14:50。未触发不计样本';
         var _sLow=parseFloat(blocks[b].getAttribute('data-low'))||0;
         if(_sLow>0&&_sLow<sr.entry){ txt+='；⚠ 打勾前盘中曾低至 '+_sLow+'（早于打勾时刻，防偷价口径不计入）'; }
         var _sLcs=(sr.lastCheck&&sr.lastCheck.skip)||'';
@@ -7084,7 +7084,15 @@ function updateReviewProgress(){
       }
       shTxt=txt; traceRec=sr;
     } else if(sr&&sr.settled){
-      shTxt='⏱ 短线最近一笔已结算：'+(sr.result==='win'?'止盈':'止损')+' '+((sr.pnl!=null)?((sr.pnl>0?'+':'')+sr.pnl+'%'):'—');
+      shTxt='⏱ 执行层｜短线：最近一笔已结算 —— '+(sr.result==='win'?'止盈':'止损')+' '+((sr.pnl!=null)?((sr.pnl>0?'+':'')+sr.pnl+'%'):'—');
+    } else {
+      // v11.109:短线未勾选 → 若因 RR<1.5 门槛被禁用,归因明示"已禁用"(纪律拦截,非系统故障)
+      var _spBan=blocks[b].querySelector('.dc-short .sp-ban');
+      var _spGate=blocks[b].querySelector('.dc-short .sp-gate.bad');
+      if(_spBan||_spGate){
+        var _why=(_spGate?_spGate.textContent:'').replace(/\s+/g,' ')||(_spBan?_spBan.textContent.replace(/\s+/g,' '):'赔率不佳（未达 RR≥1.5 门槛）');
+        shTxt='⛔ 执行层｜短线：已禁用 —— '+escHtmlF(_why)+'；即便计划（量化）已触达，仍坚决不执行短线买入（纪律拦截）';
+      }
     }
     if(r&&r.enabled&&!r.settled){
       var days=bjDaysBetweenF(r.openedDate,bjTodayF());
@@ -7099,9 +7107,21 @@ function updateReviewProgress(){
         // v11.76:状态机重构 —— 打勾=监控中(候选队列),绝不显示"已入场"。
         //   收盘后(15:00)未触发 ⇒ 明示「今日未触发（未消耗样本）」;盘中 ⇒ 显示还需回落多少。
         var afterClose=(function(){var d=new Date(Date.now()+8*3600*1000);return (d.getUTCHours()*60+d.getUTCMinutes())>=15*60;})();
-        var monTxt=afterClose
-          ? '🟡 监控中：今日未触发入场（未消耗样本）—— 未回落至计划入场价 '+r.entry+'（今日最高 '+(r.lastCheck&&r.lastCheck.high||px)+'），明日继续'
-          : '🟡 监控中：等待回落至计划入场价 '+r.entry+' 触发虚拟买入（现价 '+px+(need!=null?('，还差 '+need+'%'):'')+'）';
+        // v11.109:状态分层 —— 明确"执行层"(勾选时锁定)与"计划层"(今日重算方案)两条线并行,消除价格跳变误导
+        var monTxt;
+        if(afterClose){
+          monTxt='🟡 执行层｜波段：监控中 —— 今日未触发入场（未消耗样本），未回落至计划入场价 '+r.entry+'（今日最高 '+(r.lastCheck&&r.lastCheck.high||px)+'），明日继续';
+        } else if(need!=null && need<=0){
+          monTxt='🟡 执行层｜波段：监控中 —— 现价 '+px+' 已低于入场价 '+r.entry+'（打勾当日按防偷价/门控未触发，详见下方标注）';
+        } else {
+          monTxt='🟡 执行层｜波段：监控中 —— 等待回落至 '+r.entry+' 触发虚拟买入（现价 '+px+'，距触发还需下跌 '+(need!=null?need+'%':'--')+'）';
+        }
+        // 计划层注记:今日计划(量化)方案已触达 ≠ 执行层触发(执行层始终按勾选时锁定价跟踪)
+        var _planE=parseFloat(blocks[b].getAttribute('data-entry'))||0;
+        var _dl=parseFloat(blocks[b].getAttribute('data-low'))||0;
+        if(_planE && Math.abs(_planE-r.entry)>0.001 && _dl>0 && _dl<=_planE){
+          monTxt+='；📋 今日计划（量化）已触达 '+_planE+'，但执行层始终按勾选时锁定的 '+r.entry+' 跟踪，两条线并行不悖';
+        }
         // v11.106:漏判标记(不能隐瞒)—— 分时数据缺失时打勾当日触发判定被跳过,必须明示并说明会自动补判
         var _lcs=(r.lastCheck&&r.lastCheck.skip)||'';
         if(_lcs.indexOf('分钟K不可得')>=0){ monTxt='⚠️ 判定数据缺失：分钟分时未取到，打勾('+ (r.entryTime||'—') +')之后的触发判定本时段被跳过；下次刷新拉到分时会自动补判（含此前触及）。'+monTxt; }

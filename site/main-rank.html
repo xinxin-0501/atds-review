@@ -6849,7 +6849,7 @@ function updateReviewProgress(){
       var days=bjDaysBetweenF(sr.openedDate,bjTodayF());
       var held2=sr.entryHit?tradingDaysBetweenF(sr.entryDate,bjTodayF()):0;
       if(!sr.entryHit){
-        txt='⏱ 短线2-3天监控中：等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+sr.priceStop+' · 分批止盈 '+sr.tp1+'/'+sr.tp2+' · 时间止损 T+3 14:50。未触发不计样本';
+        txt='⏱ 执行层｜短线：监控中 —— 等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+sr.priceStop+' · 分批止盈 '+sr.tp1+'/'+sr.tp2+' · 时间止损 T+3 14:50。未触发不计样本';
         var _sLow=parseFloat(blocks[b].getAttribute('data-low'))||0;
         if(_sLow>0&&_sLow<sr.entry){ txt+='；⚠ 打勾前盘中曾低至 '+_sLow+'（早于打勾时刻，防偷价口径不计入）'; }
         var _sLcs=(sr.lastCheck&&sr.lastCheck.skip)||'';
@@ -6863,7 +6863,15 @@ function updateReviewProgress(){
       }
       shTxt=txt; traceRec=sr;
     } else if(sr&&sr.settled){
-      shTxt='⏱ 短线最近一笔已结算：'+(sr.result==='win'?'止盈':'止损')+' '+((sr.pnl!=null)?((sr.pnl>0?'+':'')+sr.pnl+'%'):'—');
+      shTxt='⏱ 执行层｜短线：最近一笔已结算 —— '+(sr.result==='win'?'止盈':'止损')+' '+((sr.pnl!=null)?((sr.pnl>0?'+':'')+sr.pnl+'%'):'—');
+    } else {
+      // v11.109:短线未勾选 → 若因 RR<1.5 门槛被禁用,归因明示"已禁用"(纪律拦截,非系统故障)
+      var _spBan=blocks[b].querySelector('.dc-short .sp-ban');
+      var _spGate=blocks[b].querySelector('.dc-short .sp-gate.bad');
+      if(_spBan||_spGate){
+        var _why=(_spGate?_spGate.textContent:'').replace(/\s+/g,' ')||(_spBan?_spBan.textContent.replace(/\s+/g,' '):'赔率不佳（未达 RR≥1.5 门槛）');
+        shTxt='⛔ 执行层｜短线：已禁用 —— '+escHtmlF(_why)+'；即便计划（量化）已触达，仍坚决不执行短线买入（纪律拦截）';
+      }
     }
     if(r&&r.enabled&&!r.settled){
       var days=bjDaysBetweenF(r.openedDate,bjTodayF());
@@ -6878,9 +6886,21 @@ function updateReviewProgress(){
         // v11.76:状态机重构 —— 打勾=监控中(候选队列),绝不显示"已入场"。
         //   收盘后(15:00)未触发 ⇒ 明示「今日未触发（未消耗样本）」;盘中 ⇒ 显示还需回落多少。
         var afterClose=(function(){var d=new Date(Date.now()+8*3600*1000);return (d.getUTCHours()*60+d.getUTCMinutes())>=15*60;})();
-        var monTxt=afterClose
-          ? '🟡 监控中：今日未触发入场（未消耗样本）—— 未回落至计划入场价 '+r.entry+'（今日最高 '+(r.lastCheck&&r.lastCheck.high||px)+'），明日继续'
-          : '🟡 监控中：等待回落至计划入场价 '+r.entry+' 触发虚拟买入（现价 '+px+(need!=null?('，还差 '+need+'%'):'')+'）';
+        // v11.109:状态分层 —— 明确"执行层"(勾选时锁定)与"计划层"(今日重算方案)两条线并行,消除价格跳变误导
+        var monTxt;
+        if(afterClose){
+          monTxt='🟡 执行层｜波段：监控中 —— 今日未触发入场（未消耗样本），未回落至计划入场价 '+r.entry+'（今日最高 '+(r.lastCheck&&r.lastCheck.high||px)+'），明日继续';
+        } else if(need!=null && need<=0){
+          monTxt='🟡 执行层｜波段：监控中 —— 现价 '+px+' 已低于入场价 '+r.entry+'（打勾当日按防偷价/门控未触发，详见下方标注）';
+        } else {
+          monTxt='🟡 执行层｜波段：监控中 —— 等待回落至 '+r.entry+' 触发虚拟买入（现价 '+px+'，距触发还需下跌 '+(need!=null?need+'%':'--')+'）';
+        }
+        // 计划层注记:今日计划(量化)方案已触达 ≠ 执行层触发(执行层始终按勾选时锁定价跟踪)
+        var _planE=parseFloat(blocks[b].getAttribute('data-entry'))||0;
+        var _dl=parseFloat(blocks[b].getAttribute('data-low'))||0;
+        if(_planE && Math.abs(_planE-r.entry)>0.001 && _dl>0 && _dl<=_planE){
+          monTxt+='；📋 今日计划（量化）已触达 '+_planE+'，但执行层始终按勾选时锁定的 '+r.entry+' 跟踪，两条线并行不悖';
+        }
         // v11.106:漏判标记(不能隐瞒)—— 分时数据缺失时打勾当日触发判定被跳过,必须明示并说明会自动补判
         var _lcs=(r.lastCheck&&r.lastCheck.skip)||'';
         if(_lcs.indexOf('分钟K不可得')>=0){ monTxt='⚠️ 判定数据缺失：分钟分时未取到，打勾('+ (r.entryTime||'—') +')之后的触发判定本时段被跳过；下次刷新拉到分时会自动补判（含此前触及）。'+monTxt; }
