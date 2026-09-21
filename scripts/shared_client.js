@@ -138,10 +138,13 @@ async function addFetchedToWatchlist(code){
   } catch (e) {}
   // 分钟趋势 + 封单 + 龙虎榜 + 事件(真实,并发拉取,失败不阻塞)
   try {
-    var ext = await Promise.all([
+    var ext = await Promise.race([
+      Promise.all([
       fetchMinuteTrendF(code, 'm60'), fetchMinuteTrendF(code, 'm15'),
       fetchLimitUpSealF(code), fetchLhbDetailF(code), fetchEventsF(code),
       fetchStockProfileF(code)
+      ]),
+      new Promise(function(res){ setTimeout(function(){ res(null); }, 8000); })
     ]);
     if (ext[5] && ext[5].industry) data.industry = ext[5].industry;   // v11.19:行业名 → autoGenStrategy 生成 business 文案
     // 分钟线兜底:双源失败(如浏览器CORS拦截腾讯/新浪)时用日线MA5/MA20斜率近似,坚决不显示"暂缺"
@@ -203,7 +206,7 @@ async function fetchKlineF(code, count) {
   count = count || 70;
   try {
     const url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + code + ',day,,,' + count + ',qfq';
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } });
+    const res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, 9000);
     const txt = await res.text();
     const j = JSON.parse(txt);
     const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
