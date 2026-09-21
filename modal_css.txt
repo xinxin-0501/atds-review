@@ -810,3 +810,10 @@
 .sr-score{font-size:12px;font-weight:800;color:#7c3aed;min-width:40px;text-align:right}
 .sr-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
 .sr-note{font-size:11px;color:#94a3b8;font-weight:400}
+
+/* v11.112 计划偏移同步提示(橙色) */
+.plan-sync-warn{margin:6px 0;padding:8px 10px;background:#fff7ed;border:1px solid #fdba74;border-radius:10px;font-size:12px;color:#9a3412;line-height:1.6}
+.psw-row{margin:2px 0}
+.psw-btn{border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;margin-left:6px;cursor:pointer}
+.psw-sync{background:#ea580c;color:#fff}
+.plan-sync-warn .psw-btn:not(.psw-sync){background:#fff;color:#9a3412;border:1px solid #fdba74}
