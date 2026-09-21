@@ -4711,7 +4711,37 @@
       </div>
     </div>
   </div>
-  
+  <div class="card ss-card eye-card">
+    <div class="wave-header">
+      <div class="wave-title">👁️ 天眼地量 TOP20</div>
+      <div class="wave-sub">天眼:MA20持续上行 + MA5下穿MA20后重新上穿且拐头向上 · 地量:今日量<30日最高量20%且近10日最低<br><span class="ss-note">⚠ 形态:自30日高点回调<15%且回调≤30日;今日收阳或下影线占比>0.3。全A剔除ST/北交所 · 严禁未来函数</span></div>
+    </div>
+    
+    <div class="wave-tools">
+      <span class="wave-scan-info">天眼地量选股</span>
+      <button id="eye-open-btn" class="wl-btn wl-btn-primary" onclick="openEyeHeavenModal()">📋 打开天眼地量名单</button>
+    </div>
+    <div class="sc-hint">当日暂无满足天眼地量形态的标的（宁缺毋滥，不放宽阈值凑数）</div>
+  </div><div class="modal-mask" id="eye-heaven-modal" onclick="if(event.target===this)closeEyeHeavenModal()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-eyebrow">👁️ 天眼地量 TOP20 · 全A剔除ST/北交所</div>
+        <span class="modal-close" onclick="closeEyeHeavenModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <div class="nh-summary">扫描范围：天眼地量选股（全A剔除ST/北交所）</div>
+        
+        <div class="sc-tools">
+          <button class="wl-btn wl-btn-primary" onclick="bulkAddEyeHeavenToWatchlist()">⚡ 一键全部加入观察池</button>
+        </div>
+        <div class="ss-list">
+          <div class="ss-row ss-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span></div>
+          <div class="ts-empty" style="padding:20px 10px;text-align:center;color:#94a3b8;font-size:13px;">当日无入选（宁缺毋滥）</div>
+        </div>
+        <div class="sc-hint">缩量率=今日量/30日最高量(越低越好) · 形态天数=距30日高点交易日数 · 点击个股行可查看深度分析</div>
+      </div>
+    </div>
+  </div>
   <div class="card da-card">
     <div class="card-title">AI 数据分析 · 八步复盘</div>
     <div class="da-note">基于当日公开行情自动生成，标注数据来源与准确性评分；交易复盘（第五/六步）需提供逐笔记录。</div>
