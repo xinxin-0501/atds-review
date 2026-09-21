@@ -1798,7 +1798,7 @@ function renderShortCore(report) {
     const cls = upDownClass(x.pct);
     const sigTone = x.lianban >= 2 ? 'break' : (x.ztCount >= 2 ? 'strong' : 'up');
     const sigText = x.lianban >= 2 ? (x.lianban + '连板') : (x.ztCount >= 3 ? '多涨停' : (x.ztCount === 2 ? '双涨停' : '强势股'));
-    return `<div class="sc-item" data-code="${esc(x.code)}" onclick="openStockResearch(this.dataset.code)">
+    return `<div class="sc-item" data-code="${esc(x.code)}" data-pct="${Number(x.pct) || 0}" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">${x.rank}</span>
         <span class="sc-name">${esc(x.name)}<small>${esc(x.code)}</small></span>
@@ -1846,6 +1846,11 @@ function renderShortCore(report) {
       </div>
       <div class="modal-body">
         <div class="nh-summary sc-summary">扫描范围：${esc(_scopeText || '全A剔除ST')}</div>
+        <div class="sc-filter">
+          <button class="sc-filter-btn on" data-f="all" onclick="filterShortCore(this)">全部</button>
+          <button class="sc-filter-btn" data-f="zt" onclick="filterShortCore(this)">涨停梯队</button>
+          <button class="sc-filter-btn" data-f="nz" onclick="filterShortCore(this)">未涨停(涨停基因)</button>
+        </div>
         <div class="sc-tools">
           <button class="wl-btn wl-btn-primary" onclick="bulkAddShortCoreToWatchlist()">⚡ 一键全部加入观察池</button>
           <button class="wl-btn" id="sc-refresh-btn" onclick="refreshShortCoreQuotes()">↻ 刷新行情</button>

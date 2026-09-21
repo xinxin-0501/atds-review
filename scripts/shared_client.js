@@ -1931,6 +1931,18 @@ function keepOldShortPlanPrice(code){
 }
 window.syncPlanPrice=syncPlanPrice; window.keepOldPlanPrice=keepOldPlanPrice;
 window.syncShortPlanPrice=syncShortPlanPrice; window.keepOldShortPlanPrice=keepOldShortPlanPrice;
+/* v11.122:超短核心筛选(全部/涨停梯队/未涨停)——涨停阈值 pct≥9.8(与渲染端一致) */
+function filterShortCore(btn){
+  var f = btn.getAttribute('data-f') || 'all';
+  document.querySelectorAll('#short-core-modal .sc-filter-btn').forEach(function(b){ b.classList.toggle('on', b === btn); });
+  document.querySelectorAll('#short-core-modal .sc-item[data-code]').forEach(function(r){
+    var pct = Number(r.getAttribute('data-pct')) || 0;
+    var zt = pct >= 9.8;
+    var show = (f === 'all') || (f === 'zt' && zt) || (f === 'nz' && !zt);
+    r.style.display = show ? '' : 'none';
+  });
+}
+window.filterShortCore = filterShortCore;
 
 /* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
 (function bindWatchlistScrollSync(){

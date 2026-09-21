@@ -822,3 +822,8 @@
 .sr-line2 .ts-add{flex-shrink:0;padding:3px 10px;font-size:12px}
 
 #signal-radar-modal{z-index:10000}
+
+/* v11.122 超短核心筛选 tab */
+.sc-filter{display:flex;gap:4px;margin:8px 0}
+.sc-filter-btn{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer}
+.sc-filter-btn.on{background:#b45309;color:#fff;border-color:#b45309}

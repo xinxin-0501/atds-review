@@ -3122,7 +3122,9 @@ async function scanStrongStock() {
     const amt = Number(x.amountWan) || 0;
     // v11.50:同 scanShortCore —— 原 pct<9.8 排除涨停股,但强势股的【黄金坑=首板涨停】【突破新高】都可能在涨停日成立,
   //         且 ztCount(近20日涨停次数)不应因当日涨停而漏计。放开上限至 20.5%(兼容20cm板)。
-  return pct > -4 && pct <= 20.5 && turn >= 0.5 && turn <= 40 && amt >= 8000;
+  // v11.121:下限 -4% → 0 —— 原允许当日下跌的股进候选,但"当日下跌"说明回调未企稳,不该作为【当前强势】上榜
+  //         (实测 09-21 光迅科技 -0.84% 因历史缺口+黄金坑+二波形态上榜,用户反馈"不强势也上榜")。强势=当日不跌。
+  return pct >= 0 && pct <= 20.5 && turn >= 0.5 && turn <= 40 && amt >= 8000;
   });
   const results = [];
   const CONC = 16;
