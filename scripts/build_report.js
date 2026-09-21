@@ -1658,7 +1658,9 @@ function renderShortPlanHtml(s, report) {
   const ff = s.fundFlow || {};
   const evNear = ((s.events || [])[0]) || null;
   const t3 = '第3个交易日 14:50';
-  return eyeHint + '<div class="sp-gate ' + (banned ? 'bad' : 'ok') + '">' + (banned
+  // v11.105:把短线计划自己的参数挂到 DOM(供 toggleShortTrack 读取)——此前勾选时读的是外层 .dc-review 的
+  //   data-entry(波段计划价),导致短线 rec 与短线计划卡口径不一致(如 601999:计划 6.79/6.45/6.90/8.55 vs rec 6.74/6.73/6.87/8.49)。
+  return '<div class="sp-wrap" data-s-entry="' + f2(entry) + '" data-s-stop="' + f2(priceStop) + '" data-s-tp1="' + f2(tp1v) + '" data-s-tp2="' + f2(tp2) + '">' + eyeHint + '<div class="sp-gate ' + (banned ? 'bad' : 'ok') + '">' + (banned
     ? ('⛔ ' + why)
     : ('✓ 门槛通过：RR ' + f2(rr) + ' ≥ 1.5 · 大盘风控正常' + (idxPct != null ? ('(上证 ' + idxPct.toFixed(2) + '%)') : ''))) + '</div>' +
     '<div class="dc-line sp-row">入场：<b>' + f2(entry) + '</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div>' +
@@ -1667,7 +1669,7 @@ function renderShortPlanHtml(s, report) {
     '<div class="dc-line sp-row">分批止盈：①<b>' + f2(tp1v) + '</b>(+4%或前压力' + (press.length ? ' ' + f2(press[0]) : '') + ')减仓50%·止损上移至成本 ②<b>' + f2(tp2) + '</b>(+' + tp2pct + '%)清仓剩余</div>' +
     '<div class="dc-line sp-row">资金量能：主力净流入 ' + f2(ff.d1) + '亿(d3 ' + f2(ff.d3) + ') · 量比 ' + f2(s.volRatio) + '</div>' +
     '<div class="dc-line sp-row">逻辑催化：' + esc(String(s.logic || '--').slice(0, 60)) + (evNear ? (' · 最近事件:' + esc(String(evNear.type || '') + ' ' + String(evNear.date || ''))) : '') + '</div>' +
-    '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="' + esc(String(s.code)) + '" onchange="toggleShortTrack(this)"' + (banned ? ' disabled' : '') + '> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label>' + (banned ? '<span class="sp-ban">⛔ 已禁用</span>' : '') + '</div>';
+    '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="' + esc(String(s.code)) + '" onchange="toggleShortTrack(this)"' + (banned ? ' disabled' : '') + '> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label>' + (banned ? '<span class="sp-ban">⛔ 已禁用</span>' : '') + '</div></div>';
 }
 
 function renderWatchlist(report) {
