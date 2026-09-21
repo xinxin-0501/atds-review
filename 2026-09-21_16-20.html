@@ -832,6 +832,11 @@
 .sr-line2 .ts-add{flex-shrink:0;padding:3px 10px;font-size:12px}
 
 #signal-radar-modal{z-index:10000}
+
+/* v11.122 超短核心筛选 tab */
+.sc-filter{display:flex;gap:4px;margin:8px 0}
+.sc-filter-btn{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer}
+.sc-filter-btn.on{background:#b45309;color:#fff;border-color:#b45309}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -2253,7 +2258,7 @@
       <a href="index.html">首页</a><a href="2026-09-21_09-45.html">盘前</a><a href="2026-09-21_16-20.html" class="active">收盘</a><a href="2026-09-21_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘 · <b>数据时间 16:30</b>（约 264 分钟前）</div><h1 class="hero-title">2026-09-21 · <span class="hero-time">16:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 100°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 收盘复盘 · <b>数据时间 16:30</b>（约 390 分钟前）</div><h1 class="hero-title">2026-09-21 · <span class="hero-time">16:20</span></h1><div class="hero-sub">收盘静态快照 · 数据截至 16:20</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 100°</span></div></div>
 <a class="ts-banner" href="2026-09-21_14-30.html">📋 14:30 尾盘定调快照已生成（四大选股 · 盘中未定型 · 非最终结果）→ 立即查看</a>
 <div class="section">
 <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-09-21 收盘复盘 · 数据截至 16:20</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">100°</div><div class="ce-stage">过热区 · 情绪极度亢奋</div><div class="ce-fact">主特征: 谨防高潮后分歧</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">81%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">103</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">103</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈80%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">5板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">30%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">4263</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">929</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">94</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:4263"></div><div class="ce-bar-flat" style="flex:94"></div><div class="ce-bar-down" style="flex:929"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>81%</b></span><span>成交额 <b>20315亿</b> (沪深合计)</span><span>家数口径 <b>沪深</b>(不含北交所)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row" data-code="000001" data-prefix="sh"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val up">+0.97%</span><span class="ce-idx-price">3949.91</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:29.099999999999998%"></div></div></div><div class="ce-idx-row" data-code="399001" data-prefix="sz"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val up">+0.65%</span><span class="ce-idx-price">13730.02</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:19.5%"></div></div></div><div class="ce-idx-row" data-code="399006" data-prefix="sz"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val up">+0.80%</span><span class="ce-idx-price">3399.59</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill up" style="width:24%"></div></div></div><div class="ce-block-hint">量能维持在 2 万亿上方 (20315 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">其他医疗服务</span><span class="ce-ml-val up">+7.97%</span></div><div class="ce-ml-row"><span class="ce-ml-name">房产租赁经纪</span><span class="ce-ml-val up">+7.35%</span></div><div class="ce-ml-row"><span class="ce-ml-name">会展服务</span><span class="ce-ml-val up">+7.18%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">医药生物</span><span class="ce-ml-val up">+67.4亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制剂</span><span class="ce-ml-val up">+28亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制药</span><span class="ce-ml-val up">+27.6亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">通信设备</span><span class="ce-ml-val up">+26亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card"><div class="card-title">04 情绪高度(连板梯队)</div><div class="ce-ladder"><span class="ce-ladder-pill">5板 · 华瓷股份</span><span class="ce-ladder-pill">4板 · 内蒙新华</span><span class="ce-ladder-pill">3板 · 南华生物</span></div></div><div class="card"><div class="card-title">05 明日观察锚点</div><div class="ce-anchor-grid"><div class="ce-anchor-card"><div class="ce-anchor-h">🎯 主线持续性</div><div class="ce-anchor-desc">观察 家居用品 龙头 华瓷股份 能否继续表态</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">⚠️ 情绪退潮阈值</div><div class="ce-anchor-desc">今日炸板 25 家 · 晋级率 30%,炸板率 &gt; 40% 或晋级率 &lt; 50% 需警惕</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">📊 量能验证</div><div class="ce-anchor-desc">成交额 20315亿 基础上能否重拾放量</div></div><div class="ce-anchor-card"><div class="ce-anchor-h">🛡️ 高位风险</div><div class="ce-anchor-desc">华瓷股份 5 板,关注与所属板块是否背离</div></div></div></div><div class="card tw-card-outer"><div class="card-title"><span class="tw-eyebrow">06</span> 明日看什么</div><div class="tw-tabs"><div class="tw-tab active" data-tw-idx="0" onclick="toggleTwCard(0)"><span class="tw-tab-rank">1</span><span class="tw-tab-name">医疗服务</span><span class="tw-tab-cat tw-cat-buy">可买入</span></div><div class="tw-tab" data-tw-idx="1" onclick="toggleTwCard(1)"><span class="tw-tab-rank">2</span><span class="tw-tab-name">服装家纺</span><span class="tw-tab-cat tw-cat-buy">可买入</span></div><div class="tw-tab" data-tw-idx="2" onclick="toggleTwCard(2)"><span class="tw-tab-rank">3</span><span class="tw-tab-name">化学制品</span><span class="tw-tab-cat tw-cat-watch">可观察</span></div><div class="tw-tab" data-tw-idx="3" onclick="toggleTwCard(3)"><span class="tw-tab-rank">4</span><span class="tw-tab-name">纺织制造</span><span class="tw-tab-cat tw-cat-watch">可观察</span></div><div class="tw-tab" data-tw-idx="4" onclick="toggleTwCard(4)"><span class="tw-tab-rank">5</span><span class="tw-tab-name">家居用品</span><span class="tw-tab-cat tw-cat-wait">等回调</span></div><div class="tw-tab" data-tw-idx="5" onclick="toggleTwCard(5)"><span class="tw-tab-rank">6</span><span class="tw-tab-name">出版</span><span class="tw-tab-cat tw-cat-wait">等回调</span></div></div><div class="tw-details"><div class="tw-detail active" data-tw-detail="0"><div class="tw-d-picks"><span class="tw-d-pick">万邦医药</span><span class="tw-d-pick">成都先导</span><span class="tw-d-pick">泓博医药</span></div><div class="tw-d-reason">医疗服务 主线确认、3家涨停·最高3板、净流入12.6亿;明日只做龙头不追高,看量能能否延续</div></div><div class="tw-detail" data-tw-detail="1"><div class="tw-d-picks"><span class="tw-d-pick">中胤时尚</span><span class="tw-d-pick">三夫户外</span><span class="tw-d-pick">恒辉安防</span></div><div class="tw-d-reason">服装家纺 主线确认、2家涨停·最高3板、净流入0.9亿;明日只做龙头不追高,看量能能否延续</div></div><div class="tw-detail" data-tw-detail="2"><div class="tw-d-picks"><span class="tw-d-pick">长华化学</span><span class="tw-d-pick">阿拉丁</span><span class="tw-d-pick">先锋新材</span></div><div class="tw-d-reason">化学制品 主线确认、1家涨停·最高3板、净流入0.6亿;明日看能否晋级主线,先观察资金是否真实回流</div></div><div class="tw-detail" data-tw-detail="3"><div class="tw-d-picks"><span class="tw-d-pick">华纺股份</span></div><div class="tw-d-reason">纺织制造 主线确认、1家涨停·最高3板、净流出0.9亿;明日看能否晋级主线,先观察资金是否真实回流</div></div><div class="tw-detail" data-tw-detail="4"><div class="tw-d-picks"><span class="tw-d-pick">家联科技</span><span class="tw-d-pick">青岛金王</span><span class="tw-d-pick">德尔未来</span></div><div class="tw-d-reason">家居用品 主线确认、3家涨停·最高5板、净流出0.3亿;短期过热,等回调企稳再择机</div></div><div class="tw-detail" data-tw-detail="5"><div class="tw-d-picks"><span class="tw-d-pick">龙版传媒</span><span class="tw-d-pick">荣信文化</span><span class="tw-d-pick">果麦文化</span></div><div class="tw-d-reason">出版 主线确认、3家涨停·最高4板、净流出2.0亿;短期过热,等回调企稳再择机</div></div></div><div class="tw-caution"><span class="tw-caution-tag">03 谨慎方向</span>家居用品高位加速谨防兑现、医疗服务主线一致高开勿追高、半导体资金净流出暂避、无量不追,放量才跟。</div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
@@ -3962,13 +3967,18 @@
       </div>
       <div class="modal-body">
         <div class="nh-summary sc-summary">扫描范围：全A 5004 只剔除ST → 活跃候选 2917 只，按综合分(原始)→封单额→连板排序，显示分按100封顶，已排除【一直封死】的涨停 95 只（盘中买不到），按 score 优先取前 20 只</div>
+        <div class="sc-filter">
+          <button class="sc-filter-btn on" data-f="all" onclick="filterShortCore(this)">全部</button>
+          <button class="sc-filter-btn" data-f="zt" onclick="filterShortCore(this)">涨停梯队</button>
+          <button class="sc-filter-btn" data-f="nz" onclick="filterShortCore(this)">未涨停(涨停基因)</button>
+        </div>
         <div class="sc-tools">
           <button class="wl-btn wl-btn-primary" onclick="bulkAddShortCoreToWatchlist()">⚡ 一键全部加入观察池</button>
           <button class="wl-btn" id="sc-refresh-btn" onclick="refreshShortCoreQuotes()">↻ 刷新行情</button>
         </div>
         <div class="sc-list">
           <div class="sc-row sc-head"><span>#</span><span>标的</span><span>现价</span><span>涨跌</span><span>评分</span><span>信号</span></div>
-          <div class="sc-item" data-code="603230" onclick="openStockResearch(this.dataset.code)">
+          <div class="sc-item" data-code="603230" data-pct="10.01" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">1</span>
         <span class="sc-name">内蒙新华<small>603230</small></span>
@@ -3991,7 +4001,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="600448" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="600448" data-pct="9.89" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">2</span>
         <span class="sc-name">华纺股份<small>600448</small></span>
@@ -4014,7 +4024,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="600630" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="600630" data-pct="10.01" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">3</span>
         <span class="sc-name">龙头股份<small>600630</small></span>
@@ -4037,7 +4047,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="603316" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="603316" data-pct="10.01" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">4</span>
         <span class="sc-name">诚邦股份<small>603316</small></span>
@@ -4060,7 +4070,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="688112" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="688112" data-pct="20" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">5</span>
         <span class="sc-name">鼎阳科技<small>688112</small></span>
@@ -4083,7 +4093,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="002589" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="002589" data-pct="10.09" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">6</span>
         <span class="sc-name">瑞康医药<small>002589</small></span>
@@ -4106,7 +4116,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="no">✗</b></span>
       </div>
-    </div><div class="sc-item" data-code="601811" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="601811" data-pct="10" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">7</span>
         <span class="sc-name">新华文轩<small>601811</small></span>
@@ -4129,7 +4139,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="603001" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="603001" data-pct="9.97" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">8</span>
         <span class="sc-name">奥康国际<small>603001</small></span>
@@ -4152,7 +4162,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="002172" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="002172" data-pct="10.04" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">9</span>
         <span class="sc-name">澳洋健康<small>002172</small></span>
@@ -4175,7 +4185,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="000910" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="000910" data-pct="10.02" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">10</span>
         <span class="sc-name">大亚圣象<small>000910</small></span>
@@ -4198,7 +4208,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="no">✗</b></span>
       </div>
-    </div><div class="sc-item" data-code="603068" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="603068" data-pct="10" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">11</span>
         <span class="sc-name">博通集成<small>603068</small></span>
@@ -4221,7 +4231,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="no">✗</b></span>
       </div>
-    </div><div class="sc-item" data-code="001389" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="001389" data-pct="10" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">12</span>
         <span class="sc-name">广合科技<small>001389</small></span>
@@ -4244,7 +4254,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="601086" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="601086" data-pct="10.02" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">13</span>
         <span class="sc-name">国芳集团<small>601086</small></span>
@@ -4267,7 +4277,7 @@
         <span>突破 <b class="no">✗</b></span>
         <span>均线多头 <b class="no">✗</b></span>
       </div>
-    </div><div class="sc-item" data-code="002367" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="002367" data-pct="9.98" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">14</span>
         <span class="sc-name">康力电梯<small>002367</small></span>
@@ -4290,7 +4300,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="no">✗</b></span>
       </div>
-    </div><div class="sc-item" data-code="301193" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="301193" data-pct="9.74" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">15</span>
         <span class="sc-name">家联科技<small>301193</small></span>
@@ -4313,7 +4323,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="603319" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="603319" data-pct="10.02" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">16</span>
         <span class="sc-name">美湖股份<small>603319</small></span>
@@ -4336,7 +4346,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="002860" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="002860" data-pct="9.99" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">17</span>
         <span class="sc-name">星帅尔<small>002860</small></span>
@@ -4359,7 +4369,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="no">✗</b></span>
       </div>
-    </div><div class="sc-item" data-code="603289" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="603289" data-pct="10.05" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">18</span>
         <span class="sc-name">泰瑞机器<small>603289</small></span>
@@ -4382,7 +4392,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="603042" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="603042" data-pct="10" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">19</span>
         <span class="sc-name">华脉科技<small>603042</small></span>
@@ -4405,7 +4415,7 @@
         <span>突破 <b class="ok">✓</b></span>
         <span>均线多头 <b class="ok">✓</b></span>
       </div>
-    </div><div class="sc-item" data-code="002836" onclick="openStockResearch(this.dataset.code)">
+    </div><div class="sc-item" data-code="002836" data-pct="0.5" onclick="openStockResearch(this.dataset.code)">
       <div class="sc-row">
         <span class="sc-rank">20</span>
         <span class="sc-name">新宏泽<small>002836</small></span>
@@ -7034,6 +7044,18 @@ function keepOldShortPlanPrice(code){
 }
 window.syncPlanPrice=syncPlanPrice; window.keepOldPlanPrice=keepOldPlanPrice;
 window.syncShortPlanPrice=syncShortPlanPrice; window.keepOldShortPlanPrice=keepOldShortPlanPrice;
+/* v11.122:超短核心筛选(全部/涨停梯队/未涨停)——涨停阈值 pct≥9.8(与渲染端一致) */
+function filterShortCore(btn){
+  var f = btn.getAttribute('data-f') || 'all';
+  document.querySelectorAll('#short-core-modal .sc-filter-btn').forEach(function(b){ b.classList.toggle('on', b === btn); });
+  document.querySelectorAll('#short-core-modal .sc-item[data-code]').forEach(function(r){
+    var pct = Number(r.getAttribute('data-pct')) || 0;
+    var zt = pct >= 9.8;
+    var show = (f === 'all') || (f === 'zt' && zt) || (f === 'nz' && !zt);
+    r.style.display = show ? '' : 'none';
+  });
+}
+window.filterShortCore = filterShortCore;
 
 /* ============ 观察池统一横滑:表头拉杆为主,数据行隐藏滚动条并联动 scrollLeft ============ */
 (function bindWatchlistScrollSync(){
