@@ -65,6 +65,39 @@ const SLOT_WINDOWS = { premarket: ['08:30', '10:00'], midday: ['09:25', '14:59']
 //   tailscan : 尾盘定调快照(14:30 前后)。理想窗口 14:20~14:59(14:20 触发 → 四大扫描约 8~10 分钟 → ~14:30 完成);
 //     有效边界 15:00:15:00 之后今日K线已定型,再采就是收盘数据,不能再叫"14:30 盘中快照"(会伪装盘)。
 const LATE_LIMIT = { premarket: '10:15', midday: '14:59', auction: '09:35', tailscan: '15:00' };
+/* ════════ v11.110 交易日历 + 告警(Server酱) ════════ */
+// 交易日判定:周末(getUTCDay) + 本地硬编码法定休市日(scripts/trading_calendar.json,每年1月更新)。
+//   数据驱动兜底:采集时用东财指数"最新交易日期"交叉验证,!=今天 ⇒ 判休市,即使日历缺天也自动纠正。
+function isTradingDayF(dateStr){
+  if(!dateStr)return true;
+  var d=new Date(dateStr+'T00:00:00+08:00');
+  if(isNaN(d.getTime()))return true;
+  var dow=d.getUTCDay();
+  if(dow===0||dow===6)return false;
+  try{
+    var cal=JSON.parse(fs.readFileSync(path.join(ROOT,'scripts','trading_calendar.json'),'utf8'));
+    var y=String(d.getUTCFullYear());
+    var list=(cal&&cal.holidays&&cal.holidays[y])||[];
+    if(list.indexOf(dateStr)>=0)return false;
+  }catch(e){/* 日历缺失按交易日处理,靠数据驱动兜底纠正 */}
+  return true;
+}
+// 告警(节流:同一类告警每天最多发一次,避免刷屏 + 免费版额度)。告警失败绝不阻断采集主流程。
+var _alertSent={};
+async function sendAlertF(tag,title,desp){
+  var key=process.env.SERVERCHAN_SENDKEY||'';
+  if(!key)return;
+  var today=fmtDate(shanghaiNow());
+  var k=tag+'_'+today;
+  if(_alertSent[k])return;
+  _alertSent[k]=true;
+  try{
+    var body='title='+encodeURIComponent(String(title).slice(0,32))+'&desp='+encodeURIComponent(String(desp||'').slice(0,4000));
+    var r=await fetch('https://sctapi.ftqq.com/'+key+'.send',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=utf-8'},body:body});
+    var j=await r.json();
+    console.log('[告警]',j&&j.code===0?'已推送 '+tag:'推送失败 '+(j&&j.message||''));
+  }catch(e){console.warn('[告警] 发送异常(不阻断):',e.message);}
+}
 function slotGuardF(type, targetDate, todayBj, nowHM, slotExists) {
   const w = SLOT_WINDOWS[type];
   if (!w) return { ok: true, warn: '', late: false };        // close / 未知类型:不设守卫
@@ -464,6 +497,8 @@ async function fetchKline(code, count = 250) {
     const cached = loadKlineCache()[code];
     if (cached && Array.isArray(cached.series) && cached.series.length >= 30) return cached.series;
   } catch (e) { /* 缓存缺失忽略 */ }
+  // v11.110:三源兜底(腾讯→东财→新浪)全失败 + 本地缓存也无 ⇒ 告警(节流:每天一次)
+  sendAlertF('source-all-fail', 'ATDS 三源兜底全失败', 'K线数据源(腾讯→东财→新浪)全部失败且无本地缓存: ' + code + '（时间 ' + new Date().toISOString() + '）');
   return [];
 }
 
@@ -3422,6 +3457,11 @@ async function main() {
     return;
   }
   const now = shanghaiNow();
+  // v11.110:节假日跳过 —— 周末/法定休市日直接退出,不空跑、不产出(数据驱动兜底见 indices 采集后)
+  if (!isTradingDayF(fmtDate(now))) {
+    console.log('[交易日历] 今日 ' + fmtDate(now) + ' 为休市日（周末或法定节假日），跳过采集');
+    process.exit(0);
+  }
   // v11.54:时刻守卫(必须在任何落盘之前;auction 分支也要经过它)
   let LATE_CAPTURE = false;   // v11.60(B):迟到补采标记,写进 meta.lateCapture
   {
@@ -3468,6 +3508,21 @@ async function main() {
   const indexCodes = config.indices.map(i => (i.setcode === '1' ? 'sh' : 'sz') + i.code);
   const watchCodes = config.watchlist.map(w => (w.setcode === '1' ? 'sh' : 'sz') + w.code);
   const tencentAll = await fetchTencent([...indexCodes, ...watchCodes]);
+  // v11.110:数据驱动兜底 —— 东财指数最新交易日 != 今天 ⇒ 判休市(日历缺失时的自动纠正),并告警
+  if (!explicitArg) {
+    try {
+      const _emIdx = await emFetchJson('https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.000001&fields1=f1,f2,f3&fields2=f51&klt=101&fqt=0&lmt=2&end=20500101', { 'User-Agent': 'Mozilla/5.0', 'Referer': 'https://quote.eastmoney.com/' }, 8000);
+      const _kl = (_emIdx && _emIdx.data && _emIdx.data.klines) || [];
+      if (_kl.length) {
+        const _lastDate = String(_kl[_kl.length - 1]).split(',')[0];
+        if (_lastDate && _lastDate !== fmtDate(now)) {
+          console.log('[数据驱动兜底] 东财最新交易日 ' + _lastDate + ' ≠ 今天 ' + fmtDate(now) + '，判休市跳过');
+          await sendAlertF('holiday-mismatch', 'ATDS 节假日误判', '日历判定今日为交易日，但东财指数最新交易日为 ' + _lastDate + '（≠今天 ' + fmtDate(now) + '），疑似节假日休市，已跳过采集');
+          process.exit(0);
+        }
+      }
+    } catch (e) { /* 兜底检查失败不影响主流程(东财不可达时仍按日历/腾讯结果走) */ }
+  }
   const indices = config.indices.map((idx, i) => ({ name: idx.name, code: idx.code, price: tencentAll[i].price, changePct: tencentAll[i].pct }));
   let watchlist = config.watchlist.map((w, i) => {
     const t = tencentAll[config.indices.length + i];
@@ -3962,4 +4017,4 @@ async function main() {
 process.on('exit', () => { try { saveKlineCache(true); } catch (e) { /* 忽略 */ } });
 main()
   .then(() => { saveKlineCache(true); })            // 正常结束:强制落盘一次
-  .catch(e => { console.error('采集失败:', e.message); try { saveKlineCache(true); } catch (e2) { } process.exit(1); });
+  .catch(e => { console.error('采集失败:', e.message); try { saveKlineCache(true); } catch (e2) { } sendAlertF('crash', 'ATDS 进程崩溃', '采集失败: ' + e.message + '\n时间: ' + (new Date().toISOString())).then(() => process.exit(1)); });
