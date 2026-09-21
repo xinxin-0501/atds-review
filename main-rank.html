@@ -5978,14 +5978,14 @@ function buildShortPlanHtml(s, plan, banned) {
     : (idxPct != null && idxPct <= -2.5) ? ('大盘风控触发(上证 ' + idxPct.toFixed(2) + '% ≤ -2.5%)，短线计划禁用') : '';
   var ff = s.fundFlow || {};
   var evNear = ((s.events || [])[0]) || null;
-  return '<div class="sp-gate ' + (isBan ? 'bad' : 'ok') + '">' + (isBan ? ('⛔ ' + why) : ('✓ 门槛通过：RR ' + f2(plan.rr) + ' ≥ 1.5 · 大盘风控正常' + (idxPct != null ? ('(上证 ' + idxPct.toFixed(2) + '%)') : ''))) + '</div>' +
+  return '<div class="sp-wrap" data-s-entry="' + f2(entry) + '" data-s-stop="' + f2(r2(priceStop)) + '" data-s-tp1="' + f2(r2(tp1)) + '" data-s-tp2="' + f2(r2(tp2)) + '"><div class="sp-gate ' + (isBan ? 'bad' : 'ok') + '">' + (isBan ? ('⛔ ' + why) : ('✓ 门槛通过：RR ' + f2(plan.rr) + ' ≥ 1.5 · 大盘风控正常' + (idxPct != null ? ('(上证 ' + idxPct.toFixed(2) + '%)') : ''))) + '</div>' +
     '<div class="dc-line sp-row">入场：<b>' + f2(entry) + '</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div>' +
     '<div class="dc-line sp-row">价格止损：<b>' + f2(r2(priceStop)) + '</b>（MA20 / 今开-3% 先触发者），无条件清仓</div>' +
     '<div class="dc-line sp-row">时间止损：<b>第3个交易日 14:50</b> 强制按最新价清仓，绝不扛单</div>' +
     '<div class="dc-line sp-row">分批止盈：①<b>' + f2(r2(tp1)) + '</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>' + f2(r2(tp2)) + '</b>(+' + tp2pct + '%)清仓剩余</div>' +
     '<div class="dc-line sp-row">资金量能：主力净流入 ' + f2(ff.d1) + '亿(d3 ' + f2(ff.d3) + ') · 量比 ' + f2(s.volRatio) + '</div>' +
     '<div class="dc-line sp-row">逻辑催化：' + escHtmlF(String(s.logic || '--').slice(0, 60)) + (evNear ? (' · 最近事件:' + escHtmlF(String(evNear.type || '') + ' ' + String(evNear.date || ''))) : '') + '</div>' +
-    '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="' + escHtmlF(s.code) + '" onchange="toggleShortTrack(this)"' + (isBan ? ' disabled' : '') + '> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label>' + (isBan ? '<span class="sp-ban">⛔ 已禁用</span>' : '') + '</div>';
+    '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="' + escHtmlF(s.code) + '" onchange="toggleShortTrack(this)"' + (isBan ? ' disabled' : '') + '> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label>' + (isBan ? '<span class="sp-ban">⛔ 已禁用</span>' : '') + '</div></div>';
 }
 // v11.80:短线跟踪开关 —— 与波段互斥;参数=shortParamsF 同口径;入场语义与波段一致(打勾=候选,盘中真实触及才入场)
 function toggleShortTrack(cb){
@@ -5996,12 +5996,24 @@ function toggleShortTrack(cb){
   if (cb.checked) {
     var dcr = reviewBlock || cb.closest('.dc-review');
     if (!dcr) { cb.checked = false; return; }
-    var _entry = N2F(dcr.getAttribute('data-entry')) || N2F(dcr.getAttribute('data-price'));
-    var fakeS = { strategy: { entry: _entry }, tech: null, open: null, price: N2F(dcr.getAttribute('data-price')) };
-    // 技术字段从 localStorage 缓存取(与决策卡同源)
-    var cached = loadWatchlistStockData(code) || {};
-    fakeS.tech = cached.tech || null; fakeS.open = N2F(cached.open); fakeS.fundFlow = cached.fundFlow || null; fakeS.marketRegime = cached.marketRegime || null; fakeS.events = cached.events || null;
-    var sp = shortParamsF(fakeS);
+    // v11.105:优先读短线计划自己的参数(.sp-wrap data-s-*)——此前读外层 data-entry 是【波段计划价】,
+    //   导致短线 rec 与短线计划卡口径不一致(601999:计划 6.79/6.45/6.90/8.55 vs rec 6.74/6.73/6.87/8.49)
+    var spWrap = cb.closest('.sp-wrap') || (dcr.querySelector && dcr.querySelector('.dc-short .sp-wrap')) || null;
+    var _sE = spWrap ? N2F(spWrap.getAttribute('data-s-entry')) : null;
+    var _sS = spWrap ? N2F(spWrap.getAttribute('data-s-stop')) : null;
+    var _sT1 = spWrap ? N2F(spWrap.getAttribute('data-s-tp1')) : null;
+    var _sT2 = spWrap ? N2F(spWrap.getAttribute('data-s-tp2')) : null;
+    var sp;
+    if (_sE && _sT2 && Number(_sT2) > Number(_sE)) {
+      sp = { entry: _sE, priceStop: (_sS && _sS < _sE) ? _sS : Math.round(_sE * 0.95 * 100) / 100, tp1: (_sT1 && _sT1 > _sE) ? _sT1 : Math.round(_sE * 1.04 * 100) / 100, tp2: _sT2 };
+    } else {
+      var _entry = N2F(dcr.getAttribute('data-entry')) || N2F(dcr.getAttribute('data-price'));
+      var fakeS = { strategy: { entry: _entry }, tech: null, open: null, price: N2F(dcr.getAttribute('data-price')) };
+      // 技术字段从 localStorage 缓存取(与决策卡同源)
+      var cached = loadWatchlistStockData(code) || {};
+      fakeS.tech = cached.tech || null; fakeS.open = N2F(cached.open); fakeS.fundFlow = cached.fundFlow || null; fakeS.marketRegime = cached.marketRegime || null; fakeS.events = cached.events || null;
+      sp = shortParamsF(fakeS);
+    }
     if (sp.entry == null) { cb.checked = false; showToast('计划参数缺失，无法启用短线模式', 'warn'); return; }
     // 若同股已有波段 rec → 直接转换模式(未入场状态);已入场见上
     m[code] = { enabled: true, mode: 'short', status: 'monitoring', name: dcr.getAttribute('data-name') || code,
@@ -6832,6 +6844,8 @@ function updateReviewProgress(){
       var held2=sr.entryHit?tradingDaysBetweenF(sr.entryDate,bjTodayF()):0;
       if(!sr.entryHit){
         txt='⏱ 短线2-3天监控中：等待盘中真实触及 '+sr.entry+'（打勾仅候选；打勾前价格不算）。价格止损 '+sr.priceStop+' · 分批止盈 '+sr.tp1+'/'+sr.tp2+' · 时间止损 T+3 14:50。未触发不计样本';
+        var _sLow=parseFloat(blocks[b].getAttribute('data-low'))||0;
+        if(_sLow>0&&_sLow<sr.entry){ txt+='；⚠ 打勾前盘中曾低至 '+_sLow+'（早于打勾时刻，防偷价口径不计入）'; }
       } else if(sr.stage!=null&&sr.stage>=1){
         var fl2=(px&&sr.entry)?Math.round((px-sr.entry)/sr.entry*10000)/100:null;
         txt='⏱ 短线持有中(T+'+held2+'，已保本)：现价'+px+'，浮动'+(fl2!=null?((fl2>=0?'+':'')+fl2+'%'):'--')+'。剩余仓位止损上移至成本 '+sr.entry+'；第二止盈 '+sr.tp2+'；T+3 14:50 时间止损强制离场';
@@ -6859,6 +6873,9 @@ function updateReviewProgress(){
         var monTxt=afterClose
           ? '🟡 监控中：今日未触发入场（未消耗样本）—— 未回落至计划入场价 '+r.entry+'（今日最高 '+(r.lastCheck&&r.lastCheck.high||px)+'），明日继续'
           : '🟡 监控中：等待回落至计划入场价 '+r.entry+' 触发虚拟买入（现价 '+px+(need!=null?('，还差 '+need+'%'):'')+'）';
+        // v11.105:防误导 —— 当日最低已低于入场价但未触发 ⇒ 低点必然发生在打勾前(打勾后触及早已入场),明示防偷价口径
+        var _dayLow=parseFloat(blocks[b].getAttribute('data-low'))||0;
+        if(_dayLow>0&&_dayLow<r.entry){ monTxt+='；⚠ 打勾前盘中曾低至 '+_dayLow+'（早于打勾时刻，防偷价口径不计入）'; }
         txt=monTxt+' ｜ 观察起点 '+r.openedDate+' '+ (r.entryTime?('（'+r.entryTime+' 打勾）'):'') +'· 已 '+days+' 天 / '+ntd+' 个交易日'+skTxt+'；未触发入场不计入样本';
       }else{
         var gap=(px&&r.target)?Math.round((r.target-px)/px*10000)/100:null;
