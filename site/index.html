@@ -3701,7 +3701,7 @@ function deriveSigR(v){if(v>=5)return{name:'强势突破',tone:'break'};if(v>=2)
    行情刷新只更新现价/涨跌,计划价次日盘前才更新。 */
 function planLockCapture(code){
   try{
-    var blk=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]');
+    var blk=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]') || document.querySelector('.dc-review[data-review-code="'+code+'"]');
     if(!blk)return null;
     var lock={e:blk.getAttribute('data-entry'),s:blk.getAttribute('data-stop'),t:blk.getAttribute('data-target')};
     var sw=blk.querySelector('.sp-wrap');
@@ -3712,7 +3712,7 @@ function planLockCapture(code){
 function planLockApply(code,lock){
   try{
     if(!lock)return;
-    var blk=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]');
+    var blk=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]') || document.querySelector('.dc-review[data-review-code="'+code+'"]');
     if(!blk)return;
     if(lock.e)blk.setAttribute('data-entry',lock.e);
     if(lock.s)blk.setAttribute('data-stop',lock.s);
@@ -4168,7 +4168,7 @@ window.sortSignalRadar = sortSignalRadar;
 /* v11.112:计划偏移同步 —— 执行层切到今日计划价,清空旧入场状态并立即按今日数据重判(样本自动补录) */
 function syncPlanPrice(code){
   var sm=getShadowMap(),rec=sm[code];
-  var block=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+  var block=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]') || document.querySelector('.dc-review[data-review-code="'+code+'"]');
   if(!rec||!block)return;
   var pe=parseFloat(block.getAttribute('data-entry'))||0,ps=parseFloat(block.getAttribute('data-stop'))||0,pt=parseFloat(block.getAttribute('data-target'))||0;
   if(!(pe>0&&ps>0&&pt>pe&&pe>ps)){showToast('今日计划参数非法，无法同步','warn');return;}
@@ -4188,7 +4188,7 @@ function keepOldPlanPrice(code){
 }
 function syncShortPlanPrice(code){
   var sm=getShortMap(),rec=sm[code];
-  var block=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+  var block=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]') || document.querySelector('.dc-review[data-review-code="'+code+'"]');
   var sw=block?block.querySelector('.sp-wrap'):null;
   if(!rec||!sw){showToast('未找到短线记录或计划卡','warn');return;}
   var e=parseFloat(sw.getAttribute('data-s-entry'))||0,st=parseFloat(sw.getAttribute('data-s-stop'))||0,t1=parseFloat(sw.getAttribute('data-s-tp1'))||0,t2=parseFloat(sw.getAttribute('data-s-tp2'))||0;
@@ -5590,7 +5590,7 @@ function archiveHistoryCopyF(code,obj){
 //   单列展示、不计入胜率 —— 这是用户主动终止,不是策略打出的止盈/止损)。绝不允许静默丢弃历史。
 function archiveShadowPositionF(code,rec,reason){
   if(!rec)return;
-  var block=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+  var block=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]') || document.querySelector('.dc-review[data-review-code="'+code+'"]');
   var price=block?(parseFloat(block.getAttribute('data-price'))||0):0;
   if(!(price>0))price=Number(rec.refPrice)||0;
   var pnl=(price&&rec.entry)?Math.round((price-rec.entry)/rec.entry*10000)/100:0;
@@ -6435,7 +6435,7 @@ function settleShadowTrade(code,klines,minBars){
   var sm=getShadowMap();
   var rec=sm[code];
   if(!rec||!rec.enabled||rec.settled)return;
-  var block=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+  var block=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]') || document.querySelector('.dc-review[data-review-code="'+code+'"]');
   if(!block)return;
   var price=parseFloat(block.getAttribute('data-price'))||0;
   var high=parseFloat(block.getAttribute('data-high'))||0;
@@ -6970,7 +6970,7 @@ function updateReviewProgress(){
   // v11.80:休市标识 —— 非连续竞价时段,决策卡顶部强制显示"不产生任何结算"
   var _ph=tradingPhaseF();
   var _closedTxt=(_ph.canSettle||_ph.phase==='review')?null:('⚠️ 休市期间（'+_ph.label+'），数据为昨日静态参考，不产生任何结算');
-  var blocks=document.querySelectorAll('.dc-review');
+  var blocks=document.querySelectorAll('.wl-detail[data-detail-code] .dc-review'); if(!blocks.length)blocks=document.querySelectorAll('.dc-review');
   for(var b=0;b<blocks.length;b++){
     if(_closedTxt){
       var _blk=blocks[b];
@@ -7258,7 +7258,7 @@ function bindReviewHoverPause(block){
   block.addEventListener('mouseleave',function(){_wlRefreshPaused=false;});
 }
 function initReviewState(){
-  var blocks=document.querySelectorAll('.dc-review');
+  var blocks=document.querySelectorAll('.wl-detail[data-detail-code] .dc-review');
   for(var i=0;i<blocks.length;i++){
     applyReviewState(blocks[i]);
   }
