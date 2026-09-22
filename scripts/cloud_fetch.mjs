@@ -3417,7 +3417,7 @@ async function scanSignalRadar(idxPct){
   var clean=[];
   for(var m=0;m<results.length;m++){
     var s=results[m];
-    var days=(s.firstDate===today)?0:1;   // 简化:跨日即按1天衰减(精确交易日差由前端展示用)
+    var days=(s.firstDate && s.firstDate!==today) ? Math.max(1, tradingDaysBetweenS(s.firstDate, today)) : 0;   // v11.131:精确交易日差(工作日计数,与客户端同口径),时间衰减恢复精度
     var timeScore=100*Math.pow(0.9,days);
     s.timeScore=Math.round(timeScore);
     s.finalScore=Math.round(0.7*s.score+0.3*timeScore);
