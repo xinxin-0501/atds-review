@@ -2254,7 +2254,7 @@
       <a href="index.html">首页</a><a href="2026-08-14_08-30.html" class="active">盘前</a><a href="2026-08-14_15-20.html">收盘</a><a href="2026-09-21_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:35</b>（约 1031 分钟前）</div><h1 class="hero-title">2026-08-14 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:35</b>（约 1066 分钟前）</div><h1 class="hero-title">2026-08-14 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-14 18:35:24</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -2361,7 +2361,6 @@ tags: [ATDS, 交易复盘]
 # 观察池
 - 盛和资源 (600392): 23.90 +4.60%
 </pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
-  <div class="card"><div class="card-title">观察池回测追踪 · 次日复核</div><div id="wl-backtest-host"></div><div class="hint">暂无历史样本。</div></div>
   <div class="modal-mask" id="signal-radar-modal" onclick="if(event.target===this)closeSignalRadarModal()">
     <div class="modal" onclick="event.stopPropagation()" style="max-width:96%;width:96%;max-height:86vh;display:flex;flex-direction:column;">
       <div class="modal-header">
@@ -4261,7 +4260,6 @@ async function refreshWatchlistQuotes(){
     if(nowS-Number(window.__atdsSettleTs||0)>60000){
       window.__atdsSettleTs=nowS;
       try{settleAllShadowTrades();}catch(e){}
-    try{ if(typeof renderWlManualBacktestF==='function') renderWlManualBacktestF(); }catch(e){}   // v11.68:观察池手动新增股回测
     }
   }catch(e){
     // v11.56:刷新失败绝不能静默 —— 否则页面上的旧价会被当成当前价(用户无法察觉)。
@@ -6469,8 +6467,8 @@ window.repullTailscan=repullTailscan;
   setTimeout(refreshTailscanTail,1500);
   setInterval(function(){try{refreshTailscanTail();}catch(e){}},60000);
 })();
-/* v11.72 回测表折叠(默认收起,点标题展开) —— 四处共用:
-   盘前「观察池回测追踪」「手动新增股回测」 + 收盘「历史Top5」「观察池回测追踪」。
+/* v11.72 回测表折叠(默认收起,点标题展开) —— 收盘页两处共用:
+   收盘「历史Top5」「观察池回测追踪」。
    摘要行常显(不丢汇总),只折叠 10 列明细表与口径说明。 */
 function toggleBtFold(h){
   // ⚠️ 必须兼容两种结构:折叠头既可能是 .bt-fold 的【子孙】(推荐,closest 直接命中),
@@ -6683,134 +6681,6 @@ function toggleShadowTrack(cb){
 //   原缺陷:未打开页面的交易日完全跳过 → 可能整体错过入场时机或止盈/止损触发,样本量与结果都被扭曲。
 //   新做法:取该股日K(腾讯前复权),从观察起点次日起按时间顺序逐根判定 —— 先触者生效,同日双触保守计止损。
 //   基准一致性:仅当"最后一根K线收盘价"与"实时价"偏差 ≤5% 时才采用(防止前复权基准漂移/除权造成误判)。
-/* ===== v11.68 观察池「手动新增股」回测(客户端补算) =====
-   为什么在客户端做:手动新增股只存在浏览器 localStorage(atds_watchlist),服务端读不到,
-   所以它们的那部分回测只能由客户端补算,与服务端算好的配置股行合并到同一张表。
-   ⚠️ 无未来函数:对历史交易日 D,把该股K线【截断到 D】再重算技术画像与计划 ——
-   计划是K线的确定性函数,截断重算 == 当天真实会看到的计划;然后用 D+1 的日K复核。
-   口径与服务端 loadWatchlistBacktest 完全一致(入场=次日最低触及计划价;其后最高先触止盈→止盈,
-   最低先触止损→止损;同日双触保守计止损;未触入场价记 noentry)。 */
-function wlPlanF(t, price) {
-  var px = Number(price) || 0;
-  if (!t || !(px > 0)) return null;
-  function pick(arr, want) {
-    var a = (Array.isArray(arr) ? arr : []).filter(function (x) {
-      return x && x.price != null && x.price > 0 && Math.abs(x.price - px) / px <= 0.20;
-    });
-    for (var i = 0; i < a.length; i++) { if (a[i].weight === want) return a[i]; }
-    return a[0] || null;
-  }
-  var sup = pick(t.supports, 'strong'), pre = pick(t.pressures, 'strong');
-  var supPrice = sup ? sup.price : (t.ma20 || px * 0.96);
-  var prePrice = pre ? pre.price : (t.ma5 || px * 1.05);
-  var entry = supPrice < px ? supPrice : px;
-  var atr = t.atr14 || px * 0.03;
-  var stop = entry - Math.max(atr, entry * 0.03);
-  var target = prePrice > entry ? prePrice : entry * 1.06;
-  if (!(entry > stop) || !(target > entry)) return null;
-  var r2 = function (x) { return Math.round(x * 100) / 100; };
-  return { entry: r2(entry), stop: r2(stop), target: r2(target), rr: Math.round((target - entry) / (entry - stop) * 100) / 100 };
-}
-function manualCodesF() {
-  try { var w = JSON.parse(localStorage.getItem('atds_watchlist') || '[]'); return (Array.isArray(w) ? w : []).map(String); }
-  catch (e) { return []; }
-}
-function manualNameF(code) {
-  try { var d = JSON.parse(localStorage.getItem('atds_watchlist_data') || '{}'); return (d[code] && d[code].name) || code; }
-  catch (e) { return code; }
-}
-async function wlManualBacktestF(dayLimit) {
-  var codes = manualCodesF();
-  if (!codes.length) return [];
-  var rows = [], cap = dayLimit || 5, today = bjTodayF();
-  for (var ci = 0; ci < codes.length && ci < 30; ci++) {
-    var code = codes[ci], kl = [];
-    try { kl = await fetchKlineF(klineFullF(code), 40); } catch (e) { kl = []; }
-    if (!Array.isArray(kl) || kl.length < 20) continue;
-    var idxs = [];
-    for (var i = 0; i < kl.length; i++) {
-      var d = String((kl[i] && kl[i][0]) || '').slice(0, 10);
-      if (d && d <= today) idxs.push(i);
-    }
-    if (idxs.length < 2) continue;
-    var start = Math.max(0, idxs.length - 1 - cap);
-    for (var s2 = start; s2 < idxs.length - 1; s2++) {          // 最后一天没有"次日",跳过
-      var iD = idxs[s2];
-      var dD = String(kl[iD][0]).slice(0, 10);
-      var pxD = parseFloat(kl[iD][2]);
-      var plan = wlPlanF(calcDecisionTech(kl.slice(0, iD + 1)), pxD);
-      if (!plan) continue;
-      var nD = kl[idxs[s2 + 1]];
-      var row = { predictDate: dD, slot: '收盘', code: code, name: manualNameF(code),
-        category: '手动新增', close: pxD, entry: plan.entry, stop: plan.stop, target: plan.target,
-        rr: plan.rr, actual: null, result: null, verify: 'pending' };
-      var nHi = parseFloat(nD[3]), nLo = parseFloat(nD[4]), nClose = parseFloat(nD[2]);
-      if (pxD > 0 && nHi > 0 && nLo > 0 && nClose > 0) {
-        row.actual = { date: String(nD[0]).slice(0, 10), pct: Math.round((nClose / pxD - 1) * 1000) / 10 };
-        if (nLo <= plan.entry) {
-          var hitT = nHi >= plan.target, hitS = nLo <= plan.stop;
-          row.result = (hitT && hitS) ? 'loss' : (hitS ? 'loss' : (hitT ? 'win' : 'holding'));
-        } else { row.result = 'noentry'; }
-        row.verify = 'verified';
-      }
-      rows.push(row);
-    }
-  }
-  rows.sort(function (a, b) { return a.predictDate < b.predictDate ? 1 : -1; });
-  return rows;
-}
-async function renderWlManualBacktestF() {
-  var host = document.getElementById('wl-backtest-host');
-  if (!host) return;
-  // 5 分钟节流:行情每次刷新都重算会反复拉K线
-  var nowTs = Date.now();
-  if (nowTs - Number(window.__atdsWlBtTs || 0) < 300000) return;
-  window.__atdsWlBtTs = nowTs;
-  var rows = [];
-  try { rows = await wlManualBacktestF(5); } catch (e) { return; }
-  if (!rows.length) return;
-  var r2 = function (v) { return (v >= 0 ? '+' : '') + Number(v).toFixed(2) + '%'; };
-  var f2v = function (v) { return (v == null || isNaN(Number(v))) ? '--' : Number(v).toFixed(2); };
-  var resCell = function (r) {
-    if (r.verify === 'nodata') return '<td class="verif">无K线</td>';
-    if (r.result === 'win') return '<td class="verif ok">✅ 止盈</td>';
-    if (r.result === 'loss') return '<td class="verif no">🛑 止损</td>';
-    if (r.result === 'holding') return '<td class="verif">持有中</td>';
-    if (r.result === 'noentry') return '<td class="verif">未触入场价</td>';
-    return '<td class="verif">待验证</td>';
-  };
-  var body = rows.map(function (r) {
-    var a = r.actual;
-    return '<tr>' +
-      '<td>' + escHtmlF(r.predictDate || '--') + '<span class="tb-slot">' + escHtmlF(r.slot || '') + '</span></td>' +
-      '<td>' + escHtmlF(r.name || '--') + '<span class="tb-rank-mini">' + escHtmlF(r.code || '') + '</span></td>' +
-      '<td>' + escHtmlF(r.category || '--') + '</td>' +
-      '<td>' + f2v(r.close) + '</td><td>' + f2v(r.entry) + '</td><td>' + f2v(r.stop) + '</td><td>' + f2v(r.target) + '</td>' +
-      '<td>' + (r.rr != null ? Number(r.rr).toFixed(2) : '--') + '</td>' +
-      '<td class="verif-now">' + (a && a.pct != null ? ('<span class="' + (a.pct >= 0 ? 'up' : 'down') + '">' + r2(a.pct) + '</span><span class="tb-slot">' + escHtmlF(String(a.date || '').slice(5)) + '</span>') : '--') + '</td>' +
-      resCell(r) + '</tr>';
-  }).join('');
-  var v = rows.filter(function (x) { return x.verify === 'verified'; });
-  var w = v.filter(function (x) { return x.result === 'win'; }).length;
-  var l = v.filter(function (x) { return x.result === 'loss'; }).length;
-  var h = v.filter(function (x) { return x.result === 'holding'; }).length;
-  var ne = v.filter(function (x) { return x.result === 'noentry'; }).length;
-  var entered = w + l + h;
-  host.innerHTML = '<div class="bt-fold">' +
-    '<div class="card-title bt-fold-head" style="margin-top:10px" onclick="toggleBtFold(this)">手动新增股回测 · 次日复核<span class="bt-fold-tip">👆 点击展开明细</span><span class="bt-fold-caret">▸</span></div>' +
-    '<div class="hint" style="margin-bottom:4px">已验证 <b>' + v.length + '</b> 条 · 预测触达 <b>' + entered + '</b> 条（预测口径，非模拟跟踪入场）' +
-    (v.length ? ('（' + Math.round(entered / v.length * 100) + '%）') : '') +
-    ' · 止盈 <b>' + w + '</b> / 止损 <b>' + l + '</b>' + (h ? (' / 持有中 <b>' + h + '</b>') : '') + (ne ? (' · 未触入场价 ' + ne) : '') +
-    '　<span class="tb-slot">样本存在本机浏览器，换机/清缓存即丢失</span></div>' +
-    '<div class="bt-fold-body">' +
-    '<div class="tb-backtest-wrap"><table class="tb-backtest"><thead><tr>' +
-    '<th>预测日期</th><th>标的</th><th>来源</th><th>当日收盘</th><th>计划入场</th><th>止损</th><th>止盈</th><th>盈亏比</th><th>次日实际</th><th>结果</th>' +
-    '</tr></thead><tbody>' + body + '</tbody></table></div>' +
-    '<div class="hint">口径与服务端一致；<b>无未来函数</b>：每个历史交易日的计划是把K线截断到当日重算得到的（等于当天真实会看到的计划）。</div>' +
-    '</div>' +
-    '</div>';
-}
-
 function klineFullF(code){
   var n=String(code||'').replace(/\D/g,'');
   if(/^(4|8|92)/.test(n))return 'bj'+n;
