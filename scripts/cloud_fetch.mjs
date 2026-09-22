@@ -3334,10 +3334,11 @@ function signalRadarJudgeF(t, quote, today, idxPct){
   var ma20=t.ma20, volRatio=t.volRatio;
   var entry=Number(quote.price)||0, open=Number(quote.open)||0;
   if(!(entry>0)||!(ma20>0))return null;
-  // 今日回踩MA20(区间覆盖)
-  var todayK = null;
-  // 波段:门控粗筛 + 回踩MA20
-  var swingOk = t.ma20Slope==='up' && (t.trend==='up'||t.trend==='repair') && t.weeklyTrend==='up' && (volRatio!=null && volRatio>=0.8);
+  // v11.125:今日触达判定 —— "信号"必须是【今日价格已触及入场位/回踩位】,不是仅趋势/RR合格(否则只是潜在候选,非"已触发信号")
+  var hi=Number(quote.high)||0, lo=Number(quote.low)||0;
+  var touchMa20 = (lo>0 && hi>0 && lo<=ma20 && hi>=ma20);   // 今日回踩MA20(区间覆盖)
+  // 波段:门控粗筛 + 今日回踩MA20
+  var swingOk = t.ma20Slope==='up' && (t.trend==='up'||t.trend==='repair') && t.weeklyTrend==='up' && (volRatio!=null && volRatio>=0.8) && touchMa20;
   // 短线:v11.120 口径与观察池决策卡完全一致(entry=回踩位min(支撑,现价);stop=entry−max(ATR,3%);target=压力位或×1.06)
   //   旧口径 entry=现价 + stop=min(MA20,今开×0.97) 使 MA20 贴近现价时分母极小⇒RR 虚高(电光科技雷达 RR 2.95 vs 观察池 0.21 的根因)
   var supPrice = (t.supports && t.supports[0] && Number(t.supports[0].price) < entry) ? Number(t.supports[0].price) : null;
@@ -3348,7 +3349,8 @@ function signalRadarJudgeF(t, quote, today, idxPct){
   var tp1 = (press && press > planEntry) ? press : (planEntry * 1.06);
   var tp2 = Math.max(planEntry * 1.07, tp1 * 1.02);
   var rr = priceStop < planEntry ? (tp1 - planEntry) / (planEntry - priceStop) : 0;
-  var shortOk = (rr >= 1.5) && !(idxPct != null && idxPct <= -2.5);
+  var touchEntry = (lo>0 && hi>0 && lo<=planEntry && hi>=planEntry);   // v11.125:今日触及入场位(短线"已触发"的必要条件)
+  var shortOk = (rr >= 1.5) && !(idxPct != null && idxPct <= -2.5) && touchEntry;
   // 强度分
   var score=0, sigType=null, detail={};
   if(swingOk){
@@ -3424,7 +3426,12 @@ async function scanSignalRadar(idxPct){
     clean.push(s);
   }
   // 排序:综合分降序;并列→触发时间降序(新近优先=firstDate 降序)
-  clean.sort(function(a,b){ if(b.finalScore!==a.finalScore)return b.finalScore-a.finalScore; return String(b.firstDate)<String(a.firstDate)?-1:1; });
+  // v11.125:排序改为【触发时间由近到远】为主,触发时间相同时【综合分由高到低】为辅
+  clean.sort(function(a,b){
+    var da=String(a.firstDate||''), db=String(b.firstDate||'');
+    if(da!==db) return da<db?1:-1;                       // 近(日期大)优先
+    return (b.finalScore||0)-(a.finalScore||0);           // 同时间:综合分高优先
+  });
   var list=clean.slice(0,50).map(function(x,i){
     return {rank:i+1,code:x.code,name:x.name,signalType:x.signalType,score:x.score,timeScore:x.timeScore,finalScore:x.finalScore,
       firstDate:x.firstDate,price:x.price,pct:x.pct,entry:x.entry,rr:x.rr,volRatio:x.volRatio,ma20:x.ma20,priceStop:x.priceStop,tp1:x.tp1};
