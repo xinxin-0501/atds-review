@@ -3701,7 +3701,7 @@ function deriveSigR(v){if(v>=5)return{name:'强势突破',tone:'break'};if(v>=2)
    行情刷新只更新现价/涨跌,计划价次日盘前才更新。 */
 function planLockCapture(code){
   try{
-    var blk=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+    var blk=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]');
     if(!blk)return null;
     var lock={e:blk.getAttribute('data-entry'),s:blk.getAttribute('data-stop'),t:blk.getAttribute('data-target')};
     var sw=blk.querySelector('.sp-wrap');
@@ -3712,7 +3712,7 @@ function planLockCapture(code){
 function planLockApply(code,lock){
   try{
     if(!lock)return;
-    var blk=document.querySelector('.dc-review[data-review-code="'+code+'"]');
+    var blk=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]');
     if(!blk)return;
     if(lock.e)blk.setAttribute('data-entry',lock.e);
     if(lock.s)blk.setAttribute('data-stop',lock.s);
@@ -6986,6 +6986,10 @@ function updateReviewProgress(){
     if(!attr)continue;
     var r=sm[code],txt;
     var sr=sc[code]||null;   // v11.96:短线独立记录
+    // v11.123:短线计划禁用(RR<1.5) ⇒ 短线不跟踪——清除 rec(含禁用状态下被自动同步误入场的无效记录,无journal污染)
+    if(sr&&sr.enabled&&blocks[b].querySelector('.dc-short .sp-gate.bad')){
+      delete sc[code]; setShortMap(sc); sr=null;
+    }
     var shTxt=null,swTxt=null,traceRec=null;   // v11.98:双策略归因分别组装,堆叠展示互不覆盖
     var px=Number(blocks[b].getAttribute('data-price'))||0;
     var ntd=(r&&r.trace&&r.trace.length)?r.trace.length:0;   // v11.32:已跟踪的交易日数(取自日K逐日轨迹)
