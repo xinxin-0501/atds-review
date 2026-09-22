@@ -3754,9 +3754,8 @@ function planLockCapture(code){
   try{
     var blk=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]') || document.querySelector('.dc-review[data-review-code="'+code+'"]');
     if(!blk)return null;
+    // v11.128:只锁波段 data-entry/stop/target;不再锁短线 data-s-*(改属性不改文本会造成"展示文本 vs 属性"分裂,破坏 v11.115 短线同步)
     var lock={e:blk.getAttribute('data-entry'),s:blk.getAttribute('data-stop'),t:blk.getAttribute('data-target')};
-    var sw=blk.querySelector('.sp-wrap');
-    if(sw){lock.se=sw.getAttribute('data-s-entry');lock.ss=sw.getAttribute('data-s-stop');lock.s1=sw.getAttribute('data-s-tp1');lock.s2=sw.getAttribute('data-s-tp2');}
     return lock;
   }catch(e){return null;}
 }
@@ -3768,8 +3767,6 @@ function planLockApply(code,lock){
     if(lock.e)blk.setAttribute('data-entry',lock.e);
     if(lock.s)blk.setAttribute('data-stop',lock.s);
     if(lock.t)blk.setAttribute('data-target',lock.t);
-    var sw=blk.querySelector('.sp-wrap');
-    if(sw&&lock.se){sw.setAttribute('data-s-entry',lock.se);sw.setAttribute('data-s-stop',lock.ss);sw.setAttribute('data-s-tp1',lock.s1);sw.setAttribute('data-s-tp2',lock.s2);}
   }catch(e){}
 }
 function planLockGet(code){
