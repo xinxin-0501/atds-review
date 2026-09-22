@@ -3728,14 +3728,14 @@ function planLockApply(code,lock){
 }
 function planLockGet(code){
   try{
-    var all=JSON.parse(localStorage.getItem('atds_plan_lock_'+bjTodayF())||'{}');
+    var all=JSON.parse(localStorage.getItem('atds_plan_lock_v2_'+bjTodayF())||'{}');
     return all[code]||null;
   }catch(e){return null;}
 }
 function planLockSave(code,lock){
   try{
-    var all=JSON.parse(localStorage.getItem('atds_plan_lock_'+bjTodayF())||'{}');
-    all[code]=lock;localStorage.setItem('atds_plan_lock_'+bjTodayF(),JSON.stringify(all));
+    var all=JSON.parse(localStorage.getItem('atds_plan_lock_v2_'+bjTodayF())||'{}');
+    all[code]=lock;localStorage.setItem('atds_plan_lock_v2_'+bjTodayF(),JSON.stringify(all));
   }catch(e){}
 }
 async function refreshWatchlistQuotes(){
