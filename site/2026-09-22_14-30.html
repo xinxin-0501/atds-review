@@ -2,8 +2,9 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>ATDS PRO · 盘前简报</title>
+<title>ATDS PRO · 14:30 尾盘定调快照</title>
 <style>.modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0}
 .modal-mask.show{display:flex}
 .modal{background:#fff;border-radius:20px;max-width:414px;width:92%;margin:0 auto;padding:0;overflow:hidden}
@@ -2241,1065 +2242,539 @@
 </style>
 <script>window.addEventListener('DOMContentLoaded',function(){var t=Date.now();document.querySelectorAll('a[href]').forEach(function(a){var h=a.getAttribute('href')||'';if(/.html$/.test(h)&&h.indexOf('?')<0){a.setAttribute('href',h+'?nc='+t);}});});</script></head>
 <body>
-<div class="phone">
+<div class="phone" data-report-date="2026-09-22" data-snap-time="14:30">
 <div class="header">
     <div class="brand">
       <div class="logo">A</div>
       <div class="brand-text">
         <div class="brand-name">ATDS <span class="pro-badge">PRO</span> 复盘</div>
-        <div class="brand-sub">GLOBAL LINKAGE V4.0 · 2026-08-20 08:30</div>
+        <div class="brand-sub">GLOBAL LINKAGE V4.0 · 2026-09-22 14:30</div>
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">首页</a><a href="2026-08-20_08-30.html" class="active">盘前</a><a href="2026-08-20_15-20.html">收盘</a><a href="2026-09-22_14-30.html">尾盘</a>
+      <a href="index.html">首页</a><a href="2026-09-22_09-45.html">盘前</a><a href="2026-09-21_16-20.html">收盘</a><a href="2026-09-22_14-30.html" class="active">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:08</b>（约 1160 分钟前）</div><h1 class="hero-title">2026-08-20 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:08），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
-<div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
+<div class="hero">
+  <div class="hero-title">14:30 尾盘定调快照 <span class="hero-time">14:30</span></div>
+  <div class="hero-sub">四大选股模块盘中快照 · 采集于 14:10 · 16:20 收盘复盘会用定型数据覆盖</div>
+  <div class="hero-warn hero-warn-late">⚠️ 14:30 盘中快照，指标未定型，尾盘可能有变盘风险，非最终结果。本页仅用于筛选<b>次日观察池候选</b>。</div>
+  <div class="ts-idxline"><span class="ts-idx">上证指数 <b>3,954.22</b> +0.11%</span><span class="ts-idx">深证成指 <b>13,747.71</b> +0.13%</span><span class="ts-idx">创业板指 <b>3,407.58</b> +0.24%</span></div>
+  <div class="wave-tools" style="margin-top:8px">
+    <button id="ts-repull-btn" class="wl-btn wl-btn-primary" onclick="repullTailscan()">🔄 重新拉取最新 14:30 快照</button>
+    <span id="ts-repull-status" class="ts-repull-status"></span>
+  </div>
+  <div class="ts-sep-note">🔒 <b>选股 ≠ 模拟跟踪</b>：14:30 入选仅作次日观察池候选；系统模拟跟踪<b>不依据 14:30 静态价格入场</b>，入场判定仍只认盘中实时价格触发（本页不提供模拟跟踪开关，也不写入任何跟踪数据）。</div>
+</div>
 <div class="section">
-  <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-20 19:08:03</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>置信度</b></span>
-    <span class="wl-cell wl-cell-sig"><b>盈亏比</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="600487" data-tech="null" data-ff="null" data-stock="{&quot;code&quot;:&quot;600487&quot;,&quot;name&quot;:&quot;亨通光电&quot;,&quot;price&quot;:62.02,&quot;pct&quot;:5.28,&quot;amount&quot;:&quot;118.4亿&quot;,&quot;turnover&quot;:&quot;7.95&quot;}">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">1</span><span class="wl-name">亨通光电</span><span class="wl-code">600487</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">62.02</span></span>
-    <span class="wl-cell wl-cell-pct up">+5.28%</span>
-    <span class="wl-cell wl-cell-amt">118.4亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">3.00</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600487" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="600487" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="600487">
-    <div class="dc-head">
-      <span class="dc-pri">★</span>
-      <span class="dc-name">亨通光电 <i>600487</i></span>
-      <span class="dc-status down">等待触发</span>
-      <span class="dc-integrity warn" title="缺失:资金、关键位、龙虎榜 · 决策受限,谨慎交易">⚠ 数据暂缺·资金/关键位/龙虎榜</span>
-      <span class="dc-conf dc-conf-down">置信度 41</span>
-      <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 3.00</span>
-      <span class="dc-time">2026-08-20 19:08:03</span>
-    </div>
-    <div class="dc-tags"><span class="dc-tag">催化:题材</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:发酵</span><span class="dc-tag">情绪:发酵</span><span class="dc-tag">地位:跟风</span><span class="dc-tag">容错低</span></div>
-    
-    <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
-      <div class="dc-line"><span>主力净流入 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>3日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>5日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span></div>
-      <div class="dc-line"><span>量比 <b>--</b></span>
-    <span>换手 <b>7.95%</b></span>
-    <span>较昨日量 <b class="">--</b></span>
-    <span>振幅 <b>--</b></span>
-    <span>分歧 <b>正常换手</b></span></div>
-      <div class="dc-line">竞价 --</div>
-      <div class="dc-line"><span>封单 <b>非涨停</b></span></div>
-      <div class="dc-line">龙虎榜：近期未上榜</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv">--</span></div>
-      <div class="dc-line">压力 <span class="lv">--</span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR -- · 震荡 · 周线走平 · 60分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span> · 15分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span></div>
-      <div class="dc-line">开盘预期 --</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">📅 事件风险</div>
-      <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
-    </div>
-    <div class="dc-block dc-plan dc-plan-collapsed">
-      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
-      <div class="dc-plan-body"><table class="tp-table">
-    <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩59.54企稳</td>
-    <td class="tp-num">59.54</td>
-    <td class="tp-num stop">57.68</td>
-    <td class="tp-num">65.12</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">B 突破确认</td>
-    <td class="tp-trig">放量突破65.12</td>
-    <td class="tp-num">65.12</td>
-    <td class="tp-num stop">63.17</td>
-    <td class="tp-num">70.33</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 59.54 再执行,当前仅观察。</div>
-      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 59.54）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破57.68无条件止损 · 到达65.12无条件止盈 · 日内做T当日必须平T不隔夜</div>
-      </div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
-      
-      
-      <div class="dc-line">证伪条件：跌破近期低点且无法收回 → 逻辑失效</div>
-      <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
-      <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比10/10</div>
-    </div>
-    <div class="dc-block dc-review" data-review-code="600487" data-name="亨通光电" data-price="62.02" data-high="62.02" data-low="62.02" data-entry="59.54" data-stop="57.68" data-target="65.12" data-tdate=""><div class="dc-h">📊 盘后复盘（当日验证）</div>
-      <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
-      
-      <div class="dc-line">资金验证：资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察</div>
-      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="600487" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="600487" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="600487" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="600487" onclick="recordTTrade(this)">记做T</button></div>
-      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="600487" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
-      <div class="dc-block dc-short" data-short-code="600487"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div><div class="sp-wrap" data-s-entry="62.02" data-s-stop="58.92" data-s-tp1="64.50" data-s-tp2="66.36"><div class="sp-gate ok">✓ 门槛通过：RR -- ≥ 1.5 · 大盘风控正常(上证 0.24%)</div><div class="dc-line sp-row">入场：<b>62.02</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div><div class="dc-line sp-row">价格止损：<b>58.92</b>（MA20 / 今开-3% 先触发者），无条件清仓</div><div class="dc-line sp-row">时间止损：<b>第3个交易日 14:50</b> 强制按最新价清仓，绝不扛单（短线变长线克星）</div><div class="dc-line sp-row">分批止盈：①<b>64.50</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>66.36</b>(+7%)清仓剩余</div><div class="dc-line sp-row">资金量能：主力净流入 --亿(d3 --) · 量比 --</div><div class="dc-line sp-row">逻辑催化：--</div><div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="600487" onchange="toggleShortTrack(this)"> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label></div></div></div>
-      <div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
-      <div class="dc-line dc-trace" data-trace-code="600487"></div>
-      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察量能与MA5得失，方向未明前继续观望。</div>
-    </div>
-  </div></div><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>置信度</b></span>
-    <span class="wl-cell wl-cell-sig"><b>盈亏比</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="600392" data-tech="null" data-ff="null" data-stock="{&quot;code&quot;:&quot;600392&quot;,&quot;name&quot;:&quot;盛和资源&quot;,&quot;price&quot;:22.28,&quot;pct&quot;:-0.13,&quot;amount&quot;:&quot;11.7亿&quot;,&quot;turnover&quot;:&quot;2.95&quot;}">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">2</span><span class="wl-name">盛和资源</span><span class="wl-code">600392</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">22.28</span></span>
-    <span class="wl-cell wl-cell-pct down">-0.13%</span>
-    <span class="wl-cell wl-cell-amt">11.7亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">3.00</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="600392" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="600392" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="600392">
-    <div class="dc-head">
-      <span class="dc-pri">★</span>
-      <span class="dc-name">盛和资源 <i>600392</i></span>
-      <span class="dc-status down">等待触发</span>
-      <span class="dc-integrity warn" title="缺失:资金、关键位、龙虎榜 · 决策受限,谨慎交易">⚠ 数据暂缺·资金/关键位/龙虎榜</span>
-      <span class="dc-conf dc-conf-down">置信度 41</span>
-      <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 3.00</span>
-      <span class="dc-time">2026-08-20 19:08:03</span>
-    </div>
-    <div class="dc-tags"><span class="dc-tag">催化:稀土</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:混沌</span><span class="dc-tag">情绪:冰点</span><span class="dc-tag">地位:跟风</span><span class="dc-tag">容错低</span></div>
-    
-    <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
-      <div class="dc-line"><span>主力净流入 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>3日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>5日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span></div>
-      <div class="dc-line"><span>量比 <b>--</b></span>
-    <span>换手 <b>2.95%</b></span>
-    <span>较昨日量 <b class="">--</b></span>
-    <span>振幅 <b>--</b></span>
-    <span>分歧 <b>正常换手</b></span></div>
-      <div class="dc-line">竞价 --</div>
-      <div class="dc-line"><span>封单 <b>非涨停</b></span></div>
-      <div class="dc-line">龙虎榜：近期未上榜</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv">--</span></div>
-      <div class="dc-line">压力 <span class="lv">--</span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR -- · 震荡 · 周线走平 · 60分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span> · 15分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span></div>
-      <div class="dc-line">开盘预期 --</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">📅 事件风险</div>
-      <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
-    </div>
-    <div class="dc-block dc-plan dc-plan-collapsed">
-      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
-      <div class="dc-plan-body"><table class="tp-table">
-    <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩21.39企稳</td>
-    <td class="tp-num">21.39</td>
-    <td class="tp-num stop">20.72</td>
-    <td class="tp-num">23.39</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">B 突破确认</td>
-    <td class="tp-trig">放量突破23.39</td>
-    <td class="tp-num">23.39</td>
-    <td class="tp-num stop">22.69</td>
-    <td class="tp-num">25.27</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 21.39 再执行,当前仅观察。</div>
-      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 21.39）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破20.72无条件止损 · 到达23.39无条件止盈 · 日内做T当日必须平T不隔夜</div>
-      </div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
-      
-      
-      <div class="dc-line">证伪条件：跌破近期低点且无法收回 → 逻辑失效</div>
-      <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
-      <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比10/10</div>
-    </div>
-    <div class="dc-block dc-review" data-review-code="600392" data-name="盛和资源" data-price="22.28" data-high="22.28" data-low="22.28" data-entry="21.39" data-stop="20.72" data-target="23.39" data-tdate=""><div class="dc-h">📊 盘后复盘（当日验证）</div>
-      <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
-      
-      <div class="dc-line">资金验证：资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察</div>
-      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="600392" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="600392" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="600392" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="600392" onclick="recordTTrade(this)">记做T</button></div>
-      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="600392" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
-      <div class="dc-block dc-short" data-short-code="600392"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div><div class="sp-wrap" data-s-entry="22.28" data-s-stop="21.17" data-s-tp1="23.17" data-s-tp2="23.84"><div class="sp-gate ok">✓ 门槛通过：RR -- ≥ 1.5 · 大盘风控正常(上证 0.24%)</div><div class="dc-line sp-row">入场：<b>22.28</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div><div class="dc-line sp-row">价格止损：<b>21.17</b>（MA20 / 今开-3% 先触发者），无条件清仓</div><div class="dc-line sp-row">时间止损：<b>第3个交易日 14:50</b> 强制按最新价清仓，绝不扛单（短线变长线克星）</div><div class="dc-line sp-row">分批止盈：①<b>23.17</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>23.84</b>(+7%)清仓剩余</div><div class="dc-line sp-row">资金量能：主力净流入 --亿(d3 --) · 量比 --</div><div class="dc-line sp-row">逻辑催化：--</div><div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="600392" onchange="toggleShortTrack(this)"> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label></div></div></div>
-      <div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
-      <div class="dc-line dc-trace" data-trace-code="600392"></div>
-      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察量能与MA5得失，方向未明前继续观望。</div>
-    </div>
-  </div></div><div class="wl-stock" data-stock-code="300285"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>置信度</b></span>
-    <span class="wl-cell wl-cell-sig"><b>盈亏比</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="300285" data-tech="null" data-ff="null" data-stock="{&quot;code&quot;:&quot;300285&quot;,&quot;name&quot;:&quot;国瓷材料&quot;,&quot;price&quot;:62.92,&quot;pct&quot;:-1.87,&quot;amount&quot;:&quot;63.5亿&quot;,&quot;turnover&quot;:&quot;11.75&quot;}">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">3</span><span class="wl-name">国瓷材料</span><span class="wl-code">300285</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">62.92</span></span>
-    <span class="wl-cell wl-cell-pct down">-1.87%</span>
-    <span class="wl-cell wl-cell-amt">63.5亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">3.00</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300285" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300285" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="300285">
-    <div class="dc-head">
-      <span class="dc-pri">★</span>
-      <span class="dc-name">国瓷材料 <i>300285</i></span>
-      <span class="dc-status down">等待触发</span>
-      <span class="dc-integrity warn" title="缺失:资金、关键位、龙虎榜 · 决策受限,谨慎交易">⚠ 数据暂缺·资金/关键位/龙虎榜</span>
-      <span class="dc-conf dc-conf-down">置信度 41</span>
-      <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 3.00</span>
-      <span class="dc-time">2026-08-20 19:08:03</span>
-    </div>
-    <div class="dc-tags"><span class="dc-tag">催化:半导体材料</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:混沌</span><span class="dc-tag">情绪:冰点</span><span class="dc-tag">地位:跟风</span><span class="dc-tag">容错低</span></div>
-    
-    <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
-      <div class="dc-line"><span>主力净流入 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>3日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>5日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span></div>
-      <div class="dc-line"><span>量比 <b>--</b></span>
-    <span>换手 <b>11.75%</b></span>
-    <span>较昨日量 <b class="">--</b></span>
-    <span>振幅 <b>--</b></span>
-    <span>分歧 <b>正常换手</b></span></div>
-      <div class="dc-line">竞价 --</div>
-      <div class="dc-line"><span>封单 <b>非涨停</b></span></div>
-      <div class="dc-line">龙虎榜：近期未上榜</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv">--</span></div>
-      <div class="dc-line">压力 <span class="lv">--</span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR -- · 震荡 · 周线走平 · 60分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span> · 15分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span></div>
-      <div class="dc-line">开盘预期 --</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">📅 事件风险</div>
-      <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
-    </div>
-    <div class="dc-block dc-plan dc-plan-collapsed">
-      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
-      <div class="dc-plan-body"><table class="tp-table">
-    <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩60.40企稳</td>
-    <td class="tp-num">60.40</td>
-    <td class="tp-num stop">58.52</td>
-    <td class="tp-num">66.07</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">B 突破确认</td>
-    <td class="tp-trig">放量突破66.07</td>
-    <td class="tp-num">66.07</td>
-    <td class="tp-num stop">64.08</td>
-    <td class="tp-num">71.35</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 60.40 再执行,当前仅观察。</div>
-      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 60.40）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破58.52无条件止损 · 到达66.07无条件止盈 · 日内做T当日必须平T不隔夜</div>
-      </div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
-      
-      
-      <div class="dc-line">证伪条件：跌破近期低点且无法收回 → 逻辑失效</div>
-      <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
-      <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比10/10</div>
-    </div>
-    <div class="dc-block dc-review" data-review-code="300285" data-name="国瓷材料" data-price="62.92" data-high="62.92" data-low="62.92" data-entry="60.40" data-stop="58.52" data-target="66.07" data-tdate=""><div class="dc-h">📊 盘后复盘（当日验证）</div>
-      <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
-      
-      <div class="dc-line">资金验证：资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察</div>
-      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300285" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300285" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300285" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="300285" onclick="recordTTrade(this)">记做T</button></div>
-      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300285" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
-      <div class="dc-block dc-short" data-short-code="300285"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div><div class="sp-wrap" data-s-entry="62.92" data-s-stop="59.77" data-s-tp1="65.44" data-s-tp2="67.32"><div class="sp-gate ok">✓ 门槛通过：RR -- ≥ 1.5 · 大盘风控正常(上证 0.24%)</div><div class="dc-line sp-row">入场：<b>62.92</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div><div class="dc-line sp-row">价格止损：<b>59.77</b>（MA20 / 今开-3% 先触发者），无条件清仓</div><div class="dc-line sp-row">时间止损：<b>第3个交易日 14:50</b> 强制按最新价清仓，绝不扛单（短线变长线克星）</div><div class="dc-line sp-row">分批止盈：①<b>65.44</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>67.32</b>(+7%)清仓剩余</div><div class="dc-line sp-row">资金量能：主力净流入 --亿(d3 --) · 量比 --</div><div class="dc-line sp-row">逻辑催化：--</div><div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="300285" onchange="toggleShortTrack(this)"> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label></div></div></div>
-      <div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
-      <div class="dc-line dc-trace" data-trace-code="300285"></div>
-      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察量能与MA5得失，方向未明前继续观望。</div>
-    </div>
-  </div></div><div class="wl-stock" data-stock-code="300308"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>置信度</b></span>
-    <span class="wl-cell wl-cell-sig"><b>盈亏比</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="300308" data-tech="null" data-ff="null" data-stock="{&quot;code&quot;:&quot;300308&quot;,&quot;name&quot;:&quot;中际旭创&quot;,&quot;price&quot;:904.2,&quot;pct&quot;:0.96,&quot;amount&quot;:&quot;203.4亿&quot;,&quot;turnover&quot;:&quot;2.05&quot;}">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">4</span><span class="wl-name">中际旭创</span><span class="wl-code">300308</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">904.20</span></span>
-    <span class="wl-cell wl-cell-pct up">+0.96%</span>
-    <span class="wl-cell wl-cell-amt">203.4亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">3.00</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300308" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300308" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="300308">
-    <div class="dc-head">
-      <span class="dc-pri">★</span>
-      <span class="dc-name">中际旭创 <i>300308</i></span>
-      <span class="dc-status down">等待触发</span>
-      <span class="dc-integrity warn" title="缺失:资金、关键位、龙虎榜 · 决策受限,谨慎交易">⚠ 数据暂缺·资金/关键位/龙虎榜</span>
-      <span class="dc-conf dc-conf-down">置信度 41</span>
-      <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 3.00</span>
-      <span class="dc-time">2026-08-20 19:08:03</span>
-    </div>
-    <div class="dc-tags"><span class="dc-tag">催化:光模块</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:混沌</span><span class="dc-tag">情绪:冰点</span><span class="dc-tag">地位:跟风</span><span class="dc-tag">容错低</span></div>
-    
-    <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
-      <div class="dc-line"><span>主力净流入 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>3日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>5日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span></div>
-      <div class="dc-line"><span>量比 <b>--</b></span>
-    <span>换手 <b>2.05%</b></span>
-    <span>较昨日量 <b class="">--</b></span>
-    <span>振幅 <b>--</b></span>
-    <span>分歧 <b>正常换手</b></span></div>
-      <div class="dc-line">竞价 --</div>
-      <div class="dc-line"><span>封单 <b>非涨停</b></span></div>
-      <div class="dc-line">龙虎榜：近期未上榜</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv">--</span></div>
-      <div class="dc-line">压力 <span class="lv">--</span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR -- · 震荡 · 周线走平 · 60分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span> · 15分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span></div>
-      <div class="dc-line">开盘预期 --</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">📅 事件风险</div>
-      <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
-    </div>
-    <div class="dc-block dc-plan dc-plan-collapsed">
-      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
-      <div class="dc-plan-body"><table class="tp-table">
-    <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩868.03企稳</td>
-    <td class="tp-num">868.03</td>
-    <td class="tp-num stop">840.91</td>
-    <td class="tp-num">949.41</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">B 突破确认</td>
-    <td class="tp-trig">放量突破949.41</td>
-    <td class="tp-num">949.41</td>
-    <td class="tp-num stop">920.93</td>
-    <td class="tp-num">1025.36</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 868.03 再执行,当前仅观察。</div>
-      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 868.03）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破840.91无条件止损 · 到达949.41无条件止盈 · 日内做T当日必须平T不隔夜</div>
-      </div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
-      
-      
-      <div class="dc-line">证伪条件：跌破近期低点且无法收回 → 逻辑失效</div>
-      <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
-      <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比10/10</div>
-    </div>
-    <div class="dc-block dc-review" data-review-code="300308" data-name="中际旭创" data-price="904.2" data-high="904.2" data-low="904.2" data-entry="868.03" data-stop="840.91" data-target="949.41" data-tdate=""><div class="dc-h">📊 盘后复盘（当日验证）</div>
-      <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
-      
-      <div class="dc-line">资金验证：资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察</div>
-      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300308" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300308" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300308" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="300308" onclick="recordTTrade(this)">记做T</button></div>
-      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300308" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
-      <div class="dc-block dc-short" data-short-code="300308"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div><div class="sp-wrap" data-s-entry="904.20" data-s-stop="858.99" data-s-tp1="940.37" data-s-tp2="967.49"><div class="sp-gate ok">✓ 门槛通过：RR -- ≥ 1.5 · 大盘风控正常(上证 0.24%)</div><div class="dc-line sp-row">入场：<b>904.20</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div><div class="dc-line sp-row">价格止损：<b>858.99</b>（MA20 / 今开-3% 先触发者），无条件清仓</div><div class="dc-line sp-row">时间止损：<b>第3个交易日 14:50</b> 强制按最新价清仓，绝不扛单（短线变长线克星）</div><div class="dc-line sp-row">分批止盈：①<b>940.37</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>967.49</b>(+7%)清仓剩余</div><div class="dc-line sp-row">资金量能：主力净流入 --亿(d3 --) · 量比 --</div><div class="dc-line sp-row">逻辑催化：--</div><div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="300308" onchange="toggleShortTrack(this)"> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label></div></div></div>
-      <div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
-      <div class="dc-line dc-trace" data-trace-code="300308"></div>
-      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察量能与MA5得失，方向未明前继续观望。</div>
-    </div>
-  </div></div><div class="wl-stock" data-stock-code="603538"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>置信度</b></span>
-    <span class="wl-cell wl-cell-sig"><b>盈亏比</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="603538" data-tech="null" data-ff="null" data-stock="{&quot;code&quot;:&quot;603538&quot;,&quot;name&quot;:&quot;美诺华&quot;,&quot;price&quot;:31.68,&quot;pct&quot;:5.85,&quot;amount&quot;:&quot;26.5亿&quot;,&quot;turnover&quot;:&quot;25.25&quot;}">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">5</span><span class="wl-name">美诺华</span><span class="wl-code">603538</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price up">31.68</span></span>
-    <span class="wl-cell wl-cell-pct up">+5.85%</span>
-    <span class="wl-cell wl-cell-amt">26.5亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">3.00</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="603538" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="603538" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="603538">
-    <div class="dc-head">
-      <span class="dc-pri">★</span>
-      <span class="dc-name">美诺华 <i>603538</i></span>
-      <span class="dc-status down">等待触发</span>
-      <span class="dc-integrity warn" title="缺失:资金、关键位、龙虎榜 · 决策受限,谨慎交易">⚠ 数据暂缺·资金/关键位/龙虎榜</span>
-      <span class="dc-conf dc-conf-down">置信度 41</span>
-      <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 3.00</span>
-      <span class="dc-time">2026-08-20 19:08:03</span>
-    </div>
-    <div class="dc-tags"><span class="dc-tag">催化:医药</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:发酵</span><span class="dc-tag">情绪:发酵</span><span class="dc-tag">地位:跟风</span><span class="dc-tag">容错低</span></div>
-    
-    <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
-      <div class="dc-line"><span>主力净流入 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>3日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>5日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span></div>
-      <div class="dc-line"><span>量比 <b>--</b></span>
-    <span>换手 <b>25.25%</b></span>
-    <span>较昨日量 <b class="">--</b></span>
-    <span>振幅 <b>--</b></span>
-    <span>分歧 <b>正常换手</b></span></div>
-      <div class="dc-line">竞价 --</div>
-      <div class="dc-line"><span>封单 <b>非涨停</b></span></div>
-      <div class="dc-line">龙虎榜：近期未上榜</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv">--</span></div>
-      <div class="dc-line">压力 <span class="lv">--</span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR -- · 震荡 · 周线走平 · 60分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span> · 15分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span></div>
-      <div class="dc-line">开盘预期 --</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">📅 事件风险</div>
-      <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
-    </div>
-    <div class="dc-block dc-plan dc-plan-collapsed">
-      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
-      <div class="dc-plan-body"><table class="tp-table">
-    <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩30.41企稳</td>
-    <td class="tp-num">30.41</td>
-    <td class="tp-num stop">29.46</td>
-    <td class="tp-num">33.26</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">B 突破确认</td>
-    <td class="tp-trig">放量突破33.26</td>
-    <td class="tp-num">33.26</td>
-    <td class="tp-num stop">32.27</td>
-    <td class="tp-num">35.93</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 30.41 再执行,当前仅观察。</div>
-      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 30.41）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破29.46无条件止损 · 到达33.26无条件止盈 · 日内做T当日必须平T不隔夜</div>
-      </div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
-      
-      
-      <div class="dc-line">证伪条件：跌破近期低点且无法收回 → 逻辑失效</div>
-      <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
-      <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比10/10</div>
-    </div>
-    <div class="dc-block dc-review" data-review-code="603538" data-name="美诺华" data-price="31.68" data-high="31.68" data-low="31.68" data-entry="30.41" data-stop="29.46" data-target="33.26" data-tdate=""><div class="dc-h">📊 盘后复盘（当日验证）</div>
-      <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
-      
-      <div class="dc-line">资金验证：资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察</div>
-      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="603538" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="603538" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="603538" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="603538" onclick="recordTTrade(this)">记做T</button></div>
-      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="603538" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
-      <div class="dc-block dc-short" data-short-code="603538"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div><div class="sp-wrap" data-s-entry="31.68" data-s-stop="30.10" data-s-tp1="32.95" data-s-tp2="33.90"><div class="sp-gate ok">✓ 门槛通过：RR -- ≥ 1.5 · 大盘风控正常(上证 0.24%)</div><div class="dc-line sp-row">入场：<b>31.68</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div><div class="dc-line sp-row">价格止损：<b>30.10</b>（MA20 / 今开-3% 先触发者），无条件清仓</div><div class="dc-line sp-row">时间止损：<b>第3个交易日 14:50</b> 强制按最新价清仓，绝不扛单（短线变长线克星）</div><div class="dc-line sp-row">分批止盈：①<b>32.95</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>33.90</b>(+7%)清仓剩余</div><div class="dc-line sp-row">资金量能：主力净流入 --亿(d3 --) · 量比 --</div><div class="dc-line sp-row">逻辑催化：--</div><div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="603538" onchange="toggleShortTrack(this)"> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label></div></div></div>
-      <div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
-      <div class="dc-line dc-trace" data-trace-code="603538"></div>
-      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察量能与MA5得失，方向未明前继续观望。</div>
-    </div>
-  </div></div><div class="wl-stock" data-stock-code="300342"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>置信度</b></span>
-    <span class="wl-cell wl-cell-sig"><b>盈亏比</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="300342" data-tech="null" data-ff="null" data-stock="{&quot;code&quot;:&quot;300342&quot;,&quot;name&quot;:&quot;天银机电&quot;,&quot;price&quot;:32.17,&quot;pct&quot;:-3.07,&quot;amount&quot;:&quot;7.9亿&quot;,&quot;turnover&quot;:&quot;5.81&quot;}">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">6</span><span class="wl-name">天银机电</span><span class="wl-code">300342</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">32.17</span></span>
-    <span class="wl-cell wl-cell-pct down">-3.07%</span>
-    <span class="wl-cell wl-cell-amt">7.9亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">3.00</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300342" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300342" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="300342">
-    <div class="dc-head">
-      <span class="dc-pri">★</span>
-      <span class="dc-name">天银机电 <i>300342</i></span>
-      <span class="dc-status down">等待触发</span>
-      <span class="dc-integrity warn" title="缺失:资金、关键位、龙虎榜 · 决策受限,谨慎交易">⚠ 数据暂缺·资金/关键位/龙虎榜</span>
-      <span class="dc-conf dc-conf-down">置信度 41</span>
-      <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 3.00</span>
-      <span class="dc-time">2026-08-20 19:08:03</span>
-    </div>
-    <div class="dc-tags"><span class="dc-tag">催化:军工</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:退潮</span><span class="dc-tag">情绪:退潮</span><span class="dc-tag">地位:跟风</span><span class="dc-tag">容错低</span></div>
-    
-    <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
-      <div class="dc-line"><span>主力净流入 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>3日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>5日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span></div>
-      <div class="dc-line"><span>量比 <b>--</b></span>
-    <span>换手 <b>5.81%</b></span>
-    <span>较昨日量 <b class="">--</b></span>
-    <span>振幅 <b>--</b></span>
-    <span>分歧 <b>正常换手</b></span></div>
-      <div class="dc-line">竞价 --</div>
-      <div class="dc-line"><span>封单 <b>非涨停</b></span></div>
-      <div class="dc-line">龙虎榜：近期未上榜</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv">--</span></div>
-      <div class="dc-line">压力 <span class="lv">--</span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR -- · 震荡 · 周线走平 · 60分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span> · 15分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span></div>
-      <div class="dc-line">开盘预期 --</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">📅 事件风险</div>
-      <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
-    </div>
-    <div class="dc-block dc-plan dc-plan-collapsed">
-      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
-      <div class="dc-plan-body"><table class="tp-table">
-    <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩30.88企稳</td>
-    <td class="tp-num">30.88</td>
-    <td class="tp-num stop">29.92</td>
-    <td class="tp-num">33.78</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">B 突破确认</td>
-    <td class="tp-trig">放量突破33.78</td>
-    <td class="tp-num">33.78</td>
-    <td class="tp-num stop">32.77</td>
-    <td class="tp-num">36.48</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 30.88 再执行,当前仅观察。</div>
-      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 30.88）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破29.92无条件止损 · 到达33.78无条件止盈 · 日内做T当日必须平T不隔夜</div>
-      </div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
-      
-      
-      <div class="dc-line">证伪条件：跌破近期低点且无法收回 → 逻辑失效</div>
-      <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
-      <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比10/10</div>
-    </div>
-    <div class="dc-block dc-review" data-review-code="300342" data-name="天银机电" data-price="32.17" data-high="32.17" data-low="32.17" data-entry="30.88" data-stop="29.92" data-target="33.78" data-tdate=""><div class="dc-h">📊 盘后复盘（当日验证）</div>
-      <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
-      
-      <div class="dc-line">资金验证：资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察</div>
-      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300342" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300342" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300342" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="300342" onclick="recordTTrade(this)">记做T</button></div>
-      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300342" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
-      <div class="dc-block dc-short" data-short-code="300342"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div><div class="sp-wrap" data-s-entry="32.17" data-s-stop="30.56" data-s-tp1="33.46" data-s-tp2="34.42"><div class="sp-gate ok">✓ 门槛通过：RR -- ≥ 1.5 · 大盘风控正常(上证 0.24%)</div><div class="dc-line sp-row">入场：<b>32.17</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div><div class="dc-line sp-row">价格止损：<b>30.56</b>（MA20 / 今开-3% 先触发者），无条件清仓</div><div class="dc-line sp-row">时间止损：<b>第3个交易日 14:50</b> 强制按最新价清仓，绝不扛单（短线变长线克星）</div><div class="dc-line sp-row">分批止盈：①<b>33.46</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>34.42</b>(+7%)清仓剩余</div><div class="dc-line sp-row">资金量能：主力净流入 --亿(d3 --) · 量比 --</div><div class="dc-line sp-row">逻辑催化：--</div><div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="300342" onchange="toggleShortTrack(this)"> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label></div></div></div>
-      <div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
-      <div class="dc-line dc-trace" data-trace-code="300342"></div>
-      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察量能与MA5得失，方向未明前继续观望。</div>
-    </div>
-  </div></div><div class="wl-stock" data-stock-code="300607"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
-    <span class="wl-cell wl-cell-rank"><b>排名/标的</b></span>
-    <span class="wl-cell wl-cell-price"><b>最新价</b></span>
-    <span class="wl-cell wl-cell-pct"><b>涨跌幅</b></span>
-    <span class="wl-cell wl-cell-amt"><b>成交额</b></span>
-    <span class="wl-cell wl-cell-atds"><b>置信度</b></span>
-    <span class="wl-cell wl-cell-sig"><b>盈亏比</b></span>
-    <span class="wl-cell wl-cell-act"><b>操作</b></span>
-  </div><div class="wl-stock-row" data-code="300607" data-tech="null" data-ff="null" data-stock="{&quot;code&quot;:&quot;300607&quot;,&quot;name&quot;:&quot;拓斯达&quot;,&quot;price&quot;:32.69,&quot;pct&quot;:-0.24,&quot;amount&quot;:&quot;9.4亿&quot;,&quot;turnover&quot;:&quot;8.51&quot;}">
-    <span class="wl-cell wl-cell-rank"><span class="rank-no">7</span><span class="wl-name">拓斯达</span><span class="wl-code">300607</span></span>
-    <span class="wl-cell wl-cell-price"><span class="price down">32.69</span></span>
-    <span class="wl-cell wl-cell-pct down">-0.24%</span>
-    <span class="wl-cell wl-cell-amt">9.4亿</span>
-    <span class="wl-cell wl-cell-atds"><span class="conf conf-down">41</span></span>
-    <span class="wl-cell wl-cell-sig"><span class="rr rr-muted">3.00</span></span>
-    <span class="wl-cell wl-cell-act"><button class="wl-btn wl-btn-primary" data-code="300607" onclick="openStockResearch(this.dataset.code)">分析</button><button class="wl-btn wl-btn-del" data-code="300607" onclick="removeWatchlistRow(this.dataset.code)">删</button></span>
-  </div></div><div class="wl-detail" data-detail-code="300607">
-    <div class="dc-head">
-      <span class="dc-pri">★</span>
-      <span class="dc-name">拓斯达 <i>300607</i></span>
-      <span class="dc-status down">等待触发</span>
-      <span class="dc-integrity warn" title="缺失:资金、关键位、龙虎榜 · 决策受限,谨慎交易">⚠ 数据暂缺·资金/关键位/龙虎榜</span>
-      <span class="dc-conf dc-conf-down">置信度 41</span>
-      <span class="dc-rr rr-muted" title="为预案盈亏比，需回踩触发后生效，现价买入无效">盈亏比 3.00</span>
-      <span class="dc-time">2026-08-20 19:08:03</span>
-    </div>
-    <div class="dc-tags"><span class="dc-tag">催化:题材</span><span class="dc-tag">时效:短线1-3天</span><span class="dc-tag">阶段:混沌</span><span class="dc-tag">情绪:冰点</span><span class="dc-tag">地位:跟风</span><span class="dc-tag">容错低</span></div>
-    
-    <div class="dc-block"><div class="dc-h">💰 资金与量能</div>
-      <div class="dc-line"><span>主力净流入 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>3日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span>
-    <span>5日 <b class="" title="数据源抽风，已降级读取本地缓存，但仍无缓存数据，决策受限"><i class="ff-missing">数据暂缺</i></b></span></div>
-      <div class="dc-line"><span>量比 <b>--</b></span>
-    <span>换手 <b>8.51%</b></span>
-    <span>较昨日量 <b class="">--</b></span>
-    <span>振幅 <b>--</b></span>
-    <span>分歧 <b>正常换手</b></span></div>
-      <div class="dc-line">竞价 --</div>
-      <div class="dc-line"><span>封单 <b>非涨停</b></span></div>
-      <div class="dc-line">龙虎榜：近期未上榜</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🎯 关键位与多周期</div>
-      <div class="dc-line">支撑 <span class="lv">--</span></div>
-      <div class="dc-line">压力 <span class="lv">--</span></div>
-      <div class="dc-line">缺口 无近期缺口 · ATR -- · 震荡 · 周线走平 · 60分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span> · 15分 <span class="min-approx" title="分钟级数据缺失，此为由日线推算的近似趋势，仅供参考">震荡(近似)<i class="min-approx-ico">ⓘ</i></span></div>
-      <div class="dc-line">开盘预期 --</div>
-    </div>
-    <div class="dc-block"><div class="dc-h">📅 事件风险</div>
-      <div class="dc-line dc-events"><span class="ev">近期无重大事件公告</span></div>
-      <div class="dc-line dc-src-note">⚠ 近期无减持/回购/问询等关键词公告（东财公告+巨潮均已核查），财报/解禁来自东财</div>
-    </div>
-    <div class="dc-block dc-plan dc-plan-collapsed">
-      <div class="dc-h dc-plan-toggle" onclick="togglePlanBlock(this)">📋 今日交易计划（量化）<span class="dc-plan-caret">▸</span><span class="dc-plan-lock">⛔ 等待触发·未达入场条件</span><span class="dc-plan-expand">👆 点击展开</span></div>
-      <div class="dc-plan-body"><table class="tp-table">
-    <tr><th>方案</th><th>触发条件</th><th>入场</th><th>止损</th><th>止盈</th><th>盈亏比</th></tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">A 回踩低吸</td>
-    <td class="tp-trig">回踩31.38企稳</td>
-    <td class="tp-num">31.38</td>
-    <td class="tp-num stop">30.40</td>
-    <td class="tp-num">34.32</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    <tr class="tp-notrig">
-    <td class="tp-name">B 突破确认</td>
-    <td class="tp-trig">放量突破34.32</td>
-    <td class="tp-num">34.32</td>
-    <td class="tp-num stop">33.29</td>
-    <td class="tp-num">37.07</td>
-    <td class="tp-rr tp-rr-muted">未触发</td>
-  </tr>
-    
-  </table><div class="tp-warn tp-warn-bad">⚠ 盈亏比不合格，做T风险极高，建议放弃。</div><div class="tp-warn">⚠ 现价直接买入盈亏比 0.71(<1.5),不合格 —— 等待回踩至 31.38 再执行,当前仅观察。</div>
-      <div class="dc-line dc-disc" style="color:#1d4ed8;">📌 执行层模拟跟踪锚定的是【首选方案（回踩低吸 31.38）】—— 其余方案（如突破确认）仅作参考，触达也不计入模拟跟踪样本</div>
-      <div class="dc-line">仓位:单笔风险0.5%-1% ÷ 止损3.1% → 建议仓位 <b>15%-15%</b>（受单股上限压制，实际最高仓位15%）</div>
-      <div class="dc-line dc-disc">执行纪律：跌破30.40无条件止损 · 到达34.32无条件止盈 · 日内做T当日必须平T不隔夜</div>
-      </div>
-    </div>
-    <div class="dc-block"><div class="dc-h">🛡 风控与证伪</div>
-      
-      
-      <div class="dc-line">证伪条件：跌破近期低点且无法收回 → 逻辑失效</div>
-      <div class="dc-line">移动止损：盈利5%止损上移成本线；盈利12%上移至+8%；跌破趋势线清仓；连续亏损3次强制降仓</div>
-      <div class="dc-line">仓位约束：单股≤15% · 单题材≤30% · 总仓位≤50%（震荡市）· 单笔风险0.5%-1%</div>
-      <div class="dc-line">置信度构成：趋势5/30 + 资金12/25 + 题材8/20 + 关键位6/15 + 盈亏比10/10</div>
-    </div>
-    <div class="dc-block dc-review" data-review-code="300607" data-name="拓斯达" data-price="32.69" data-high="32.69" data-low="32.69" data-entry="31.38" data-stop="30.40" data-target="34.32" data-tdate=""><div class="dc-h">📊 盘后复盘（当日验证）</div>
-      <div class="dc-line">关键位验证：最高-- 未触及压力 · 最低-- 未触及支撑</div>
-      
-      <div class="dc-line">资金验证：资金数据加载失败/暂缺（数据源抽风，已降级读取本地缓存仍无数据），无法验证做多预期，当前仅观察</div>
-      <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="300607" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="300607" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="300607" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="300607" onclick="recordTTrade(this)">记做T</button></div>
-      <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="300607" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
-      <div class="dc-block dc-short" data-short-code="300607"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div><div class="sp-wrap" data-s-entry="32.69" data-s-stop="31.06" data-s-tp1="34.00" data-s-tp2="34.98"><div class="sp-gate ok">✓ 门槛通过：RR -- ≥ 1.5 · 大盘风控正常(上证 0.24%)</div><div class="dc-line sp-row">入场：<b>32.69</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div><div class="dc-line sp-row">价格止损：<b>31.06</b>（MA20 / 今开-3% 先触发者），无条件清仓</div><div class="dc-line sp-row">时间止损：<b>第3个交易日 14:50</b> 强制按最新价清仓，绝不扛单（短线变长线克星）</div><div class="dc-line sp-row">分批止盈：①<b>34.00</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>34.98</b>(+7%)清仓剩余</div><div class="dc-line sp-row">资金量能：主力净流入 --亿(d3 --) · 量比 --</div><div class="dc-line sp-row">逻辑催化：--</div><div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="300607" onchange="toggleShortTrack(this)"> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label></div></div></div>
-      <div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
-      <div class="dc-line dc-trace" data-trace-code="300607"></div>
-      <div class="dc-line dc-next-day">🎯 明日核心观察点：明日观察量能与MA5得失，方向未明前继续观望。</div>
-    </div>
-  </div></div></div></div><div id="wl-filter-empty" class="wl-filter-empty" style="display:none">未在观察池中找到匹配个股，如需添加请点击右侧「+ 搜索加入」</div></div><div class="wl-details"></div></div><div class="card knowledge-card"><div class="knowledge-title">KNOWLEDGE SYNC</div><div class="knowledge-h">沉淀到 Obsidian</div><div class="knowledge-desc">将当前盘前/盘中结论、实时观察池与策略导出为标准 Markdown</div><div class="knowledge-note">ℹ 手动导出模式：点击下方按钮下载/复制 .md，再粘贴进 Obsidian 即可，全程本地操作、无网络依赖、不会卡顿或报错。</div><pre id="knowledge-md" class="knowledge-md">---
-title: ATDS Pro V4.0 盘前简报
-tags: [ATDS, 交易复盘]
----
-# 观察池
-- 亨通光电 (600487): 62.02 +5.28%
-- 盛和资源 (600392): 22.28 -0.13%
-- 国瓷材料 (300285): 62.92 -1.87%
-- 中际旭创 (300308): 904.20 +0.96%
-- 美诺华 (603538): 31.68 +5.85%
-- 天银机电 (300342): 32.17 -3.07%
-- 拓斯达 (300607): 32.69 -0.24%
-</pre><div class="wl-tools" style="margin-top:10px;"><button class="wl-tool wl-tool-red" onclick="downloadMd()">下载 .md 文件</button><button class="wl-tool" onclick="copyMd()">复制 Markdown</button></div></div>
-  <div class="modal-mask" id="signal-radar-modal" onclick="if(event.target===this)closeSignalRadarModal()">
-    <div class="modal" onclick="event.stopPropagation()" style="max-width:96%;width:96%;max-height:86vh;display:flex;flex-direction:column;">
-      <div class="modal-header">
-        <div class="modal-eyebrow">🎯 全市场信号雷达 · TOP50 <span class="sr-note">(前日收盘预扫描（2026-09-21_16-20）· 今日盘前正式扫描结果以 09:45 更新为准)</span></div>
-        <span class="modal-close" onclick="closeSignalRadarModal()">×</span>
-      </div>
-      <div class="modal-body" style="overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;">
-        <div class="sr-tools">
-          <div class="sr-tabs"><button class="sr-tab on" data-type="all" onclick="filterSignalRadar(this)">全部</button><button class="sr-tab" data-type="swing" onclick="filterSignalRadar(this)">波段</button><button class="sr-tab" data-type="short" onclick="filterSignalRadar(this)">短线</button><button class="sr-tab" data-type="both" onclick="filterSignalRadar(this)">双信号</button></div>
-          <div class="sr-sort"><span>排序：</span><button class="sr-sort-btn on" data-sort="score" onclick="sortSignalRadar(this)">综合分</button><button class="sr-sort-btn" data-sort="time" onclick="sortSignalRadar(this)">触发时间</button></div>
-        </div>
-        <div class="sr-list" id="sr-list"><div class="sr-row" data-code="002584" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">1</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002584" onclick="openStockResearch(this.dataset.code)">西陇科学</span><span class="sr-code">002584</span><span class="sr-price up">9.76</span><span class="sr-pct up">+0.10%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 8.02 · MA20 8.47 · 入场 9.76</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="002584" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="000993" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">2</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="000993" onclick="openStockResearch(this.dataset.code)">闽东电力</span><span class="sr-code">000993</span><span class="sr-price up">20.43</span><span class="sr-pct up">+4.23%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 5.3 · MA20 12.92 · 入场 20.43</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="000993" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="000981" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">3</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="000981" onclick="openStockResearch(this.dataset.code)">山子高科</span><span class="sr-code">000981</span><span class="sr-price down">2.95</span><span class="sr-pct down">-1.67%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 4.78 · MA20 2.77 · 入场 2.95</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="000981" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="605058" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">4</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="605058" onclick="openStockResearch(this.dataset.code)">澳弘电子</span><span class="sr-code">605058</span><span class="sr-price up">48.43</span><span class="sr-pct up">+2.17%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 5.48 · MA20 33.21 · 入场 48.43</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="605058" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="601218" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">5</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="601218" onclick="openStockResearch(this.dataset.code)">吉鑫科技</span><span class="sr-code">601218</span><span class="sr-price down">5.44</span><span class="sr-pct down">-1.98%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 7.64 · MA20 4.78 · 入场 5.44</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="601218" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002560" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">6</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002560" onclick="openStockResearch(this.dataset.code)">通达股份</span><span class="sr-code">002560</span><span class="sr-price up">7.48</span><span class="sr-pct up">+1.49%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 5.19 · MA20 6.62 · 入场 7.48</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="002560" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002522" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">7</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002522" onclick="openStockResearch(this.dataset.code)">浙江众成</span><span class="sr-code">002522</span><span class="sr-price up">6.25</span><span class="sr-pct up">+2.63%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 4.64 · MA20 5.45 · 入场 6.25</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="002522" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002623" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">8</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002623" onclick="openStockResearch(this.dataset.code)">亚玛顿</span><span class="sr-code">002623</span><span class="sr-price up">19.83</span><span class="sr-pct up">+7.07%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 4.77 · MA20 16.38 · 入场 19.83</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="002623" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002912" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">9</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002912" onclick="openStockResearch(this.dataset.code)">中新赛克</span><span class="sr-code">002912</span><span class="sr-price down">23.98</span><span class="sr-pct down">-2.32%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 8.8 · MA20 21.63 · 入场 23.98</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="002912" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="603439" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">10</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="603439" onclick="openStockResearch(this.dataset.code)">三力制药</span><span class="sr-code">603439</span><span class="sr-price up">14.38</span><span class="sr-pct up">+5.74%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 4.31 · MA20 12.7 · 入场 14.38</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="603439" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="688004" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">11</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="688004" onclick="openStockResearch(this.dataset.code)">博汇科技</span><span class="sr-code">688004</span><span class="sr-price down">33.93</span><span class="sr-pct down">-3.80%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 8.78 · MA20 24.56 · 入场 33.93</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="688004" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="000572" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">12</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="000572" onclick="openStockResearch(this.dataset.code)">海马汽车</span><span class="sr-code">000572</span><span class="sr-price down">4.25</span><span class="sr-pct down">-1.39%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 4.62 · MA20 4.03 · 入场 4.25</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="000572" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="605507" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">13</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="605507" onclick="openStockResearch(this.dataset.code)">国邦医药</span><span class="sr-code">605507</span><span class="sr-price down">18.05</span><span class="sr-pct down">-0.66%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 5.8 · MA20 16.09 · 入场 18.05</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="605507" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002232" data-score="100" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">14</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002232" onclick="openStockResearch(this.dataset.code)">启明信息</span><span class="sr-code">002232</span><span class="sr-price up">15.75</span><span class="sr-pct up">+1.74%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 5.34 · MA20 14.83 · 入场 15.75</span><span class="sr-score">100分</span><button class="wl-btn ts-add" data-code="002232" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="603686" data-score="99" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">15</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="603686" onclick="openStockResearch(this.dataset.code)">福龙马</span><span class="sr-code">603686</span><span class="sr-price down">15.22</span><span class="sr-pct down">-1.62%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 3.53 · MA20 13.6 · 入场 15.22</span><span class="sr-score">99分</span><button class="wl-btn ts-add" data-code="603686" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="300464" data-score="99" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">16</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="300464" onclick="openStockResearch(this.dataset.code)">星徽股份</span><span class="sr-code">300464</span><span class="sr-price up">11.88</span><span class="sr-pct up">+2.33%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 3.69 · MA20 8.55 · 入场 11.88</span><span class="sr-score">99分</span><button class="wl-btn ts-add" data-code="300464" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="603386" data-score="99" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">17</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="603386" onclick="openStockResearch(this.dataset.code)">骏亚科技</span><span class="sr-code">603386</span><span class="sr-price up">18.02</span><span class="sr-pct up">+2.15%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 3.68 · MA20 15.49 · 入场 18.02</span><span class="sr-score">99分</span><button class="wl-btn ts-add" data-code="603386" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="003006" data-score="98" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">18</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="003006" onclick="openStockResearch(this.dataset.code)">百亚股份</span><span class="sr-code">003006</span><span class="sr-price down">21.21</span><span class="sr-pct down">-0.19%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 3.49 · MA20 16.46 · 入场 21.21</span><span class="sr-score">98分</span><button class="wl-btn ts-add" data-code="003006" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002212" data-score="97" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">19</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002212" onclick="openStockResearch(this.dataset.code)">天融信</span><span class="sr-code">002212</span><span class="sr-price up">7.28</span><span class="sr-pct up">+2.97%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.92 · MA20 6.78 · 入场 7.28</span><span class="sr-score">97分</span><button class="wl-btn ts-add" data-code="002212" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="688216" data-score="97" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">20</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="688216" onclick="openStockResearch(this.dataset.code)">气派科技</span><span class="sr-code">688216</span><span class="sr-price up">41.12</span><span class="sr-pct up">+6.01%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 3 · MA20 33.01 · 入场 41.12</span><span class="sr-score">97分</span><button class="wl-btn ts-add" data-code="688216" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="600929" data-score="97" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">21</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="600929" onclick="openStockResearch(this.dataset.code)">雪天盐业</span><span class="sr-code">600929</span><span class="sr-price up">6.43</span><span class="sr-pct up">+5.41%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 3.03 · MA20 5.54 · 入场 6.43</span><span class="sr-score">97分</span><button class="wl-btn ts-add" data-code="600929" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="300741" data-score="96" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">22</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="300741" onclick="openStockResearch(this.dataset.code)">华宝股份</span><span class="sr-code">300741</span><span class="sr-price up">26.00</span><span class="sr-pct up">+3.38%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.85 · MA20 18.62 · 入场 26</span><span class="sr-score">96分</span><button class="wl-btn ts-add" data-code="300741" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002927" data-score="96" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">23</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002927" onclick="openStockResearch(this.dataset.code)">泰永长征</span><span class="sr-code">002927</span><span class="sr-price up">20.51</span><span class="sr-pct up">+5.45%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.88 · MA20 17.46 · 入场 20.51</span><span class="sr-score">96分</span><button class="wl-btn ts-add" data-code="002927" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="688292" data-score="96" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">24</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="688292" onclick="openStockResearch(this.dataset.code)">浩瀚深度</span><span class="sr-code">688292</span><span class="sr-price down">22.17</span><span class="sr-pct down">-3.69%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.76 · MA20 18.61 · 入场 22.17</span><span class="sr-score">96分</span><button class="wl-btn ts-add" data-code="688292" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002848" data-score="96" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">25</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002848" onclick="openStockResearch(this.dataset.code)">高斯贝尔</span><span class="sr-code">002848</span><span class="sr-price up">15.53</span><span class="sr-pct up">+1.50%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.85 · MA20 14.25 · 入场 15.53</span><span class="sr-score">96分</span><button class="wl-btn ts-add" data-code="002848" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002218" data-score="96" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">26</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002218" onclick="openStockResearch(this.dataset.code)">拓日新能</span><span class="sr-code">002218</span><span class="sr-price up">4.32</span><span class="sr-pct up">+0.47%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.78 · MA20 4.11 · 入场 4.32</span><span class="sr-score">96分</span><button class="wl-btn ts-add" data-code="002218" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="000823" data-score="95" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">27</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="000823" onclick="openStockResearch(this.dataset.code)">超声电子</span><span class="sr-code">000823</span><span class="sr-price up">25.20</span><span class="sr-pct up">+7.78%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.53 · MA20 18.48 · 入场 25.2</span><span class="sr-score">95分</span><button class="wl-btn ts-add" data-code="000823" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="603888" data-score="95" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">28</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="603888" onclick="openStockResearch(this.dataset.code)">新华网</span><span class="sr-code">603888</span><span class="sr-price up">18.79</span><span class="sr-pct up">+1.73%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.6 · MA20 17 · 入场 18.79</span><span class="sr-score">95分</span><button class="wl-btn ts-add" data-code="603888" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="000980" data-score="95" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">29</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="000980" onclick="openStockResearch(this.dataset.code)">众泰汽车</span><span class="sr-code">000980</span><span class="sr-price down">2.24</span><span class="sr-pct down">-2.18%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.52 · MA20 1.92 · 入场 2.24</span><span class="sr-score">95分</span><button class="wl-btn ts-add" data-code="000980" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="603120" data-score="95" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">30</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="603120" onclick="openStockResearch(this.dataset.code)">肯特催化</span><span class="sr-code">603120</span><span class="sr-price up">61.99</span><span class="sr-pct up">+4.70%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.54 · MA20 49.74 · 入场 61.99</span><span class="sr-score">95分</span><button class="wl-btn ts-add" data-code="603120" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="000859" data-score="95" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">31</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="000859" onclick="openStockResearch(this.dataset.code)">国风新材</span><span class="sr-code">000859</span><span class="sr-price up">9.73</span><span class="sr-pct up">+3.07%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.55 · MA20 9.07 · 入场 9.73</span><span class="sr-score">95分</span><button class="wl-btn ts-add" data-code="000859" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="600410" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">32</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="600410" onclick="openStockResearch(this.dataset.code)">华胜天成</span><span class="sr-code">600410</span><span class="sr-price up">17.19</span><span class="sr-pct up">+4.06%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.14 · MA20 14.83 · 入场 17.19</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="600410" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="300207" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">33</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="300207" onclick="openStockResearch(this.dataset.code)">欣旺达</span><span class="sr-code">300207</span><span class="sr-price down">19.67</span><span class="sr-pct down">-1.80%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.49 · MA20 18.07 · 入场 19.67</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="300207" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="301366" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">34</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="301366" onclick="openStockResearch(this.dataset.code)">一博科技</span><span class="sr-code">301366</span><span class="sr-price down">72.00</span><span class="sr-pct down">-3.25%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.1 · MA20 60.28 · 入场 72</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="301366" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="600059" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">35</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="600059" onclick="openStockResearch(this.dataset.code)">古越龙山</span><span class="sr-code">600059</span><span class="sr-price up">11.48</span><span class="sr-pct up">+7.29%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.46 · MA20 8.99 · 入场 11.48</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="600059" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="301132" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">36</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="301132" onclick="openStockResearch(this.dataset.code)">满坤科技</span><span class="sr-code">301132</span><span class="sr-price up">63.26</span><span class="sr-pct up">+4.93%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.49 · MA20 46.76 · 入场 63.26</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="301132" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002169" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">37</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="002169" onclick="openStockResearch(this.dataset.code)">智光电气</span><span class="sr-code">002169</span><span class="sr-price up">14.90</span><span class="sr-pct up">+9.16%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.1 · MA20 12.71 · 入场 14.9</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="002169" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="603328" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">38</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="603328" onclick="openStockResearch(this.dataset.code)">依顿电子</span><span class="sr-code">603328</span><span class="sr-price up">13.80</span><span class="sr-pct up">+4.39%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.16 · MA20 11.9 · 入场 13.8</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="603328" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="300939" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">39</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="300939" onclick="openStockResearch(this.dataset.code)">秋田微</span><span class="sr-code">300939</span><span class="sr-price up">98.55</span><span class="sr-pct up">+3.24%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.12 · MA20 72.49 · 入场 98.55</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="300939" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="300820" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">40</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="300820" onclick="openStockResearch(this.dataset.code)">英杰电气</span><span class="sr-code">300820</span><span class="sr-price up">72.99</span><span class="sr-pct up">+2.18%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.11 · MA20 59.19 · 入场 72.99</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="300820" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="603000" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">41</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="603000" onclick="openStockResearch(this.dataset.code)">人民网</span><span class="sr-code">603000</span><span class="sr-price down">17.27</span><span class="sr-pct down">-0.46%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.37 · MA20 16.89 · 入场 17.27</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="603000" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="600880" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">42</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="600880" onclick="openStockResearch(this.dataset.code)">博瑞传播</span><span class="sr-code">600880</span><span class="sr-price down">4.90</span><span class="sr-pct down">-3.54%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.46 · MA20 4.43 · 入场 4.9</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="600880" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="603375" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">43</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="603375" onclick="openStockResearch(this.dataset.code)">盛景微</span><span class="sr-code">603375</span><span class="sr-price up">53.80</span><span class="sr-pct up">+4.08%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.26 · MA20 43.85 · 入场 53.8</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="603375" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="600293" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">44</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="600293" onclick="openStockResearch(this.dataset.code)">三峡新材</span><span class="sr-code">600293</span><span class="sr-price up">3.47</span><span class="sr-pct up">+3.89%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.21 · MA20 3.07 · 入场 3.47</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="600293" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="301041" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">45</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="301041" onclick="openStockResearch(this.dataset.code)">金百泽</span><span class="sr-code">301041</span><span class="sr-price up">36.20</span><span class="sr-pct up">+0.64%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.23 · MA20 30.92 · 入场 36.2</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="301041" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="600719" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">46</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="600719" onclick="openStockResearch(this.dataset.code)">大连热电</span><span class="sr-code">600719</span><span class="sr-price down">8.17</span><span class="sr-pct down">-2.97%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.22 · MA20 7.52 · 入场 8.17</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="600719" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="300234" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">47</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="300234" onclick="openStockResearch(this.dataset.code)">开尔新材</span><span class="sr-code">300234</span><span class="sr-price up">12.15</span><span class="sr-pct up">+1.67%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.1 · MA20 10.42 · 入场 12.15</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="300234" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="000753" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">48</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="000753" onclick="openStockResearch(this.dataset.code)">漳州发展</span><span class="sr-code">000753</span><span class="sr-price down">5.26</span><span class="sr-pct down">-2.05%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.3 · MA20 5.08 · 入场 5.26</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="000753" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="301061" data-score="94" data-firstdate="2026-09-21" data-type="swing">
-      <div class="sr-line1"><span class="sr-rank">49</span><em class="sr-tag-swing">波段</em><span class="sr-name" data-code="301061" onclick="openStockResearch(this.dataset.code)">匠心家居</span><span class="sr-code">301061</span><span class="sr-price up">43.74</span><span class="sr-pct up">+3.11%</span></div>
-      <div class="sr-line2"><span class="sr-meta">量比 2.11 · MA20 37.33 · 入场 43.74</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="301061" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div><div class="sr-row" data-code="002730" data-score="94" data-firstdate="2026-09-21" data-type="short">
-      <div class="sr-line1"><span class="sr-rank">50</span><em class="sr-tag-short">短线</em><span class="sr-name" data-code="002730" onclick="openStockResearch(this.dataset.code)">电光科技</span><span class="sr-code">002730</span><span class="sr-price down">23.61</span><span class="sr-pct down">-2.03%</span></div>
-      <div class="sr-line2"><span class="sr-meta">RR 2.95 · 量比 1.43 · MA20 23.29 · 入场 23.61</span><span class="sr-score">94分</span><button class="wl-btn ts-add" data-code="002730" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button></div>
-    </div></div>
-        <div class="sc-hint">发现层粗筛 · 「加入」复用模拟跟踪执行层(精确5门控)。综合分=0.7×信号强度+0.3×时间衰减</div>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">盘前交易驾驶舱</div>
-    <div class="cp-grid"><div class="cp-item"><div class="cp-k">情绪温度</div><div class="cp-v">84° · 高温区 · 高涨</div></div><div class="cp-item"><div class="cp-k">涨停家数</div><div class="cp-v">79 家 · 最高 4 板</div></div><div class="cp-item"><div class="cp-k">连板龙头</div><div class="cp-v">金健米业</div></div><div class="cp-item"><div class="cp-k">炸板家数</div><div class="cp-v">0 家</div></div><div class="cp-item"><div class="cp-k">60日新高</div><div class="cp-v">75 只</div></div><div class="cp-item"><div class="cp-k">进攻主线</div><div class="cp-v">中药Ⅱ / 专用设备</div></div></div>
-  </div>
-  <div class="card em-card"><div class="em-header"><span class="em-title">盘前参与策略</span><span class="em-sub">盘前接力判断 · 板块联动确认 · 强势股池筛选</span><span class="em-date">2026-08-20</span></div><div class="card ms-card"><div class="ms-banner"><span class="ms-b-dot"></span><b>0️⃣ 市场状态 · 参考背景</b><span class="ms-b-eyebrow">高温区 · 高涨</span></div><div class="ms-eyebrow">主线机会律 · 顺大势逆小势</div><div class="ms-grid"><div class="ms-cell ms-cell-a"><div class="ms-cell-k">主线 A</div><div class="ms-cell-v">生物制品</div><div class="ms-cell-meta"><span class="up">+19.09%</span> · 资金 <b class="up">+0.0亿</b></div></div><div class="ms-cell ms-cell-b"><div class="ms-cell-k">主线 B</div><div class="ms-cell-v">化学制药</div><div class="ms-cell-meta"><span class="up">+13.01%</span> · 资金 <b class="up">+0.0亿</b></div></div><div class="ms-cell ms-cell-c"><div class="ms-cell-k">状态 C</div><div class="ms-cell-v">情绪高涨,接力效应强</div><div class="ms-cell-meta">情绪 <b>84°</b> · 高度 <b>4板</b></div></div><div class="ms-cell ms-cell-d"><div class="ms-cell-k">分歧 D</div><div class="ms-cell-v">8% 晋级</div><div class="ms-cell-meta">炸板 <b>0家</b> · 红盘 <b>0%</b></div></div></div><ul class="ms-tips"><li>今日开盘关注 生物制品 龙头 沃森生物 表态,北证/科创流动性偏弱谨慎参与。</li><li>主线机会窗口为生物制品板块,下一日化学制药启动。</li><li>当前主线机会窗口:生物制品 主线确认,成交额 20794亿 (沪深合计)。</li></ul></div><div class="em-bks"><div class="em-bk"><div class="em-bk-h"><span class="em-bk-tag">A</span><div class="em-bk-meta"><div class="em-bk-title">生物制品 <span class="em-bk-sub">(+19.1%)</span></div><div class="em-bk-tech">主线+趋势技术</div></div></div><div class="em-bk-body"><div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">0.00 <span class="em-bk-u">亿</span></span></div><div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">11家 / 1板 · 沃森生物 · <b class="up">+19.09%</b></span></div><div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>沃森生物</b> <span class="em-bk-tag-mini"></span> · <b class="up">--</b></span></div><div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>--</b> · 最高 <b>--</b> · 最低 <b>--</b> · 换手 <b>--</b></span></div><div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">0.00</b>亿 · 中 <b class="up">--</b>亿</span></div></div></div><div class="em-bk"><div class="em-bk-h"><span class="em-bk-tag">B</span><div class="em-bk-meta"><div class="em-bk-title">化学制药 <span class="em-bk-sub">(+13.0%)</span></div><div class="em-bk-tech">主线+趋势技术</div></div></div><div class="em-bk-body"><div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">0.00 <span class="em-bk-u">亿</span></span></div><div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">10家 / 1板 · 中 关 村 · <b class="up">+13.01%</b></span></div><div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>中 关 村</b> <span class="em-bk-tag-mini"></span> · <b class="up">--</b></span></div><div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>--</b> · 最高 <b>--</b> · 最低 <b>--</b> · 换手 <b>--</b></span></div><div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">0.00</b>亿 · 中 <b class="up">--</b>亿</span></div></div></div><div class="em-bk"><div class="em-bk-h"><span class="em-bk-tag">C</span><div class="em-bk-meta"><div class="em-bk-title">农产品加 <span class="em-bk-sub">(+10.0%)</span></div><div class="em-bk-tech">主线+趋势技术</div></div></div><div class="em-bk-body"><div class="em-bk-row"><span class="em-bk-k">主力净流入</span><span class="em-bk-v em-strong">0.00 <span class="em-bk-u">亿</span></span></div><div class="em-bk-row"><span class="em-bk-k">涨停 / 板家 · 领涨 · 涨幅</span><span class="em-bk-v">1家 / 4板 · 金健米业 · <b class="up">+9.97%</b></span></div><div class="em-bk-row em-bk-strong"><span class="em-bk-k">强势股</span><span class="em-bk-v"><b>金健米业</b> <span class="em-bk-tag-mini"></span> · <b class="up">--</b></span></div><div class="em-bk-bar"><span class="em-bk-bar-k">龙虎榜(今日)</span><span class="em-bk-bar-v">开盘 <b>--</b> · 最高 <b>--</b> · 最低 <b>--</b> · 换手 <b>--</b></span></div><div class="em-bk-row"><span class="em-bk-k">资金流入(主/中单)</span><span class="em-bk-v">主 <b class="up">0.00</b>亿 · 中 <b class="up">--</b>亿</span></div></div></div></div><div class="em-section"><div class="em-section-h">🎯 分层推荐 · 仅低吸不追板</div><div class="rec-layer rec-layer-a"><div class="rec-layer-h"><span class="rec-layer-tag">A</span><span class="rec-layer-name">稳健层</span><span class="rec-layer-sub">· 生物制品</span></div><div class="rec-layer-desc">穿越点确认·放量启动·回踩低吸·首选埋伏</div><div class="rec-cards"><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">沃森生物</span><span class="rec-card-tag rec-card-tag-a">首选</span><span class="rec-card-meta"> <span class="up">+19.1%</span></span></div><div class="rec-card-sub">生物制品</div><div class="rec-card-reason">板块龙头·一字带板·首选埋伏</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div></div></div><div class="rec-layer rec-layer-b"><div class="rec-layer-h"><span class="rec-layer-tag">B</span><span class="rec-layer-name">进攻层</span><span class="rec-layer-sub">· 化学制药 · 农产品加</span></div><div class="rec-layer-desc">穿越点确认·放量启动·回踩低吸·首选埋伏</div><div class="rec-cards"><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">中 关 村</span><span class="rec-card-tag rec-card-tag-b">首选</span><span class="rec-card-meta"> <span class="up">+13.0%</span></span></div><div class="rec-card-sub">化学制药</div><div class="rec-card-reason">板块龙头·一字带板·首选埋伏</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">金健米业</span><span class="rec-card-tag rec-card-tag-b">龙头</span><span class="rec-card-meta"> <span class="up">+10.0%</span></span></div><div class="rec-card-sub">农产品加</div><div class="rec-card-reason">板块龙头·一字带板·首选埋伏</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div></div></div><div class="rec-layer rec-layer-c"><div class="rec-layer-h"><span class="rec-layer-tag">C</span><span class="rec-layer-name">防御层</span><span class="rec-layer-sub">· 专用设备 · 化学制药</span></div><div class="rec-layer-desc">穿越点确认·放量启动·回踩低吸·首选埋伏</div><div class="rec-cards"><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">速达股份</span><span class="rec-card-tag rec-card-tag-c">首选</span><span class="rec-card-meta"> <span class="up">+10.0%</span></span></div><div class="rec-card-sub">专用设备</div><div class="rec-card-reason">板块龙头·一字带板·首选埋伏</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div><div class="rec-card"><div class="rec-card-h"><span class="rec-card-name">中 关 村</span><span class="rec-card-tag rec-card-tag-c">龙头</span><span class="rec-card-meta"> <span class="up">+13.0%</span></span></div><div class="rec-card-sub">化学制药</div><div class="rec-card-reason">板块龙头·一字带板·首选埋伏</div><div class="rec-card-prices"><div class="rec-p"><span class="rec-p-l">买价</span><span class="rec-p-v">9.85</span></div><div class="rec-p"><span class="rec-p-l">止损</span><span class="rec-p-v rec-p-stop">9.36</span></div><div class="rec-p"><span class="rec-p-l">目标</span><span class="rec-p-v rec-p-tgt">10.64</span></div></div></div></div></div><div class="em-rec-hint">⚠ 只低吸不追板:不打 1 字板首封,严防诱多陷阱;价格按当前 K 线自动派生,数据每日实时更新。</div></div><div class="em-section"><div class="em-section-h">🚫 不参与清单</div><ul class="em-avoid"><li><span class="em-avoid-tag">不参与</span><b>莱美药业(20cm涨停)</b> · 莱美药业已20cm涨停(5.94),严重追高</li><li><span class="em-avoid-tag">不参与</span><b>沃森生物(20cm涨停)</b> · 沃森生物已20cm涨停(15.12),严重追高</li><li><span class="em-avoid-tag">不参与</span><b>中 关 村/化学制药</b> · 化学制药已涨停或大涨,等回调</li><li><span class="em-avoid-tag">不参与</span><b>双鹭药业/化学制药</b> · 化学制药已涨停或大涨,等回调</li><li><span class="em-avoid-tag">不参与</span><b>ST/*ST 股</b> · 退市风险+流动性差</li></ul></div><div class="em-section"><div class="em-section-h">💰 组合 3 档</div><div class="em-port"><div class="em-port-row em-port-1"><div class="em-port-lv">1</div><div class="em-port-name">保守型(总仓 1/3)<span class="em-port-target">目标 3-5%</span></div><div class="em-port-stocks"><span class="em-port-stock">速达股份</span><span class="em-port-stock">中 关 村</span></div></div><div class="em-port-row em-port-2"><div class="em-port-lv">2</div><div class="em-port-name">稳健型(总仓 1/2)<span class="em-port-target">目标 5-8%</span></div><div class="em-port-stocks"><span class="em-port-stock">沃森生物</span></div></div><div class="em-port-row em-port-3"><div class="em-port-lv">3</div><div class="em-port-name">进取型(总仓 2/3)<span class="em-port-target">目标 8-12%</span></div><div class="em-port-stocks"><span class="em-port-stock">中 关 村</span><span class="em-port-stock">金健米业</span></div></div></div><div class="em-port-hint">建议组合:稳健仓 50% + 进取仓 30% + 保守仓 20%,价格每日 09:30 开盘后自动刷新。</div></div><div class="em-section"><div class="em-section-h">🔭 关注锚点</div><ul class="em-anchor"><li><span class="em-anchor-tag">顺势资金驱动</span> <b>生物制品</b> 资金 +0.0亿,主线低吸机会。</li><li><span class="em-anchor-tag">异动主线</span> <b>化学制药</b> +13.0% 加速,看分时承接。</li><li><span class="em-anchor-tag">低位资源</span> 黄金/有色资金切换,关注防御+科技双线联动。</li><li><span class="em-anchor-tag">错位节奏</span> 量能维持 2 万亿上方,主线分化后看二线品种接续。</li></ul></div><div class="em-section"><div class="em-section-h">📐 操作建议 · 4 条</div><ol class="em-ops"><li><b>低吸为主</b>:不开新仓 1 字板、不追高,只做回踩 MA5/MA10 后的低吸确认。</li><li><b>严控仓位</b>:进取型 2/3、稳健型 1/2、保守型 1/3,严格执行止盈止损。</li><li><b>主线聚焦</b>:只参与 A/B/C 三主线的强势品种,板块强度评分 &gt; 80 分。</li><li><b>盘中验证</b>:开盘 30 分钟看量能+主线表态,午后 14:00 后看尾盘抢筹或撤退。</li></ol></div><div class="em-section"><div class="em-section-h">⚠️ 风险提示</div><ul class="em-risk-list"><li><b>高位连板股(连板≥4)</b> · 当前连板≥4 共 1 只,承接强度需复核</li><li><b>当日炸板股</b> · 近 0 只炸板,分歧加大</li><li><b>北证/微盘股</b> · 波动放大+流动性敏感</li><li><b>⚠</b> 高位股抱团松动:情绪温度 84°·高温区,谨防高潮后分歧</li><li><b>⚠</b> 量能持续性:成交额 20794亿 维持,但主线分化加剧</li><li><b>⚠</b> 炸板率监控:当前 0%,&gt; 40% 警惕</li><li><b>⚠</b> 主线切换风险:生物制品若放量跌破 MA5,考虑减仓</li><li><b>⚠</b> 北证/科创板:流动性偏弱,高位谨慎参与</li></ul></div></div>
-  <div class="card bt-card-outer"><div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换<span class="bt-time">· 08:30</span></div><div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">今日主线预判 · 资金切换方向 · 风险提示</span></div><div class="bt-row"><div class="bt-card bt-4"><div class="bt-lv">4板</div><div class="bt-name">金健米业</div><div class="bt-sub">四板高度</div></div><div class="bt-card bt-3"><div class="bt-lv">3板</div><div class="bt-name">--</div><div class="bt-sub">三板高度</div></div><div class="bt-card bt-2"><div class="bt-lv">2板</div><div class="bt-name">汉森制药</div><div class="bt-sub">二板</div></div><div class="bt-card bt-1"><div class="bt-lv">1板</div><div class="bt-name">中 关 村</div><div class="bt-sub">首板</div></div><div class="bt-card bt-new"><div class="bt-lv">断板</div><div class="bt-name">--</div><div class="bt-sub">断板</div></div></div><div class="bt-struct-note"><b>结构辨证</b>:生物制品 今日最高 4板(龙头 沃森生物),板块 +19.1% / 资金 +0.0亿;化学制药 +13.0% 居次,农产品加 +10.0% 第三,医疗器械 +15.0%。梯队高度 4板,情绪 84°(高温区),注意高位分歧与一致兑现风险。</div><div class="vt-section"><div class="vt-h">② 主线研判</div><div class="vt-line"><span class="vt-rank">①</span><b>生物制品</b> — 穿越板块总龙头(<b class="up">沃森生物 4板</b>)<div class="vt-desc">板块 +19.09%、资金 +0.0亿,0家涨停,龙头 沃森生物 领涨,是当前情绪总龙头,注意高位分歧。</div></div><div class="vt-line"><span class="vt-rank">②</span><b>化学制药</b> — 今日次强爆发(<b class="up">中 关 村</b>)<div class="vt-desc">板块 +13.01%、资金 +0.0亿,0家涨停,龙头 中 关 村 领涨,为二线主线。</div></div><div class="vt-line"><span class="vt-rank">③</span><b>农产品加</b> — 梯队成形<div class="vt-desc">板块 +9.97%、资金 +0.0亿,0家涨停,龙头 金健米业。</div></div><div class="vt-line"><span class="vt-rank">④</span><b>医疗器械</b> — 资金主节奏<div class="vt-desc">板块 +14.98%、资金 +0.0亿,0家涨停,关注承接力度。</div></div></div><div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors"><li><span class="vt-tag">沃森生物 4板</span>生物制品 板块 +19.1% 领涨,龙头 沃森生物 表态,关注能否延续 4 板穿越</li><li><span class="vt-tag">中 关 村</span>化学制药 今日次强,龙头 中 关 村 领涨,观察明日能否接力</li><li><span class="vt-tag">金健米业</span>农产品加 梯队成形,资金 净流入 0.0亿,关注持续性</li><li><span class="vt-tag">达安基因</span>医疗器械 板块 +15.0%,资金 净流入 0.0亿,高位注意回撤</li><li><span class="vt-tag">炸板监控</span>今日炸板 0家,炸板率超 40% 需警惕情绪退潮</li><li><span class="vt-tag">量能验证</span>成交额 20794亿,关注量能能否维持</li></ul></div><div class="bd-section"><div class="bd-h">④ 板块强弱 · 3最强 · 3分歧 · 3流出</div><table class="bd-tbl"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>方向</th></tr></thead><tbody><tr class="bd-seg-h bd-seg-1"><td colspan="5"><span class="bd-seg-num">1</span><b>最强</b> · 一字带动 · 龙头确立</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">生物制品</td><td class="up">+19.09%</td><td class="up">+11.5亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">化学制品</td><td class="up">+14.99%</td><td class="up">+9.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">医疗器械</td><td class="up">+14.98%</td><td class="up">+9.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr class="bd-seg-h bd-seg-2"><td colspan="5"><span class="bd-seg-num">2</span><b>分歧</b> · 资金流入但涨幅收敛</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">医疗服务</td><td class="up">+13.33%</td><td class="up">+8.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">化学制药</td><td class="up">+13.01%</td><td class="up">+7.8亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">家居用品</td><td class="up">+10.05%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr class="bd-seg-h bd-seg-3"><td colspan="5"><span class="bd-seg-num">3</span><b>流出</b> · 退潮 / 资金撤离</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">饰品</td><td class="up">+10.05%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">电机Ⅱ</td><td class="up">+10.02%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">电力</td><td class="up">+10.02%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr></tbody></table></div><div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div><div class="msw-row"><span class="msw-tag msw-tag-def">防御</span><div class="msw-vals"><span class="up">+0.00%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-row"><span class="msw-tag msw-tag-ag">农产品加</span><div class="msw-vals"><span class="up">+9.97%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-note">今日主力净流入最强:生物制品 +0.0亿;资金承接方向切换至 农产品加 / 防御</div><div class="msw-nums"><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">生物制品</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">化学制药</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">农产品加</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">医疗器械</div></div></div><div class="msw-foot">主力净流入(亿元)取自东财行业板块口径(真实值,非估算):生物制品、化学制药、农产品加、医疗器械 居前;防御(防御)与农业(农产品加)为资金切换承接方向,谨防一致兑现。</div></div><div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断(早盘快照);开盘后紧盯龙头表态。</div></div>
-  <div class="card">
-    <div class="card-title">当前最强主线方向 <span class="card-sub">点击板块查看可观察个股</span></div>
-    <div class="md-list"><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(0)">
-        <div class="md-rank">1</div>
-        <div class="md-main">
-          <div class="md-name">生物制品 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 11家 / 1板 · 领涨 沃森生物 · ATDS 96</div>
-        </div>
-        <div class="md-pct up">+19.09%</div>
-        <div class="md-arrow">▾</div>
-      </div>
-      <div class="md-picks-wrap" id="md-picks-0">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-picks-empty">候选数据暂缺</div>
-      </div>
-    </div><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(1)">
-        <div class="md-rank">2</div>
-        <div class="md-main">
-          <div class="md-name">化学制药 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 10家 / 1板 · 领涨 中 关 村 · ATDS 96</div>
-        </div>
-        <div class="md-pct up">+13.01%</div>
-        <div class="md-arrow">▾</div>
-      </div>
-      <div class="md-picks-wrap" id="md-picks-1">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-picks-empty">候选数据暂缺</div>
-      </div>
-    </div><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(2)">
-        <div class="md-rank">3</div>
-        <div class="md-main">
-          <div class="md-name">农产品加 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 1家 / 4板 · 领涨 金健米业 · ATDS 96</div>
-        </div>
-        <div class="md-pct up">+9.97%</div>
-        <div class="md-arrow">▾</div>
-      </div>
-      <div class="md-picks-wrap" id="md-picks-2">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-picks-empty">候选数据暂缺</div>
-      </div>
-    </div><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(3)">
-        <div class="md-rank">4</div>
-        <div class="md-main">
-          <div class="md-name">医疗器械 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 4家 / 1板 · 领涨 达安基因 · ATDS 96</div>
-        </div>
-        <div class="md-pct up">+14.98%</div>
-        <div class="md-arrow">▾</div>
-      </div>
-      <div class="md-picks-wrap" id="md-picks-3">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-picks-empty">候选数据暂缺</div>
-      </div>
-    </div><div class="md-card">
-      <div class="md-item" onclick="toggleMdPicks(4)">
-        <div class="md-rank">5</div>
-        <div class="md-main">
-          <div class="md-name">专用设备 <span class="md-status ok">主线确认</span></div>
-          <div class="md-sub">涨停 2家 / 2板 · 领涨 速达股份 · ATDS 96</div>
-        </div>
-        <div class="md-pct up">+10.01%</div>
-        <div class="md-arrow">▾</div>
-      </div>
-      <div class="md-picks-wrap" id="md-picks-4">
-        <div class="md-picks-h">排除涨停 · 优先可观察前3</div>
-        <div class="md-picks-empty">候选数据暂缺</div>
-      </div>
-    </div></div>
-  </div>
-  <div class="card">
-    <div class="card-title">全部方向实时强度排名 · 前 10 名</div>
-    <table class="table"><thead><tr><th>#</th><th>主线</th><th>涨幅</th><th>涨停数</th><th>领涨</th></tr></thead><tbody><tr>
-      <td>1</td>
-      <td>生物制品</td>
-      <td class="up">+19.09%</td>
-      <td>11家 / 1板</td>
-      <td>沃森生物</td>
-    </tr><tr>
-      <td>2</td>
-      <td>化学制药</td>
-      <td class="up">+13.01%</td>
-      <td>10家 / 1板</td>
-      <td>中 关 村</td>
-    </tr><tr>
-      <td>3</td>
-      <td>农产品加</td>
-      <td class="up">+9.97%</td>
-      <td>1家 / 4板</td>
-      <td>金健米业</td>
-    </tr><tr>
-      <td>4</td>
-      <td>医疗器械</td>
-      <td class="up">+14.98%</td>
-      <td>4家 / 1板</td>
-      <td>达安基因</td>
-    </tr><tr>
-      <td>5</td>
-      <td>专用设备</td>
-      <td class="up">+10.01%</td>
-      <td>2家 / 2板</td>
-      <td>速达股份</td>
-    </tr><tr>
-      <td>6</td>
-      <td>中药Ⅱ</td>
-      <td class="up">+9.99%</td>
-      <td>2家 / 2板</td>
-      <td>汉森制药</td>
-    </tr><tr>
-      <td>7</td>
-      <td>医疗服务</td>
-      <td class="up">+13.33%</td>
-      <td>3家 / 1板</td>
-      <td>贝瑞基因</td>
-    </tr><tr>
-      <td>8</td>
-      <td>电网设备</td>
-      <td class="up">+9.99%</td>
-      <td>3家 / 1板</td>
-      <td>风范股份</td>
-    </tr><tr>
-      <td>9</td>
-      <td>家居用品</td>
-      <td class="up">+10.05%</td>
-      <td>1家 / 2板</td>
-      <td>志邦家居</td>
-    </tr><tr>
-      <td>10</td>
-      <td>化学制品</td>
-      <td class="up">+14.99%</td>
-      <td>2家 / 1板</td>
-      <td>键邦股份</td>
-    </tr></tbody></table>
-  </div>
-  <div class="card">
-    <div class="card-title">个股研究摘要</div>
-    <div class="sr-list"><div class="sr-item" data-code="002385" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">1</div>
-      <div class="sr-main">
-        <div class="sr-name">大北农 <small>002385</small></div>
-        <div class="sr-reason">启动+老鸭头+拉升·量比2.0·5日涨12.5%</div>
-      </div>
-      <div class="sr-pct up">+5.57%</div>
-    </div><div class="sr-item" data-code="603113" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">2</div>
-      <div class="sr-main">
-        <div class="sr-name">金能科技 <small>603113</small></div>
-        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨20.7%</div>
-      </div>
-      <div class="sr-pct up">+7.77%</div>
-    </div><div class="sr-item" data-code="600737" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">3</div>
-      <div class="sr-main">
-        <div class="sr-name">中粮糖业 <small>600737</small></div>
-        <div class="sr-reason">老鸭头+拉升·量比2.0·5日涨25.1%</div>
-      </div>
-      <div class="sr-pct up">+6.16%</div>
-    </div><div class="sr-item" data-code="688807" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">4</div>
-      <div class="sr-main">
-        <div class="sr-name">优迅股份 <small>688807</small></div>
-        <div class="sr-reason">拉升·量比2.0·5日涨19.7%</div>
-      </div>
-      <div class="sr-pct up">+6.99%</div>
-    </div><div class="sr-item" data-code="600988" onclick="if(this.dataset.code)openStockResearch(this.dataset.code)">
-      <div class="sr-rank">5</div>
-      <div class="sr-main">
-        <div class="sr-name">赤峰黄金 <small>600988</small></div>
-        <div class="sr-reason">老鸭头·量比2.0·5日涨19.2%</div>
-      </div>
-      <div class="sr-pct up">+7.91%</div>
-    </div></div>
+<div class="card ts-module" data-module="pattern">
+    <div class="card-title">形态扫描 · 14:30 尾盘定调<span class="ts-count">20 只</span></div>
+    <div class="ts-note">启动/老鸭头/拉升 · 盘中未定型形态(候选池 66 只)</div>
+    <div class="ts-head"><span>排名</span><span>标的 / 信号</span><span>14:30涨幅</span><span>尾盘表现</span><span></span></div>
+    <div class="ts-rows"><div class="ts-row" data-code="002264" data-pct="4.31">
+    <span class="ts-rank">1</span>
+    <span class="ts-main"><a class="ts-name" data-code="002264" onclick="openStockResearch(this.dataset.code)">新 华 都</a><span class="ts-code">002264</span><span class="ts-sig">启动+老鸭头+拉升 · 90分</span></span>
+    <span class="ts-pct up">+4.31%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002264" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002957" data-pct="4.94">
+    <span class="ts-rank">2</span>
+    <span class="ts-main"><a class="ts-name" data-code="002957" onclick="openStockResearch(this.dataset.code)">科瑞技术</a><span class="ts-code">002957</span><span class="ts-sig">启动+老鸭头+拉升 · 87分</span></span>
+    <span class="ts-pct up">+4.94%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002957" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="300691" data-pct="7.83">
+    <span class="ts-rank">3</span>
+    <span class="ts-main"><a class="ts-name" data-code="300691" onclick="openStockResearch(this.dataset.code)">联合光电</a><span class="ts-code">300691</span><span class="ts-sig">老鸭头+拉升 · 82分</span></span>
+    <span class="ts-pct up">+7.83%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="300691" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002246" data-pct="4">
+    <span class="ts-rank">4</span>
+    <span class="ts-main"><a class="ts-name" data-code="002246" onclick="openStockResearch(this.dataset.code)">北化股份</a><span class="ts-code">002246</span><span class="ts-sig">老鸭头+拉升 · 79分</span></span>
+    <span class="ts-pct up">+4.00%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002246" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="601579" data-pct="4.93">
+    <span class="ts-rank">5</span>
+    <span class="ts-main"><a class="ts-name" data-code="601579" onclick="openStockResearch(this.dataset.code)">会稽山</a><span class="ts-code">601579</span><span class="ts-sig">老鸭头+拉升 · 78分</span></span>
+    <span class="ts-pct up">+4.93%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="601579" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="301213" data-pct="7.3">
+    <span class="ts-rank">6</span>
+    <span class="ts-main"><a class="ts-name" data-code="301213" onclick="openStockResearch(this.dataset.code)">观想科技</a><span class="ts-code">301213</span><span class="ts-sig">启动+拉升 · 77分</span></span>
+    <span class="ts-pct up">+7.30%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="301213" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="688203" data-pct="6.85">
+    <span class="ts-rank">7</span>
+    <span class="ts-main"><a class="ts-name" data-code="688203" onclick="openStockResearch(this.dataset.code)">海正生材</a><span class="ts-code">688203</span><span class="ts-sig">老鸭头+拉升 · 76分</span></span>
+    <span class="ts-pct up">+6.85%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688203" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="688613" data-pct="6.82">
+    <span class="ts-rank">8</span>
+    <span class="ts-main"><a class="ts-name" data-code="688613" onclick="openStockResearch(this.dataset.code)">奥精医疗</a><span class="ts-code">688613</span><span class="ts-sig">老鸭头+拉升 · 76分</span></span>
+    <span class="ts-pct up">+6.82%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688613" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="001389" data-pct="7.03">
+    <span class="ts-rank">9</span>
+    <span class="ts-main"><a class="ts-name" data-code="001389" onclick="openStockResearch(this.dataset.code)">广合科技</a><span class="ts-code">001389</span><span class="ts-sig">拉升 · 74分</span></span>
+    <span class="ts-pct up">+7.03%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="001389" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="000066" data-pct="6.94">
+    <span class="ts-rank">10</span>
+    <span class="ts-main"><a class="ts-name" data-code="000066" onclick="openStockResearch(this.dataset.code)">中国长城</a><span class="ts-code">000066</span><span class="ts-sig">启动 · 74分</span></span>
+    <span class="ts-pct up">+6.94%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="000066" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002815" data-pct="6.62">
+    <span class="ts-rank">11</span>
+    <span class="ts-main"><a class="ts-name" data-code="002815" onclick="openStockResearch(this.dataset.code)">崇达技术</a><span class="ts-code">002815</span><span class="ts-sig">拉升 · 74分</span></span>
+    <span class="ts-pct up">+6.62%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002815" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="603341" data-pct="6.27">
+    <span class="ts-rank">12</span>
+    <span class="ts-main"><a class="ts-name" data-code="603341" onclick="openStockResearch(this.dataset.code)">龙旗科技</a><span class="ts-code">603341</span><span class="ts-sig">启动 · 74分</span></span>
+    <span class="ts-pct up">+6.27%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="603341" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002164" data-pct="6.94">
+    <span class="ts-rank">13</span>
+    <span class="ts-main"><a class="ts-name" data-code="002164" onclick="openStockResearch(this.dataset.code)">宁波东力</a><span class="ts-code">002164</span><span class="ts-sig">启动 · 74分</span></span>
+    <span class="ts-pct up">+6.94%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002164" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="300725" data-pct="5.74">
+    <span class="ts-rank">14</span>
+    <span class="ts-main"><a class="ts-name" data-code="300725" onclick="openStockResearch(this.dataset.code)">药石科技</a><span class="ts-code">300725</span><span class="ts-sig">拉升 · 74分</span></span>
+    <span class="ts-pct up">+5.74%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="300725" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="603978" data-pct="6.44">
+    <span class="ts-rank">15</span>
+    <span class="ts-main"><a class="ts-name" data-code="603978" onclick="openStockResearch(this.dataset.code)">深圳新星</a><span class="ts-code">603978</span><span class="ts-sig">拉升 · 74分</span></span>
+    <span class="ts-pct up">+6.44%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="603978" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="688026" data-pct="6.5">
+    <span class="ts-rank">16</span>
+    <span class="ts-main"><a class="ts-name" data-code="688026" onclick="openStockResearch(this.dataset.code)">洁特生物</a><span class="ts-code">688026</span><span class="ts-sig">老鸭头 · 74分</span></span>
+    <span class="ts-pct up">+6.50%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688026" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="688662" data-pct="4.82">
+    <span class="ts-rank">17</span>
+    <span class="ts-main"><a class="ts-name" data-code="688662" onclick="openStockResearch(this.dataset.code)">富信科技</a><span class="ts-code">688662</span><span class="ts-sig">拉升 · 74分</span></span>
+    <span class="ts-pct up">+4.82%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688662" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002443" data-pct="5.4">
+    <span class="ts-rank">18</span>
+    <span class="ts-main"><a class="ts-name" data-code="002443" onclick="openStockResearch(this.dataset.code)">金洲管道</a><span class="ts-code">002443</span><span class="ts-sig">拉升 · 74分</span></span>
+    <span class="ts-pct up">+5.40%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002443" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="688137" data-pct="4.34">
+    <span class="ts-rank">19</span>
+    <span class="ts-main"><a class="ts-name" data-code="688137" onclick="openStockResearch(this.dataset.code)">近岸蛋白</a><span class="ts-code">688137</span><span class="ts-sig">拉升 · 74分</span></span>
+    <span class="ts-pct up">+4.34%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688137" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="300369" data-pct="4.65">
+    <span class="ts-rank">20</span>
+    <span class="ts-main"><a class="ts-name" data-code="300369" onclick="openStockResearch(this.dataset.code)">绿盟科技</a><span class="ts-code">300369</span><span class="ts-sig">拉升 · 74分</span></span>
+    <span class="ts-pct up">+4.65%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="300369" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div></div>
+  </div><div class="card ts-module" data-module="wave">
+    <div class="card-title">波背离 TOP20 · 14:30 尾盘定调<span class="ts-count">20 只</span></div>
+    <div class="ts-note">前期强势→调整→缩量→KDJ背离金叉 · 盘中未定型</div>
+    <div class="ts-head"><span>排名</span><span>标的 / 信号</span><span>14:30涨幅</span><span>尾盘表现</span><span></span></div>
+    <div class="ts-rows"><div class="ts-row" data-code="688195" data-pct="2.15">
+    <span class="ts-rank">1</span>
+    <span class="ts-main"><a class="ts-name" data-code="688195" onclick="openStockResearch(this.dataset.code)">腾景科技</a><span class="ts-code">688195</span><span class="ts-sig">类型3·非辨识度·横盘调整·KDJ背离金叉 · 100分</span></span>
+    <span class="ts-pct up">+2.15%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688195" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002708" data-pct="-1.74">
+    <span class="ts-rank">2</span>
+    <span class="ts-main"><a class="ts-name" data-code="002708" onclick="openStockResearch(this.dataset.code)">光洋股份</a><span class="ts-code">002708</span><span class="ts-sig">类型3·非辨识度·横盘调整·KDJ背离金叉 · 100分</span></span>
+    <span class="ts-pct down">-1.74%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002708" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="603626" data-pct="-1.97">
+    <span class="ts-rank">3</span>
+    <span class="ts-main"><a class="ts-name" data-code="603626" onclick="openStockResearch(this.dataset.code)">科森科技</a><span class="ts-code">603626</span><span class="ts-sig">类型3·非辨识度·横盘调整·KDJ背离金叉 · 100分</span></span>
+    <span class="ts-pct down">-1.97%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="603626" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="300798" data-pct="3.08">
+    <span class="ts-rank">4</span>
+    <span class="ts-main"><a class="ts-name" data-code="300798" onclick="openStockResearch(this.dataset.code)">锦鸡股份</a><span class="ts-code">300798</span><span class="ts-sig">类型3·非辨识度·横盘调整·KDJ背离金叉 · 100分</span></span>
+    <span class="ts-pct up">+3.08%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="300798" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="601666" data-pct="0.89">
+    <span class="ts-rank">5</span>
+    <span class="ts-main"><a class="ts-name" data-code="601666" onclick="openStockResearch(this.dataset.code)">平煤股份</a><span class="ts-code">601666</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 100分</span></span>
+    <span class="ts-pct up">+0.89%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="601666" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="600316" data-pct="1.81">
+    <span class="ts-rank">6</span>
+    <span class="ts-main"><a class="ts-name" data-code="600316" onclick="openStockResearch(this.dataset.code)">洪都航空</a><span class="ts-code">600316</span><span class="ts-sig">类型3·非辨识度·横盘调整·KDJ背离金叉 · 100分</span></span>
+    <span class="ts-pct up">+1.81%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600316" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="600722" data-pct="8.77">
+    <span class="ts-rank">7</span>
+    <span class="ts-main"><a class="ts-name" data-code="600722" onclick="openStockResearch(this.dataset.code)">金牛化工</a><span class="ts-code">600722</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 100分</span></span>
+    <span class="ts-pct up">+8.77%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600722" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002279" data-pct="2.04">
+    <span class="ts-rank">8</span>
+    <span class="ts-main"><a class="ts-name" data-code="002279" onclick="openStockResearch(this.dataset.code)">久其软件</a><span class="ts-code">002279</span><span class="ts-sig">类型3·非辨识度·横盘调整·KDJ背离金叉 · 98分</span></span>
+    <span class="ts-pct up">+2.04%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002279" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002589" data-pct="-0.28">
+    <span class="ts-rank">9</span>
+    <span class="ts-main"><a class="ts-name" data-code="002589" onclick="openStockResearch(this.dataset.code)">瑞康医药</a><span class="ts-code">002589</span><span class="ts-sig">类型3·非辨识度·横盘调整·KDJ背离金叉 · 98分</span></span>
+    <span class="ts-pct down">-0.28%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002589" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002703" data-pct="4.17">
+    <span class="ts-rank">10</span>
+    <span class="ts-main"><a class="ts-name" data-code="002703" onclick="openStockResearch(this.dataset.code)">浙江世宝</a><span class="ts-code">002703</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 98分</span></span>
+    <span class="ts-pct up">+4.17%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002703" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="003040" data-pct="2.43">
+    <span class="ts-rank">11</span>
+    <span class="ts-main"><a class="ts-name" data-code="003040" onclick="openStockResearch(this.dataset.code)">楚天龙</a><span class="ts-code">003040</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 98分</span></span>
+    <span class="ts-pct up">+2.43%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="003040" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="000059" data-pct="0.17">
+    <span class="ts-rank">12</span>
+    <span class="ts-main"><a class="ts-name" data-code="000059" onclick="openStockResearch(this.dataset.code)">华锦股份</a><span class="ts-code">000059</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 96分</span></span>
+    <span class="ts-pct up">+0.17%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="000059" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="300063" data-pct="3.09">
+    <span class="ts-rank">13</span>
+    <span class="ts-main"><a class="ts-name" data-code="300063" onclick="openStockResearch(this.dataset.code)">天龙集团</a><span class="ts-code">300063</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 96分</span></span>
+    <span class="ts-pct up">+3.09%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="300063" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="301390" data-pct="-5.74">
+    <span class="ts-rank">14</span>
+    <span class="ts-main"><a class="ts-name" data-code="301390" onclick="openStockResearch(this.dataset.code)">经纬股份</a><span class="ts-code">301390</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 96分</span></span>
+    <span class="ts-pct down">-5.74%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="301390" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="600126" data-pct="0.64">
+    <span class="ts-rank">15</span>
+    <span class="ts-main"><a class="ts-name" data-code="600126" onclick="openStockResearch(this.dataset.code)">杭钢股份</a><span class="ts-code">600126</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 94分</span></span>
+    <span class="ts-pct up">+0.64%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600126" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="600256" data-pct="-0.85">
+    <span class="ts-rank">16</span>
+    <span class="ts-main"><a class="ts-name" data-code="600256" onclick="openStockResearch(this.dataset.code)">广汇能源</a><span class="ts-code">600256</span><span class="ts-sig">类型3·非辨识度·横盘调整·KDJ背离金叉 · 94分</span></span>
+    <span class="ts-pct down">-0.85%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600256" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="600313" data-pct="-0.69">
+    <span class="ts-rank">17</span>
+    <span class="ts-main"><a class="ts-name" data-code="600313" onclick="openStockResearch(this.dataset.code)">农发种业</a><span class="ts-code">600313</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 94分</span></span>
+    <span class="ts-pct down">-0.69%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600313" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="600354" data-pct="-2.87">
+    <span class="ts-rank">18</span>
+    <span class="ts-main"><a class="ts-name" data-code="600354" onclick="openStockResearch(this.dataset.code)">敦煌种业</a><span class="ts-code">600354</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 94分</span></span>
+    <span class="ts-pct down">-2.87%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600354" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="001229" data-pct="0.63">
+    <span class="ts-rank">19</span>
+    <span class="ts-main"><a class="ts-name" data-code="001229" onclick="openStockResearch(this.dataset.code)">魅视科技</a><span class="ts-code">001229</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 94分</span></span>
+    <span class="ts-pct up">+0.63%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="001229" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="300864" data-pct="4.53">
+    <span class="ts-rank">20</span>
+    <span class="ts-main"><a class="ts-name" data-code="300864" onclick="openStockResearch(this.dataset.code)">南大环境</a><span class="ts-code">300864</span><span class="ts-sig">非辨识度·回调调整(战法未单列)·KDJ背离金叉 · 94分</span></span>
+    <span class="ts-pct up">+4.53%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="300864" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div></div>
+  </div><div class="card ts-module" data-module="short">
+    <div class="card-title">超短核心 TOP20 · 14:30 尾盘定调<span class="ts-count">20 只</span></div>
+    <div class="ts-note">涨停基因/连板+竞价/封单强度 · 盘中未定型(收盘定型版见 16:20)</div>
+    <div class="ts-head"><span>排名</span><span>标的 / 信号</span><span>14:30涨幅</span><span>尾盘表现</span><span></span></div>
+    <div class="ts-rows"><div class="ts-row" data-code="603230" data-pct="9.98">
+    <span class="ts-rank">1</span>
+    <span class="ts-main"><a class="ts-name" data-code="603230" onclick="openStockResearch(this.dataset.code)">内蒙新华</a><span class="ts-code">603230</span><span class="ts-sig">连板5·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+9.98%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="603230" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="000756" data-pct="10.02">
+    <span class="ts-rank">2</span>
+    <span class="ts-main"><a class="ts-name" data-code="000756" onclick="openStockResearch(this.dataset.code)">新华制药</a><span class="ts-code">000756</span><span class="ts-sig">连板2·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.02%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="000756" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002178" data-pct="10.04">
+    <span class="ts-rank">3</span>
+    <span class="ts-main"><a class="ts-name" data-code="002178" onclick="openStockResearch(this.dataset.code)">延华智能</a><span class="ts-code">002178</span><span class="ts-sig">连板2·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.04%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002178" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="603068" data-pct="10">
+    <span class="ts-rank">4</span>
+    <span class="ts-main"><a class="ts-name" data-code="603068" onclick="openStockResearch(this.dataset.code)">博通集成</a><span class="ts-code">603068</span><span class="ts-sig">连板3·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.00%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="603068" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002259" data-pct="9.96">
+    <span class="ts-rank">5</span>
+    <span class="ts-main"><a class="ts-name" data-code="002259" onclick="openStockResearch(this.dataset.code)">升达林业</a><span class="ts-code">002259</span><span class="ts-sig">连板2·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+9.96%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002259" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="001317" data-pct="10.01">
+    <span class="ts-rank">6</span>
+    <span class="ts-main"><a class="ts-name" data-code="001317" onclick="openStockResearch(this.dataset.code)">三羊马</a><span class="ts-code">001317</span><span class="ts-sig">连板3·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.01%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="001317" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="603020" data-pct="10.02">
+    <span class="ts-rank">7</span>
+    <span class="ts-main"><a class="ts-name" data-code="603020" onclick="openStockResearch(this.dataset.code)">爱普股份</a><span class="ts-code">603020</span><span class="ts-sig">连板2·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.02%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="603020" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002303" data-pct="10.05">
+    <span class="ts-rank">8</span>
+    <span class="ts-main"><a class="ts-name" data-code="002303" onclick="openStockResearch(this.dataset.code)">美盈森</a><span class="ts-code">002303</span><span class="ts-sig">连板2·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.05%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002303" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="300110" data-pct="20.06">
+    <span class="ts-rank">9</span>
+    <span class="ts-main"><a class="ts-name" data-code="300110" onclick="openStockResearch(this.dataset.code)">华仁药业</a><span class="ts-code">300110</span><span class="ts-sig">连板2·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+20.06%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="300110" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="301234" data-pct="20">
+    <span class="ts-rank">10</span>
+    <span class="ts-main"><a class="ts-name" data-code="301234" onclick="openStockResearch(this.dataset.code)">五洲医疗</a><span class="ts-code">301234</span><span class="ts-sig">连板1·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+20.00%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="301234" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="600641" data-pct="10.01">
+    <span class="ts-rank">11</span>
+    <span class="ts-main"><a class="ts-name" data-code="600641" onclick="openStockResearch(this.dataset.code)">先导基电</a><span class="ts-code">600641</span><span class="ts-sig">连板1·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.01%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600641" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002141" data-pct="10.07">
+    <span class="ts-rank">12</span>
+    <span class="ts-main"><a class="ts-name" data-code="002141" onclick="openStockResearch(this.dataset.code)">贤丰控股</a><span class="ts-code">002141</span><span class="ts-sig">连板1·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.07%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002141" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="688123" data-pct="9.59">
+    <span class="ts-rank">13</span>
+    <span class="ts-main"><a class="ts-name" data-code="688123" onclick="openStockResearch(this.dataset.code)">聚辰股份</a><span class="ts-code">688123</span><span class="ts-sig">连板1 · 100分</span></span>
+    <span class="ts-pct up">+9.59%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688123" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="000560" data-pct="10.03">
+    <span class="ts-rank">14</span>
+    <span class="ts-main"><a class="ts-name" data-code="000560" onclick="openStockResearch(this.dataset.code)">我爱我家</a><span class="ts-code">000560</span><span class="ts-sig">连板2·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.03%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="000560" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="001389" data-pct="6.97">
+    <span class="ts-rank">15</span>
+    <span class="ts-main"><a class="ts-name" data-code="001389" onclick="openStockResearch(this.dataset.code)">广合科技</a><span class="ts-code">001389</span><span class="ts-sig">连板2 · 100分</span></span>
+    <span class="ts-pct up">+6.97%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="001389" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="001268" data-pct="10.02">
+    <span class="ts-rank">16</span>
+    <span class="ts-main"><a class="ts-name" data-code="001268" onclick="openStockResearch(this.dataset.code)">联合精密</a><span class="ts-code">001268</span><span class="ts-sig">连板1·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.02%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="001268" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="300829" data-pct="7.47">
+    <span class="ts-rank">17</span>
+    <span class="ts-main"><a class="ts-name" data-code="300829" onclick="openStockResearch(this.dataset.code)">金丹科技</a><span class="ts-code">300829</span><span class="ts-sig">连板2 · 100分</span></span>
+    <span class="ts-pct up">+7.47%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="300829" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="603893" data-pct="10">
+    <span class="ts-rank">18</span>
+    <span class="ts-main"><a class="ts-name" data-code="603893" onclick="openStockResearch(this.dataset.code)">瑞芯微</a><span class="ts-code">603893</span><span class="ts-sig">连板1·封单0.0亿 · 100分</span></span>
+    <span class="ts-pct up">+10.00%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="603893" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002963" data-pct="3.76">
+    <span class="ts-rank">19</span>
+    <span class="ts-main"><a class="ts-name" data-code="002963" onclick="openStockResearch(this.dataset.code)">豪尔赛</a><span class="ts-code">002963</span><span class="ts-sig">连板5 · 100分</span></span>
+    <span class="ts-pct up">+3.76%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002963" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="301176" data-pct="7.12">
+    <span class="ts-rank">20</span>
+    <span class="ts-main"><a class="ts-name" data-code="301176" onclick="openStockResearch(this.dataset.code)">逸豪新材</a><span class="ts-code">301176</span><span class="ts-sig">连板1 · 100分</span></span>
+    <span class="ts-pct up">+7.12%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="301176" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div></div>
+  </div><div class="card ts-module" data-module="strong">
+    <div class="card-title">强势股 TOP20 · 14:30 尾盘定调<span class="ts-count">20 只</span></div>
+    <div class="ts-note">缺口/黄金坑/突破起爆 · 盘中未定型</div>
+    <div class="ts-head"><span>排名</span><span>标的 / 信号</span><span>14:30涨幅</span><span>尾盘表现</span><span></span></div>
+    <div class="ts-rows"><div class="ts-row" data-code="600792" data-pct="6.41">
+    <span class="ts-rank">1</span>
+    <span class="ts-main"><a class="ts-name" data-code="600792" onclick="openStockResearch(this.dataset.code)">云煤能源</a><span class="ts-code">600792</span><span class="ts-sig">突破20日收盘高·黄金坑(首板支撑)·KDJ金叉 · 90分</span></span>
+    <span class="ts-pct up">+6.41%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600792" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="605088" data-pct="0.53">
+    <span class="ts-rank">2</span>
+    <span class="ts-main"><a class="ts-name" data-code="605088" onclick="openStockResearch(this.dataset.code)">冠盛股份</a><span class="ts-code">605088</span><span class="ts-sig">突破20日收盘高·黄金坑(首板支撑)·KDJ金叉 · 87分</span></span>
+    <span class="ts-pct up">+0.53%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="605088" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="605577" data-pct="4.59">
+    <span class="ts-rank">3</span>
+    <span class="ts-main"><a class="ts-name" data-code="605577" onclick="openStockResearch(this.dataset.code)">龙版传媒</a><span class="ts-code">605577</span><span class="ts-sig">缺口未回补(未缩量)·二波启动·黄金坑(首板支撑)·KDJ金叉 · 85分</span></span>
+    <span class="ts-pct up">+4.59%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="605577" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="600630" data-pct="5.37">
+    <span class="ts-rank">4</span>
+    <span class="ts-main"><a class="ts-name" data-code="600630" onclick="openStockResearch(this.dataset.code)">龙头股份</a><span class="ts-code">600630</span><span class="ts-sig">缺口未回补(未缩量)·突破20日收盘高·KDJ金叉 · 80分</span></span>
+    <span class="ts-pct up">+5.37%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600630" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="688026" data-pct="6.42">
+    <span class="ts-rank">5</span>
+    <span class="ts-main"><a class="ts-name" data-code="688026" onclick="openStockResearch(this.dataset.code)">洁特生物</a><span class="ts-code">688026</span><span class="ts-sig">缺口未回补(未缩量)·突破20日收盘高·KDJ金叉 · 80分</span></span>
+    <span class="ts-pct up">+6.42%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688026" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="688244" data-pct="6.3">
+    <span class="ts-rank">6</span>
+    <span class="ts-main"><a class="ts-name" data-code="688244" onclick="openStockResearch(this.dataset.code)">永信至诚</a><span class="ts-code">688244</span><span class="ts-sig">突破20日收盘高·黄金坑(首板支撑)·KDJ金叉 · 80分</span></span>
+    <span class="ts-pct up">+6.30%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688244" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="000910" data-pct="10.06">
+    <span class="ts-rank">7</span>
+    <span class="ts-main"><a class="ts-name" data-code="000910" onclick="openStockResearch(this.dataset.code)">大亚圣象</a><span class="ts-code">000910</span><span class="ts-sig">缺口未回补(未缩量)·突破20日收盘高·KDJ金叉 · 80分</span></span>
+    <span class="ts-pct up">+10.06%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="000910" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="001260" data-pct="9.98">
+    <span class="ts-rank">8</span>
+    <span class="ts-main"><a class="ts-name" data-code="001260" onclick="openStockResearch(this.dataset.code)">坤泰股份</a><span class="ts-code">001260</span><span class="ts-sig">突破20日收盘高·黄金坑(首板支撑)·KDJ金叉 · 80分</span></span>
+    <span class="ts-pct up">+9.98%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="001260" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002141" data-pct="10.07">
+    <span class="ts-rank">9</span>
+    <span class="ts-main"><a class="ts-name" data-code="002141" onclick="openStockResearch(this.dataset.code)">贤丰控股</a><span class="ts-code">002141</span><span class="ts-sig">突破20日收盘高·KDJ金叉 · 80分</span></span>
+    <span class="ts-pct up">+10.07%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002141" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002957" data-pct="5.13">
+    <span class="ts-rank">10</span>
+    <span class="ts-main"><a class="ts-name" data-code="002957" onclick="openStockResearch(this.dataset.code)">科瑞技术</a><span class="ts-code">002957</span><span class="ts-sig">突破20日收盘高·黄金坑(首板支撑) · 80分</span></span>
+    <span class="ts-pct up">+5.13%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002957" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="301047" data-pct="18.1">
+    <span class="ts-rank">11</span>
+    <span class="ts-main"><a class="ts-name" data-code="301047" onclick="openStockResearch(this.dataset.code)">义翘神州</a><span class="ts-code">301047</span><span class="ts-sig">二波启动·突破20日收盘高 · 80分</span></span>
+    <span class="ts-pct up">+18.10%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="301047" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="601086" data-pct="2.43">
+    <span class="ts-rank">12</span>
+    <span class="ts-main"><a class="ts-name" data-code="601086" onclick="openStockResearch(this.dataset.code)">国芳集团</a><span class="ts-code">601086</span><span class="ts-sig">缺口未回补(未缩量)·突破20日收盘高·KDJ金叉 · 77分</span></span>
+    <span class="ts-pct up">+2.43%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="601086" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="603002" data-pct="2.33">
+    <span class="ts-rank">13</span>
+    <span class="ts-main"><a class="ts-name" data-code="603002" onclick="openStockResearch(this.dataset.code)">宏昌电子</a><span class="ts-code">603002</span><span class="ts-sig">突破20日收盘高·黄金坑(首板支撑)·KDJ金叉 · 77分</span></span>
+    <span class="ts-pct up">+2.33%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="603002" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="688225" data-pct="0.69">
+    <span class="ts-rank">14</span>
+    <span class="ts-main"><a class="ts-name" data-code="688225" onclick="openStockResearch(this.dataset.code)">亚信安全</a><span class="ts-code">688225</span><span class="ts-sig">突破20日收盘高·黄金坑(首板支撑)·KDJ金叉 · 77分</span></span>
+    <span class="ts-pct up">+0.69%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="688225" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="000532" data-pct="1.89">
+    <span class="ts-rank">15</span>
+    <span class="ts-main"><a class="ts-name" data-code="000532" onclick="openStockResearch(this.dataset.code)">华金资本</a><span class="ts-code">000532</span><span class="ts-sig">突破20日收盘高·KDJ金叉 · 77分</span></span>
+    <span class="ts-pct up">+1.89%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="000532" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="002138" data-pct="2.36">
+    <span class="ts-rank">16</span>
+    <span class="ts-main"><a class="ts-name" data-code="002138" onclick="openStockResearch(this.dataset.code)">顺络电子</a><span class="ts-code">002138</span><span class="ts-sig">突破20日收盘高·黄金坑(首板支撑)·KDJ金叉 · 77分</span></span>
+    <span class="ts-pct up">+2.36%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="002138" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="301015" data-pct="1.07">
+    <span class="ts-rank">17</span>
+    <span class="ts-main"><a class="ts-name" data-code="301015" onclick="openStockResearch(this.dataset.code)">百洋医药</a><span class="ts-code">301015</span><span class="ts-sig">二波启动·突破20日收盘高·KDJ金叉 · 77分</span></span>
+    <span class="ts-pct up">+1.07%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="301015" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="301189" data-pct="2.7">
+    <span class="ts-rank">18</span>
+    <span class="ts-main"><a class="ts-name" data-code="301189" onclick="openStockResearch(this.dataset.code)">奥尼电子</a><span class="ts-code">301189</span><span class="ts-sig">突破20日收盘高·黄金坑(首板支撑)·KDJ金叉 · 77分</span></span>
+    <span class="ts-pct up">+2.70%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="301189" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="301230" data-pct="1.65">
+    <span class="ts-rank">19</span>
+    <span class="ts-main"><a class="ts-name" data-code="301230" onclick="openStockResearch(this.dataset.code)">泓博医药</a><span class="ts-code">301230</span><span class="ts-sig">二波启动·突破20日收盘高 · 77分</span></span>
+    <span class="ts-pct up">+1.65%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="301230" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div><div class="ts-row" data-code="600246" data-pct="3.75">
+    <span class="ts-rank">20</span>
+    <span class="ts-main"><a class="ts-name" data-code="600246" onclick="openStockResearch(this.dataset.code)">万通发展</a><span class="ts-code">600246</span><span class="ts-sig">缺口未回补(未缩量)·突破20日收盘高·黄金坑(首板支撑) · 75分</span></span>
+    <span class="ts-pct up">+3.75%</span>
+    <span class="ts-tail" title="实时涨幅 − 14:30 快照涨幅;15:00 后即为 14:30→收盘">—</span>
+    <button class="wl-btn ts-add" data-code="600246" onclick="addFetchedToWatchlist(this.dataset.code)">加入</button>
+  </div></div>
+  </div><div class="card ts-module" data-module="eye">
+    <div class="card-title">👁️ 天眼地量 TOP20 · 14:30 尾盘定调<span class="ts-count">0 只</span></div>
+    <div class="ts-note">MA20上行+MA5回抽眼睛+地量+浅回调 · 盘中未定型(收盘定型版见 16:20)</div>
+    <div class="ts-head"><span>排名</span><span>标的 / 信号</span><span>14:30涨幅</span><span>尾盘表现</span><span></span></div>
+    <div class="ts-rows"><div class="ts-empty">当日无入选(数据源不可达或无满足战法条件的标的)</div></div>
   </div>
 </div>
-<div class="footer">ATDS PRO · 仅做行情与信息展示 · 不构成投资建议</div>
+<div class="footer">ATDS PRO · 14:30 尾盘定调快照（14:10 采集）· 仅做行情与信息展示 · 不构成投资建议</div>
 </div>
 <script>
 function getBaseUrl(){var h=location.href.split("#")[0];if(/index\.html/i.test(h)){return h.replace(/index\.html.*$/i,"");}if(h.slice(-1)==="/"){return h;}var i=h.lastIndexOf("/");return h.slice(0,i+1);}
