@@ -2517,7 +2517,6 @@ ${renderHero(report)}
 ${renderFollowerRiskBanner(report)}
 <div class="section">
   ${renderWatchlist(report)}
-  ${renderWatchlistBacktest(report)}
   ${renderSignalRadar(report)}
   ${renderPremarketCockpit(report)}
   ${renderPremarketStrategy(report, { title: '盘前参与策略', subtitle: '盘前接力判断 · 板块联动确认 · 强势股池筛选' })}
