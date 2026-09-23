@@ -2276,7 +2276,7 @@
       <a href="index.html">首页</a><a href="2026-09-11_09-45.html" class="active">盘前</a><a href="2026-09-11_16-20.html">收盘</a><a href="2026-09-23_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:47</b>（约 664 分钟前）</div><h1 class="hero-title">2026-09-11 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 60°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:47</b>（约 711 分钟前）</div><h1 class="hero-title">2026-09-11 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 60°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-11 09:47:00</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -8857,7 +8857,7 @@ if(document.readyState==='complete'||document.readyState==='interactive'){setTim
    参考用户提供的「结构信号」案例:推荐日/裸K确认参考/结构失效参考/+3%兑现线/-5%失效线/
    NX 黄梯蓝梯(SuperTrend)/MA5/MA20/CD抄底/成交量/资金活跃度(量能代理)。
    合规:均为结构观察与研究记录阈值,非交易指令、非荐股。 */
-var SSQ = { code: '', period: 'day', count: 66 };
+var SSQ = { code: '', period: 'day', count: 66, view: null };
 async function fetchKlinePeriod(code, period, count){
   var url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + encodeURIComponent(code) + ',' + period + ',,,' + count + ',qfq';
   try{
@@ -8902,21 +8902,24 @@ function structSignalCalc(kl, code, name, count, suf){
     ma20.push(i>=19?(C.slice(i-19,i+1).reduce(function(a,b){return a+b;},0)/20):null);
   }
   var nY=ssqSuperTrend(H,L,C,20,3), nB=ssqSuperTrend(H,L,C,10,2);
+  // v11.133 准确性:①CD/推荐日只认「最新完整K线」——排除今天未收盘的K线(盘中形态可能消失,收盘才算数)
+  var lastComplete=n-1;
+  try{ if(D[n-1]===bjTodayF() && n>=2) lastComplete=n-2; }catch(e){}
   var cd=[];
-  for(var i=20;i<n;i++){
+  for(var i=20;i<=lastComplete;i++){
     var low20=Math.min.apply(null,L.slice(i-20,i));
     if(L[i]<=low20 && C[i]>O[i]) cd.push(i);
   }
   var recoIdx=null;
   if(cd.length){
     var lastCd=cd[cd.length-1];
-    for(var i=lastCd+1;i<n;i++){
+    // v11.133 准确性:②只认「真金叉」(MA5 从 MA20 下方上穿)——删除原"已金叉状态"兜底分支,
+    //   该分支会把 CD 后第一天直接标成推荐日(哪怕根本没有发生金叉),导致推荐日/±3%±5%基准失真
+    for(var i=lastCd+1;i<=lastComplete;i++){
       if(ma5[i-1]!=null&&ma20[i-1]!=null&&ma5[i-1]<=ma20[i-1]&&ma5[i]>ma20[i]){recoIdx=i;break;}
-      if(ma5[i]>ma20[i]&&ma5[i-1]!=null&&ma5[i-1]>ma20[i-1]){recoIdx=i;break;}
     }
   }
-  var lastIdx=n-1;
-  try{ if(D[lastIdx]===bjTodayF() && n>=2) lastIdx=n-2; }catch(e){}
+  var lastIdx=lastComplete;
   var confirmHigh=H[lastIdx];
   var failLow=Math.min.apply(null,L.slice(Math.max(0,n-10)));
   var recoClose=recoIdx!=null?C[recoIdx]:null;
@@ -8928,15 +8931,12 @@ function structSignalCalc(kl, code, name, count, suf){
       var a20=V.slice(i-19,i+1).reduce(function(a,b){return a+b;},0)/20;
       bm.push(a20>0?Math.round(a5/a20*100):null);}else bm.push(null);
   }
-  // v11.132c:默认只显示所选范围的根数(避免 3个月画出 100+ 根挤成一团);
-  // 若 CD 抄底点比该范围更早,则向前扩到 CD 前 10 根,保证「CD→金叉」故事完整
+  // v11.133:disp 保留【全部已取回数据】(含预热根数,平移/缩放有真实历史可看),
+  // 默认视窗(最后 cnt 根)由 drawStructChart 的 SSQ.view 控制,数据不再物理截断。
   var cnt=count||SSQ.count||66;
-  var win0=Math.max(0,n-cnt);
-  if(cd.length) win0=Math.min(win0,Math.max(0,cd[cd.length-1]-10));
-  var disp={D:D.slice(win0),O:O.slice(win0),C:C.slice(win0),H:H.slice(win0),L:L.slice(win0),V:V.slice(win0),
-    ma5:ma5.slice(win0),ma20:ma20.slice(win0),nY:nY.slice(win0),nB:nB.slice(win0),bm:bm.slice(win0),win0:win0};
-  var cdDisp=cd.filter(function(i){return i>=win0;}).map(function(i){return i-win0;});
-  var recoDisp=(recoIdx!=null&&recoIdx>=win0)?(recoIdx-win0):null;
+  var disp={D:D,O:O,C:C,H:H,L:L,V:V,ma5:ma5,ma20:ma20,nY:nY,nB:nB,bm:bm,win0:0};
+  var cdDisp=cd.slice();
+  var recoDisp=recoIdx;
   var lastC=C[n-1];
   var atr14=null;
   if(n>=15){var trs=[];
@@ -8963,32 +8963,47 @@ function drawStructChart(cv, calc){
   var padL=6,padR=58,padT=46;
   var mainH=236,volY=padT+mainH+16,volH=62,bmY=volY+volH+14,bmH=56;
   var x0=padL,x1=W-padR,iw=x1-x0;
-  var spX=iw/n,cw=Math.max(2.5,Math.min(spX*0.7,12));   // v11.132c:K线宽度自适应(最小2.5px,不再挤成一条线)
+  // v11.133 视窗:数据全量保留,默认只显示所选范围(最后 cnt 根);支持单指拖动平移/双指捏合缩放/双击复位,
+  // 可看到全部已取回数据(含范围外的预热根数)。
+  var cnt=calc.meta.count||66;
+  if(!(SSQ.view&&SSQ.view.s!=null&&SSQ.view.e<=n&&SSQ.view.e>SSQ.view.s&&SSQ.view.e-SSQ.view.s>=20)){
+    SSQ.view={s:Math.max(0,n-cnt),e:n};
+  }
+  var vs=SSQ.view.s,ve=SSQ.view.e,nv=ve-vs;
+  var spX=iw/nv,cw=Math.max(2.5,Math.min(spX*0.7,12));
   var lo=Infinity,hi=-Infinity;
-  for(var i=0;i<n;i++){lo=Math.min(lo,d.L[i]);hi=Math.max(hi,d.H[i]);
+  for(var i=vs;i<ve;i++){lo=Math.min(lo,d.L[i]);hi=Math.max(hi,d.H[i]);
     if(d.nY[i]!=null)hi=Math.max(hi,d.nY[i]);if(d.nB[i]!=null)hi=Math.max(hi,d.nB[i]);}
-  // v11.132c:四条参考线(含 +3%兑现/-5%失效)无条件纳入 Y 轴范围 —— 原 0.5~1.5 倍过滤会把偏离当前价区的线
-  // 排除在视野外,导致用户「看不到这两条线」。与参考模板一致:线永远画在图内。
+  // v11.132c 沿用:四条参考线(含 +3%兑现/-5%失效)无条件纳入 Y 轴范围,线永远画在图内
   var lvs=[calc.levels.p3,calc.levels.m95,calc.levels.confirmHigh,calc.levels.failLow];
   for(var i=0;i<lvs.length;i++){if(lvs[i]>0){hi=Math.max(hi,lvs[i]);lo=Math.min(lo,lvs[i]);}}
   var span=(hi-lo)||1;lo-=span*0.05;hi+=span*0.07;
   var Y=function(v){return padT+(hi-v)/(hi-lo)*mainH;};
-  var X=function(i){return x0+iw*(i+0.5)/n;};
-  // v11.132c:标题行 + 副标题(模板样式:「名称 · 代码.市场 · 周期」/「价格与 CD 信号」)
+  var X=function(i){return x0+iw*(i-vs+0.5)/nv;};
+  // 标题行 + 副标题(模板样式:「名称 · 代码.市场 · 周期」/「价格与 CD 信号」)
   var pLabel={day:'日线',week:'周线',m15:'15分钟',m60:'60分钟'}[calc.meta.period]||'日线';
   ctx.textBaseline='alphabetic';
   ctx.fillStyle='#e8edf2';ctx.font='bold 12px sans-serif';
   ctx.fillText((calc.meta.name||calc.meta.code)+' · '+calc.meta.code+'.'+(calc.meta.suf||'')+' · '+pLabel,x0+2,15);
   ctx.fillStyle='#8b98a5';ctx.font='10px sans-serif';
-  // v11.132c:推荐线落在中部时「推荐日」标签会与居中副标题重叠 → 碰撞规避(有碰撞则不画副标题)
-  var subOk=!(calc.recoDisp!=null&&Math.abs(X(calc.recoDisp)-(x0+iw/2))<64);
+  // 推荐线落在中部视窗时「推荐日」标签会与居中副标题重叠 → 碰撞规避(有碰撞则不画副标题)
+  var subOk=!(calc.recoDisp!=null&&calc.recoDisp>=vs&&calc.recoDisp<ve&&Math.abs(X(calc.recoDisp)-(x0+iw/2))<64);
   if(subOk)ctx.fillText('价格与 CD 信号',x0+iw/2-33,31);
   ctx.strokeStyle='#1b2129';ctx.lineWidth=1;ctx.font='9px sans-serif';ctx.fillStyle='#5b6673';
   for(var g=0;g<=4;g++){var v=lo+(hi-lo)*g/4,y=Y(v);ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();ctx.fillText(v.toFixed(2),x1+3,y+3);}
   function drawLine(arr,color){ctx.strokeStyle=color;ctx.lineWidth=1.2;ctx.beginPath();var started=false;
-    for(var i=0;i<n;i++){if(arr[i]==null)continue;var x=X(i),y=Y(arr[i]);if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);}ctx.stroke();}
-  drawLine(d.nY,'rgba(212,160,23,0.9)');drawLine(d.nB,'rgba(59,130,246,0.9)');
-  for(var i=0;i<n;i++){
+    for(var i=vs;i<ve;i++){if(arr[i]==null)continue;var x=X(i),y=Y(arr[i]);if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);}ctx.stroke();}
+  // v11.133:SuperTrend 以「梯子形态」渲染(参照模板 NX黄梯/蓝梯)——半透明阶梯带逐段填充 + 实线阶梯边
+  function drawLadder(arr,lineColor,fillColor){
+    ctx.fillStyle=fillColor;
+    for(var i=vs;i<ve-1;i++){var a=arr[i],b=arr[i+1];if(a==null||b==null)continue;
+      var y1=Y(a),y2=Y(b);ctx.fillRect(X(i)-spX*0.5,Math.min(y1,y2),Math.max(2,spX),Math.max(2.5,Math.abs(y2-y1)));}
+    ctx.strokeStyle=lineColor;ctx.lineWidth=1.4;ctx.beginPath();var started=false;
+    for(var i=vs;i<ve;i++){if(arr[i]==null){started=false;continue;}var x=X(i),y=Y(arr[i]);if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);}ctx.stroke();
+  }
+  drawLadder(d.nY,'rgba(212,160,23,0.95)','rgba(212,160,23,0.18)');
+  drawLadder(d.nB,'rgba(59,130,246,0.95)','rgba(59,130,246,0.18)');
+  for(var i=vs;i<ve;i++){
     var up=d.C[i]>=d.O[i],col=up?'#ef4444':'#22c55e';
     var x=X(i);
     ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1;
@@ -9000,33 +9015,88 @@ function drawStructChart(cv, calc){
   }
   drawLine(d.ma5,'#f87171');drawLine(d.ma20,'#c084fc');
   ctx.fillStyle='#f59e0b';
-  for(var i=0;i<calc.cdDisp.length;i++){var idx=calc.cdDisp[i],x=X(idx),y=Y(d.L[idx])+8;
+  for(var k=0;k<calc.cdDisp.length;k++){var idx=calc.cdDisp[k];if(idx<vs||idx>=ve)continue;
+    var x=X(idx),y=Y(d.L[idx])+8;
     ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x-4,y+1);ctx.lineTo(x+4,y+1);ctx.closePath();ctx.fill();}
-  if(calc.recoDisp!=null){var rx=X(calc.recoDisp);
+  if(calc.recoDisp!=null&&calc.recoDisp>=vs&&calc.recoDisp<ve){var rx=X(calc.recoDisp);
     ctx.strokeStyle='#ef4444';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(rx,padT-6);ctx.lineTo(rx,padT+mainH+10);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle='#ef4444';ctx.font='bold 10px sans-serif';
     var rtx=Math.min(Math.max(rx-13,x0+2),x1-40);ctx.fillText('推荐日',rtx,padT-9);}
+  // 参考线标签防重叠:同侧标签纵向过近时向下错开(线仍在真实位置)
+  var lastLY=-1e9,lastRY=-1e9;
   function hline(v,color,label,dash,side){if(!(v>0))return;var y=Y(v);if(y<padT-2||y>padT+mainH+2)return;
     ctx.strokeStyle=color;ctx.setLineDash(dash||[5,3]);ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=color;ctx.font='10px sans-serif';if(side==='R'){var tw=ctx.measureText(label).width;ctx.fillText(label,x1-tw+2,y-3);}else{ctx.fillText(label,x0+3,y-3);}}
+    var ty=y-3;
+    if(side==='R'){if(ty-lastRY<11)ty=lastRY+11;lastRY=ty;ctx.fillStyle=color;ctx.font='10px sans-serif';
+      var tw=ctx.measureText(label).width;ctx.fillText(label,x1-tw+2,ty);}
+    else{if(ty-lastLY<11)ty=lastLY+11;lastLY=ty;ctx.fillStyle=color;ctx.font='10px sans-serif';
+      ctx.fillText(label,x0+3,ty);}}
   hline(calc.levels.p3,'#22c55e','+3% 兑现线',[6,3],'L');
   hline(calc.levels.m95,'#ef4444','-5% 失效线',[6,3],'L');
   hline(calc.levels.confirmHigh,'#eab308','裸K确认参考',[6,3],'R');
   hline(calc.levels.failLow,'#f87171','结构失效参考',[6,3],'R');
-  var vmax=0;for(var i=0;i<n;i++)vmax=Math.max(vmax,d.V[i]);vmax=vmax||1;
+  var vmax=0;for(var i=vs;i<ve;i++)vmax=Math.max(vmax,d.V[i]);vmax=vmax||1;
   var vYv=function(v){return volY+volH-(v/vmax)*volH;};
   ctx.fillStyle='#384250';
-  for(var i=0;i<n;i++){var x=X(i),bw=Math.max(1,cw);ctx.fillRect(x-bw/2,vYv(d.V[i]),bw,volY+volH-vYv(d.V[i]));}
+  for(var i=vs;i<ve;i++){var x=X(i),bw=Math.max(1,Math.min(cw,spX*0.85));ctx.fillRect(x-bw/2,vYv(d.V[i]),bw,volY+volH-vYv(d.V[i]));}
   ctx.fillStyle='#8b98a5';ctx.font='9px sans-serif';ctx.fillText('成交量',x0+2,volY-2);
-  var bmax=0;for(var i=0;i<n;i++)if(d.bm[i]!=null)bmax=Math.max(bmax,d.bm[i]);bmax=bmax||100;
+  var bmax=0;for(var i=vs;i<ve;i++)if(d.bm[i]!=null)bmax=Math.max(bmax,d.bm[i]);bmax=bmax||100;
   var bYv=function(v){return bmY+bmH-(v/bmax)*bmH;};
   ctx.strokeStyle='#22c55e';ctx.lineWidth=1.2;ctx.beginPath();var st2=false;
-  for(var i=0;i<n;i++){if(d.bm[i]==null)continue;var x=X(i),y=bYv(d.bm[i]);if(!st2){ctx.moveTo(x,y);st2=true;}else ctx.lineTo(x,y);}
+  for(var i=vs;i<ve;i++){if(d.bm[i]==null)continue;var x=X(i),y=bYv(d.bm[i]);if(!st2){ctx.moveTo(x,y);st2=true;}else ctx.lineTo(x,y);}
   ctx.stroke();
   ctx.fillStyle='#22c55e';ctx.font='9px sans-serif';ctx.fillText('资金活跃度(量能代理)',x0+2,bmY-2);
   ctx.fillStyle='#5b6673';ctx.font='9px sans-serif';
-  for(var g=0;g<4;g++){var idx=Math.floor(n*g/3.99);if(idx>=n)idx=n-1;var x=X(idx);
-    ctx.fillText(String(d.D[idx]).slice(5),Math.min(W-30,x-10),H-3);}
+  for(var g=0;g<4;g++){var idx2=vs+Math.floor(nv*g/3.99);if(idx2>=ve)idx2=ve-1;var x=X(idx2);
+    ctx.fillText(String(d.D[idx2]).slice(5),Math.min(W-30,x-10),H-3);}
+  // ── v11.133 交互:单指拖动平移 / 双指捏合缩放 / 双击复位(每块 canvas 只绑一次,重绘不叠加监听) ──
+  if(!cv.__ssqBind){
+    cv.__ssqBind=1;cv.style.touchAction='none';
+    function clampView(s,e){
+      var w=e-s;
+      if(w<20){var c=(s+e)/2;s=c-10;e=c+10;}
+      if(w>n){s=0;e=n;}
+      if(s<0){e-=s;s=0;}
+      if(e>n){s-=e-n;e=n;}
+      if(s<0)s=0;
+      return [Math.round(s),Math.round(e)];
+    }
+    var drag0=null,pinch0=null,lastTapT=0;
+    var spNow=function(){return iw/(SSQ.view.e-SSQ.view.s);};   // 缩放后步长随视窗宽度变化,动态取
+    cv.addEventListener('touchstart',function(ev){
+      if(ev.touches.length===1){drag0={x:ev.touches[0].clientX,s:SSQ.view.s,e:SSQ.view.e};pinch0=null;}
+      else if(ev.touches.length>=2){
+        var dx=ev.touches[0].clientX-ev.touches[1].clientX,dy=ev.touches[0].clientY-ev.touches[1].clientY;
+        pinch0={d:Math.sqrt(dx*dx+dy*dy)||1,s:SSQ.view.s,e:SSQ.view.e,cx:(ev.touches[0].clientX+ev.touches[1].clientX)/2};
+        drag0=null;ev.preventDefault();
+      }
+    },{passive:false});
+    cv.addEventListener('touchmove',function(ev){
+      ev.preventDefault();
+      var now=Date.now();if(now-(cv.__ssqLast||0)<16)return;cv.__ssqLast=now;
+      if(ev.touches.length===1&&drag0){
+        var db=(ev.touches[0].clientX-drag0.x)/spNow();
+        var se=clampView(drag0.s-db,drag0.e-db);SSQ.view={s:se[0],e:se[1]};drawStructChart(cv,calc);
+      }else if(ev.touches.length>=2&&pinch0){
+        var dx=ev.touches[0].clientX-ev.touches[1].clientX,dy=ev.touches[0].clientY-ev.touches[1].clientY;
+        var ratio=(Math.sqrt(dx*dx+dy*dy)||1)/pinch0.d;
+        var w=(pinch0.e-pinch0.s)/ratio;
+        var r=cv.getBoundingClientRect();
+        var fx=Math.min(1,Math.max(0,(pinch0.cx-r.left-x0)/iw));
+        var fs=pinch0.s+(pinch0.e-pinch0.s)*fx;
+        var se=clampView(fs-w*fx,fs-w*fx+w);SSQ.view={s:se[0],e:se[1]};drawStructChart(cv,calc);
+      }
+    },{passive:false});
+    cv.addEventListener('touchend',function(ev){if(ev.touches.length===0){drag0=null;pinch0=null;}},{passive:false});
+    // 桌面鼠标拖动(真机审计用)
+    cv.addEventListener('mousedown',function(ev){drag0={x:ev.clientX,s:SSQ.view.s,e:SSQ.view.e};});
+    cv.addEventListener('mousemove',function(ev){if(drag0&&ev.buttons){
+      var now=Date.now();if(now-(cv.__ssqLast||0)<16)return;cv.__ssqLast=now;
+      var db=(ev.clientX-drag0.x)/spNow();
+      var se=clampView(drag0.s-db,drag0.e-db);SSQ.view={s:se[0],e:se[1]};drawStructChart(cv,calc);}});
+    cv.addEventListener('mouseup',function(){drag0=null;});
+    cv.addEventListener('dblclick',function(){SSQ.view={s:Math.max(0,n-cnt),e:n};drawStructChart(cv,calc);});
+  }
 }
 function ssqRenderParams(calc){
   var rk=calc.risk;
@@ -9077,8 +9147,8 @@ async function runStructQuery(){
   var out=document.getElementById('ssq-out');
   out.innerHTML='<div class="ssq-empty">查询中…</div>';
   var period=SSQ.period==='m15'?'m15':(SSQ.period==='m60'?'m60':(SSQ.period==='week'?'week':'day'));
-  var kl=await fetchKlinePeriod(full,period,Math.max(SSQ.count+40,80));
-  if((!kl||kl.length<35)&&period==='day'){ try{ kl=await fetchKlineF(full,Math.max(SSQ.count+40,80)); }catch(e){} }   // v11.132:日线降级三源兜底
+  var kl=await fetchKlinePeriod(full,period,Math.max(SSQ.count+80,120));   // v11.133:+80 余量(平移可看到范围外历史)
+  if((!kl||kl.length<35)&&period==='day'){ try{ kl=await fetchKlineF(full,Math.max(SSQ.count+80,120)); }catch(e){} }   // v11.132:日线降级三源兜底
   if(!kl||kl.length<35){out.innerHTML='<div class="ssq-empty">未获取到该代码K线(请确认代码/北交所暂不支持)</div>';return;}
   // v11.132c:拉真实个股名称(图上标题用);失败降级显示代码,不阻断查询
   var suf=full.slice(0,2).toUpperCase(),nm='';
@@ -9089,8 +9159,9 @@ async function runStructQuery(){
     if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)nm=String(qf[1]);}
   }catch(e){}
   var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
+  SSQ.view=null;   // v11.133:新查询重置视窗(默认显示所选范围,再由手势平移/缩放)
   out.innerHTML=ssqRenderParams(calc)+'<div class="ssq-cwrap" id="ssq-canvas-wrap"><canvas id="ssq-canvas"></canvas></div>'+
-    '<div class="ssq-legend"><i style="background:#d4a017"></i>NX黄梯 <i style="background:#3b82f6"></i>NX蓝梯 <i style="background:#ef4444"></i>K线/MA5 <i style="background:#c084fc"></i>MA20 <i style="color:#f59e0b">▲</i>CD抄底 <span style="color:#ef4444;margin:0 3px 0 8px">┆</span>推荐日 <i style="background:#384250"></i>成交量 <i style="background:#22c55e"></i>资金活跃度</div>'+
+    '<div class="ssq-legend"><span style="white-space:nowrap"><i style="background:#d4a017"></i>NX黄梯</span> <span style="white-space:nowrap"><i style="background:#3b82f6"></i>NX蓝梯</span> <span style="white-space:nowrap"><i style="background:#ef4444"></i>K线/MA5</span> <span style="white-space:nowrap"><i style="background:#c084fc"></i>MA20</span> <span style="white-space:nowrap"><i style="color:#f59e0b">▲</i>CD抄底</span> <span style="white-space:nowrap"><span style="color:#ef4444;margin:0 3px 0 8px">┆</span>推荐日</span> <span style="white-space:nowrap"><i style="background:#384250"></i>成交量</span> <span style="white-space:nowrap"><i style="background:#22c55e"></i>资金活跃度</span></div>'+
     ssqRenderLevels(calc);
   drawStructChart(document.getElementById('ssq-canvas'),calc);
 }
