@@ -324,3 +324,13 @@ jobs:
       - name: Deploy to GitHub Pages
         if: steps.check.outputs.skip != 'true' && steps.win.outputs.inwin == 'true' && steps.type.outputs.type != 'auction'
         uses: actions/deploy-pages@v4
+
+      # v11.137:失败告警接线 —— 此前 notify.mjs 存在但从未被调用(告警机制形同虚设)。
+      #   if: failure() = 任一前置步骤失败即推 Server酱(采集崩/网络全失败/构建失败等)。
+      #   注意:越界守卫 exit(3) 属预期行为,但也会触发本告警 —— 若该类告警频繁出现,
+      #   说明调度相位仍需调(见 §二b),此时告警恰好是排查信号,不算误报。
+      - name: Notify failure (Server酱)
+        if: failure()
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+        run: node scripts/notify.mjs "ATDS 采集/构建失败" "GitHub Actions 流程失败,请检查 run 日志(https://github.com/xinxin-0501/atds-review/actions)。"

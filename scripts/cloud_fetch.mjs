@@ -249,6 +249,23 @@ async function fetchZB(dateArg) {
   return (j.data && j.data.tc) || 0;
 }
 
+// v11.137:跌停池 —— 此前 limitDown 硬编码空数组、limitDownCount 硬编码 0(数据造假:当日实有跌停却被显示 0)。
+//   与 fetchZT 对称,取东财 getTopicDTPool;返回 {total, list, qdate}。
+async function fetchDT(dateArg) {
+  try {
+    const url = `http://push2ex.eastmoney.com/getTopicDTPool?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt&Pageindex=0&pagesize=300&sort=fund%3Aasc&date=${dateArg || process.argv[3] || ''}`;
+    const j = await emFetchJson(url, { 'User-Agent': 'Mozilla/5.0' }, 10000);
+    if (!j) throw new Error('所有主机均无返回');
+    const d = j.data || {};
+    const list = (d.pool || []).map(s => ({
+      code: String(s.c), name: s.n, price: (s.p || 0) / 1000,
+      pct: Math.round((s.zdp || 0) * 100) / 100, lianban: s.lbc || 1,
+      hybk: s.hybk || '', sealWan: Math.round((s.fund || 0) / 10000)
+    }));
+    return { total: d.tc || list.length, list, qdate: String(d.qdate || '') };
+  } catch (e) { console.error('fetchDT 失败:', e.message); return { total: 0, list: [], qdate: '' }; }
+}
+
 async function fetchBreadth() {
   // 东财沪深指数上涨/下跌/平盘家数(f104/f105/f106)。v11.15:改走 emFetchJson 多主机轮换
   // v11.53 修复(重要):原 secids 含【创业板指 0.399006】—— 而创业板是深市的子集,
@@ -3684,6 +3701,8 @@ async function main() {
   const newHigh = await fetchNewHighCount(todayCompact);
 
   const zt = await fetchZT(todayCompact);
+  // v11.137:跌停池(修复 limitDown 硬编码空 —— 当日跌停真实入榜)
+  const dt = await fetchDT(todayCompact);
   // 全市场形态扫描(启动/老鸭头/拉升)
   const marketScan = await scanMarketPatterns(zt.list);
   // v11.51:【竞价/开盘强度快照】
@@ -3706,7 +3725,7 @@ async function main() {
   } else {
     try {
       const j = JSON.parse(fs.readFileSync(AUCTION_PATH, 'utf8'));
-      if (j && j.date === date && j.map) { auctionMap = j.map; console.log('已载入竞价/开盘强度快照:', Object.keys(j.map).length, '只(采集于', j.savedAt, ')'); }
+      if (j && j.date === date && j.map) { auctionMap = j.map; console.log('已载入竞价/开盘强度快照:', Object.keys(j.map).length, '只(采集于', j.capturedAt, ')'); }
       else console.log('竞价快照日期不符(' + (j && j.date) + '≠' + date + '),本次不使用');
     } catch (e) { console.log('无竞价快照(降级:使用盘中实时开盘涨幅)'); }
   }
@@ -3759,7 +3778,7 @@ async function main() {
   // v11.66:板块全量数据必须【先取】—— deriveCloseEmotion 与 mainRank 都要用它(原先在 mainRank 处才取,晚了一步)
   const sectorsAll = await fetchSectors();
   // 收盘情绪复盘(maxLB 已定义)
-  const _emotionTemp = { upCount: breadth.up, downCount: breadth.down, flatCount: breadth.flat, limitUpCount: zt.total, limitDownCount: 0, zhaBanCount: zbCount, maxLianBan: dragonPool.maxLianBan || 0, maxLianBanStock: (dragonPool.consecutiveBoards && dragonPool.consecutiveBoards[0]) ? dragonPool.consecutiveBoards[0].name : '--' };
+  const _emotionTemp = { upCount: breadth.up, downCount: breadth.down, flatCount: breadth.flat, limitUpCount: zt.total, limitDownCount: dt.total, zhaBanCount: zbCount, maxLianBan: dragonPool.maxLianBan || 0, maxLianBanStock: (dragonPool.consecutiveBoards && dragonPool.consecutiveBoards[0]) ? dragonPool.consecutiveBoards[0].name : '--' };
   const closeEmotion = deriveCloseEmotion(zt.list, dragonPool, _emotionTemp, breadth, sectorsAll);
 
   const maxLB = zt.list.reduce((m, s) => (s.lianban > m.lianban ? s : m), zt.list[0] || { lianban: 0 });
@@ -3785,6 +3804,11 @@ async function main() {
     rank: i + 1, code: s.code, name: s.name, price: s.price, pct: s.pct,
     lianban: s.lianban, boardInfo: s.boardInfo, reason: s.hybk,
     sealAmount: (s.sealWan / 10000).toFixed(2), kaiban: s.kaiban
+  }));
+  // v11.137:跌停榜(修复前恒空数组)
+  const limitDown = dt.list.slice(0, 15).map((s, i) => ({
+    rank: i + 1, code: s.code, name: s.name, price: s.price, pct: s.pct,
+    lianban: s.lianban, reason: s.hybk, sealAmount: (s.sealWan / 10000).toFixed(2)
   }));
 
   // 4. 全部方向实时强度排名：东财行业板块 + 涨停池聚合（hybk）
@@ -4055,7 +4079,7 @@ async function main() {
       // v11.53:口径随数据一并落盘 —— v11.53 之前采集的文件里,创业板(深市子集)被重复计入,
       //   历史 json 无法追溯修正。标注"由数据自述",避免界面给旧文件贴上错误的口径说明。
       breadthScope: '沪深',
-      limitUpCount: zt.total, limitDownCount: 0, zhaBanCount: zbCount,
+      limitUpCount: zt.total, limitDownCount: dt.total, zhaBanCount: zbCount,
       maxLianBan: dragonPool.maxLianBan || '--', maxLianBanStock: (dragonPool.consecutiveBoards && dragonPool.consecutiveBoards[0]) ? dragonPool.consecutiveBoards[0].name : '--',
       totalAmount: totalAmountYi ? totalAmountYi.toFixed(0) + '亿' : '--'
     },
@@ -4064,7 +4088,7 @@ async function main() {
     regimeGate: { totalAmount: totalAmountYi, newHighCount: newHigh.count, totalZhengZhang: newHigh.total, newHighSource: newHigh.source },
     hotSectors,
     limitUp,
-    limitDown: [],
+    limitDown,
     watchlist,
     waveDivergence,
     shortCore,
