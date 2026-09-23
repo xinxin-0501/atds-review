@@ -2276,7 +2276,7 @@
       <a href="index.html">首页</a><a href="2026-08-19_08-30.html" class="active">盘前</a><a href="2026-08-19_15-20.html">收盘</a><a href="2026-09-23_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 20:34</b>（约 141 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 20:34），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 66°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 20:34</b>（约 161 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 20:34），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 66°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-19 20:34:51</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -8541,13 +8541,13 @@ function structSignalCalc(kl, code, name, count, suf){
     var low20=Math.min.apply(null,L.slice(i-20,i));
     if(L[i]<=low20 && C[i]>O[i]) cd.push(i);
   }
-  var recoIdx=null;
-  if(cd.length){
-    var lastCd=cd[cd.length-1];
-    // v11.133 准确性:②只认「真金叉」(MA5 从 MA20 下方上穿)——删除原"已金叉状态"兜底分支,
-    //   该分支会把 CD 后第一天直接标成推荐日(哪怕根本没有发生金叉),导致推荐日/±3%±5%基准失真
-    for(var i=lastCd+1;i<=lastComplete;i++){
-      if(ma5[i-1]!=null&&ma20[i-1]!=null&&ma5[i-1]<=ma20[i-1]&&ma5[i]>ma20[i]){recoIdx=i;break;}
+  // v11.135 准确性:CD 与推荐日【配对】——从最近的 CD 往前找,取第一个「其后确实发生 MA5 上穿 MA20 真金叉」的 CD。
+  //   原逻辑机械取最后一个 CD,若它之后没出现金叉(如回调新低),推荐日/±3%/±5% 全部落空(600111 实证);
+  //   正确语义:最新 CD 尚未确认(无金叉)时,展示最近一组「已确认」的 CD→金叉结构。
+  var recoIdx=null,cdPick=null;
+  for(var ci=cd.length-1;ci>=0 && recoIdx==null;ci--){
+    for(var i=cd[ci]+1;i<=lastComplete;i++){
+      if(ma5[i-1]!=null&&ma20[i-1]!=null&&ma5[i-1]<=ma20[i-1]&&ma5[i]>ma20[i]){ cdPick=cd[ci]; recoIdx=i; break; }
     }
   }
   var lastIdx=lastComplete;
@@ -8574,8 +8574,8 @@ function structSignalCalc(kl, code, name, count, suf){
     for(var i=n-14;i<n;i++){var pc=C[i-1];trs.push(Math.max(H[i]-L[i],Math.abs(H[i]-pc),Math.abs(L[i]-pc)));}
     atr14=trs.reduce(function(a,b){return a+b;},0)/trs.length;}
   var risk=atr14!=null?Math.round(atr14*1.5*100)/100:null;
-  return {disp:disp,cdDisp:cdDisp,recoDisp:recoDisp,n:n,
-    levels:{recoDate:recoIdx!=null?D[recoIdx]:null,recoClose:recoClose,confirmHigh:Math.round(confirmHigh*100)/100,
+  return {disp:disp,cdDisp:cdDisp,recoDisp:recoDisp,cdPick:cdPick,n:n,
+    levels:{recoDate:recoIdx!=null?D[recoIdx]:null,cdDate:cdPick!=null?D[cdPick]:null,recoClose:recoClose,confirmHigh:Math.round(confirmHigh*100)/100,
       failLow:Math.round(failLow*100)/100,p3:p3,m95:m95,lastIdx:lastIdx,lastDate:D[lastIdx]},
     risk:{atr:atr14!=null?Math.round(atr14*100)/100:null,risk:risk,
       stop: risk!=null?Math.round((lastC-risk)*100)/100:null,
@@ -8624,11 +8624,13 @@ function drawStructChart(cv, calc){
   for(var g=0;g<=4;g++){var v=lo+(hi-lo)*g/4,y=Y(v);ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();ctx.fillText(v.toFixed(2),x1+3,y+3);}
   function drawLine(arr,color){ctx.strokeStyle=color;ctx.lineWidth=1.2;ctx.beginPath();var started=false;
     for(var i=vs;i<ve;i++){if(arr[i]==null)continue;var x=X(i),y=Y(arr[i]);if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);}ctx.stroke();}
-  // v11.133:SuperTrend 以「梯子形态」渲染(参照模板 NX黄梯/蓝梯)——半透明阶梯带逐段填充 + 实线阶梯边
+  // v11.135:SuperTrend「梯子形态」——每段一个半透明横档(最小厚度,贴近模板的宽梯带),叠加实线阶梯边
   function drawLadder(arr,lineColor,fillColor){
+    var t=Math.max(5,Math.min(12,mainH*0.045));   // 梯档最小厚度(px):SuperTrend 平走段也能看出「梯子」
     ctx.fillStyle=fillColor;
     for(var i=vs;i<ve-1;i++){var a=arr[i],b=arr[i+1];if(a==null||b==null)continue;
-      var y1=Y(a),y2=Y(b);ctx.fillRect(X(i)-spX*0.5,Math.min(y1,y2),Math.max(2,spX),Math.max(2.5,Math.abs(y2-y1)));}
+      var y1=Y(a),y2=Y(b),yc2=(y1+y2)/2,h=Math.max(Math.abs(y2-y1),t);
+      ctx.fillRect(X(i)-spX*0.5,yc2-h/2,Math.max(2,spX),h);}
     ctx.strokeStyle=lineColor;ctx.lineWidth=1.4;ctx.beginPath();var started=false;
     for(var i=vs;i<ve;i++){if(arr[i]==null){started=false;continue;}var x=X(i),y=Y(arr[i]);if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);}ctx.stroke();
   }
@@ -8647,8 +8649,14 @@ function drawStructChart(cv, calc){
   drawLine(d.ma5,'#f87171');drawLine(d.ma20,'#c084fc');
   ctx.fillStyle='#f59e0b';
   for(var k=0;k<calc.cdDisp.length;k++){var idx=calc.cdDisp[k];if(idx<vs||idx>=ve)continue;
-    var x=X(idx),y=Y(d.L[idx])+8;
-    ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x-4,y+1);ctx.lineTo(x+4,y+1);ctx.closePath();ctx.fill();}
+    var x=X(idx),y=Y(d.L[idx])+8,isPick=(calc.cdPick===idx);
+    // v11.135:与推荐日配对的 CD 加大并标「CD」(模板样式),其余候选保持小三角
+    ctx.beginPath();
+    if(isPick){ctx.moveTo(x,y-8);ctx.lineTo(x-6,y+2);ctx.lineTo(x+6,y+2);}
+    else{ctx.moveTo(x,y-6);ctx.lineTo(x-4,y+1);ctx.lineTo(x+4,y+1);}
+    ctx.closePath();ctx.fill();
+    if(isPick){ctx.font='bold 9px sans-serif';ctx.fillText('CD',x-6,y+12);ctx.font='9px sans-serif';}
+  }
   if(calc.recoDisp!=null&&calc.recoDisp>=vs&&calc.recoDisp<ve){var rx=X(calc.recoDisp);
     ctx.strokeStyle='#ef4444';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(rx,padT-6);ctx.lineTo(rx,padT+mainH+10);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle='#ef4444';ctx.font='bold 10px sans-serif';
@@ -8740,7 +8748,9 @@ function ssqRenderParams(calc){
     '</div>';
 }
 function ssqRenderLevels(calc){
-  var lv=calc.levels,rd=lv.recoDate||'近期无CD后金叉';
+  var lv=calc.levels;
+  // v11.135:推荐日与 CD 配对展示(推荐日=该 CD 后首个 MA5↑MA20 金叉日)
+  var rd=(lv.cdDate&&lv.recoDate)?(lv.cdDate+' CD → '+lv.recoDate+' 金叉'):(lv.recoDate||'近期无CD后金叉');
   var row=function(k,v,desc){return '<tr><td class="ssq-k">'+k+'</td><td class="ssq-v">'+v+'</td><td class="ssq-d">'+desc+'</td></tr>';};
   return '<table class="ssq-lv"><tr><th>要素</th><th>数值</th><th>含义(与原图一致)</th></tr>'+
     row('推荐日',rd,'红色竖线。只评价这一天之后的走势,避免用后来的结果倒推推荐质量')+
