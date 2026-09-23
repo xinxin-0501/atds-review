@@ -2276,7 +2276,7 @@
       <a href="index.html">首页</a><a href="2026-09-17_09-45.html" class="active">盘前</a><a href="2026-09-17_16-20.html">收盘</a><a href="2026-09-23_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:40</b>（约 623 分钟前）</div><h1 class="hero-title">2026-09-17 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">中温区 · 51°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 09:40</b>（约 661 分钟前）</div><h1 class="hero-title">2026-09-17 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">中温区 · 51°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-17 09:40:56</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -8887,7 +8887,7 @@ function ssqSuperTrend(H, L, C, period, mult){
   }
   return out;
 }
-function structSignalCalc(kl, code, name){
+function structSignalCalc(kl, code, name, count, suf){
   var n = kl.length;
   var D=[],O=[],C=[],H=[],L=[],V=[];
   for(var i=0;i<n;i++){
@@ -8928,9 +8928,11 @@ function structSignalCalc(kl, code, name){
       var a20=V.slice(i-19,i+1).reduce(function(a,b){return a+b;},0)/20;
       bm.push(a20>0?Math.round(a5/a20*100):null);}else bm.push(null);
   }
-  var win0=0;
-  if(cd.length) win0=Math.max(0, cd[cd.length-1]-10);
-  win0=Math.min(win0, Math.max(0,n-130));
+  // v11.132c:默认只显示所选范围的根数(避免 3个月画出 100+ 根挤成一团);
+  // 若 CD 抄底点比该范围更早,则向前扩到 CD 前 10 根,保证「CD→金叉」故事完整
+  var cnt=count||SSQ.count||66;
+  var win0=Math.max(0,n-cnt);
+  if(cd.length) win0=Math.min(win0,Math.max(0,cd[cd.length-1]-10));
   var disp={D:D.slice(win0),O:O.slice(win0),C:C.slice(win0),H:H.slice(win0),L:L.slice(win0),V:V.slice(win0),
     ma5:ma5.slice(win0),ma20:ma20.slice(win0),nY:nY.slice(win0),nB:nB.slice(win0),bm:bm.slice(win0),win0:win0};
   var cdDisp=cd.filter(function(i){return i>=win0;}).map(function(i){return i-win0;});
@@ -8948,27 +8950,39 @@ function structSignalCalc(kl, code, name){
       stop: risk!=null?Math.round((lastC-risk)*100)/100:null,
       r1: risk!=null?Math.round((lastC+risk)*100)/100:null,
       r2: risk!=null?Math.round((lastC+2*risk)*100)/100:null, lastClose:Math.round(lastC*100)/100},
-    meta:{code:code,name:name,period:SSQ.period,count:SSQ.count}};
+    meta:{code:code,name:name,suf:suf||'',period:SSQ.period,count:cnt}};
 }
 function drawStructChart(cv, calc){
   var d=calc.disp;var n=d.C.length;if(!n)return;
   var dpr=window.devicePixelRatio||1;
   var wrap=document.getElementById('ssq-canvas-wrap');
-  var W=Math.max(300,wrap.clientWidth-4),H=430;
+  var W=Math.max(300,wrap.clientWidth-4),H=470;
   cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
   var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.fillStyle='#0d1117';ctx.fillRect(0,0,W,H);
-  var padL=6,padR=58,padT=14;
-  var mainH=246,volY=padT+mainH+16,volH=64,bmY=volY+volH+14,bmH=60;
-  var x0=padL,x1=W-padR,iw=x1-x0,cw=iw/n*0.68;
+  var padL=6,padR=58,padT=46;
+  var mainH=236,volY=padT+mainH+16,volH=62,bmY=volY+volH+14,bmH=56;
+  var x0=padL,x1=W-padR,iw=x1-x0;
+  var spX=iw/n,cw=Math.max(2.5,Math.min(spX*0.7,12));   // v11.132c:K线宽度自适应(最小2.5px,不再挤成一条线)
   var lo=Infinity,hi=-Infinity;
   for(var i=0;i<n;i++){lo=Math.min(lo,d.L[i]);hi=Math.max(hi,d.H[i]);
     if(d.nY[i]!=null)hi=Math.max(hi,d.nY[i]);if(d.nB[i]!=null)hi=Math.max(hi,d.nB[i]);}
-  var lvs=[calc.levels.confirmHigh,calc.levels.failLow];if(calc.levels.p3)lvs.push(calc.levels.p3);if(calc.levels.m95)lvs.push(calc.levels.m95);
-  for(var i=0;i<lvs.length;i++){if(lvs[i]>0&&lvs[i]>hi*0.5&&lvs[i]<hi*1.5){hi=Math.max(hi,lvs[i]);lo=Math.min(lo,lvs[i]);}}
+  // v11.132c:四条参考线(含 +3%兑现/-5%失效)无条件纳入 Y 轴范围 —— 原 0.5~1.5 倍过滤会把偏离当前价区的线
+  // 排除在视野外,导致用户「看不到这两条线」。与参考模板一致:线永远画在图内。
+  var lvs=[calc.levels.p3,calc.levels.m95,calc.levels.confirmHigh,calc.levels.failLow];
+  for(var i=0;i<lvs.length;i++){if(lvs[i]>0){hi=Math.max(hi,lvs[i]);lo=Math.min(lo,lvs[i]);}}
   var span=(hi-lo)||1;lo-=span*0.05;hi+=span*0.07;
   var Y=function(v){return padT+(hi-v)/(hi-lo)*mainH;};
   var X=function(i){return x0+iw*(i+0.5)/n;};
+  // v11.132c:标题行 + 副标题(模板样式:「名称 · 代码.市场 · 周期」/「价格与 CD 信号」)
+  var pLabel={day:'日线',week:'周线',m15:'15分钟',m60:'60分钟'}[calc.meta.period]||'日线';
+  ctx.textBaseline='alphabetic';
+  ctx.fillStyle='#e8edf2';ctx.font='bold 12px sans-serif';
+  ctx.fillText((calc.meta.name||calc.meta.code)+' · '+calc.meta.code+'.'+(calc.meta.suf||'')+' · '+pLabel,x0+2,15);
+  ctx.fillStyle='#8b98a5';ctx.font='10px sans-serif';
+  // v11.132c:推荐线落在中部时「推荐日」标签会与居中副标题重叠 → 碰撞规避(有碰撞则不画副标题)
+  var subOk=!(calc.recoDisp!=null&&Math.abs(X(calc.recoDisp)-(x0+iw/2))<64);
+  if(subOk)ctx.fillText('价格与 CD 信号',x0+iw/2-33,31);
   ctx.strokeStyle='#1b2129';ctx.lineWidth=1;ctx.font='9px sans-serif';ctx.fillStyle='#5b6673';
   for(var g=0;g<=4;g++){var v=lo+(hi-lo)*g/4,y=Y(v);ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();ctx.fillText(v.toFixed(2),x1+3,y+3);}
   function drawLine(arr,color){ctx.strokeStyle=color;ctx.lineWidth=1.2;ctx.beginPath();var started=false;
@@ -8980,7 +8994,7 @@ function drawStructChart(cv, calc){
     ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(x,Y(d.H[i]));ctx.lineTo(x,Y(d.L[i]));ctx.stroke();
     var yo=Y(d.O[i]),yc=Y(d.C[i]);
-    var bw=Math.max(1.5,cw);
+    var bw=Math.max(1.5,Math.min(cw,spX*0.85));
     if(up){ctx.strokeRect(x-bw/2,yc,bw,Math.max(1,yo-yc));}
     else{ctx.fillRect(x-bw/2,yo,bw,Math.max(1,yc-yo));}
   }
@@ -8989,11 +9003,12 @@ function drawStructChart(cv, calc){
   for(var i=0;i<calc.cdDisp.length;i++){var idx=calc.cdDisp[i],x=X(idx),y=Y(d.L[idx])+8;
     ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x-4,y+1);ctx.lineTo(x+4,y+1);ctx.closePath();ctx.fill();}
   if(calc.recoDisp!=null){var rx=X(calc.recoDisp);
-    ctx.strokeStyle='#ef4444';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(rx,padT-4);ctx.lineTo(rx,padT+mainH+10);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle='#ef4444';ctx.font='bold 10px sans-serif';ctx.fillText('推荐日',rx-14,padT-5);}
-  function hline(v,color,label,dash,side){if(!(v>0))return;var y=Y(v);if(y<padT||y>padT+mainH)return;
+    ctx.strokeStyle='#ef4444';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(rx,padT-6);ctx.lineTo(rx,padT+mainH+10);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#ef4444';ctx.font='bold 10px sans-serif';
+    var rtx=Math.min(Math.max(rx-13,x0+2),x1-40);ctx.fillText('推荐日',rtx,padT-9);}
+  function hline(v,color,label,dash,side){if(!(v>0))return;var y=Y(v);if(y<padT-2||y>padT+mainH+2)return;
     ctx.strokeStyle=color;ctx.setLineDash(dash||[5,3]);ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle=color;ctx.font='9px sans-serif';if(side==='R'){var tw=ctx.measureText(label).width;ctx.fillText(label,x1-tw,y-2);}else{ctx.fillText(label,x0+2,y-2);}}
+    ctx.fillStyle=color;ctx.font='10px sans-serif';if(side==='R'){var tw=ctx.measureText(label).width;ctx.fillText(label,x1-tw+2,y-3);}else{ctx.fillText(label,x0+3,y-3);}}
   hline(calc.levels.p3,'#22c55e','+3% 兑现线',[6,3],'L');
   hline(calc.levels.m95,'#ef4444','-5% 失效线',[6,3],'L');
   hline(calc.levels.confirmHigh,'#eab308','裸K确认参考',[6,3],'R');
@@ -9065,9 +9080,17 @@ async function runStructQuery(){
   var kl=await fetchKlinePeriod(full,period,Math.max(SSQ.count+40,80));
   if((!kl||kl.length<35)&&period==='day'){ try{ kl=await fetchKlineF(full,Math.max(SSQ.count+40,80)); }catch(e){} }   // v11.132:日线降级三源兜底
   if(!kl||kl.length<35){out.innerHTML='<div class="ssq-empty">未获取到该代码K线(请确认代码/北交所暂不支持)</div>';return;}
-  var calc=structSignalCalc(kl,code,code);
+  // v11.132c:拉真实个股名称(图上标题用);失败降级显示代码,不阻断查询
+  var suf=full.slice(0,2).toUpperCase(),nm='';
+  try{
+    var qres=await fetchWithTimeout('https://qt.gtimg.cn/q='+full,{cache:'no-store'});
+    var qbuf=await qres.arrayBuffer();
+    var qm=new TextDecoder('gbk').decode(qbuf).match(/="([^"]+)"/);
+    if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)nm=String(qf[1]);}
+  }catch(e){}
+  var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
   out.innerHTML=ssqRenderParams(calc)+'<div class="ssq-cwrap" id="ssq-canvas-wrap"><canvas id="ssq-canvas"></canvas></div>'+
-    '<div class="ssq-legend"><i style="background:#d4a017"></i>NX黄梯 <i style="background:#3b82f6"></i>NX蓝梯 <i style="background:#ef4444"></i>K线/MA5 <i style="background:#c084fc"></i>MA20 <i style="color:#f59e0b">▲</i>CD抄底 <i style="background:#384250"></i>成交量 <i style="background:#22c55e"></i>资金活跃度</div>'+
+    '<div class="ssq-legend"><i style="background:#d4a017"></i>NX黄梯 <i style="background:#3b82f6"></i>NX蓝梯 <i style="background:#ef4444"></i>K线/MA5 <i style="background:#c084fc"></i>MA20 <i style="color:#f59e0b">▲</i>CD抄底 <span style="color:#ef4444;margin:0 3px 0 8px">┆</span>推荐日 <i style="background:#384250"></i>成交量 <i style="background:#22c55e"></i>资金活跃度</div>'+
     ssqRenderLevels(calc);
   drawStructChart(document.getElementById('ssq-canvas'),calc);
 }
