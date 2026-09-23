@@ -834,6 +834,28 @@
 .sc-filter{display:flex;gap:4px;margin:8px 0}
 .sc-filter-btn{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer}
 .sc-filter-btn.on{background:#b45309;color:#fff;border-color:#b45309}
+
+/* v11.132 K线·结构信号查询窗口 */
+.ssq-row{display:flex;align-items:center;gap:6px;margin:8px 0;flex-wrap:wrap;font-size:12px;color:#475569}
+.ssq-input{flex:1;min-width:120px;border:1px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:14px;font-weight:700}
+.ssq-btn{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer}
+.ssq-btn.on{background:#b45309;color:#fff;border-color:#b45309}
+.ssq-params{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.ssq-cell{border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;background:#f8fafc}
+.ssq-c-l{font-size:11px;color:#64748b}
+.ssq-c-v{font-size:18px;font-weight:800;color:#0f172a}
+.ssq-c-s{font-size:10px;color:#94a3b8}
+.ssq-cwrap{background:#0d1117;border-radius:10px;padding:4px;margin:8px 0}
+.ssq-legend{font-size:10px;color:#64748b;margin:4px 0 8px;line-height:1.8}
+.ssq-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin:0 3px 0 8px}
+.ssq-lv{width:100%;border-collapse:collapse;font-size:11px}
+.ssq-lv th{background:#f1f5f9;color:#475569;padding:5px;text-align:left}
+.ssq-lv td{border-top:1px solid #eef2f7;padding:6px 5px;vertical-align:top;color:#334155}
+.ssq-k{font-weight:800;color:#0f172a;white-space:nowrap}
+.ssq-v{font-weight:800;color:#b45309;white-space:nowrap}
+.ssq-d{color:#64748b;line-height:1.5}
+.ssq-empty{padding:20px;text-align:center;color:#94a3b8;font-size:13px}
+.ssq-note{font-size:10px;color:#94a3b8;margin-top:8px;line-height:1.5}
 .intl-mkt{margin:14px 16px}
 .intl-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .intl-eyebrow{font-size:10px;color:#185FA5;letter-spacing:1.5px}
@@ -2924,45 +2946,31 @@ async function addFetchedToWatchlist(code){
   }
   var data=await fetchStockData(code);
   if(!data){showToast("未能获取行情,请检查网络后重试","warn");return;}
-  // 拉 K 线 → 决策技术画像(ATR14/支撑压力/缺口/多周期),与 config 观察池一致
-  try {
-    var c0 = code.charAt(0);
-    var full = (c0 === '6' || c0 === '5') ? ('sh' + code) : ((c0 === '4' || c0 === '8' || c0 === '92') ? ('bj' + code) : ('sz' + code));
-    var kl = await fetchKlineF(full, 90);
-    if (kl && kl.length >= 30) {
-      data.tech = calcDecisionTech(kl);
-    }
-  } catch (e) { /* K 线失败不影响加入,决策卡降级为粗逻辑 */ }
-  // 主力资金流(东财):失败不阻塞,决策卡显示 -- 
-  try {
-    var ff2 = await fetchStockFundFlowF(code);
-    if (ff2) data.fundFlow = ff2;
-  } catch (e) {}
-  // 分钟趋势 + 封单 + 龙虎榜 + 事件(真实,并发拉取,失败不阻塞)
-  try {
-    var ext = await Promise.race([
-      Promise.all([
-      fetchMinuteTrendF(code, 'm60'), fetchMinuteTrendF(code, 'm15'),
-      fetchLimitUpSealF(code), fetchLhbDetailF(code), fetchEventsF(code),
-      fetchStockProfileF(code)
-      ]),
-      new Promise(function(res){ setTimeout(function(){ res(null); }, 8000); })
-    ]);
-    if (ext[5] && ext[5].industry) data.industry = ext[5].industry;   // v11.19:行业名 → autoGenStrategy 生成 business 文案
-    // 分钟线兜底:双源失败(如浏览器CORS拦截腾讯/新浪)时用日线MA5/MA20斜率近似,坚决不显示"暂缺"
-    var f60 = ext[0], f15 = ext[1];
-    if (!f60) f60 = approxMinFromTechF(data.tech);
-    if (!f15) f15 = approxMinFromTechF(data.tech);
-    if (f60 || f15) data.minTrend = { m60: f60, m15: f15 };
-    if (ext[2]) data.seal = ext[2];
-    if (ext[3]) data.lhb = ext[3];
-    // v11.0:fetchEventsF 返回 {events,status,srcUsed,cninfoStatus};拆分 events + eventsStatus
-    if (ext[4]) {
-      if (Array.isArray(ext[4].events) && ext[4].events.length) data.events = ext[4].events;
-      data.eventsStatus = { cninfo: ext[4].cninfoStatus || (ext[4].status === 'ok' ? 'ok' : 'fail'), srcUsed: ext[4].srcUsed || '' };
-    }
-  } catch (e) { console.warn('[addFetchedToWatchlist]', code, '并发拉取失败:', e.message); }
-  // v11.4:自动生成 strategy 字段——手动加股不再缺"逻辑与催化"模块;终极保底:autoGenStrategy 抛错时也用最简模板填充
+
+  // v11.134【性能】:先用实时行情算粗策略并【立即渲染卡片】,消除"点加入后长时间无反应"。
+  // 技术画像/资金流/分钟线/封单/龙虎榜/事件等耗时富化改到后台并发拉取,完成后原地更新卡片 + 落盘。
+  applyStrategyToData(data);
+  addToWatchlistUI(data);
+  try{updateReviewProgress();}catch(e){}   // v11.21:新加入的个股立即刷新"策略执行/归因"文本
+  // 保存全量数据(供退出重登时立即渲染,不依赖网络)
+  saveWatchlistStockData(String(code), data);
+  saveWatchlist(code);
+  var el=document.querySelector('.wl-stock-row[data-code="'+code+'"]');
+  if(el){el.style.background="#e8f5e9";setTimeout(function(){el.style.background="";},1500);}
+  // 滚动到观察池卡片,方便用户看到新增
+  var card=document.querySelector('.watchlist-card');
+  if(card&&card.scrollIntoView){try{card.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}}
+  showToast("✓ 已加入观察池: "+data.name);
+  var mm=document.getElementById("modal-"+code);
+  if(mm)mm.classList.remove("show");
+  document.body.style.overflow="";
+  // v11.74:加入后重跑一次池内过滤(新卡也要遵循当前输入框的过滤条件)
+  if(typeof filterWatchlist==='function')filterWatchlist();
+  enrichWatchlistStockAsync(code, data);   // v11.134:后台富化(不阻塞"已加入"反馈)
+}
+
+// v11.134:生成 strategy/logic/capital/keyLevels/plan/todayStrategy —— 粗算(无 tech)与富化后(有 tech)各调一次
+function applyStrategyToData(data){
   try {
     var atds = 70+Math.min(25,Math.max(-15,Math.round(Number(data.pct||0)*2+(Number(data.turnover)||0)*0.5)));
     var auto = autoGenStrategy(data, Number(data.pct)||0, atds, Number(data.turnover)||0, data.tech);
@@ -2975,7 +2983,7 @@ async function addFetchedToWatchlist(code){
     if (!data.category) data.category = '题材';
     data.atds = atds;
   } catch (e) {
-    console.warn('[addFetchedToWatchlist]', code, 'autoGenStrategy 失败,使用兜底模板:', e.message);
+    console.warn('[applyStrategyToData]', data.code, 'autoGenStrategy 失败,使用兜底模板:', e.message);
     var vfb=Number(data.pct)||0;
     data.logic = vfb>=5?'强势突破,关注量能持续性':vfb>=2?'强势承接,技术偏强':vfb>=-1?'震荡整理,方向待确认':vfb>=-3?'回调观察,关注支撑位':'弱势回调,严格控制仓位';
     data.capital='换手 '+(Number(data.turnover)||0).toFixed(2)+'%,关注资金异动';
@@ -2985,24 +2993,62 @@ async function addFetchedToWatchlist(code){
     data.todayStrategy={core:'数据补全中,稍后刷新',planA:{title:'求稳回踩',content:'参考实时价位'},planB:{title:'突破确认',content:'参考实时价位'},choice:'先观望',position:'保守仓位',alert:'数据补全后再判断'};
     data.category=data.category||'题材';
   }
-  addToWatchlistUI(data);
-  try{updateReviewProgress();}catch(e){}   // v11.21:新加入的个股立即刷新"策略执行/归因"文本
-  // 保存全量数据(供退出重登时立即渲染,不依赖网络)
+}
+
+// v11.134【性能】后台并发富化:K线/资金流/分钟线/封单/龙虎榜/事件/资料,完成后原地更新卡片 + 落盘。
+// 原来这些是【串行 await】,总耗时=各段之和(最坏 20s+);现并发=最长一段,且不阻塞加入反馈。
+async function enrichWatchlistStockAsync(code, data){
+  var c0=code.charAt(0);
+  var full=(c0==='6'||c0==='5')?('sh'+code):((c0==='4'||c0==='8'||c0==='92')?('bj'+code):('sz'+code));
+  var r=await Promise.all([
+    fetchKlineF(full, 90).catch(function(){ return null; }),
+    fetchStockFundFlowF(code).catch(function(){ return null; }),
+    Promise.race([
+      Promise.all([
+        fetchMinuteTrendF(code, 'm60'), fetchMinuteTrendF(code, 'm15'),
+        fetchLimitUpSealF(code), fetchLhbDetailF(code), fetchEventsF(code),
+        fetchStockProfileF(code)
+      ]),
+      new Promise(function(res){ setTimeout(function(){ res(null); }, 8000); })
+    ]).catch(function(){ return null; })
+  ]);
+  var kl=r[0], ff2=r[1], ext=r[2];
+  // 若用户已删除该股,不再落盘/更新,避免数据残留
+  if(!document.querySelector('.wl-stock[data-stock-code="'+code+'"]'))return;
+  if(kl && kl.length >= 30){ data.tech = calcDecisionTech(kl); }
+  if(ff2) data.fundFlow = ff2;
+  if(ext && Array.isArray(ext)){
+    if(ext[5] && ext[5].industry) data.industry = ext[5].industry;
+    var f60 = ext[0], f15 = ext[1];
+    if(!f60) f60 = approxMinFromTechF(data.tech);
+    if(!f15) f15 = approxMinFromTechF(data.tech);
+    if(f60 || f15) data.minTrend = { m60: f60, m15: f15 };
+    if(ext[2]) data.seal = ext[2];
+    if(ext[3]) data.lhb = ext[3];
+    if(ext[4]){
+      if(Array.isArray(ext[4].events) && ext[4].events.length) data.events = ext[4].events;
+      data.eventsStatus = { cninfo: ext[4].cninfoStatus || (ext[4].status === 'ok' ? 'ok' : 'fail'), srcUsed: ext[4].srcUsed || '' };
+    }
+  }
+  applyStrategyToData(data);   // 富化后用 tech 重算策略(关键位更准)
   saveWatchlistStockData(String(code), data);
-  saveWatchlist(code);
-  // 添加后立即强制刷新一次,确保显示最新实时行情(不等待 60s 定时)
-  setTimeout(function(){try{refreshWatchlistQuotes();}catch(e){}}, 200);
-  var el=document.querySelector('.wl-stock-row[data-code="'+code+'"]');
-  if(el){el.style.background="#e8f5e9";setTimeout(function(){el.style.background="";},1500);}
-  // 滚动到观察池卡片,方便用户看到新增
-  var card=document.querySelector('.watchlist-card');
-  if(card&&card.scrollIntoView){try{card.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}}
-  showToast("✓ 已加入观察池: "+data.name);
-  var mm=document.getElementById("modal-"+code);
-  if(mm)mm.classList.remove("show");
-  document.body.style.overflow="";
-  // v11.74:加入后重跑一次池内过滤(新卡也要遵循当前输入框的过滤条件)
-  if(typeof filterWatchlist==='function')filterWatchlist();
+  updateWatchlistCardAfterEnrich(code, data);
+}
+
+// v11.134:富化完成后原地更新已存在的卡片(不重复建卡),避免闪烁与重复数据
+function updateWatchlistCardAfterEnrich(code, data){
+  var stock=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');
+  if(!stock)return;
+  var row=stock.querySelector('.wl-stock-row[data-code]');
+  if(row){
+    if(data.tech)row.setAttribute('data-tech',JSON.stringify(data.tech));
+    if(data.fundFlow)row.setAttribute('data-ff',JSON.stringify(data.fundFlow));
+    var bd=dcBadges(data);
+    var ce=row.querySelector('.wl-cell-atds .conf');if(ce){ce.className='conf conf-'+bd.confTone;ce.textContent=bd.confTotal;}
+    var re2=row.querySelector('.wl-cell-sig .rr');if(re2){re2.className='rr rr-'+bd.rrTone;re2.textContent=bd.rrTxt;}
+  }
+  var d=stock.querySelector('.wl-detail[data-detail-code]');
+  if(d)d.innerHTML=buildDecisionCardHtml(data);
 }
 async function fetchKlineF(code, count) {
   count = count || 70;
@@ -7913,6 +7959,326 @@ window.updateEntryFAB = updateEntryFAB;
 window.toggleEntrySort = toggleEntrySort;
 (function () { setTimeout(function () { try { ensureEntryUI(); updateEntryFAB(); } catch (e) {} }, 900); })();
 if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initWatchlistProUI,700);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initWatchlistProUI,700);});}
+
+/* ════════ v11.132 K线·结构信号(盘前独立查询窗口) ════════
+   参考用户提供的「结构信号」案例:推荐日/裸K确认参考/结构失效参考/+3%兑现线/-5%失效线/
+   NX 黄梯蓝梯(SuperTrend)/MA5/MA20/CD抄底/成交量/资金活跃度(量能代理)。
+   合规:均为结构观察与研究记录阈值,非交易指令、非荐股。 */
+var SSQ = { code: '', period: 'day', count: 66, view: null };
+async function fetchKlinePeriod(code, period, count){
+  var url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + encodeURIComponent(code) + ',' + period + ',,,' + count + ',qfq';
+  try{
+    var res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' }, 9000);   // v11.134:no-store 确保每日/每次查询都拉最新,不被浏览器缓存
+    var txt = await res.text();
+    var j = JSON.parse(txt);
+    var d = j && j.data && j.data[code];
+    if(!d) return [];
+    for(var k in d){ if(Array.isArray(d[k]) && d[k].length) return d[k]; }
+  }catch(e){}
+  return [];
+}
+function ssqSuperTrend(H, L, C, period, mult){
+  var n = C.length, out = [], atr = 0, fu = null, fl = null, st = null;
+  for(var i = 0; i < n; i++){
+    var tr = i === 0 ? (H[i] - L[i]) : Math.max(H[i]-L[i], Math.abs(H[i]-C[i-1]), Math.abs(L[i]-C[i-1]));
+    atr = i === 0 ? tr : (atr*(period-1)+tr)/period;
+    if(i < period-1){ out.push(null); continue; }
+    var hl2 = (H[i]+L[i])/2, bu = hl2+mult*atr, lb = hl2-mult*atr;
+    var prevST = out[i-1] != null ? out[i-1] : fl;
+    if(fu == null){ fu = bu; fl = lb; st = fl; out.push(st); continue; }
+    var nfu = (bu < fu || C[i-1] > fu) ? bu : fu;
+    var nfl = (lb > fl || C[i-1] < fl) ? lb : fl;
+    st = (prevST === fu) ? ((C[i] > nfu) ? nfl : nfu) : ((C[i] < nfl) ? nfu : nfl);
+    fu = nfu; fl = nfl;
+    out.push(st);
+  }
+  return out;
+}
+function structSignalCalc(kl, code, name, count, suf){
+  var n = kl.length;
+  var D=[],O=[],C=[],H=[],L=[],V=[];
+  for(var i=0;i<n;i++){
+    D.push(String(kl[i][0]).slice(0,10));
+    O.push(parseFloat(kl[i][1])); C.push(parseFloat(kl[i][2]));
+    H.push(parseFloat(kl[i][3])); L.push(parseFloat(kl[i][4]));
+    V.push(parseFloat(kl[i][5])||0);
+  }
+  var ma5=[],ma20=[];
+  for(var i=0;i<n;i++){
+    ma5.push(i>=4?(C.slice(i-4,i+1).reduce(function(a,b){return a+b;},0)/5):null);
+    ma20.push(i>=19?(C.slice(i-19,i+1).reduce(function(a,b){return a+b;},0)/20):null);
+  }
+  var nY=ssqSuperTrend(H,L,C,20,3), nB=ssqSuperTrend(H,L,C,10,2);
+  // v11.133 准确性:①CD/推荐日只认「最新完整K线」——排除今天未收盘的K线(盘中形态可能消失,收盘才算数)
+  var lastComplete=n-1;
+  try{ if(D[n-1]===bjTodayF() && n>=2) lastComplete=n-2; }catch(e){}
+  var cd=[];
+  for(var i=20;i<=lastComplete;i++){
+    var low20=Math.min.apply(null,L.slice(i-20,i));
+    if(L[i]<=low20 && C[i]>O[i]) cd.push(i);
+  }
+  var recoIdx=null;
+  if(cd.length){
+    var lastCd=cd[cd.length-1];
+    // v11.133 准确性:②只认「真金叉」(MA5 从 MA20 下方上穿)——删除原"已金叉状态"兜底分支,
+    //   该分支会把 CD 后第一天直接标成推荐日(哪怕根本没有发生金叉),导致推荐日/±3%±5%基准失真
+    for(var i=lastCd+1;i<=lastComplete;i++){
+      if(ma5[i-1]!=null&&ma20[i-1]!=null&&ma5[i-1]<=ma20[i-1]&&ma5[i]>ma20[i]){recoIdx=i;break;}
+    }
+  }
+  var lastIdx=lastComplete;
+  var confirmHigh=H[lastIdx];
+  var failLow=Math.min.apply(null,L.slice(Math.max(0,n-10)));
+  var recoClose=recoIdx!=null?C[recoIdx]:null;
+  var p3=recoClose!=null?Math.round(recoClose*1.03*100)/100:null;
+  var m95=recoClose!=null?Math.round(recoClose*0.95*100)/100:null;
+  var bm=[];
+  for(var i=0;i<n;i++){
+    if(i>=19){var a5=V.slice(i-4,i+1).reduce(function(a,b){return a+b;},0)/5;
+      var a20=V.slice(i-19,i+1).reduce(function(a,b){return a+b;},0)/20;
+      bm.push(a20>0?Math.round(a5/a20*100):null);}else bm.push(null);
+  }
+  // v11.133:disp 保留【全部已取回数据】(含预热根数,平移/缩放有真实历史可看),
+  // 默认视窗(最后 cnt 根)由 drawStructChart 的 SSQ.view 控制,数据不再物理截断。
+  var cnt=count||SSQ.count||66;
+  var disp={D:D,O:O,C:C,H:H,L:L,V:V,ma5:ma5,ma20:ma20,nY:nY,nB:nB,bm:bm,win0:0};
+  var cdDisp=cd.slice();
+  var recoDisp=recoIdx;
+  var lastC=C[n-1];
+  var atr14=null;
+  if(n>=15){var trs=[];
+    for(var i=n-14;i<n;i++){var pc=C[i-1];trs.push(Math.max(H[i]-L[i],Math.abs(H[i]-pc),Math.abs(L[i]-pc)));}
+    atr14=trs.reduce(function(a,b){return a+b;},0)/trs.length;}
+  var risk=atr14!=null?Math.round(atr14*1.5*100)/100:null;
+  return {disp:disp,cdDisp:cdDisp,recoDisp:recoDisp,n:n,
+    levels:{recoDate:recoIdx!=null?D[recoIdx]:null,recoClose:recoClose,confirmHigh:Math.round(confirmHigh*100)/100,
+      failLow:Math.round(failLow*100)/100,p3:p3,m95:m95,lastIdx:lastIdx,lastDate:D[lastIdx]},
+    risk:{atr:atr14!=null?Math.round(atr14*100)/100:null,risk:risk,
+      stop: risk!=null?Math.round((lastC-risk)*100)/100:null,
+      r1: risk!=null?Math.round((lastC+risk)*100)/100:null,
+      r2: risk!=null?Math.round((lastC+2*risk)*100)/100:null, lastClose:Math.round(lastC*100)/100},
+    meta:{code:code,name:name,suf:suf||'',period:SSQ.period,count:cnt}};
+}
+function drawStructChart(cv, calc){
+  var d=calc.disp;var n=d.C.length;if(!n)return;
+  var dpr=window.devicePixelRatio||1;
+  var wrap=document.getElementById('ssq-canvas-wrap');
+  var W=Math.max(300,wrap.clientWidth-4),H=470;
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle='#0d1117';ctx.fillRect(0,0,W,H);
+  var padL=6,padR=58,padT=46;
+  var mainH=236,volY=padT+mainH+16,volH=62,bmY=volY+volH+14,bmH=56;
+  var x0=padL,x1=W-padR,iw=x1-x0;
+  // v11.133 视窗:数据全量保留,默认只显示所选范围(最后 cnt 根);支持单指拖动平移/双指捏合缩放/双击复位,
+  // 可看到全部已取回数据(含范围外的预热根数)。
+  var cnt=calc.meta.count||66;
+  if(!(SSQ.view&&SSQ.view.s!=null&&SSQ.view.e<=n&&SSQ.view.e>SSQ.view.s&&SSQ.view.e-SSQ.view.s>=20)){
+    SSQ.view={s:Math.max(0,n-cnt),e:n};
+  }
+  var vs=SSQ.view.s,ve=SSQ.view.e,nv=ve-vs;
+  var spX=iw/nv,cw=Math.max(2.5,Math.min(spX*0.7,12));
+  var lo=Infinity,hi=-Infinity;
+  for(var i=vs;i<ve;i++){lo=Math.min(lo,d.L[i]);hi=Math.max(hi,d.H[i]);
+    if(d.nY[i]!=null)hi=Math.max(hi,d.nY[i]);if(d.nB[i]!=null)hi=Math.max(hi,d.nB[i]);}
+  // v11.132c 沿用:四条参考线(含 +3%兑现/-5%失效)无条件纳入 Y 轴范围,线永远画在图内
+  var lvs=[calc.levels.p3,calc.levels.m95,calc.levels.confirmHigh,calc.levels.failLow];
+  for(var i=0;i<lvs.length;i++){if(lvs[i]>0){hi=Math.max(hi,lvs[i]);lo=Math.min(lo,lvs[i]);}}
+  var span=(hi-lo)||1;lo-=span*0.05;hi+=span*0.07;
+  var Y=function(v){return padT+(hi-v)/(hi-lo)*mainH;};
+  var X=function(i){return x0+iw*(i-vs+0.5)/nv;};
+  // 标题行 + 副标题(模板样式:「名称 · 代码.市场 · 周期」/「价格与 CD 信号」)
+  var pLabel={day:'日线',week:'周线',m15:'15分钟',m60:'60分钟'}[calc.meta.period]||'日线';
+  ctx.textBaseline='alphabetic';
+  ctx.fillStyle='#e8edf2';ctx.font='bold 12px sans-serif';
+  ctx.fillText((calc.meta.name||calc.meta.code)+' · '+calc.meta.code+'.'+(calc.meta.suf||'')+' · '+pLabel,x0+2,15);
+  ctx.fillStyle='#8b98a5';ctx.font='10px sans-serif';
+  // 推荐线落在中部视窗时「推荐日」标签会与居中副标题重叠 → 碰撞规避(有碰撞则不画副标题)
+  var subOk=!(calc.recoDisp!=null&&calc.recoDisp>=vs&&calc.recoDisp<ve&&Math.abs(X(calc.recoDisp)-(x0+iw/2))<64);
+  if(subOk)ctx.fillText('价格与 CD 信号',x0+iw/2-33,31);
+  ctx.strokeStyle='#1b2129';ctx.lineWidth=1;ctx.font='9px sans-serif';ctx.fillStyle='#5b6673';
+  for(var g=0;g<=4;g++){var v=lo+(hi-lo)*g/4,y=Y(v);ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();ctx.fillText(v.toFixed(2),x1+3,y+3);}
+  function drawLine(arr,color){ctx.strokeStyle=color;ctx.lineWidth=1.2;ctx.beginPath();var started=false;
+    for(var i=vs;i<ve;i++){if(arr[i]==null)continue;var x=X(i),y=Y(arr[i]);if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);}ctx.stroke();}
+  // v11.133:SuperTrend 以「梯子形态」渲染(参照模板 NX黄梯/蓝梯)——半透明阶梯带逐段填充 + 实线阶梯边
+  function drawLadder(arr,lineColor,fillColor){
+    ctx.fillStyle=fillColor;
+    for(var i=vs;i<ve-1;i++){var a=arr[i],b=arr[i+1];if(a==null||b==null)continue;
+      var y1=Y(a),y2=Y(b);ctx.fillRect(X(i)-spX*0.5,Math.min(y1,y2),Math.max(2,spX),Math.max(2.5,Math.abs(y2-y1)));}
+    ctx.strokeStyle=lineColor;ctx.lineWidth=1.4;ctx.beginPath();var started=false;
+    for(var i=vs;i<ve;i++){if(arr[i]==null){started=false;continue;}var x=X(i),y=Y(arr[i]);if(!started){ctx.moveTo(x,y);started=true;}else ctx.lineTo(x,y);}ctx.stroke();
+  }
+  drawLadder(d.nY,'rgba(212,160,23,0.95)','rgba(212,160,23,0.18)');
+  drawLadder(d.nB,'rgba(59,130,246,0.95)','rgba(59,130,246,0.18)');
+  for(var i=vs;i<ve;i++){
+    var up=d.C[i]>=d.O[i],col=up?'#ef4444':'#22c55e';
+    var x=X(i);
+    ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,Y(d.H[i]));ctx.lineTo(x,Y(d.L[i]));ctx.stroke();
+    var yo=Y(d.O[i]),yc=Y(d.C[i]);
+    var bw=Math.max(1.5,Math.min(cw,spX*0.85));
+    if(up){ctx.strokeRect(x-bw/2,yc,bw,Math.max(1,yo-yc));}
+    else{ctx.fillRect(x-bw/2,yo,bw,Math.max(1,yc-yo));}
+  }
+  drawLine(d.ma5,'#f87171');drawLine(d.ma20,'#c084fc');
+  ctx.fillStyle='#f59e0b';
+  for(var k=0;k<calc.cdDisp.length;k++){var idx=calc.cdDisp[k];if(idx<vs||idx>=ve)continue;
+    var x=X(idx),y=Y(d.L[idx])+8;
+    ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x-4,y+1);ctx.lineTo(x+4,y+1);ctx.closePath();ctx.fill();}
+  if(calc.recoDisp!=null&&calc.recoDisp>=vs&&calc.recoDisp<ve){var rx=X(calc.recoDisp);
+    ctx.strokeStyle='#ef4444';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(rx,padT-6);ctx.lineTo(rx,padT+mainH+10);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#ef4444';ctx.font='bold 10px sans-serif';
+    var rtx=Math.min(Math.max(rx-13,x0+2),x1-40);ctx.fillText('推荐日',rtx,padT-9);}
+  // 参考线标签防重叠:同侧标签纵向过近时向下错开(线仍在真实位置)
+  var lastLY=-1e9,lastRY=-1e9;
+  function hline(v,color,label,dash,side){if(!(v>0))return;var y=Y(v);if(y<padT-2||y>padT+mainH+2)return;
+    ctx.strokeStyle=color;ctx.setLineDash(dash||[5,3]);ctx.beginPath();ctx.moveTo(x0,y);ctx.lineTo(x1,y);ctx.stroke();ctx.setLineDash([]);
+    var ty=y-3;
+    if(side==='R'){if(ty-lastRY<11)ty=lastRY+11;lastRY=ty;ctx.fillStyle=color;ctx.font='10px sans-serif';
+      var tw=ctx.measureText(label).width;ctx.fillText(label,x1-tw+2,ty);}
+    else{if(ty-lastLY<11)ty=lastLY+11;lastLY=ty;ctx.fillStyle=color;ctx.font='10px sans-serif';
+      ctx.fillText(label,x0+3,ty);}}
+  hline(calc.levels.p3,'#22c55e','+3% 兑现线',[6,3],'L');
+  hline(calc.levels.m95,'#ef4444','-5% 失效线',[6,3],'L');
+  hline(calc.levels.confirmHigh,'#eab308','裸K确认参考',[6,3],'R');
+  hline(calc.levels.failLow,'#f87171','结构失效参考',[6,3],'R');
+  var vmax=0;for(var i=vs;i<ve;i++)vmax=Math.max(vmax,d.V[i]);vmax=vmax||1;
+  var vYv=function(v){return volY+volH-(v/vmax)*volH;};
+  ctx.fillStyle='#384250';
+  for(var i=vs;i<ve;i++){var x=X(i),bw=Math.max(1,Math.min(cw,spX*0.85));ctx.fillRect(x-bw/2,vYv(d.V[i]),bw,volY+volH-vYv(d.V[i]));}
+  ctx.fillStyle='#8b98a5';ctx.font='9px sans-serif';ctx.fillText('成交量',x0+2,volY-2);
+  var bmax=0;for(var i=vs;i<ve;i++)if(d.bm[i]!=null)bmax=Math.max(bmax,d.bm[i]);bmax=bmax||100;
+  var bYv=function(v){return bmY+bmH-(v/bmax)*bmH;};
+  ctx.strokeStyle='#22c55e';ctx.lineWidth=1.2;ctx.beginPath();var st2=false;
+  for(var i=vs;i<ve;i++){if(d.bm[i]==null)continue;var x=X(i),y=bYv(d.bm[i]);if(!st2){ctx.moveTo(x,y);st2=true;}else ctx.lineTo(x,y);}
+  ctx.stroke();
+  ctx.fillStyle='#22c55e';ctx.font='9px sans-serif';ctx.fillText('资金活跃度(量能代理)',x0+2,bmY-2);
+  ctx.fillStyle='#5b6673';ctx.font='9px sans-serif';
+  for(var g=0;g<4;g++){var idx2=vs+Math.floor(nv*g/3.99);if(idx2>=ve)idx2=ve-1;var x=X(idx2);
+    ctx.fillText(String(d.D[idx2]).slice(5),Math.min(W-30,x-10),H-3);}
+  // ── v11.133 交互:单指拖动平移 / 双指捏合缩放 / 双击复位(每块 canvas 只绑一次,重绘不叠加监听) ──
+  if(!cv.__ssqBind){
+    cv.__ssqBind=1;cv.style.touchAction='none';
+    function clampView(s,e){
+      var w=e-s;
+      if(w<20){var c=(s+e)/2;s=c-10;e=c+10;}
+      if(w>n){s=0;e=n;}
+      if(s<0){e-=s;s=0;}
+      if(e>n){s-=e-n;e=n;}
+      if(s<0)s=0;
+      return [Math.round(s),Math.round(e)];
+    }
+    var drag0=null,pinch0=null,lastTapT=0;
+    var spNow=function(){return iw/(SSQ.view.e-SSQ.view.s);};   // 缩放后步长随视窗宽度变化,动态取
+    cv.addEventListener('touchstart',function(ev){
+      if(ev.touches.length===1){drag0={x:ev.touches[0].clientX,s:SSQ.view.s,e:SSQ.view.e};pinch0=null;}
+      else if(ev.touches.length>=2){
+        var dx=ev.touches[0].clientX-ev.touches[1].clientX,dy=ev.touches[0].clientY-ev.touches[1].clientY;
+        pinch0={d:Math.sqrt(dx*dx+dy*dy)||1,s:SSQ.view.s,e:SSQ.view.e,cx:(ev.touches[0].clientX+ev.touches[1].clientX)/2};
+        drag0=null;ev.preventDefault();
+      }
+    },{passive:false});
+    cv.addEventListener('touchmove',function(ev){
+      ev.preventDefault();
+      var now=Date.now();if(now-(cv.__ssqLast||0)<16)return;cv.__ssqLast=now;
+      if(ev.touches.length===1&&drag0){
+        var db=(ev.touches[0].clientX-drag0.x)/spNow();
+        var se=clampView(drag0.s-db,drag0.e-db);SSQ.view={s:se[0],e:se[1]};drawStructChart(cv,calc);
+      }else if(ev.touches.length>=2&&pinch0){
+        var dx=ev.touches[0].clientX-ev.touches[1].clientX,dy=ev.touches[0].clientY-ev.touches[1].clientY;
+        var ratio=(Math.sqrt(dx*dx+dy*dy)||1)/pinch0.d;
+        var w=(pinch0.e-pinch0.s)/ratio;
+        var r=cv.getBoundingClientRect();
+        var fx=Math.min(1,Math.max(0,(pinch0.cx-r.left-x0)/iw));
+        var fs=pinch0.s+(pinch0.e-pinch0.s)*fx;
+        var se=clampView(fs-w*fx,fs-w*fx+w);SSQ.view={s:se[0],e:se[1]};drawStructChart(cv,calc);
+      }
+    },{passive:false});
+    cv.addEventListener('touchend',function(ev){if(ev.touches.length===0){drag0=null;pinch0=null;}},{passive:false});
+    // 桌面鼠标拖动(真机审计用)
+    cv.addEventListener('mousedown',function(ev){drag0={x:ev.clientX,s:SSQ.view.s,e:SSQ.view.e};});
+    cv.addEventListener('mousemove',function(ev){if(drag0&&ev.buttons){
+      var now=Date.now();if(now-(cv.__ssqLast||0)<16)return;cv.__ssqLast=now;
+      var db=(ev.clientX-drag0.x)/spNow();
+      var se=clampView(drag0.s-db,drag0.e-db);SSQ.view={s:se[0],e:se[1]};drawStructChart(cv,calc);}});
+    cv.addEventListener('mouseup',function(){drag0=null;});
+    cv.addEventListener('dblclick',function(){SSQ.view={s:Math.max(0,n-cnt),e:n};drawStructChart(cv,calc);});
+  }
+}
+function ssqRenderParams(calc){
+  var rk=calc.risk;
+  var cell=function(label,val,sub){return '<div class="ssq-cell"><div class="ssq-c-l">'+label+'</div><div class="ssq-c-v">'+val+'</div><div class="ssq-c-s">'+sub+'</div></div>';};
+  return '<div class="ssq-params">'+
+    cell('每段计划风险',rk.risk!=null?rk.risk:'--','ATR14 × 1.5')+
+    cell('参考止损',rk.stop!=null?rk.stop:'--','最新收盘 − 计划风险')+
+    cell('第一管理位 1R',rk.r1!=null?rk.r1:'--','最新收盘 + 计划风险')+
+    cell('止盈 2R',rk.r2!=null?rk.r2:'--','最新收盘 + 2 × 计划风险')+
+    '</div>';
+}
+function ssqRenderLevels(calc){
+  var lv=calc.levels,rd=lv.recoDate||'近期无CD后金叉';
+  var row=function(k,v,desc){return '<tr><td class="ssq-k">'+k+'</td><td class="ssq-v">'+v+'</td><td class="ssq-d">'+desc+'</td></tr>';};
+  return '<table class="ssq-lv"><tr><th>要素</th><th>数值</th><th>含义(与原图一致)</th></tr>'+
+    row('推荐日',rd,'红色竖线。只评价这一天之后的走势,避免用后来的结果倒推推荐质量')+
+    row('裸K确认参考',lv.confirmHigh,'最新完整日K的高点。价格有效站上,说明突破得到进一步确认;不是自动买入价')+
+    row('结构失效参考',lv.failLow,'近10日低点。跌破后,原来的上行结构明显转弱,应重新评估')+
+    row('+3% 兑现线',lv.p3!=null?lv.p3:'--','从推荐价出发的统一验证门槛,用来记录结果,不是止盈指令')+
+    row('-5% 失效线',lv.m95!=null?lv.m95:'--','从推荐价出发的统一验证门槛,不是止损指令')+
+    '</table>';
+}
+function openStructSignalModal(){
+  var m=document.getElementById('struct-modal');
+  if(!m){
+    m=document.createElement('div');m.id='struct-modal';m.className='modal-mask';
+    m.innerHTML='<div class="modal" onclick="event.stopPropagation()" style="max-width:96%;width:96%;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">'+
+      '<div class="modal-header"><div class="modal-eyebrow">📉 K线 · 结构信号</div><span class="modal-close" onclick="closeStructSignalModal()">×</span></div>'+
+      '<div class="modal-body">'+
+      '<div class="ssq-row">代码 <input id="ssq-code" class="ssq-input" placeholder="6位代码,如 002965 / 600721" maxlength="6" inputmode="numeric"> <button class="wl-btn wl-btn-primary" onclick="runStructQuery()">查询</button></div>'+
+      '<div class="ssq-row">级别 <span id="ssq-period"><button class="ssq-btn on" data-p="day" onclick="ssqSetP(this)">日K</button><button class="ssq-btn" data-p="week" onclick="ssqSetP(this)">周K</button><button class="ssq-btn" data-p="m15" onclick="ssqSetP(this)">15分钟</button><button class="ssq-btn" data-p="m60" onclick="ssqSetP(this)">60分钟</button></span></div>'+
+      '<div class="ssq-row">范围 <span id="ssq-range"><button class="ssq-btn" data-c="22" onclick="ssqSetC(this)">1个月</button><button class="ssq-btn" data-c="44" onclick="ssqSetC(this)">2个月</button><button class="ssq-btn on" data-c="66" onclick="ssqSetC(this)">3个月</button><button class="ssq-btn" data-c="130" onclick="ssqSetC(this)">半年</button><button class="ssq-btn" data-c="250" onclick="ssqSetC(this)">一年</button></span></div>'+
+      '<div id="ssq-out"><div class="ssq-empty">输入任意 6 位个股代码后点「查询」,即时生成结构信号</div></div>'+
+      '<div class="ssq-note">结构观察与研究记录阈值,非交易指令、非荐股;信号由程序按固定规则计算,不构成投资建议。</div>'+
+      '</div></div>';
+    document.body.appendChild(m);
+  }
+  m.classList.add('show');document.body.style.overflow='hidden';
+  // v11.134:重开时若已有查询过的代码,自动刷新最新数据(每日/每次打开都拉最新,而非沿用旧快照)
+  var inp=document.getElementById('ssq-code');
+  var cur=inp&&inp.value||'';
+  if(SSQ.code && !cur){ if(inp)inp.value=SSQ.code; cur=SSQ.code; }
+  if(cur && /^\d{6}$/.test(cur)){ SSQ.code=cur; try{ runStructQuery(); }catch(e){} }
+}
+function closeStructSignalModal(){var m=document.getElementById('struct-modal');if(m){m.classList.remove('show');document.body.style.overflow='';}}
+function ssqSetP(btn){SSQ.period=btn.getAttribute('data-p');var sp=document.getElementById('ssq-period');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});if(SSQ.code)runStructQuery();}
+function ssqSetC(btn){SSQ.count=parseInt(btn.getAttribute('data-c'),10)||66;var sp=document.getElementById('ssq-range');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});if(SSQ.code)runStructQuery();}
+async function runStructQuery(){
+  var inp=document.getElementById('ssq-code');var code=(inp&&inp.value||'').trim();
+  SSQ.code=code;
+  if(!/^\d{6}$/.test(code)){showToast('请输入 6 位个股代码','warn');return;}
+  var c0=code.charAt(0);var full=(c0==='6'||c0==='5')?('sh'+code):((c0==='4'||c0==='8'||c0==='9')?('bj'+code):('sz'+code));
+  var out=document.getElementById('ssq-out');
+  out.innerHTML='<div class="ssq-empty">查询中…</div>';
+  var period=SSQ.period==='m15'?'m15':(SSQ.period==='m60'?'m60':(SSQ.period==='week'?'week':'day'));
+  var kl=await fetchKlinePeriod(full,period,Math.max(SSQ.count+80,120));   // v11.133:+80 余量(平移可看到范围外历史)
+  if((!kl||kl.length<35)&&period==='day'){ try{ kl=await fetchKlineF(full,Math.max(SSQ.count+80,120)); }catch(e){} }   // v11.132:日线降级三源兜底
+  if(!kl||kl.length<35){out.innerHTML='<div class="ssq-empty">未获取到该代码K线(请确认代码/北交所暂不支持)</div>';return;}
+  // v11.132c:拉真实个股名称(图上标题用);失败降级显示代码,不阻断查询
+  var suf=full.slice(0,2).toUpperCase(),nm='';
+  try{
+    var qres=await fetchWithTimeout('https://qt.gtimg.cn/q='+full,{cache:'no-store'});
+    var qbuf=await qres.arrayBuffer();
+    var qm=new TextDecoder('gbk').decode(qbuf).match(/="([^"]+)"/);
+    if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)nm=String(qf[1]);}
+  }catch(e){}
+  var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
+  SSQ.view=null;   // v11.133:新查询重置视窗(默认显示所选范围,再由手势平移/缩放)
+  out.innerHTML=ssqRenderParams(calc)+'<div class="ssq-cwrap" id="ssq-canvas-wrap"><canvas id="ssq-canvas"></canvas></div>'+
+    '<div class="ssq-legend"><span style="white-space:nowrap"><i style="background:#d4a017"></i>NX黄梯</span> <span style="white-space:nowrap"><i style="background:#3b82f6"></i>NX蓝梯</span> <span style="white-space:nowrap"><i style="background:#ef4444"></i>K线/MA5</span> <span style="white-space:nowrap"><i style="background:#c084fc"></i>MA20</span> <span style="white-space:nowrap"><i style="color:#f59e0b">▲</i>CD抄底</span> <span style="white-space:nowrap"><span style="color:#ef4444;margin:0 3px 0 8px">┆</span>推荐日</span> <span style="white-space:nowrap"><i style="background:#384250"></i>成交量</span> <span style="white-space:nowrap"><i style="background:#22c55e"></i>资金活跃度</span></div>'+
+    ssqRenderLevels(calc);
+  drawStructChart(document.getElementById('ssq-canvas'),calc);
+}
+window.openStructSignalModal=openStructSignalModal;window.closeStructSignalModal=closeStructSignalModal;
+window.ssqSetP=ssqSetP;window.ssqSetC=ssqSetC;window.runStructQuery=runStructQuery;
 </script>
 <script>
 /* minimal qrcode */
