@@ -1686,6 +1686,7 @@ function renderWatchlist(report) {
         '<button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button>' +
         '<button class="wl-tool" onclick="handleSearchStock()">个股分析</button>' +
         '<button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button>' +
+        '<button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button>' +
         '<button class="wl-tool" onclick="alert(\'批量导入待接入\')">↥ 批量导入</button>' +
         '<button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button>' +
       '</div>' +

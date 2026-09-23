@@ -827,3 +827,25 @@
 .sc-filter{display:flex;gap:4px;margin:8px 0}
 .sc-filter-btn{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer}
 .sc-filter-btn.on{background:#b45309;color:#fff;border-color:#b45309}
+
+/* v11.132 K线·结构信号查询窗口 */
+.ssq-row{display:flex;align-items:center;gap:6px;margin:8px 0;flex-wrap:wrap;font-size:12px;color:#475569}
+.ssq-input{flex:1;min-width:120px;border:1px solid #e2e8f0;border-radius:8px;padding:7px 10px;font-size:14px;font-weight:700}
+.ssq-btn{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer}
+.ssq-btn.on{background:#b45309;color:#fff;border-color:#b45309}
+.ssq-params{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.ssq-cell{border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;background:#f8fafc}
+.ssq-c-l{font-size:11px;color:#64748b}
+.ssq-c-v{font-size:18px;font-weight:800;color:#0f172a}
+.ssq-c-s{font-size:10px;color:#94a3b8}
+.ssq-cwrap{background:#0d1117;border-radius:10px;padding:4px;margin:8px 0}
+.ssq-legend{font-size:10px;color:#64748b;margin:4px 0 8px;line-height:1.8}
+.ssq-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin:0 3px 0 8px}
+.ssq-lv{width:100%;border-collapse:collapse;font-size:11px}
+.ssq-lv th{background:#f1f5f9;color:#475569;padding:5px;text-align:left}
+.ssq-lv td{border-top:1px solid #eef2f7;padding:6px 5px;vertical-align:top;color:#334155}
+.ssq-k{font-weight:800;color:#0f172a;white-space:nowrap}
+.ssq-v{font-weight:800;color:#b45309;white-space:nowrap}
+.ssq-d{color:#64748b;line-height:1.5}
+.ssq-empty{padding:20px;text-align:center;color:#94a3b8;font-size:13px}
+.ssq-note{font-size:10px;color:#94a3b8;margin-top:8px;line-height:1.5}
