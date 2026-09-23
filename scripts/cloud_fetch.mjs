@@ -691,12 +691,12 @@ async function fetchSectors() {
   //   现改为【分页取全量】: 服务端把 pz 封顶 100,必须翻页。实测 496 个板块,匹配率 27/27。
   //   字段: f3=涨跌幅(%) · f62=主力净流入(元) · f104/f105=上涨/下跌家数 · f20=总市值。
   const out = [], seen = new Set();
-  const T0 = Date.now(), BUDGET_MS = 20000;   // v11.66:总时间预算 —— 分页是顺序请求,必须设上限,否则个别主机超时会拖慢整个采集
+  const T0 = Date.now(), BUDGET_MS = 30000;   // v11.66:总时间预算 —— 分页是顺序请求,必须设上限
   for (let pn = 1; pn <= 8; pn++) {
     if (pn > 1 && Date.now() - T0 > BUDGET_MS) { console.warn('  板块分页超时预算,已取到', out.length, '个'); break; }
     const j = await emFetchJson('https://push2.eastmoney.com/api/qt/clist/get?pn=' + pn +
       '&pz=100&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:2&fields=f12,f14,f3,f104,f105,f62,f20',
-      { 'User-Agent': 'Mozilla/5.0' }, 6000, 1);
+      { 'User-Agent': 'Mozilla/5.0' }, 8000, 3);   // v11.139:重试 1→3 轮、超时 6s→8s —— 板块是 mainRank/mainLines/moneyInflow 三处的共同上游,瞬时故障即整块降级(v11.112 根因)
     const diff = (j && j.data && j.data.diff) || [];
     if (!diff.length) break;
     for (const x of diff) {
@@ -707,6 +707,7 @@ async function fetchSectors() {
     if (diff.length < 100) break;
   }
   if (out.length) console.log('  板块全量:', out.length, '个 (' + (Date.now() - T0) + 'ms)');
+  else console.error('★[降级告警] 板块数据源(东财)全部主机均无返回 —— mainRank/主线/资金流向将缺失,请查数据源可用性');
   return out;
 }
 
@@ -4064,6 +4065,8 @@ async function main() {
       //   而不是把它当成"当日 16:20 的延迟补采"来告警(后者会让人以为报告是坏的)。
       replay: isReplay ? true : undefined,
       dataSource: '腾讯行情 + 东方财富公开接口',
+      // v11.139:板块数据源降级标记 —— sectorsAll 为空时明确记录(不再静默降级),供审计追溯
+      degraded: (sectorsAll && sectorsAll.length) ? undefined : '板块数据源(东财)暂不可用,主线/资金流向/板块排行缺失',
       dataAsOfDate,
       dataAsOfLabel: isPre ? '今日盘前实时' : '今日盘中/收盘',
       // v11.60(B):迟到补采标记 —— 采集时刻晚于该槽位理想窗口(但仍在数据有效边界内)。
