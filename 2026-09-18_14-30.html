@@ -2794,6 +2794,29 @@ function fetchWithTimeout(url, opt, ms){
     } catch(e){ if(!done){ done=true; clearTimeout(timer); reject(e); } }
   });
 }
+/* v11.130:去抖落盘 —— 手动连续新增时,每只股都全量 JSON.stringify 大缓存(尤其 K线缓存 120根×多字段×N股)
+   是 O(n²) 热点,21 只即明显延迟。连续写入合并为 600ms 后落盘 1 次;beforeunload 强制 flush 防丢。 */
+var __dbWrites = {};
+function debouncedWrite(key, data){
+  var e = __dbWrites[key];
+  if(!e){ e = {timer:null, data:null}; __dbWrites[key]=e; }
+  e.data = data;
+  if(!e.timer){
+    e.timer = setTimeout(function(){
+      try{ localStorage.setItem(key, JSON.stringify(e.data)); }catch(err){}
+      e.timer = null; e.data = null;
+    }, 600);
+  }
+}
+// 读缓存优先内存(去抖窗口内最新值尚未落盘),否则读 localStorage
+function debouncedRead(key){
+  var e = __dbWrites[key];
+  if(e && e.data != null) return e.data;
+  try{ return JSON.parse(localStorage.getItem(key)||'{}'); }catch(err){ return {}; }
+}
+window.addEventListener('beforeunload', function(){
+  for(var k in __dbWrites){ var e = __dbWrites[k]; if(e.timer){ clearTimeout(e.timer); try{ localStorage.setItem(k, JSON.stringify(e.data)); }catch(err){} } }
+});
 
 async function fetchStockData(raw){
   if(!/^\d{6}$/.test(String(raw)))return null;
@@ -2994,11 +3017,11 @@ async function fetchKlineF(code, count) {
       // v11.55:①记下这根末K代表的交易日(tradeDate),不再只写"抓取日"(那个字段以前没人读,是死字段);
       //        ②拒绝写入:数据源抽风可能返回**比缓存更旧**的序列 → 保留新的,不用旧的覆盖。
       try {
-        var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}');
+        var kc=debouncedRead('atds_kline_cache');
         var st=klineStampF(series,bjTodayF(),bjNowHM());
         if(klineShouldOverwriteF(kc[code],series)){
           kc[code]={date:bjTodayF(),tradeDate:st.tradeDate,capturedAt:st.capturedAt,partial:st.partial,series:series.slice(-120)};
-          localStorage.setItem('atds_kline_cache',JSON.stringify(kc));
+          debouncedWrite('atds_kline_cache', kc);   // v11.130:去抖落盘,替代每次全量 setItem
         }else{
           console.warn('[kline] 拒绝写入: 新数据末根 '+st.tradeDate+' 早于缓存 '+(kc[code]&&kc[code].tradeDate));
         }
@@ -3008,7 +3031,7 @@ async function fetchKlineF(code, count) {
   } catch (e) {}
   // 失败兜底:浏览器本地缓存 → 仓库 data/kline_cache.json(GitHub Pages 同源)
   // v11.55:兜底路径必须说明"这是哪天的K线",否则卡片会拿几天前的K线算"当前关键位"却不自知。
-  try { var kc2=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
+  try { var kc2=debouncedRead('atds_kline_cache'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
   try { var r=await fetch('data/kline_cache.json',{cache:'no-store'}); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
   return [];
 }

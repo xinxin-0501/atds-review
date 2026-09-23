@@ -2251,10 +2251,10 @@
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">首页</a><a href="2026-08-20_08-30.html" class="active">盘前</a><a href="2026-08-20_15-20.html">收盘</a><a href="2026-09-21_14-30.html">尾盘</a>
+      <a href="index.html">首页</a><a href="2026-08-20_08-30.html" class="active">盘前</a><a href="2026-08-20_15-20.html">收盘</a><a href="2026-09-22_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:08</b>（约 1378 分钟前）</div><h1 class="hero-title">2026-08-20 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:08），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:08</b>（约 876 分钟前）</div><h1 class="hero-title">2026-08-20 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:08），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-20 19:08:03</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -3319,6 +3319,29 @@ function fetchWithTimeout(url, opt, ms){
     } catch(e){ if(!done){ done=true; clearTimeout(timer); reject(e); } }
   });
 }
+/* v11.130:去抖落盘 —— 手动连续新增时,每只股都全量 JSON.stringify 大缓存(尤其 K线缓存 120根×多字段×N股)
+   是 O(n²) 热点,21 只即明显延迟。连续写入合并为 600ms 后落盘 1 次;beforeunload 强制 flush 防丢。 */
+var __dbWrites = {};
+function debouncedWrite(key, data){
+  var e = __dbWrites[key];
+  if(!e){ e = {timer:null, data:null}; __dbWrites[key]=e; }
+  e.data = data;
+  if(!e.timer){
+    e.timer = setTimeout(function(){
+      try{ localStorage.setItem(key, JSON.stringify(e.data)); }catch(err){}
+      e.timer = null; e.data = null;
+    }, 600);
+  }
+}
+// 读缓存优先内存(去抖窗口内最新值尚未落盘),否则读 localStorage
+function debouncedRead(key){
+  var e = __dbWrites[key];
+  if(e && e.data != null) return e.data;
+  try{ return JSON.parse(localStorage.getItem(key)||'{}'); }catch(err){ return {}; }
+}
+window.addEventListener('beforeunload', function(){
+  for(var k in __dbWrites){ var e = __dbWrites[k]; if(e.timer){ clearTimeout(e.timer); try{ localStorage.setItem(k, JSON.stringify(e.data)); }catch(err){} } }
+});
 
 async function fetchStockData(raw){
   if(!/^\d{6}$/.test(String(raw)))return null;
@@ -3519,11 +3542,11 @@ async function fetchKlineF(code, count) {
       // v11.55:①记下这根末K代表的交易日(tradeDate),不再只写"抓取日"(那个字段以前没人读,是死字段);
       //        ②拒绝写入:数据源抽风可能返回**比缓存更旧**的序列 → 保留新的,不用旧的覆盖。
       try {
-        var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}');
+        var kc=debouncedRead('atds_kline_cache');
         var st=klineStampF(series,bjTodayF(),bjNowHM());
         if(klineShouldOverwriteF(kc[code],series)){
           kc[code]={date:bjTodayF(),tradeDate:st.tradeDate,capturedAt:st.capturedAt,partial:st.partial,series:series.slice(-120)};
-          localStorage.setItem('atds_kline_cache',JSON.stringify(kc));
+          debouncedWrite('atds_kline_cache', kc);   // v11.130:去抖落盘,替代每次全量 setItem
         }else{
           console.warn('[kline] 拒绝写入: 新数据末根 '+st.tradeDate+' 早于缓存 '+(kc[code]&&kc[code].tradeDate));
         }
@@ -3533,7 +3556,7 @@ async function fetchKlineF(code, count) {
   } catch (e) {}
   // 失败兜底:浏览器本地缓存 → 仓库 data/kline_cache.json(GitHub Pages 同源)
   // v11.55:兜底路径必须说明"这是哪天的K线",否则卡片会拿几天前的K线算"当前关键位"却不自知。
-  try { var kc2=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
+  try { var kc2=debouncedRead('atds_kline_cache'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
   try { var r=await fetch('data/kline_cache.json',{cache:'no-store'}); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
   return [];
 }

@@ -2251,11 +2251,11 @@
       <div class="logo">A</div>
       <div class="brand-text">
         <div class="brand-name">ATDS <span class="pro-badge">PRO</span> 复盘</div>
-        <div class="brand-sub">GLOBAL LINKAGE V4.0 · 2026-09-22 16:20</div>
+        <div class="brand-sub">GLOBAL LINKAGE V4.0 · 2026-09-23 09:45</div>
       </div>
     </div>
     <div class="time-nav">
-      <a href="index.html">首页</a><a href="2026-09-22_09-45.html">盘前</a><a href="2026-09-22_16-20.html" class="active">收盘</a>
+      <a href="index.html">首页</a><a href="2026-09-23_09-45.html" class="active">盘前</a><a href="2026-09-22_16-20.html">收盘</a>
     </div>
   </div>
 <div class="section">
@@ -2263,64 +2263,64 @@
     <div class="card-title">全部方向实时强度排名 · 前 10 名</div>
     <table class="table"><thead><tr><th>#</th><th>主线</th><th>涨幅</th><th>涨停数</th><th>领涨</th></tr></thead><tbody><tr>
       <td>1</td>
-      <td>家居用品</td>
-      <td class="up">+10.00%</td>
-      <td>4家 / 6板</td>
-      <td>华瓷股份</td>
+      <td>出版</td>
+      <td class="up">+9.98%</td>
+      <td>2家 / 4板</td>
+      <td>新华文轩</td>
     </tr><tr>
       <td>2</td>
-      <td>出版</td>
-      <td class="up">+9.97%</td>
-      <td>4家 / 5板</td>
-      <td>内蒙新华</td>
+      <td>家居用品</td>
+      <td class="up">+10.01%</td>
+      <td>1家 / 4板</td>
+      <td>大亚圣象</td>
     </tr><tr>
       <td>3</td>
-      <td>医疗服务</td>
-      <td class="up">+10.02%</td>
-      <td>2家 / 4板</td>
-      <td>南华生物</td>
+      <td>房地产服</td>
+      <td class="up">+10.07%</td>
+      <td>2家 / 3板</td>
+      <td>华远控股</td>
     </tr><tr>
       <td>4</td>
-      <td>半导体</td>
-      <td class="up">+10.00%</td>
-      <td>2家 / 3板</td>
-      <td>博通集成</td>
+      <td>服装家纺</td>
+      <td class="up">+10.02%</td>
+      <td>1家 / 3板</td>
+      <td>泰慕士</td>
     </tr><tr>
       <td>5</td>
-      <td>化学制药</td>
-      <td class="up">+13.38%</td>
-      <td>3家 / 2板</td>
-      <td>新华制药</td>
-    </tr><tr>
-      <td>6</td>
-      <td>广告营销</td>
-      <td class="up">+9.98%</td>
-      <td>3家 / 2板</td>
-      <td>华媒控股</td>
-    </tr><tr>
-      <td>7</td>
-      <td>铁路公路</td>
-      <td class="up">+10.01%</td>
-      <td>1家 / 3板</td>
-      <td>三羊马</td>
-    </tr><tr>
-      <td>8</td>
       <td>IT服务Ⅱ</td>
-      <td class="up">+10.02%</td>
-      <td>2家 / 2板</td>
+      <td class="up">+9.99%</td>
+      <td>1家 / 3板</td>
       <td>南威软件</td>
     </tr><tr>
+      <td>6</td>
+      <td>电视广播</td>
+      <td class="up">+10.06%</td>
+      <td>1家 / 2板</td>
+      <td>天威视讯</td>
+    </tr><tr>
+      <td>7</td>
+      <td>玻璃玻纤</td>
+      <td class="up">+10.12%</td>
+      <td>1家 / 1板</td>
+      <td>三峡新材</td>
+    </tr><tr>
+      <td>8</td>
+      <td>光学光电</td>
+      <td class="up">+10.00%</td>
+      <td>1家 / 1板</td>
+      <td>沃格光电</td>
+    </tr><tr>
       <td>9</td>
-      <td>软件开发</td>
-      <td class="up">+10.02%</td>
-      <td>2家 / 2板</td>
-      <td>延华智能</td>
+      <td>消费电子</td>
+      <td class="up">+10.04%</td>
+      <td>1家 / 1板</td>
+      <td>胜利精密</td>
     </tr><tr>
       <td>10</td>
-      <td>房地产服</td>
-      <td class="up">+9.95%</td>
-      <td>2家 / 2板</td>
-      <td>华远控股</td>
+      <td>光伏设备</td>
+      <td class="up">+10.02%</td>
+      <td>1家 / 1板</td>
+      <td>金辰股份</td>
     </tr></tbody></table>
   </div>
 </div>
@@ -2344,6 +2344,29 @@ function fetchWithTimeout(url, opt, ms){
     } catch(e){ if(!done){ done=true; clearTimeout(timer); reject(e); } }
   });
 }
+/* v11.130:去抖落盘 —— 手动连续新增时,每只股都全量 JSON.stringify 大缓存(尤其 K线缓存 120根×多字段×N股)
+   是 O(n²) 热点,21 只即明显延迟。连续写入合并为 600ms 后落盘 1 次;beforeunload 强制 flush 防丢。 */
+var __dbWrites = {};
+function debouncedWrite(key, data){
+  var e = __dbWrites[key];
+  if(!e){ e = {timer:null, data:null}; __dbWrites[key]=e; }
+  e.data = data;
+  if(!e.timer){
+    e.timer = setTimeout(function(){
+      try{ localStorage.setItem(key, JSON.stringify(e.data)); }catch(err){}
+      e.timer = null; e.data = null;
+    }, 600);
+  }
+}
+// 读缓存优先内存(去抖窗口内最新值尚未落盘),否则读 localStorage
+function debouncedRead(key){
+  var e = __dbWrites[key];
+  if(e && e.data != null) return e.data;
+  try{ return JSON.parse(localStorage.getItem(key)||'{}'); }catch(err){ return {}; }
+}
+window.addEventListener('beforeunload', function(){
+  for(var k in __dbWrites){ var e = __dbWrites[k]; if(e.timer){ clearTimeout(e.timer); try{ localStorage.setItem(k, JSON.stringify(e.data)); }catch(err){} } }
+});
 
 async function fetchStockData(raw){
   if(!/^\d{6}$/.test(String(raw)))return null;
@@ -2544,11 +2567,11 @@ async function fetchKlineF(code, count) {
       // v11.55:①记下这根末K代表的交易日(tradeDate),不再只写"抓取日"(那个字段以前没人读,是死字段);
       //        ②拒绝写入:数据源抽风可能返回**比缓存更旧**的序列 → 保留新的,不用旧的覆盖。
       try {
-        var kc=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}');
+        var kc=debouncedRead('atds_kline_cache');
         var st=klineStampF(series,bjTodayF(),bjNowHM());
         if(klineShouldOverwriteF(kc[code],series)){
           kc[code]={date:bjTodayF(),tradeDate:st.tradeDate,capturedAt:st.capturedAt,partial:st.partial,series:series.slice(-120)};
-          localStorage.setItem('atds_kline_cache',JSON.stringify(kc));
+          debouncedWrite('atds_kline_cache', kc);   // v11.130:去抖落盘,替代每次全量 setItem
         }else{
           console.warn('[kline] 拒绝写入: 新数据末根 '+st.tradeDate+' 早于缓存 '+(kc[code]&&kc[code].tradeDate));
         }
@@ -2558,7 +2581,7 @@ async function fetchKlineF(code, count) {
   } catch (e) {}
   // 失败兜底:浏览器本地缓存 → 仓库 data/kline_cache.json(GitHub Pages 同源)
   // v11.55:兜底路径必须说明"这是哪天的K线",否则卡片会拿几天前的K线算"当前关键位"却不自知。
-  try { var kc2=JSON.parse(localStorage.getItem('atds_kline_cache')||'{}'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
+  try { var kc2=debouncedRead('atds_kline_cache'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
   try { var r=await fetch('data/kline_cache.json',{cache:'no-store'}); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
   return [];
 }
