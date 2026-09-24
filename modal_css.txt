@@ -744,31 +744,7 @@
 .sp-row{font-size:11px;color:#334155;line-height:1.6}
 .sp-row b{color:#0f172a}
 .sp-ban{font-size:10px;color:#991b1b;font-weight:800;margin-left:6px}
-/* v11.82 盘前「今日已入场」悬浮弹窗(只读) */
-.entry-fab{position:fixed;right:14px;bottom:84px;z-index:9990;background:#1d4ed8;color:#fff;border:none;border-radius:22px;padding:10px 16px;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(29,78,216,.4);cursor:pointer;touch-action:none;user-select:none;max-width:70vw;white-space:nowrap;width:auto;min-width:0}
-.entry-fab.has{background:#dc2626}
-.entry-pop{position:fixed;left:0;right:0;bottom:0;z-index:9991;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.18);max-height:70vh;display:none;flex-direction:column}
-.entry-pop.show{display:flex}
-.entry-pop-h{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eef2f7;font-size:15px;font-weight:800;color:#0f172a}
-.entry-pop-close{font-size:12px;color:#64748b;cursor:pointer;padding:2px 8px;border:1px solid #e2e8f0;border-radius:12px}
-.entry-pop-body{overflow-y:auto;padding:8px 12px}
-.entry-item{position:relative;border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;margin-bottom:8px;cursor:pointer;background:#fafbfc}
-.entry-item-main{display:flex;align-items:baseline;gap:6px;flex-wrap:nowrap;overflow:hidden}
-.entry-name{font-size:14px;font-weight:800;color:#0f172a}
-.entry-code{font-size:10px;color:#94a3b8}
-.entry-price{font-size:14px;font-weight:800;margin-left:auto;white-space:nowrap}
-.entry-pct{font-size:12px;font-weight:700;white-space:nowrap;min-width:50px;text-align:right}
-.entry-item-sub{font-size:11px;color:#475569;margin-top:3px;line-height:1.5}
-.entry-fl{font-size:13px;font-weight:900;white-space:nowrap;min-width:46px;text-align:right}
-.entry-fl-up{color:#dc2626}.entry-fl-down{color:#16a34a}
-.entry-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
-.entry-sec-h{font-size:12px;font-weight:800;color:#334155;margin:10px 2px 6px;padding-left:6px;border-left:3px solid #94a3b8}
-.entry-sec-h.win{border-left-color:#dc2626;color:#dc2626}
-.entry-sec-h.loss{border-left-color:#16a34a;color:#16a34a}
-.entry-tag-short{font-style:normal;font-size:9px;color:#fff;background:#b45309;border-radius:4px;padding:1px 4px;margin-left:4px}
-.entry-tag-swing{font-style:normal;font-size:9px;color:#fff;background:#1d4ed8;border-radius:4px;padding:1px 4px;margin-left:4px}
 .eye-warn{margin:8px 12px;padding:8px 10px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:12px;font-weight:800;border-radius:8px}
-.wl-stock.entry-flash{outline:3px solid #f59e0b;outline-offset:-3px}
 
 /* v11.83 尾盘定调快照入口横幅 */
 .ts-banner{display:block;margin:10px 12px 0;padding:10px 12px;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 2px 8px rgba(249,115,22,.35);line-height:1.5}
@@ -781,7 +757,6 @@
 .jrn-archive-body{display:none;padding:8px 12px}
 .jrn-archive.open .jrn-archive-body{display:block}
 
-.entry-sort{font-size:11px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:2px 9px;cursor:pointer;user-select:none;font-weight:700}
 
 /* v11.111 全市场信号雷达(盘前弹窗) */
 .sr-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}
