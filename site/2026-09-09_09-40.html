@@ -2254,7 +2254,7 @@
       <a href="index.html">首页</a><a href="2026-09-09_09-40.html" class="active">盘前</a><a href="2026-09-09_16-20.html">收盘</a><a href="2026-09-24_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:20</b>（约 230 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:20），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 79°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:20</b>（约 258 分钟前）</div><h1 class="hero-title">2026-09-09 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:20），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 79°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-09 19:20:47</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -9126,6 +9126,8 @@ async function runStructQuery(){
   var c0=code.charAt(0);var full=(c0==='6'||c0==='5')?('sh'+code):((c0==='4'||c0==='8'||c0==='9')?('bj'+code):('sz'+code));
   var out=document.getElementById('ssq-out');
   out.innerHTML='<div class="ssq-empty">查询中…(主源+备用源并行拉取,最长约 9 秒)</div>';
+  // v11.148:北交所拦截(与加股一致:92/83/87/88 缺历史K线,无法算MA/ATR等指标)
+  if(isBJCode(code)){ out.innerHTML='<div class="ssq-empty">暂不支持北交所股票(缺历史K线,无法计算MA/ATR等指标,且 30% 涨跌幅破坏风控)</div>'; return; }
   var period=SSQ.period==='m15'?'m15':(SSQ.period==='m60'?'m60':(SSQ.period==='week'?'week':'day'));
   var suf=full.slice(0,2).toUpperCase();
   var kl,nm='';
@@ -9134,28 +9136,29 @@ async function runStructQuery(){
     SSQ.cache=SSQ.cache||{};
     var cacheKey=full+'|'+period+'|'+SSQ.count;
     var hit=SSQ.cache[cacheKey];
+    var namePromise=fetchWithTimeout('https://qt.gtimg.cn/q='+full,{cache:'no-store'}).then(function(r){return r.arrayBuffer();}).then(function(b){
+        var qm=new TextDecoder('gbk').decode(b).match(/="([^"]+)"/);
+        if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)return String(qf[1]);}
+        return '';}).catch(function(){return '';});
     if(hit&&(Date.now()-hit.t)<60000){
       kl=hit.kl;
     }else{
       var pA=fetchKlinePeriod(full,period,Math.max(SSQ.count+80,120)).catch(function(){return [];});
       var pB=(period==='day')?fetchKlineF(full,Math.max(SSQ.count+80,120)).catch(function(){return [];}):Promise.resolve([]);
-      var pN=fetchWithTimeout('https://qt.gtimg.cn/q='+full,{cache:'no-store'}).then(function(r){return r.arrayBuffer();}).then(function(b){
-          var qm=new TextDecoder('gbk').decode(b).match(/="([^"]+)"/);
-          if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)return String(qf[1]);}
-          return '';}).catch(function(){return '';});
       // v11.147:首个有效结果优先(主源成功立即出图,不等慢源),12s 硬兜底(绝不无限等)
-      var res=await new Promise(function(resolve){
-        var nDone=0,got=null,nmV='';
-        function fin(){ nDone++; if(nDone>=3||got){ resolve([got,nmV]); } }
+      kl=await new Promise(function(resolve){
+        var nDone=0,got=null;
+        function fin(){ nDone++; if(nDone>=2||got){ resolve(got); } }
         pA.then(function(v){ if(v&&v.length>=35&&!got)got=v; fin(); }).catch(function(){ fin(); });
         pB.then(function(v){ if(v&&v.length>=35&&!got)got=v; fin(); }).catch(function(){ fin(); });
-        pN.then(function(v){ nmV=v||''; fin(); }).catch(function(){ nmV=''; fin(); });
-        setTimeout(function(){ resolve([got,nmV]); },12000);
+        setTimeout(function(){ resolve(got); },12000);
       });
-      kl=res[0];nm=res[1]||'';
       if(kl&&kl.length>=35)SSQ.cache[cacheKey]={t:Date.now(),kl:kl};
     }
     if(!kl||kl.length<35){out.innerHTML='<div class="ssq-empty">未获取到该代码K线(请确认代码/北交所暂不支持;数据源偶发限流可稍后重试)</div>';return;}
+    // v11.148:名称(用于 ST 剔除与图上标题);K线有效后再等名称(通常已并行完成,几乎不额外耗时)
+    try{ nm=await namePromise; }catch(e){ nm=''; }
+    if(nm && /^\*?ST/i.test(String(nm).trim())){ out.innerHTML='<div class="ssq-empty">暂不支持 ST / 风险警示股（'+escHtmlF(nm)+'），结构信号判定不适用于风险警示股</div>'; return; }
     var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
   SSQ.view=null;   // v11.133:新查询重置视窗(默认显示所选范围,再由手势平移/缩放)
   out.innerHTML=ssqRenderParams(calc)+'<div class="ssq-cwrap" id="ssq-canvas-wrap"><canvas id="ssq-canvas"></canvas></div>'+
