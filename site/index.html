@@ -7426,6 +7426,8 @@ function structSignalCalc(kl, code, name, count, suf){
       //   相对门槛过高,漏掉温和放量启动(实测百亚股份 09-07 量1.54×横盘但随后连涨70%)
       if(!(V[li]>=fv*1.8||V[li]>=va5*1.5))continue;
       if(!(C[li]>O[li]))continue;
+      // v11.152:突破日实体≥1% —— 排除十字星假突破(实测福能股份 09-11 实体仅0.2%被标启动,随后回落)
+      if(!((C[li]-O[li])/O[li]>=0.01))continue;
       if(!(ma5[li]!=null&&ma10[li]!=null&&ma20[li]!=null&&C[li]>ma5[li]&&C[li]>ma10[li]&&C[li]>ma20[li]))continue;
       // v11.143 强化:⑤b 突破日为温和放量阳线(实体≤7%) —— 排除脉冲/涨停式大涨(那是模式①,不是低吸启动)
       if(!((C[li]-O[li])/O[li]<=0.07))continue;
