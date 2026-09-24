@@ -3662,6 +3662,24 @@ async function main() {
   const generatedAt = capturedAt;
   const isReplay = fmtDate(now) !== date;   // 目标日 ≠ 采集日 ⇒ 历史重采(非当日迟到)
 
+  // v11.146【close 幂等闸 · 根治】当日 close 已存在且当前不在收盘采集窗口(16:10~17:30)内 → 拒绝覆盖。
+  //   背景:本地/迟到重采(实测 09-23 19:34、09-24 18:34)会把当日真实收盘数据覆盖掉,
+  //   meta.generatedAt 被污染成 19:34/18:34,且竞价字段因本地 auction_cache 陈旧而整块丢失。
+  //   闸门只拦"当日已有 close + 超窗"的重复采集;窗口内的合法修正、历史日期补采(isReplay)不受影响;
+  //   确需强制重采当日 close 时用 `--force-close`。
+  const forceClose = process.argv.includes('--force-close');
+  if (type === 'close' && !isReplay && !forceClose) {
+    const _exClose = path.join(DATA_DIR, `${date}_16-20.json`);
+    if (fs.existsSync(_exClose)) {
+      const _nowHM = now.getHours() * 60 + now.getMinutes();
+      const _inWin = _nowHM >= (16 * 60 + 10) && _nowHM <= (17 * 60 + 30);
+      if (!_inWin) {
+        console.log('[幂等闸] 当日 close 已存在且当前 ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' 不在收盘窗口内,拒绝覆盖(保持首次采集);窗口内修正或补采历史不受影响,强制重采用 --force-close');
+        process.exit(0);
+      }
+    }
+  }
+
   const isPre = type === 'premarket';
   const todayCompact = explicitArg || `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
   const yObj = explicitArg ? new Date(`${date}T12:00:00+08:00`) : new Date(now);
