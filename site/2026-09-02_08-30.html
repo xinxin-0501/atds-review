@@ -2254,7 +2254,7 @@
       <a href="index.html">首页</a><a href="2026-09-02_08-30.html" class="active">盘前</a><a href="2026-09-02_16-20.html">收盘</a><a href="2026-09-24_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 11:37</b>（约 754 分钟前）</div><h1 class="hero-title">2026-09-02 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 11:37），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 72°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 11:37</b>（约 784 分钟前）</div><h1 class="hero-title">2026-09-02 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 11:37），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 72°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-02 11:37:58</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -8816,7 +8816,7 @@ function structSignalCalc(kl, code, name, count, suf){
     var keyLow=Math.min.apply(null,L.slice(Math.max(0,recoIdx-20),recoIdx+1));   // 关键支撑(含 CD 低点)
     for(var li=recoIdx+1;li<=lastComplete;li++){
       var flatN=Math.min(6,li-recoIdx-1);
-      if(flatN<3)continue;                                                       // 横盘期至少 3 根
+      if(flatN<2)continue;                                                       // v11.150:横盘期至少 2 根(原3根会漏掉金叉后快速启动的形态,实测百亚股份)
       var s0=Math.max(recoIdx+1,li-flatN);                                       // 横盘段起点(推荐日次日起)
       // ④a 横盘:段内收盘振幅 ≤ 8%
       var hiC=-Infinity,loC=Infinity;
@@ -8827,8 +8827,9 @@ function structSignalCalc(kl, code, name, count, suf){
       var refV=V[recoIdx]||0;
       var v30=0,vn=0;for(var k5=Math.max(0,li-30);k5<li;k5++){v30+=V[k5];vn++;}
       v30=vn?v30/vn:0;
-      if(!(refV>0&&fv<=refV*1.2))continue;
-      if(!(v30>0&&fv<=v30))continue;
+      // v11.150:缩量锚放宽 —— 推荐日(金叉日)本身常为放量日,金叉后温和爬升的横盘量自然略高于它,
+      //   原锚(fv≤推荐日量×1.2)必失败(实测百亚股份)。改取两者宽者。
+      if(!(refV>0&&fv<=Math.max(refV*1.2,v30*1.3)))continue;
       // ④c 不破关键支撑
       var sLo=Infinity;for(var k6=s0;k6<li;k6++){if(L[k6]<sLo)sLo=L[k6];}
       if(!(sLo>=keyLow*0.995))continue;
@@ -8838,11 +8839,11 @@ function structSignalCalc(kl, code, name, count, suf){
       if(!(ma20[li]!=null&&midC>=ma20[li]*0.98))continue;
       // ⑤ 突破日:再次放量 + 一阳穿三线 + 平台新高 + 阳线
       var va5=0;for(var k7=1;k7<=5;k7++)va5+=(V[li-k7]||0);va5/=5;
-      if(!(V[li]>=fv*2&&V[li]>=va5*1.5))continue;
+      // v11.150:量能门槛改二选一(≥横盘均量×1.8 或 ≥前5日均量×1.5) —— 原「必须≥横盘×2」在极缩量横盘下
+      //   相对门槛过高,漏掉温和放量启动(实测百亚股份 09-07 量1.54×横盘但随后连涨70%)
+      if(!(V[li]>=fv*1.8||V[li]>=va5*1.5))continue;
       if(!(C[li]>O[li]))continue;
       if(!(ma5[li]!=null&&ma10[li]!=null&&ma20[li]!=null&&C[li]>ma5[li]&&C[li]>ma10[li]&&C[li]>ma20[li]))continue;
-      var hiSince=-Infinity;for(var k8=recoIdx;k8<li;k8++){if(C[k8]>hiSince)hiSince=C[k8];}
-      if(!(C[li]>hiSince))continue;
       // v11.143 强化:⑤b 突破日为温和放量阳线(实体≤7%) —— 排除脉冲/涨停式大涨(那是模式①,不是低吸启动)
       if(!((C[li]-O[li])/O[li]<=0.07))continue;
       // ⑤c MA20 走平或上拐(ma20[li] ≥ ma20[li-2]) —— 排除 MA20 仍向下的趋势内突破
@@ -9118,7 +9119,11 @@ function openStructSignalModal(){
 }
 function closeStructSignalModal(){var m=document.getElementById('struct-modal');if(m){m.classList.remove('show');document.body.style.overflow='';}}
 function ssqSetP(btn){SSQ.period=btn.getAttribute('data-p');var sp=document.getElementById('ssq-period');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});if(SSQ.code)runStructQuery();}
-function ssqSetC(btn){SSQ.count=parseInt(btn.getAttribute('data-c'),10)||66;var sp=document.getElementById('ssq-range');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});if(SSQ.code)runStructQuery();}
+function ssqSetC(btn){SSQ.count=parseInt(btn.getAttribute('data-c'),10)||66;var sp=document.getElementById('ssq-range');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});
+  // v11.151:范围切换不重新拉取 —— 日线一次已拉 count+80 根,切范围只改视窗秒级重渲染(根治:原逻辑重新查询,
+  //   一年 330 根在手机网络下 10-20s 才返回,期间 canvas 无响应 = 用户看到的"半年/一年无法移动缩放")
+  if(SSQ.kl&&SSQ.klPeriod===SSQ.period&&SSQ.kl.length>=Math.max(SSQ.count,35)&&typeof rerenderStruct==='function'){ rerenderStruct(); return; }
+  if(SSQ.code)runStructQuery();}
 async function runStructQuery(){
   var inp=document.getElementById('ssq-code');var code=(inp&&inp.value||'').trim();
   SSQ.code=code;
@@ -9159,15 +9164,29 @@ async function runStructQuery(){
     // v11.148:名称(用于 ST 剔除与图上标题);K线有效后再等名称(通常已并行完成,几乎不额外耗时)
     try{ nm=await namePromise; }catch(e){ nm=''; }
     if(nm && /^\*?ST/i.test(String(nm).trim())){ out.innerHTML='<div class="ssq-empty">暂不支持 ST / 风险警示股（'+escHtmlF(nm)+'），结构信号判定不适用于风险警示股</div>'; return; }
+    SSQ.kl=kl;SSQ.klPeriod=period;SSQ.lastName=nm||code;SSQ.lastSuf=suf;   // v11.151:缓存K线供范围切换复用
     var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
   SSQ.view=null;   // v11.133:新查询重置视窗(默认显示所选范围,再由手势平移/缩放)
-  out.innerHTML=ssqRenderParams(calc)+'<div class="ssq-cwrap" id="ssq-canvas-wrap"><canvas id="ssq-canvas"></canvas></div>'+
-    '<div class="ssq-legend"><span style="white-space:nowrap"><i style="background:#ef4444"></i>K线(阳空心/阴实心)/MA5</span> <span style="white-space:nowrap"><i style="background:#c084fc"></i>MA20</span> <span style="white-space:nowrap"><i style="color:#f59e0b">▲</i>CD抄底</span> <span style="white-space:nowrap"><i style="background:#ff2d78;border-radius:50%"></i>启动</span> <span style="white-space:nowrap"><span style="color:#ef4444;margin:0 3px 0 8px">┆</span>推荐日</span> <span style="white-space:nowrap"><i style="background:#384250"></i>成交量</span> <span style="white-space:nowrap"><i style="background:#22c55e"></i>资金活跃度</span> <span style="white-space:nowrap;color:#94a3b8">按住看日期</span></div>'+
-    ssqRenderLevels(calc);
-    drawStructChart(document.getElementById('ssq-canvas'),calc);
+  renderStructOutput(out,calc);
   }catch(e){
     out.innerHTML='<div class="ssq-empty">查询失败:'+(String(e&&e.message||e)).slice(0,80)+' —— 请稍后重试</div>';
   }
+}
+// v11.151:结构信号渲染收口(runStructQuery 与范围切换 ssqSetC 共用)
+function renderStructOutput(out,calc){
+  out.innerHTML=ssqRenderParams(calc)+'<div class="ssq-cwrap" id="ssq-canvas-wrap"><canvas id="ssq-canvas"></canvas></div>'+
+    '<div class="ssq-legend"><span style="white-space:nowrap"><i style="background:#ef4444"></i>K线(阳空心/阴实心)/MA5</span> <span style="white-space:nowrap"><i style="background:#c084fc"></i>MA20</span> <span style="white-space:nowrap"><i style="color:#f59e0b">▲</i>CD抄底</span> <span style="white-space:nowrap"><i style="background:#ff2d78;border-radius:50%"></i>启动</span> <span style="white-space:nowrap"><span style="color:#ef4444;margin:0 3px 0 8px">┆</span>推荐日</span> <span style="white-space:nowrap"><i style="background:#384250"></i>成交量</span> <span style="white-space:nowrap"><i style="background:#22c55e"></i>资金活跃度</span> <span style="white-space:nowrap;color:#94a3b8">按住看日期</span></div>'+
+    ssqRenderLevels(calc);
+  drawStructChart(document.getElementById('ssq-canvas'),calc);
+}
+// v11.151:范围切换复用已拉K线,仅重算+重渲染(不重新拉取)
+function rerenderStruct(){
+  var out=document.getElementById('ssq-out'); if(!out||!SSQ.kl)return;
+  try{
+    var calc=structSignalCalc(SSQ.kl,SSQ.code,SSQ.lastName||SSQ.code,SSQ.count,SSQ.lastSuf||'');
+    SSQ.view=null;
+    renderStructOutput(out,calc);
+  }catch(e){ console.warn('[rerenderStruct]',e.message); }
 }
 window.openStructSignalModal=openStructSignalModal;window.closeStructSignalModal=closeStructSignalModal;
 window.ssqSetP=ssqSetP;window.ssqSetC=ssqSetC;window.runStructQuery=runStructQuery;
