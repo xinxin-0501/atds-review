@@ -2254,7 +2254,7 @@
       <a href="index.html">首页</a><a href="2026-08-20_08-30.html" class="active">盘前</a><a href="2026-08-20_15-20.html">收盘</a><a href="2026-09-24_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:08</b>（约 57 分钟前）</div><h1 class="hero-title">2026-08-20 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:08），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 19:08</b>（约 72 分钟前）</div><h1 class="hero-title">2026-08-20 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 19:08），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 84°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-20 19:08:03</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -8368,16 +8368,47 @@ function structSignalCalc(kl, code, name, count, suf){
     }
   }
   var lastIdx=lastComplete;
-  // v11.140:启动点(用户参考图「复利行动」模式⑤「再次放量突破均线:第二天低吸仓」)——
-  //   推荐日之后首个满足【放量(成交量≥前5日均量×1.5) + 一阳穿三线(收盘站上 MA5/MA10/MA20) + 收阳】的K线。
-  //   找不到(如推荐日后一直缩量阴跌)则不标,诚实呈现。
+  // v11.142:启动点判定按「复利行动」模式重写(用户反馈:北方稀土此前误报 —— 缺少横盘缩量酝酿期,
+  //   把推荐日后的脉冲长阳当成了启动)。完整链条 = 推荐(金叉) → ④横盘缩量·不破关键位 → ⑤再次放量突破均线。
+  //   【阶段④ 横盘缩量期】(推荐日次日起 3~6 根):
+  //     a. 横盘:段内收盘价最大振幅 ≤ 8%;
+  //     b. 缩量:段内日均量 ≤ 推荐日量×1.2 且 ≤ 近30日均量(持续缩量);
+  //     c. 不破关键位:段内最低价 ≥ 关键支撑(推荐日前20日至推荐日的最低价,容差0.5%)。
+  //   【阶段⑤ 突破信号日】需同时满足:
+  //     a. 再次放量:当日量 ≥ 横盘期日均量×2 且 ≥ 前5日均量×1.5;
+  //     b. 突破均线:收盘 > MA5/MA10/MA20(一阳穿三线);
+  //     c. 平台突破:收盘创推荐日以来新高;
+  //     d. 阳线:收盘 > 开盘。
+  //   次日为低吸建仓点(图2模式);任一条件不满足则不标 —— 无横盘酝酿的脉冲大涨是虚假信号。
   var launchIdx=null;
   if(recoIdx!=null){
+    var keyLow=Math.min.apply(null,L.slice(Math.max(0,recoIdx-20),recoIdx+1));   // 关键支撑(含 CD 低点)
     for(var li=recoIdx+1;li<=lastComplete;li++){
-      var _va=0;for(var k2=1;k2<=5;k2++)_va+=(V[li-k2]||0);_va/=5;
-      if(!(_va>0&&V[li]>=_va*1.5))continue;                       // 放量
-      if(!(C[li]>O[li]))continue;                                  // 阳线
-      if(ma5[li]!=null&&ma10[li]!=null&&ma20[li]!=null&&C[li]>ma5[li]&&C[li]>ma10[li]&&C[li]>ma20[li]){launchIdx=li;break;} // 一阳穿三线
+      var flatN=Math.min(6,li-recoIdx-1);
+      if(flatN<3)continue;                                                       // 横盘期至少 3 根
+      var s0=Math.max(recoIdx+1,li-flatN);                                       // 横盘段起点(推荐日次日起)
+      // ④a 横盘:段内收盘振幅 ≤ 8%
+      var hiC=-Infinity,loC=Infinity;
+      for(var k3=s0;k3<li;k3++){if(C[k3]>hiC)hiC=C[k3];if(C[k3]<loC)loC=C[k3];}
+      if(!(loC>0&&(hiC-loC)/loC<=0.08))continue;
+      // ④b 缩量:段均量 ≤ 推荐日量×1.2 且 ≤ 近30日均量
+      var fv=0;for(var k4=s0;k4<li;k4++)fv+=V[k4];fv/=(li-s0);
+      var refV=V[recoIdx]||0;
+      var v30=0,vn=0;for(var k5=Math.max(0,li-30);k5<li;k5++){v30+=V[k5];vn++;}
+      v30=vn?v30/vn:0;
+      if(!(refV>0&&fv<=refV*1.2))continue;
+      if(!(v30>0&&fv<=v30))continue;
+      // ④c 不破关键支撑
+      var sLo=Infinity;for(var k6=s0;k6<li;k6++){if(L[k6]<sLo)sLo=L[k6];}
+      if(!(sLo>=keyLow*0.995))continue;
+      // ⑤ 突破日:再次放量 + 一阳穿三线 + 平台新高 + 阳线
+      var va5=0;for(var k7=1;k7<=5;k7++)va5+=(V[li-k7]||0);va5/=5;
+      if(!(V[li]>=fv*2&&V[li]>=va5*1.5))continue;
+      if(!(C[li]>O[li]))continue;
+      if(!(ma5[li]!=null&&ma10[li]!=null&&ma20[li]!=null&&C[li]>ma5[li]&&C[li]>ma10[li]&&C[li]>ma20[li]))continue;
+      var hiSince=-Infinity;for(var k8=recoIdx;k8<li;k8++){if(C[k8]>hiSince)hiSince=C[k8];}
+      if(!(C[li]>hiSince))continue;
+      launchIdx=li;break;
     }
   }
   var confirmHigh=H[lastIdx];
@@ -8615,7 +8646,7 @@ function ssqRenderLevels(calc){
     row('推荐日',rd,'红色竖线。只评价这一天之后的走势,避免用后来的结果倒推推荐质量')+
     row('CD 信号',lv.cdPats&&lv.cdPats.length?(lv.cdPats.join('·')+(lv.cdVolOk?' (量能确认)':' (量能未确认)')):'--',
       '九大进场信号:低位出现经典底部形态(笔直大阳/旭日东升/大长腿/十字星/双锤/阳包阴/希望之星/大阴接小阳/新低收阳);量能确认=温和放量')+
-    row('启动信号',lv.launchDate||'--','图7模式⑤「再次放量突破均线」:推荐日后首次 放量(≥前5日均量1.5倍)+一阳穿三线 站上MA5/MA10/MA20 的阳线;粉色圆形标记;无则不标')+
+    row('启动信号',lv.launchDate||'--','图2模式:前期横盘缩量(≥3根,振幅≤8%,量≤推荐日1.2倍且≤30日均量)且不破关键支撑,当日再放量(≥横盘均量2倍且≥5日均量1.5倍)一阳穿三线+创推荐日以来新高;粉色圆形;次日为低吸观察点;无酝酿期不标(防虚假信号)')+
     row('裸K确认参考',lv.confirmHigh,'最新完整日K的高点。价格有效站上,说明突破得到进一步确认;不是自动买入价')+
     row('结构失效参考',lv.failLow,'近10日低点。跌破后,原来的上行结构明显转弱,应重新评估')+
     row('+3% 兑现线',lv.p3!=null?lv.p3:'--','从推荐价出发的统一验证门槛,用来记录结果,不是止盈指令')+
