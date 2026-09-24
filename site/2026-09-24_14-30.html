@@ -3044,7 +3044,7 @@ async function fetchKlineF(code, count) {
   count = count || 70;
   try {
     const url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + code + ',day,,,' + count + ',qfq';
-    const res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, 9000);
+    const res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' }, 9000);
     const txt = await res.text();
     const j = JSON.parse(txt);
     const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
@@ -6276,10 +6276,12 @@ function toggleActivePositions(){ activeOpen=!activeOpen; renderJournalStats(); 
 window.toggleActivePositions=toggleActivePositions;
 // v11.143:入场日期去前导零(2026-09-23 → 2026-9-23,按用户示例格式)
 function fmtEntryDateF(d){ var p=String(d||'').split('-'); return p.length===3?(p[0]+'-'+parseInt(p[1],10)+'-'+parseInt(p[2],10)):String(d||'—'); }
+// v11.144:连续竞价时段校验(09:30-11:30 / 13:00-15:00)—— 盘后/盘前时刻不得冒充入场时间
+function inTradingPeriodF(hm){ var m=parseInt(String(hm).slice(0,2),10)*60+parseInt(String(hm).slice(3,5),10); return (m>=570&&m<=690)||(m>=780&&m<=900); }
 function renderActivePositions(){
   var sm=getShadowMap(),sh=getShortMap(),items=[];
-  for(var c in sm){var r=sm[c];if(r&&r.enabled&&r.entryHit&&!r.settled)items.push({code:c,name:r.name,mode:'swing',entry:r.entry,entryPrice:r.entryPrice,stop:r.stop,target:r.target,entryDate:r.entryDate||r.openedDate,entryType:r.entryType,touchAt:r.touchAt,entryTime:r.entryTime});}
-  for(var c2 in sh){var r2=sh[c2];if(r2&&r2.enabled&&r2.entryHit&&!r2.settled)items.push({code:c2,name:r2.name,mode:'short',entry:r2.entry,entryPrice:r2.entryPrice,stop:(r2.priceStop!=null?r2.priceStop:r2.stop),target:(r2.tp2!=null?r2.tp2:r2.target),entryDate:r2.entryDate||r2.openedDate,entryType:r2.entryType,touchAt:r2.touchAt,entryTime:r2.entryTime});}
+  for(var c in sm){var r=sm[c];if(r&&r.enabled&&r.entryHit&&!r.settled)items.push({code:c,name:r.name,mode:'swing',entry:r.entry,entryPrice:r.entryPrice,stop:r.stop,target:r.target,entryDate:r.entryDate||r.openedDate,entryType:r.entryType,touchAt:r.touchAt});}
+  for(var c2 in sh){var r2=sh[c2];if(r2&&r2.enabled&&r2.entryHit&&!r2.settled)items.push({code:c2,name:r2.name,mode:'short',entry:r2.entry,entryPrice:r2.entryPrice,stop:(r2.priceStop!=null?r2.priceStop:r2.stop),target:(r2.tp2!=null?r2.tp2:r2.target),entryDate:r2.entryDate||r2.openedDate,entryType:r2.entryType,touchAt:r2.touchAt});}
   // v11.143:可回缩 —— 默认收起,点击标题展开明细
   var head='<div class="jrn-archive-head" style="border:1px solid #eef2f7;border-radius:10px;background:#f8fafc;margin-bottom:4px" onclick="toggleActivePositions()">📒 <b>模拟跟踪复盘</b> · 当前持仓 <b>'+items.length+'</b> 笔 <span class="jrn-arc-caret">'+(activeOpen?'▾':'▸')+'</span></div>';
   var tip='<div class="jrn-disc">当前持仓（已入场未结算）。止盈/止损结算后自动迁入「📁 个股历史档案」，此处清零重新开始。</div>';
@@ -6294,8 +6296,9 @@ function renderActivePositions(){
       var price=blk?(parseFloat(blk.getAttribute('data-price'))||0):0;
       var pnl=(price&&it.entry)?(Math.round((price-it.entry)/it.entry*10000)/100):null;
       var etTxt=(it.entryType==='pullback')?'回踩低吸':(it.entryType==='current'?'现价入场':'');
-      // v11.143:入场带时间(触发时刻)与实际入场价 —— 2026-9-23 10:30@13.38（回踩低吸）
-      var et=(it.touchAt||it.entryTime||'');
+      // v11.144:入场时间只认【真实分钟级触发时刻】(touchAt)且必须在连续竞价时段内 ——
+      //   打勾时刻(entryTime,可能是盘后)绝不冒充入场时间;旧样本无 touchAt 则只显示日期,诚实呈现。
+      var et=(it.touchAt&&/^[0-2]\d:[0-5]\d$/.test(it.touchAt)&&inTradingPeriodF(it.touchAt))?it.touchAt:'';
       var ep=(it.entryPrice!=null?it.entryPrice:it.entry);
       rows+='<div class="jrn-row'+(pnl==null?'':(pnl>0?' jrn-pos':(pnl<0?' jrn-neg':'')))+'">'+
         '<span class="jrn-code">'+escHtmlF(String(it.code))+' '+escHtmlF(it.name||'')+(it.mode==='short'?' <b style="color:#b45309">[短线]</b>':' <b style="color:#1d4ed8">[波段]</b>')+'</span>'+
@@ -7856,7 +7859,7 @@ function structSignalCalc(kl, code, name, count, suf){
   for(var i=20;i<=lastComplete;i++){
     var rHi=-Infinity,rLo=Infinity;
     for(var j=Math.max(0,i-60);j<=i;j++){if(H[j]>rHi)rHi=H[j];if(L[j]<rLo)rLo=L[j];}
-    if(((C[i]-rLo)/((rHi-rLo)||1))<0.4){
+    if(((C[i]-rLo)/((rHi-rLo)||1))<0.3){   // v11.144:低位收紧 40%→30%(下跌中继的“半山腰”不再满足低位前提)
       var sig=cdBottomPatternsF(i,O,C,H,L,V);
       if(sig.pats.length){cd.push(i);cdMeta[i]={pats:sig.pats,volOk:sig.volOk};}
     }
@@ -7864,6 +7867,17 @@ function structSignalCalc(kl, code, name, count, suf){
   // v11.135 准确性:CD 与推荐日【配对】——从最近的 CD 往前找,取第一个「其后确实发生 MA5 上穿 MA20 真金叉」的 CD。
   //   原逻辑机械取最后一个 CD,若它之后没出现金叉(如回调新低),推荐日/±3%/±5% 全部落空(600111 实证);
   //   正确语义:最新 CD 尚未确认(无金叉)时,展示最近一组「已确认」的 CD→金叉结构。
+  // v11.144:CD 企稳确认 —— CD 后 5 根内若跌破 CD 当日最低价(容差0.5%),该信号是【下跌中继】而非底部,剔除。
+  //   修复"半山腰误标":此前低位区间(下40%)太宽,下跌途中任何小阳线都被当 CD。
+  var cd2=[],cdMeta2={};
+  for(var di=0;di<cd.length;di++){
+    var ci2=cd[di],okStable=true;
+    for(var sj=ci2+1;sj<=Math.min(ci2+5,lastComplete);sj++){
+      if(L[sj]<L[ci2]*0.995){okStable=false;break;}
+    }
+    if(okStable){cd2.push(ci2);cdMeta2[ci2]=cdMeta[ci2];}
+  }
+  cd=cd2;cdMeta=cdMeta2;
   var recoIdx=null,cdPick=null;
   for(var ci=cd.length-1;ci>=0 && recoIdx==null;ci--){
     for(var i=cd[ci]+1;i<=lastComplete;i++){
@@ -7933,7 +7947,6 @@ function structSignalCalc(kl, code, name, count, suf){
       var a20=V.slice(i-19,i+1).reduce(function(a,b){return a+b;},0)/20;
       bm.push(a20>0?Math.round(a5/a20*100):null);}else bm.push(null);
   }
-  // v11.133:disp 保留【全部已取回数据】(含预热根数,平移/缩放有真实历史可看),
   // 默认视窗(最后 cnt 根)由 drawStructChart 的 SSQ.view 控制,数据不再物理截断。
   var cnt=count||SSQ.count||66;
   var disp={D:D,O:O,C:C,H:H,L:L,V:V,ma5:ma5,ma10:ma10,ma20:ma20,nY:nY,nB:nB,bm:bm,win0:0};
@@ -8198,25 +8211,40 @@ async function runStructQuery(){
   if(!/^\d{6}$/.test(code)){showToast('请输入 6 位个股代码','warn');return;}
   var c0=code.charAt(0);var full=(c0==='6'||c0==='5')?('sh'+code):((c0==='4'||c0==='8'||c0==='9')?('bj'+code):('sz'+code));
   var out=document.getElementById('ssq-out');
-  out.innerHTML='<div class="ssq-empty">查询中…</div>';
+  out.innerHTML='<div class="ssq-empty">查询中…(主源+备用源并行拉取,最长约 9 秒)</div>';
   var period=SSQ.period==='m15'?'m15':(SSQ.period==='m60'?'m60':(SSQ.period==='week'?'week':'day'));
-  var kl=await fetchKlinePeriod(full,period,Math.max(SSQ.count+80,120));   // v11.133:+80 余量(平移可看到范围外历史)
-  if((!kl||kl.length<35)&&period==='day'){ try{ kl=await fetchKlineF(full,Math.max(SSQ.count+80,120)); }catch(e){} }   // v11.132:日线降级三源兜底
-  if(!kl||kl.length<35){out.innerHTML='<div class="ssq-empty">未获取到该代码K线(请确认代码/北交所暂不支持)</div>';return;}
-  // v11.132c:拉真实个股名称(图上标题用);失败降级显示代码,不阻断查询
-  var suf=full.slice(0,2).toUpperCase(),nm='';
+  var suf=full.slice(0,2).toUpperCase();
+  var kl,nm='';
   try{
-    var qres=await fetchWithTimeout('https://qt.gtimg.cn/q='+full,{cache:'no-store'});
-    var qbuf=await qres.arrayBuffer();
-    var qm=new TextDecoder('gbk').decode(qbuf).match(/="([^"]+)"/);
-    if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)nm=String(qf[1]);}
-  }catch(e){}
-  var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
+    // v11.144:①双源并行竞速(原串行最长 18s → 并行 9s) ②成功结果 60s 内存缓存(重复点击秒出) ③整体 try/catch(任何异常都给终态,绝不卡"查询中")
+    SSQ.cache=SSQ.cache||{};
+    var cacheKey=full+'|'+period+'|'+SSQ.count;
+    var hit=SSQ.cache[cacheKey];
+    if(hit&&(Date.now()-hit.t)<60000){
+      kl=hit.kl;
+    }else{
+      var pA=fetchKlinePeriod(full,period,Math.max(SSQ.count+80,120)).catch(function(){return [];});
+      var pB=(period==='day')?fetchKlineF(full,Math.max(SSQ.count+80,120)).catch(function(){return [];}):Promise.resolve([]);
+      var pN=fetchWithTimeout('https://qt.gtimg.cn/q='+full,{cache:'no-store'}).then(function(r){return r.arrayBuffer();}).then(function(b){
+          var qm=new TextDecoder('gbk').decode(b).match(/="([^"]+)"/);
+          if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)return String(qf[1]);}
+          return '';}).catch(function(){return '';});
+      var res=await Promise.all([pA,pB,pN]);
+      kl=res[0];
+      if((!kl||kl.length<35)&&res[1]&&res[1].length>=35)kl=res[1];   // 主源不足35根 → 用备用源
+      nm=res[2]||'';
+      if(kl&&kl.length>=35)SSQ.cache[cacheKey]={t:Date.now(),kl:kl};
+    }
+    if(!kl||kl.length<35){out.innerHTML='<div class="ssq-empty">未获取到该代码K线(请确认代码/北交所暂不支持;数据源偶发限流可稍后重试)</div>';return;}
+    var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
   SSQ.view=null;   // v11.133:新查询重置视窗(默认显示所选范围,再由手势平移/缩放)
   out.innerHTML=ssqRenderParams(calc)+'<div class="ssq-cwrap" id="ssq-canvas-wrap"><canvas id="ssq-canvas"></canvas></div>'+
     '<div class="ssq-legend"><span style="white-space:nowrap"><i style="background:#ef4444"></i>K线(阳空心/阴实心)/MA5</span> <span style="white-space:nowrap"><i style="background:#c084fc"></i>MA20</span> <span style="white-space:nowrap"><i style="color:#f59e0b">▲</i>CD抄底</span> <span style="white-space:nowrap"><i style="background:#ff2d78;border-radius:50%"></i>启动</span> <span style="white-space:nowrap"><span style="color:#ef4444;margin:0 3px 0 8px">┆</span>推荐日</span> <span style="white-space:nowrap"><i style="background:#384250"></i>成交量</span> <span style="white-space:nowrap"><i style="background:#22c55e"></i>资金活跃度</span> <span style="white-space:nowrap;color:#94a3b8">按住看日期</span></div>'+
     ssqRenderLevels(calc);
-  drawStructChart(document.getElementById('ssq-canvas'),calc);
+    drawStructChart(document.getElementById('ssq-canvas'),calc);
+  }catch(e){
+    out.innerHTML='<div class="ssq-empty">查询失败:'+(String(e&&e.message||e)).slice(0,80)+' —— 请稍后重试</div>';
+  }
 }
 window.openStructSignalModal=openStructSignalModal;window.closeStructSignalModal=closeStructSignalModal;
 window.ssqSetP=ssqSetP;window.ssqSetC=ssqSetC;window.runStructQuery=runStructQuery;
