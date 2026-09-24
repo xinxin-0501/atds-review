@@ -2254,7 +2254,7 @@
       <a href="index.html">首页</a><a href="2026-08-17_08-30.html" class="active">盘前</a><a href="2026-08-17_16-20.html">收盘</a><a href="2026-09-24_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 13:00</b>（约 1087 分钟前）</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 13:00），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 83°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 13:00</b>（约 1104 分钟前）</div><h1 class="hero-title">2026-08-17 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 13:00），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 83°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-17 13:00:38</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -8139,7 +8139,7 @@ function openStructSignalModal(){
   if(SSQ.code && !cur){ if(inp)inp.value=SSQ.code; cur=SSQ.code; }
   if(cur && /^\d{6}$/.test(cur)){ SSQ.code=cur; try{ runStructQuery(); }catch(e){} }
 }
-function closeStructSignalModal(){var m=document.getElementById('struct-modal');if(m){m.classList.remove('show');document.body.style.overflow='';}}
+function closeStructSignalModal(){var m=document.getElementById('struct-modal');if(m){m.classList.remove('show');document.body.style.overflow='';}stopStructAutoRefresh();}
 function ssqSetP(btn){SSQ.period=btn.getAttribute('data-p');var sp=document.getElementById('ssq-period');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});if(SSQ.code)runStructQuery();}
 function ssqSetC(btn){SSQ.count=parseInt(btn.getAttribute('data-c'),10)||66;var sp=document.getElementById('ssq-range');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});
   // v11.151:范围切换不重新拉取 —— 日线一次已拉 count+80 根,切范围只改视窗秒级重渲染(根治:原逻辑重新查询,
@@ -8186,10 +8186,11 @@ async function runStructQuery(){
     // v11.148:名称(用于 ST 剔除与图上标题);K线有效后再等名称(通常已并行完成,几乎不额外耗时)
     try{ nm=await namePromise; }catch(e){ nm=''; }
     if(nm && /^\*?ST/i.test(String(nm).trim())){ out.innerHTML='<div class="ssq-empty">暂不支持 ST / 风险警示股（'+escHtmlF(nm)+'），结构信号判定不适用于风险警示股</div>'; return; }
-    SSQ.kl=kl;SSQ.klPeriod=period;SSQ.lastName=nm||code;SSQ.lastSuf=suf;   // v11.151:缓存K线供范围切换复用
+    SSQ.kl=kl;SSQ.klPeriod=period;SSQ.lastName=nm||code;SSQ.lastSuf=suf;SSQ._full=full;   // v11.151:缓存K线供范围切换复用
     var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
   SSQ.view=null;   // v11.133:新查询重置视窗(默认显示所选范围,再由手势平移/缩放)
   renderStructOutput(out,calc);
+  startStructAutoRefresh();   // v11.153:盘中自动刷新(手动搜索查完随行情动态更新)
   }catch(e){
     out.innerHTML='<div class="ssq-empty">查询失败:'+(String(e&&e.message||e)).slice(0,80)+' —— 请稍后重试</div>';
   }
@@ -8209,6 +8210,32 @@ function rerenderStruct(){
     SSQ.view=null;
     renderStructOutput(out,calc);
   }catch(e){ console.warn('[rerenderStruct]',e.message); }
+}
+
+// v11.153:结构信号「盘中自动刷新」—— 手动搜索查完后,交易时段内每 60s 重拉最新日线并重算重渲染,
+//   让 K 线与三大信号(CD/推荐日/启动)随行情动态更新(此前是"一次性快照,查完不自动变")。
+function startStructAutoRefresh(){
+  stopStructAutoRefresh();
+  try{
+    if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle)return;   // 仅连续竞价时段(09:30-11:30/13:00-14:50)
+    SSQ._autoTimer=setInterval(function(){ refreshStructLive(); },60000);
+  }catch(e){}
+}
+function stopStructAutoRefresh(){ if(SSQ._autoTimer){ clearInterval(SSQ._autoTimer); SSQ._autoTimer=null; } }
+function refreshStructLive(){
+  try{
+    if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle){ stopStructAutoRefresh(); return; }
+    if(!SSQ._full||!SSQ.code)return;
+    var out=document.getElementById('ssq-out'); if(!out)return;
+    fetchKlinePeriod(SSQ._full,'day',Math.max(SSQ.count+80,120)).then(function(kl){
+      if(kl&&kl.length>=35){
+        SSQ.kl=kl;
+        // 保留当前视窗(不重置 SSQ.view),仅重算+重渲染 —— 避免自动刷新把用户正在拖动/缩放的视窗跳回默认
+        var calc=structSignalCalc(SSQ.kl,SSQ.code,SSQ.lastName||SSQ.code,SSQ.count,SSQ.lastSuf||'');
+        try{ renderStructOutput(out,calc); }catch(e){}
+      }
+    }).catch(function(){});
+  }catch(e){}
 }
 window.openStructSignalModal=openStructSignalModal;window.closeStructSignalModal=closeStructSignalModal;
 window.ssqSetP=ssqSetP;window.ssqSetC=ssqSetC;window.runStructQuery=runStructQuery;

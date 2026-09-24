@@ -8209,7 +8209,7 @@ function openStructSignalModal(){
   if(SSQ.code && !cur){ if(inp)inp.value=SSQ.code; cur=SSQ.code; }
   if(cur && /^\d{6}$/.test(cur)){ SSQ.code=cur; try{ runStructQuery(); }catch(e){} }
 }
-function closeStructSignalModal(){var m=document.getElementById('struct-modal');if(m){m.classList.remove('show');document.body.style.overflow='';}}
+function closeStructSignalModal(){var m=document.getElementById('struct-modal');if(m){m.classList.remove('show');document.body.style.overflow='';}stopStructAutoRefresh();}
 function ssqSetP(btn){SSQ.period=btn.getAttribute('data-p');var sp=document.getElementById('ssq-period');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});if(SSQ.code)runStructQuery();}
 function ssqSetC(btn){SSQ.count=parseInt(btn.getAttribute('data-c'),10)||66;var sp=document.getElementById('ssq-range');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});
   // v11.151:范围切换不重新拉取 —— 日线一次已拉 count+80 根,切范围只改视窗秒级重渲染(根治:原逻辑重新查询,
@@ -8256,10 +8256,11 @@ async function runStructQuery(){
     // v11.148:名称(用于 ST 剔除与图上标题);K线有效后再等名称(通常已并行完成,几乎不额外耗时)
     try{ nm=await namePromise; }catch(e){ nm=''; }
     if(nm && /^\*?ST/i.test(String(nm).trim())){ out.innerHTML='<div class="ssq-empty">暂不支持 ST / 风险警示股（'+escHtmlF(nm)+'），结构信号判定不适用于风险警示股</div>'; return; }
-    SSQ.kl=kl;SSQ.klPeriod=period;SSQ.lastName=nm||code;SSQ.lastSuf=suf;   // v11.151:缓存K线供范围切换复用
+    SSQ.kl=kl;SSQ.klPeriod=period;SSQ.lastName=nm||code;SSQ.lastSuf=suf;SSQ._full=full;   // v11.151:缓存K线供范围切换复用
     var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
   SSQ.view=null;   // v11.133:新查询重置视窗(默认显示所选范围,再由手势平移/缩放)
   renderStructOutput(out,calc);
+  startStructAutoRefresh();   // v11.153:盘中自动刷新(手动搜索查完随行情动态更新)
   }catch(e){
     out.innerHTML='<div class="ssq-empty">查询失败:'+(String(e&&e.message||e)).slice(0,80)+' —— 请稍后重试</div>';
   }
@@ -8279,6 +8280,32 @@ function rerenderStruct(){
     SSQ.view=null;
     renderStructOutput(out,calc);
   }catch(e){ console.warn('[rerenderStruct]',e.message); }
+}
+
+// v11.153:结构信号「盘中自动刷新」—— 手动搜索查完后,交易时段内每 60s 重拉最新日线并重算重渲染,
+//   让 K 线与三大信号(CD/推荐日/启动)随行情动态更新(此前是"一次性快照,查完不自动变")。
+function startStructAutoRefresh(){
+  stopStructAutoRefresh();
+  try{
+    if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle)return;   // 仅连续竞价时段(09:30-11:30/13:00-14:50)
+    SSQ._autoTimer=setInterval(function(){ refreshStructLive(); },60000);
+  }catch(e){}
+}
+function stopStructAutoRefresh(){ if(SSQ._autoTimer){ clearInterval(SSQ._autoTimer); SSQ._autoTimer=null; } }
+function refreshStructLive(){
+  try{
+    if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle){ stopStructAutoRefresh(); return; }
+    if(!SSQ._full||!SSQ.code)return;
+    var out=document.getElementById('ssq-out'); if(!out)return;
+    fetchKlinePeriod(SSQ._full,'day',Math.max(SSQ.count+80,120)).then(function(kl){
+      if(kl&&kl.length>=35){
+        SSQ.kl=kl;
+        // 保留当前视窗(不重置 SSQ.view),仅重算+重渲染 —— 避免自动刷新把用户正在拖动/缩放的视窗跳回默认
+        var calc=structSignalCalc(SSQ.kl,SSQ.code,SSQ.lastName||SSQ.code,SSQ.count,SSQ.lastSuf||'');
+        try{ renderStructOutput(out,calc); }catch(e){}
+      }
+    }).catch(function(){});
+  }catch(e){}
 }
 window.openStructSignalModal=openStructSignalModal;window.closeStructSignalModal=closeStructSignalModal;
 window.ssqSetP=ssqSetP;window.ssqSetC=ssqSetC;window.runStructQuery=runStructQuery;
