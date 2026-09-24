@@ -3675,7 +3675,10 @@ async function main() {
       const _inWin = _nowHM >= (16 * 60 + 10) && _nowHM <= (17 * 60 + 30);
       if (!_inWin) {
         console.log('[幂等闸] 当日 close 已存在且当前 ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ' 不在收盘窗口内,拒绝覆盖(保持首次采集);窗口内修正或补采历史不受影响,强制重采用 --force-close');
-        process.exit(0);
+        // v11.149:exit 2(专属「幂等跳过」码)而非 exit 0 —— 让本地一键脚本据此【跳过 build+push】,
+        //   根治「幂等闸挡住数据污染、但本地脚本仍白跑重建+无意义 push」的问题。
+        //   (exit 0 会让本地 bat 的 errorlevel 判断误以为采集成功,继续往下白跑)
+        process.exit(2);
       }
     }
   }

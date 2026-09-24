@@ -18,9 +18,16 @@ echo  当前北京时间: %HOUR%  →  报告类型: %TYPE%
 echo.
 echo [1/4] 正在采集数据(午盘含全A选股扫描,可能需 5-15 分钟)...
 node scripts/cloud_fetch.mjs %TYPE%
-if errorlevel 1 (
+set RC=%errorlevel%
+if %RC% EQU 2 (
   echo.
-  echo  [!] 采集失败,请检查网络后重试。
+  echo  [幂等跳过] 当日 %TYPE% 报告已存在且不在采集窗口内,无需重采/推送,直接退出。
+  pause
+  exit /b 0
+)
+if %RC% NEQ 0 (
+  echo.
+  echo  [!] 采集失败(错误码 %RC%),请检查网络后重试。
   pause
   exit /b 1
 )
