@@ -3062,7 +3062,7 @@ async function fetchKlineF(code, count) {
   // 失败兜底:浏览器本地缓存 → 仓库 data/kline_cache.json(GitHub Pages 同源)
   // v11.55:兜底路径必须说明"这是哪天的K线",否则卡片会拿几天前的K线算"当前关键位"却不自知。
   try { var kc2=debouncedRead('atds_kline_cache'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
-  try { var r=await fetch('data/kline_cache.json',{cache:'no-store'}); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
+  try { var r=await fetchWithTimeout('data/kline_cache.json',{cache:'no-store'},3000); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
   return [];
 }
 // 给兜底K线打上"来源"标记(非枚举属性,不会被 JSON.stringify 带进缓存/属性,避免体积膨胀)
@@ -7004,7 +7004,12 @@ function settleShadowTrade(code,klines,minBars){
   //   由上面的日K路径执行。
   //   取不到分钟K时【只留空、不判定】,绝不退回用当日最低。
   if(!rec.settled&&rec.entryHit&&rec.entryDate===today){
-    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.entryTime||null);
+    // v11.147:入场时刻补录 —— touchAt 缺失且打勾时刻在交易时段内时,用当日分钟K找回首次触达时刻(真实数据,不编造)
+    if(!rec.touchAt&&rec.entryTime&&inTradingPeriodF(rec.entryTime)&&minBars&&minBars.length){
+      var _bj=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);
+      if(_bj&&_bj.touched&&_bj.at){ rec.touchAt=_bj.at; rec.entryMinute=_bj.at; }
+    }
+    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.entryTime||null);   // 打勾时刻用于排除打勾前K线(语义正确,勿改 touchAt)
     if(mj){
       if(!rec.trace||!rec.trace.length)rec.trace=[];
       var k3=[];for(var t3=0;t3<rec.trace.length;t3++){if(rec.trace[t3].d!==today)k3.push(rec.trace[t3]);}
@@ -7214,7 +7219,12 @@ function settleShortTradeF(code,rec,sm,klines,minBars,block,ph,today){
   }
   // T+1:入场当日不结算(只记轨迹)
   if(rec.entryDate===today){
-    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.touchAt||rec.entryTime);
+    // v11.147:入场时刻补录(同波段) + 打勾时刻不冒充入场时间
+    if(!rec.touchAt&&rec.entryTime&&inTradingPeriodF(rec.entryTime)&&minBars&&minBars.length){
+      var _bj2=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);
+      if(_bj2&&_bj2.touched&&_bj2.at){ rec.touchAt=_bj2.at; rec.entryMinute=_bj2.at; }
+    }
+    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.entryTime||null);   // 打勾时刻用于排除打勾前K线(勿改 touchAt)
     if(mj)pushTrace({d:today,hi:Math.round(mj.hi*100)/100,lo:Math.round(mj.lo*100)/100,ev:'hold',afterEntry:true,t1:true});
     rec.lastCheck={date:today,price:price,src:'m1',t1:true};
     setShortMap(sm);return;
@@ -8223,10 +8233,16 @@ async function runStructQuery(){
           var qm=new TextDecoder('gbk').decode(b).match(/="([^"]+)"/);
           if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)return String(qf[1]);}
           return '';}).catch(function(){return '';});
-      var res=await Promise.all([pA,pB,pN]);
-      kl=res[0];
-      if((!kl||kl.length<35)&&res[1]&&res[1].length>=35)kl=res[1];   // 主源不足35根 → 用备用源
-      nm=res[2]||'';
+      // v11.147:首个有效结果优先(主源成功立即出图,不等慢源),12s 硬兜底(绝不无限等)
+      var res=await new Promise(function(resolve){
+        var nDone=0,got=null,nmV='';
+        function fin(){ nDone++; if(nDone>=3||got){ resolve([got,nmV]); } }
+        pA.then(function(v){ if(v&&v.length>=35&&!got)got=v; fin(); }).catch(function(){ fin(); });
+        pB.then(function(v){ if(v&&v.length>=35&&!got)got=v; fin(); }).catch(function(){ fin(); });
+        pN.then(function(v){ nmV=v||''; fin(); }).catch(function(){ nmV=''; fin(); });
+        setTimeout(function(){ resolve([got,nmV]); },12000);
+      });
+      kl=res[0];nm=res[1]||'';
       if(kl&&kl.length>=35)SSQ.cache[cacheKey]={t:Date.now(),kl:kl};
     }
     if(!kl||kl.length<35){out.innerHTML='<div class="ssq-empty">未获取到该代码K线(请确认代码/北交所暂不支持;数据源偶发限流可稍后重试)</div>';return;}
