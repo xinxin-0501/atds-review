@@ -2254,7 +2254,7 @@
       <a href="index.html">首页</a><a href="2026-08-21_08-30.html" class="active">盘前</a><a href="2026-08-21_16-20.html">收盘</a><a href="2026-09-24_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 20:36</b>（约 1438 分钟前）</div><h1 class="hero-title">2026-08-21 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 20:36），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 20:36</b>（约 21 分钟前）</div><h1 class="hero-title">2026-08-21 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 20:36），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-21 20:36:34</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -6783,25 +6783,40 @@ function renderJournalStats(){
 }
 
 // v11.141:📒 模拟跟踪复盘 = 当前【未结算的入场持仓】实时视图(波段+短线);止盈/止损结算后自动迁入历史档案,此处清零。
+var activeOpen=false;   // v11.143:模拟跟踪复盘默认收起,点击标题展开明细
+function toggleActivePositions(){ activeOpen=!activeOpen; renderJournalStats(); }
+window.toggleActivePositions=toggleActivePositions;
+// v11.143:入场日期去前导零(2026-09-23 → 2026-9-23,按用户示例格式)
+function fmtEntryDateF(d){ var p=String(d||'').split('-'); return p.length===3?(p[0]+'-'+parseInt(p[1],10)+'-'+parseInt(p[2],10)):String(d||'—'); }
 function renderActivePositions(){
   var sm=getShadowMap(),sh=getShortMap(),items=[];
-  for(var c in sm){var r=sm[c];if(r&&r.enabled&&r.entryHit&&!r.settled)items.push({code:c,name:r.name,mode:'swing',entry:r.entry,stop:r.stop,target:r.target,entryDate:r.entryDate||r.openedDate,entryType:r.entryType});}
-  for(var c2 in sh){var r2=sh[c2];if(r2&&r2.enabled&&r2.entryHit&&!r2.settled)items.push({code:c2,name:r2.name,mode:'short',entry:r2.entry,stop:(r2.priceStop!=null?r2.priceStop:r2.stop),target:(r2.tp2!=null?r2.tp2:r2.target),entryDate:r2.entryDate||r2.openedDate,entryType:r2.entryType});}
-  var tip='<div class="jrn-disc">📒 <b>模拟跟踪复盘</b>：当前持仓 <b>'+items.length+'</b> 笔（已入场未结算）。止盈/止损结算后自动迁入「📁 个股历史档案」，此处清零重新开始。</div>';
-  if(!items.length)return tip+'<div class="jrn-disc">暂无持仓 —— 勾选个股「系统模拟跟踪」，盘中触发入场后在此实时显示。</div>';
-  var rows='';
-  for(var i=0;i<items.length;i++){
-    var it=items[i];
-    var blk=document.querySelector('.wl-detail[data-detail-code="'+it.code+'"] .dc-review[data-review-code="'+it.code+'"]')||document.querySelector('.dc-review[data-review-code="'+it.code+'"]');
-    var price=blk?(parseFloat(blk.getAttribute('data-price'))||0):0;
-    var pnl=(price&&it.entry)?(Math.round((price-it.entry)/it.entry*10000)/100):null;
-    var etTxt=(it.entryType==='pullback')?'回踩低吸':(it.entryType==='current'?'现价入场':'');
-    rows+='<div class="jrn-row'+(pnl==null?'':(pnl>0?' jrn-pos':(pnl<0?' jrn-neg':'')))+'">'+
-      '<span class="jrn-code">'+escHtmlF(String(it.code))+' '+escHtmlF(it.name||'')+(it.mode==='short'?' <b style="color:#b45309">[短线]</b>':' <b style="color:#1d4ed8">[波段]</b>')+'</span>'+
-      '<span class="jrn-flow">入场 '+escHtmlF(it.entryDate||'—')+'@'+it.entry+(etTxt?'（'+etTxt+'）':'')+' → 止损 '+it.stop+' / 止盈 '+it.target+'</span>'+
-      '<span class="jrn-num">'+(pnl==null?'—':((pnl>0?'+':'')+pnl+'%'))+'</span></div>';
+  for(var c in sm){var r=sm[c];if(r&&r.enabled&&r.entryHit&&!r.settled)items.push({code:c,name:r.name,mode:'swing',entry:r.entry,entryPrice:r.entryPrice,stop:r.stop,target:r.target,entryDate:r.entryDate||r.openedDate,entryType:r.entryType,touchAt:r.touchAt,entryTime:r.entryTime});}
+  for(var c2 in sh){var r2=sh[c2];if(r2&&r2.enabled&&r2.entryHit&&!r2.settled)items.push({code:c2,name:r2.name,mode:'short',entry:r2.entry,entryPrice:r2.entryPrice,stop:(r2.priceStop!=null?r2.priceStop:r2.stop),target:(r2.tp2!=null?r2.tp2:r2.target),entryDate:r2.entryDate||r2.openedDate,entryType:r2.entryType,touchAt:r2.touchAt,entryTime:r2.entryTime});}
+  // v11.143:可回缩 —— 默认收起,点击标题展开明细
+  var head='<div class="jrn-archive-head" style="border:1px solid #eef2f7;border-radius:10px;background:#f8fafc;margin-bottom:4px" onclick="toggleActivePositions()">📒 <b>模拟跟踪复盘</b> · 当前持仓 <b>'+items.length+'</b> 笔 <span class="jrn-arc-caret">'+(activeOpen?'▾':'▸')+'</span></div>';
+  var tip='<div class="jrn-disc">当前持仓（已入场未结算）。止盈/止损结算后自动迁入「📁 个股历史档案」，此处清零重新开始。</div>';
+  var body;
+  if(!items.length){
+    body=tip+'<div class="jrn-disc">暂无持仓 —— 勾选个股「系统模拟跟踪」，盘中触发入场后在此实时显示。</div>';
+  }else{
+    var rows='';
+    for(var i=0;i<items.length;i++){
+      var it=items[i];
+      var blk=document.querySelector('.wl-detail[data-detail-code="'+it.code+'"] .dc-review[data-review-code="'+it.code+'"]')||document.querySelector('.dc-review[data-review-code="'+it.code+'"]');
+      var price=blk?(parseFloat(blk.getAttribute('data-price'))||0):0;
+      var pnl=(price&&it.entry)?(Math.round((price-it.entry)/it.entry*10000)/100):null;
+      var etTxt=(it.entryType==='pullback')?'回踩低吸':(it.entryType==='current'?'现价入场':'');
+      // v11.143:入场带时间(触发时刻)与实际入场价 —— 2026-9-23 10:30@13.38（回踩低吸）
+      var et=(it.touchAt||it.entryTime||'');
+      var ep=(it.entryPrice!=null?it.entryPrice:it.entry);
+      rows+='<div class="jrn-row'+(pnl==null?'':(pnl>0?' jrn-pos':(pnl<0?' jrn-neg':'')))+'">'+
+        '<span class="jrn-code">'+escHtmlF(String(it.code))+' '+escHtmlF(it.name||'')+(it.mode==='short'?' <b style="color:#b45309">[短线]</b>':' <b style="color:#1d4ed8">[波段]</b>')+'</span>'+
+        '<span class="jrn-flow">入场 '+escHtmlF(fmtEntryDateF(it.entryDate))+(et?(' '+escHtmlF(et)):'')+'@'+ep+(etTxt?'（'+etTxt+'）':'')+' → 止损 '+it.stop+' / 止盈 '+it.target+'</span>'+
+        '<span class="jrn-num">'+(pnl==null?'—':((pnl>0?'+':'')+pnl+'%'))+'</span></div>';
+    }
+    body=tip+'<div class="jrn-wrap">'+rows+'</div>';
   }
-  return tip+'<div class="jrn-wrap">'+rows+'</div>';
+  return '<div class="jrn-archive'+(activeOpen?' open':'')+'" id="jrn-active">'+head+'<div class="jrn-archive-body">'+body+'</div></div>';
 }
 // v11.76:个股历史档案视图(按股票聚合 journal 中该股的全部模拟跟踪记录)。
 //   ⭐ 独立于观察池:个股被删除/取消勾选/清空跟踪后,这里的档案**永久保留**(除非「清空复盘数据」)。
@@ -8401,6 +8416,10 @@ function structSignalCalc(kl, code, name, count, suf){
       // ④c 不破关键支撑
       var sLo=Infinity;for(var k6=s0;k6<li;k6++){if(L[k6]<sLo)sLo=L[k6];}
       if(!(sLo>=keyLow*0.995))continue;
+      // v11.143 强化(全市场通用,进一步压虚假信号):
+      // ④d 横盘中枢在 MA20 附近或上方(段均收盘 ≥ MA20×0.98)—— 排除下跌趋势中的反弹横盘
+      var midC=0;for(var k9=s0;k9<li;k9++)midC+=C[k9];midC/=(li-s0);
+      if(!(ma20[li]!=null&&midC>=ma20[li]*0.98))continue;
       // ⑤ 突破日:再次放量 + 一阳穿三线 + 平台新高 + 阳线
       var va5=0;for(var k7=1;k7<=5;k7++)va5+=(V[li-k7]||0);va5/=5;
       if(!(V[li]>=fv*2&&V[li]>=va5*1.5))continue;
@@ -8408,6 +8427,10 @@ function structSignalCalc(kl, code, name, count, suf){
       if(!(ma5[li]!=null&&ma10[li]!=null&&ma20[li]!=null&&C[li]>ma5[li]&&C[li]>ma10[li]&&C[li]>ma20[li]))continue;
       var hiSince=-Infinity;for(var k8=recoIdx;k8<li;k8++){if(C[k8]>hiSince)hiSince=C[k8];}
       if(!(C[li]>hiSince))continue;
+      // v11.143 强化:⑤b 突破日为温和放量阳线(实体≤7%) —— 排除脉冲/涨停式大涨(那是模式①,不是低吸启动)
+      if(!((C[li]-O[li])/O[li]<=0.07))continue;
+      // ⑤c MA20 走平或上拐(ma20[li] ≥ ma20[li-2]) —— 排除 MA20 仍向下的趋势内突破
+      if(!(ma20[li-2]!=null&&ma20[li]>=ma20[li-2]))continue;
       launchIdx=li;break;
     }
   }
@@ -8507,12 +8530,15 @@ function drawStructChart(cv, calc){
     ctx.beginPath();ctx.moveTo(x,y-8);ctx.lineTo(x-6,y+2);ctx.lineTo(x+6,y+2);ctx.closePath();ctx.fill();
     ctx.font='bold 9px sans-serif';ctx.fillText('CD',x-6,y+12);ctx.font='9px sans-serif';
   }
-  // v11.140:启动信号(明艳圆形)—— 图7模式⑤「再次放量突破均线」,画在该K线上方,一眼可辨
+  // v11.140:启动信号(明艳圆形)—— 图2模式⑤「再次放量突破均线」,画在该K线上方,一眼可辨
   if(calc.launch!=null&&calc.launch>=vs&&calc.launch<ve){
     var gx=X(calc.launch),gy=Y(d.H[calc.launch])-12;
     ctx.beginPath();ctx.arc(gx,gy,5.5,0,Math.PI*2);
     ctx.fillStyle='#ff2d78';ctx.fill();
     ctx.strokeStyle='#ffe066';ctx.lineWidth=1.5;ctx.stroke();
+    // v11.143:圆下加向下小箭头,直观指向启动K线位置
+    ctx.fillStyle='#ff2d78';
+    ctx.beginPath();ctx.moveTo(gx-4,gy+8);ctx.lineTo(gx+4,gy+8);ctx.lineTo(gx,gy+14);ctx.closePath();ctx.fill();
     ctx.font='bold 9px sans-serif';ctx.fillStyle='#ff2d78';ctx.fillText('启',gx-5,gy-9);
   }
   if(calc.recoDisp!=null&&calc.recoDisp>=vs&&calc.recoDisp<ve){var rx=X(calc.recoDisp);

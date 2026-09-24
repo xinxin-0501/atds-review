@@ -89,20 +89,37 @@ function isTradingDayF(dateStr){
   }catch(e){/* 日历缺失按交易日处理,靠数据驱动兜底纠正 */}
   return true;
 }
-// 告警(节流:同一类告警每天最多发一次,避免刷屏 + 免费版额度)。告警失败绝不阻断采集主流程。
+// 告警(节流 v11.143:双层防轰炸)。告警失败绝不阻断采集主流程。
+//   背景实测:第三方 cron 每 10 分钟一个新进程,原内存节流(_alertSent)每个 run 都重置
+//   ⇒ 同一只股的"三源兜底全失败"每 10 分钟轰炸一条(2026-09-24 用户收到 6+ 条)。
+//   修:①跨进程持久化去重(同 tag+code 同日仅一条,状态落 data/alert_state_cache.json ——
+//      命名带 _cache 自动命中 push_api 的 FORBID_CACHE,本地永不推、云端 Actions 维护);
+//      ②全局冷却:同 tag 距上次发送 < 30 分钟直接跳过。
 var _alertSent={};
-async function sendAlertF(tag,title,desp){
+var _alertState=null;
+function loadAlertState(){
+  if(_alertState)return _alertState;
+  try{ _alertState=JSON.parse(fs.readFileSync(path.join(ROOT,'data','alert_state_cache.json'),'utf8'))||{}; }
+  catch(e){ _alertState={}; }
+  return _alertState;
+}
+function saveAlertState(){ try{ fs.writeFileSync(path.join(ROOT,'data','alert_state_cache.json'),JSON.stringify(_alertState||{}),'utf8'); }catch(e){} }
+async function sendAlertF(tag,title,desp,dedupeKey){
   var key=process.env.SERVERCHAN_SENDKEY||'';
   if(!key)return;
   var today=fmtDate(shanghaiNow());
-  var k=tag+'_'+today;
-  if(_alertSent[k])return;
-  _alertSent[k]=true;
+  var st=loadAlertState();
+  var pk=tag+'_'+(dedupeKey||'')+'_'+today;
+  if(st[pk])return;                                   // 同 tag+dedupeKey 同日:已发过,跳过(跨进程持久)
+  var lastT=st['_ts_'+tag]||0;
+  if(Date.now()-lastT<30*60*1000)return;              // 全局冷却 30 分钟:同 tag 限频
+  _alertSent[pk]=true;
   try{
     var body='title='+encodeURIComponent(String(title).slice(0,32))+'&desp='+encodeURIComponent(String(desp||'').slice(0,4000));
     var r=await fetch('https://sctapi.ftqq.com/'+key+'.send',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=utf-8'},body:body});
     var j=await r.json();
-    console.log('[告警]',j&&j.code===0?'已推送 '+tag:'推送失败 '+(j&&j.message||''));
+    if(j&&j.code===0){ st[pk]=1; st['_ts_'+tag]=Date.now(); saveAlertState(); console.log('[告警] 已推送 '+tag+(dedupeKey?(' ['+dedupeKey+']'):'')); }
+    else console.log('[告警] 推送失败 '+(j&&j.message||''));
   }catch(e){console.warn('[告警] 发送异常(不阻断):',e.message);}
 }
 function slotGuardF(type, targetDate, todayBj, nowHM, slotExists) {
@@ -522,7 +539,7 @@ async function fetchKline(code, count = 250) {
     if (cached && Array.isArray(cached.series) && cached.series.length >= 30) return cached.series;
   } catch (e) { /* 缓存缺失忽略 */ }
   // v11.110:三源兜底(腾讯→东财→新浪)全失败 + 本地缓存也无 ⇒ 告警(节流:每天一次)
-  sendAlertF('source-all-fail', 'ATDS 三源兜底全失败', 'K线数据源(腾讯→东财→新浪)全部失败且无本地缓存: ' + code + '（时间 ' + new Date().toISOString() + '）');
+  sendAlertF('source-all-fail', 'ATDS 三源兜底全失败', 'K线数据源(腾讯→东财→新浪)全部失败且无本地缓存: ' + code + '（时间 ' + new Date().toISOString() + '）\n\n（同股同日仅告警一次;本类告警全局30分钟限频）', code);
   return [];
 }
 
