@@ -2254,7 +2254,7 @@
       <a href="index.html">首页</a><a href="2026-09-10_09-40.html" class="active">盘前</a><a href="2026-09-10_16-20.html">收盘</a><a href="2026-09-24_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:33</b>（约 1367 分钟前）</div><h1 class="hero-title">2026-09-10 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:33），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 18:33</b>（约 1370 分钟前）</div><h1 class="hero-title">2026-09-10 · <span class="hero-time">09:40</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 18:33），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">高温区 · 71°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-10 18:33:21</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -3944,11 +3944,43 @@ function updateWatchlistCardAfterEnrich(code, data){
   var d=stock.querySelector('.wl-detail[data-detail-code]');
   if(d)d.innerHTML=buildDecisionCardHtml(data);
 }
+// v11.154:新浪 K 线 JSONP(script 注入绕 CORS;返回 [date,open,close,high,low,volume],不复权)
+function fetchSinaKlineJSONP(code, count) {
+  return new Promise(function (resolve) {
+    try {
+      var cb = '__sinaK' + Date.now();
+      var sc = document.createElement('script');
+      var done = false;
+      var timer = setTimeout(function () { if (!done) { done = true; cleanup(); resolve([]); } }, 8000);
+      function cleanup() { clearTimeout(timer); try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (sc && sc.parentNode) sc.parentNode.removeChild(sc); }
+      function parseSina(data) {
+        try {
+          var arr = Array.isArray(data) ? data : ((data && data.day) || []);
+          return arr.map(function (x) {
+            if (Array.isArray(x)) return [x[0], +x[1], +x[2], +x[3], +x[4], +x[5] || 0];
+            return [x.day, +x.open, +x.close, +x.high, +x.low, +x.volume || 0];
+          }).filter(function (r) { return r[0] && !isNaN(r[1]); });
+        } catch (e) { return []; }
+      }
+      // ⚠️ 新浪 jsonp_v2 返回「var CB=([数据])」——var 赋值会覆盖 window[cb],必须用 setter 拦截(回调函数会被覆盖,永远不触发)
+      try {
+        Object.defineProperty(window, cb, {
+          configurable: true,
+          set: function (v) { if (done) return; done = true; cleanup(); resolve(parseSina(v)); },
+          get: function () { return undefined; }
+        });
+      } catch (e) { window[cb] = function (data) { if (!done) { done = true; cleanup(); resolve(parseSina(data)); } }; }
+      sc.onerror = function () { if (!done) { done = true; cleanup(); resolve([]); } };
+      sc.src = 'https://quotes.sina.cn/cn/api/jsonp_v2.php/var%20' + cb + '=/CN_MarketDataService.getKLineData?symbol=' + code + '&scale=240&ma=no&datalen=' + Math.min(count || 120, 1023);
+      document.head.appendChild(sc);
+    } catch (e) { resolve([]); }
+  });
+}
 async function fetchKlineF(code, count) {
   count = count || 70;
   try {
     const url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + code + ',day,,,' + count + ',qfq';
-    const res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' }, 9000);
+    const res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' }, 15000);
     const txt = await res.text();
     const j = JSON.parse(txt);
     const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
@@ -3969,10 +4001,16 @@ async function fetchKlineF(code, count) {
       return series;
     }
   } catch (e) {}
+  // v11.154:新浪 JSONP 第三源(script 注入 100% 绕跨域;与腾讯不同网络路径,弱网/腾讯限流时兜底)。
+  //   ⚠️ 新浪该接口返回【不复权】数据 —— 除权股近期K线可能跳变,仅在腾讯不可达时兜底使用(拿到数据胜过拿不到)。
+  try {
+    const sina = await fetchSinaKlineJSONP(code, count);
+    if (sina && sina.length >= 30) return tagKlineSourceF(sina, { src: 'sina', tradeDate: String((sina[sina.length - 1] || [])[0] || ''), capturedAt: '', partial: false });
+  } catch (e) {}
   // 失败兜底:浏览器本地缓存 → 仓库 data/kline_cache.json(GitHub Pages 同源)
   // v11.55:兜底路径必须说明"这是哪天的K线",否则卡片会拿几天前的K线算"当前关键位"却不自知。
   try { var kc2=debouncedRead('atds_kline_cache'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
-  try { var r=await fetchWithTimeout('data/kline_cache.json',{cache:'no-store'},3000); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
+  try { var r=await fetchWithTimeout('data/kline_cache.json',{cache:'no-store'},6000); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
   return [];
 }
 // 给兜底K线打上"来源"标记(非枚举属性,不会被 JSON.stringify 带进缓存/属性,避免体积膨胀)
@@ -8723,7 +8761,7 @@ function cdBottomPatternsF(i,O,C,H,L,V){
 async function fetchKlinePeriod(code, period, count){
   var url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + encodeURIComponent(code) + ',' + period + ',,,' + count + ',qfq';
   try{
-    var res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' }, 9000);   // v11.134:no-store 确保每日/每次查询都拉最新,不被浏览器缓存
+    var res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' }, 15000);   // v11.134:no-store;v11.154:9s→15s(弱网 2G 下 9s 拉不完)
     var txt = await res.text();
     var j = JSON.parse(txt);
     var d = j && j.data && j.data[code];
@@ -9132,7 +9170,7 @@ async function runStructQuery(){
   if(!/^\d{6}$/.test(code)){showToast('请输入 6 位个股代码','warn');return;}
   var c0=code.charAt(0);var full=(c0==='6'||c0==='5')?('sh'+code):((c0==='4'||c0==='8'||c0==='9')?('bj'+code):('sz'+code));
   var out=document.getElementById('ssq-out');
-  out.innerHTML='<div class="ssq-empty">查询中…(主源+备用源并行拉取,最长约 9 秒)</div>';
+  out.innerHTML='<div class="ssq-empty">查询中…(弱网下最长约 30 秒,请稍候)</div>';
   // v11.148:北交所拦截(与加股一致:92/83/87/88 缺历史K线,无法算MA/ATR等指标)
   if(isBJCode(code)){ out.innerHTML='<div class="ssq-empty">暂不支持北交所股票(缺历史K线,无法计算MA/ATR等指标,且 30% 涨跌幅破坏风控)</div>'; return; }
   var period=SSQ.period==='m15'?'m15':(SSQ.period==='m60'?'m60':(SSQ.period==='week'?'week':'day'));
@@ -9158,7 +9196,7 @@ async function runStructQuery(){
         function fin(){ nDone++; if(nDone>=2||got){ resolve(got); } }
         pA.then(function(v){ if(v&&v.length>=35&&!got)got=v; fin(); }).catch(function(){ fin(); });
         pB.then(function(v){ if(v&&v.length>=35&&!got)got=v; fin(); }).catch(function(){ fin(); });
-        setTimeout(function(){ resolve(got); },12000);
+        setTimeout(function(){ resolve(got); },32000);   // v11.154:12s→32s(弱网下 pB 降级链最坏 ~30s)
       });
       if(kl&&kl.length>=35)SSQ.cache[cacheKey]={t:Date.now(),kl:kl};
     }
