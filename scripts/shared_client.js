@@ -1509,7 +1509,29 @@ function restoreSavedWatchlist(){
     }
   })();
 }
-if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
+// v11.155:回退 09-25(中秋休市)产生的虚假入场 —— 休市日无成交,entryDate=2026-09-25 均为脏数据;
+//   回退为未入场(计划参数保留),下一交易日(09-28)打开页面时由回补路径按真实触及重新判定入场(届时带分钟级 touchAt)。
+function purgeFakeEntries0925(){
+  try{
+    if(localStorage.getItem('atds_purged_0925'))return;
+    var fixed=[];
+    ['atds_shadow','atds_shadow_short'].forEach(function(key){
+      var m;try{m=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){m={};}
+      var hit=false;
+      for(var c in m){
+        var r=m[c];
+        if(r&&r.entryHit&&r.entryDate==='2026-09-25'&&!r.settled){
+          r.entryHit=false;delete r.entryDate;delete r.entryPrice;delete r.touchAt;delete r.entryMinute;
+          fixed.push(c+'('+(key==='atds_shadow'?'波段':'短线')+')');hit=true;
+        }
+      }
+      if(hit)localStorage.setItem(key,JSON.stringify(m));
+    });
+    localStorage.setItem('atds_purged_0925','1');
+    if(fixed.length)console.log('[v11.155] 已回退 09-25 休市日虚假入场(将于下一交易日重新按门控判定):',fixed.join('、'));
+  }catch(e){}
+}
+if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{purgeBJData();}catch(e){}} ,100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
 
 /* ============ 观察池实时行情刷新(电脑关机后手机端仍可刷新) ============ */
 function escHtmlR(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -3422,8 +3444,12 @@ function bjNowHM(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(
      14:50-15:00  尾盘风控  新触发一律停止;【例外】短线模式的时间止损(T+3纪律)在此执行
      15:00 之后   盘后复盘  只允许用【定型日K】结算(K路径);卡片实时字段(路径②)一律禁用
    周末整日 closed。节假日无法本地识别(接受残余风险,由 K 线数据自然缺日兜底)。 */
+var HOLIDAYS_CN = ['2026-09-25','2026-10-01','2026-10-02','2026-10-05','2026-10-06','2026-10-07'];   // v11.155:与 scripts/trading_calendar.json 同步(2026 中秋+国庆);新增年份须手动补
 function tradingPhaseF(){
   var d = new Date(Date.now() + 8 * 3600 * 1000);
+  var _ty = d.getUTCFullYear(), _tm = d.getUTCMonth() + 1, _td = d.getUTCDate();
+  var _today = _ty + '-' + (_tm < 10 ? '0' : '') + _tm + '-' + (_td < 10 ? '0' : '') + _td;
+  if (HOLIDAYS_CN.indexOf(_today) >= 0) return { phase: 'closed', canSettle: false, klineReview: false, allowTimeStop: false, label: '法定节假日休市' };   // v11.155:休市日不判入场/不结算/不回补(实测 09-25 中秋虚假入场)
   var dow = d.getUTCDay();
   var hm = d.getUTCHours() * 60 + d.getUTCMinutes();
   if (dow === 0 || dow === 6) return { phase: 'closed', canSettle: false, klineReview: true, allowTimeStop: false, label: '周末休市' };
