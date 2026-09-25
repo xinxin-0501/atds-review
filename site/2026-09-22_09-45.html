@@ -2254,7 +2254,7 @@
       <a href="index.html">首页</a><a href="2026-09-22_09-45.html" class="active">盘前</a><a href="2026-09-22_16-20.html">收盘</a><a href="2026-09-22_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 10:12</b>（约 687 分钟前）</div><h1 class="hero-title">2026-09-22 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn hero-warn-late">⛔ 补采数据 —— 本页标称 <b>09:45 盘前简报</b>,实际采集于 <b>10:12</b>,内容是该时刻的实时快照,<b>不是 09:45 的盘面</b>。请勿据此判断当时盘中信号。</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 90°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 10:12</b>（约 720 分钟前）</div><h1 class="hero-title">2026-09-22 · <span class="hero-time">09:45</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn hero-warn-late">⛔ 补采数据 —— 本页标称 <b>09:45 盘前简报</b>,实际采集于 <b>10:12</b>,内容是该时刻的实时快照,<b>不是 09:45 的盘面</b>。请勿据此判断当时盘中信号。</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">过热区 · 90°</span></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-09-22 10:12:11</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600487"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -8886,6 +8886,21 @@ function structSignalCalc(kl, code, name, count, suf){
       var hiC=-Infinity,loC=Infinity;
       for(var k3=s0;k3<li;k3++){if(C[k3]>hiC)hiC=C[k3];if(C[k3]<loC)loC=C[k3];}
       if(!(loC>0&&(hiC-loC)/loC<=0.08))continue;
+      // v11.156:横盘段必须【全程缩量】—— 段内任一根量比>1.1 即不算缩量横盘。
+      //   实测南华生物:推荐日(08-07)后第3根(08-12)被标启动,实为金叉放量行情的直接延续
+      //   (横盘段首根 08-10 量比 1.30>1.1);真正的启动是 09-17 横盘一个月后的爆量突破。
+      //   对照:百亚横盘段量比 0.92~0.96、移远 0.47~0.98,全程缩量不受影响。
+      if(s0>=5){
+        var maxVR=0;
+        for(var kvr=s0;kvr<li;kvr++){
+          var base=(V[kvr-1]+V[kvr-2]+V[kvr-3]+V[kvr-4]+V[kvr-5])/5;
+          if(base>0){ var vr2=V[kvr]/base; if(vr2>maxVR)maxVR=vr2; }
+        }
+        // 蓄势深度规则:横盘越久容忍越宽(2根→1.00,6根→1.30) —— 2根横盘必须全程缩量(拦金叉延续),
+        //   长横盘允许偶发放量试探(南华 09-17 横盘段 max 1.24 放行)
+        var vrThresh = 1.0 + (flatN - 2) * 0.075;
+        if(!(maxVR<=vrThresh))continue;
+      }
       // ④b 缩量:段均量 ≤ 推荐日量×1.2 且 ≤ 近30日均量
       var fv=0;for(var k4=s0;k4<li;k4++)fv+=V[k4];fv/=(li-s0);
       var refV=V[recoIdx]||0;
@@ -8908,10 +8923,11 @@ function structSignalCalc(kl, code, name, count, suf){
       if(!(V[li]>=fv*1.8||V[li]>=va5*1.5))continue;
       if(!(C[li]>O[li]))continue;
       // v11.152:突破日实体≥1% —— 排除十字星假突破(实测福能股份 09-11 实体仅0.2%被标启动,随后回落)
-      if(!((C[li]-O[li])/O[li]>=0.01))continue;
+      if(!((C[li]-O[li])/O[li]>=0.004))continue;   // v11.156:下限 1%→0.4% —— 0.4% 在福能(0.2%十字星,拦)与百亚(0.5%小阳启动,放行)之间取界
       if(!(ma5[li]!=null&&ma10[li]!=null&&ma20[li]!=null&&C[li]>ma5[li]&&C[li]>ma10[li]&&C[li]>ma20[li]))continue;
       // v11.143 强化:⑤b 突破日为温和放量阳线(实体≤7%) —— 排除脉冲/涨停式大涨(那是模式①,不是低吸启动)
-      if(!((C[li]-O[li])/O[li]<=0.07))continue;
+      // v11.156:移除实体上限7% —— 实测南华生物 09-17 实体10.2%的爆量长阳正是模式⑤启动(横盘一个月后),
+      //   上限会把它漏掉;防脉冲由横盘期条件把关(振幅≤8%要求突破前真的横住)
       // ⑤c MA20 走平或上拐(ma20[li] ≥ ma20[li-2]) —— 排除 MA20 仍向下的趋势内突破
       if(!(ma20[li-2]!=null&&ma20[li]>=ma20[li-2]))continue;
       launchIdx=li;break;
