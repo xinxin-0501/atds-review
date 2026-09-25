@@ -629,6 +629,9 @@
 /* v11.35:入场方式分组统计 + 样本备份/恢复 */
 .jrn-types{margin-top:3px;color:#6b5b2e}
 .jrn-types b{color:#8a6d3b}
+.jrn-summary{background:#f8fafc;border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;margin:4px 0 6px}
+.jrn-summary .jrn-disc{margin:0}
+.jrn-summary .jrn-types{margin-top:4px}
 .jrn-bk{margin-top:4px;padding-top:4px;border-top:1px dashed #ecdca8}
 .jrn-bk-hint{color:#8a7a4e;font-size:9px;line-height:1.6;overflow-wrap:anywhere}
 .jrn-ta{width:100%;box-sizing:border-box;height:64px;margin-top:3px;font-size:9px;line-height:1.4;color:#555;background:#fff;border:1px solid #e6d3a3;border-radius:5px;padding:4px 6px;resize:vertical;font-family:monospace;overflow-wrap:anywhere}
@@ -754,31 +757,7 @@
 .sp-row{font-size:11px;color:#334155;line-height:1.6}
 .sp-row b{color:#0f172a}
 .sp-ban{font-size:10px;color:#991b1b;font-weight:800;margin-left:6px}
-/* v11.82 盘前「今日已入场」悬浮弹窗(只读) */
-.entry-fab{position:fixed;right:14px;bottom:84px;z-index:9990;background:#1d4ed8;color:#fff;border:none;border-radius:22px;padding:10px 16px;font-size:13px;font-weight:800;box-shadow:0 4px 14px rgba(29,78,216,.4);cursor:pointer;touch-action:none;user-select:none;max-width:70vw;white-space:nowrap;width:auto;min-width:0}
-.entry-fab.has{background:#dc2626}
-.entry-pop{position:fixed;left:0;right:0;bottom:0;z-index:9991;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -4px 24px rgba(0,0,0,.18);max-height:70vh;display:none;flex-direction:column}
-.entry-pop.show{display:flex}
-.entry-pop-h{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eef2f7;font-size:15px;font-weight:800;color:#0f172a}
-.entry-pop-close{font-size:12px;color:#64748b;cursor:pointer;padding:2px 8px;border:1px solid #e2e8f0;border-radius:12px}
-.entry-pop-body{overflow-y:auto;padding:8px 12px}
-.entry-item{position:relative;border:1px solid #eef2f7;border-radius:10px;padding:8px 10px;margin-bottom:8px;cursor:pointer;background:#fafbfc}
-.entry-item-main{display:flex;align-items:baseline;gap:6px;flex-wrap:nowrap;overflow:hidden}
-.entry-name{font-size:14px;font-weight:800;color:#0f172a}
-.entry-code{font-size:10px;color:#94a3b8}
-.entry-price{font-size:14px;font-weight:800;margin-left:auto;white-space:nowrap}
-.entry-pct{font-size:12px;font-weight:700;white-space:nowrap;min-width:50px;text-align:right}
-.entry-item-sub{font-size:11px;color:#475569;margin-top:3px;line-height:1.5}
-.entry-fl{font-size:13px;font-weight:900;white-space:nowrap;min-width:46px;text-align:right}
-.entry-fl-up{color:#dc2626}.entry-fl-down{color:#16a34a}
-.entry-empty{padding:28px 10px;text-align:center;color:#94a3b8;font-size:13px}
-.entry-sec-h{font-size:12px;font-weight:800;color:#334155;margin:10px 2px 6px;padding-left:6px;border-left:3px solid #94a3b8}
-.entry-sec-h.win{border-left-color:#dc2626;color:#dc2626}
-.entry-sec-h.loss{border-left-color:#16a34a;color:#16a34a}
-.entry-tag-short{font-style:normal;font-size:9px;color:#fff;background:#b45309;border-radius:4px;padding:1px 4px;margin-left:4px}
-.entry-tag-swing{font-style:normal;font-size:9px;color:#fff;background:#1d4ed8;border-radius:4px;padding:1px 4px;margin-left:4px}
 .eye-warn{margin:8px 12px;padding:8px 10px;background:#fef2f2;border:1px solid #fecaca;color:#dc2626;font-size:12px;font-weight:800;border-radius:8px}
-.wl-stock.entry-flash{outline:3px solid #f59e0b;outline-offset:-3px}
 
 /* v11.83 尾盘定调快照入口横幅 */
 .ts-banner{display:block;margin:10px 12px 0;padding:10px 12px;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;border-radius:10px;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 2px 8px rgba(249,115,22,.35);line-height:1.5}
@@ -791,7 +770,6 @@
 .jrn-archive-body{display:none;padding:8px 12px}
 .jrn-archive.open .jrn-archive-body{display:block}
 
-.entry-sort{font-size:11px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:2px 9px;cursor:pointer;user-select:none;font-weight:700}
 
 /* v11.111 全市场信号雷达(盘前弹窗) */
 .sr-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}
@@ -2280,7 +2258,7 @@
       <a href="index.html">首页</a><a href="2026-08-19_08-30.html">盘前</a><a href="2026-08-19_11-35.html" class="active">盘中<i class="nav-retired">已停</i></a><a href="2026-08-19_15-20.html">收盘</a><a href="2026-09-24_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照 · <b>数据时间 20:36</b>（约 1325 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">18:41</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 20:36），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">中温区 · 58°</span></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 午盘快照 · <b>数据时间 20:36</b>（约 156 分钟前）</div><h1 class="hero-title">2026-08-19 · <span class="hero-time">11:35</span><span class="hero-clock">现在 <b id="rt-hero-time">23:12</b></span></h1><div class="hero-sub">指数每 60 秒刷新；涨跌家数 / 成交额 / 涨停 / 板块为快照数据，不随刷新变化</div><div class="hero-warn">⚠️ 收盘后补采（实际数据时点 20:36），非当日 11:35 盘中快照</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div><div class="hero-tags"><span class="hero-temp-tag">中温区 · 58°</span></div></div>
 <a class="ts-banner" href="2026-09-24_14-30.html">📋 14:30 尾盘定调快照已生成（四大选股 · 盘中未定型 · 非最终结果）→ 立即查看</a>
 <div class="section">
 <div class="close-emotion"><div class="ce-eyebrow">A 股收盘 · 主线与情绪复盘</div><div class="ce-title">2026-08-19 午盘快照 · 实时更新中</div><div class="ce-top-panel"><div class="ce-top-left"><div class="ce-temp">58°</div><div class="ce-stage">中温区 · 情绪正常</div><div class="ce-fact">主特征: 结构性机会</div></div><div class="ce-top-right"><div class="ce-top-stat"><span class="ce-stat-icon">🔴</span><span class="ce-stat-label">红盘</span><span class="ce-stat-val">7%</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🔥</span><span class="ce-stat-label">涨停</span><span class="ce-stat-val">36</span></div><div class="ce-top-stat"><span class="ce-stat-icon">🟢</span><span class="ce-stat-label">跌停</span><span class="ce-stat-val">0</span></div><div class="ce-top-desc">广度与接力双强,非诱多</div></div></div><div class="card"><div class="card-title">01 情绪指标</div><div class="ce-emotion-grid"><div class="ce-emotion-card"><div class="ce-emo-num">36</div><div class="ce-emo-label">涨停</div></div><div class="ce-emotion-card"><div class="ce-emo-num">≈75%</div><div class="ce-emo-label">封板率</div></div><div class="ce-emotion-card"><div class="ce-emo-num">3板</div><div class="ce-emo-label">最高度</div></div><div class="ce-emotion-card"><div class="ce-emo-num">19%</div><div class="ce-emo-label">连板晋级率</div></div></div></div><div class="card"><div class="card-title">02 市场广度与指数结构</div><div class="ce-broad-grid"><div class="ce-broad-left"><div class="ce-breadth-row"><div class="ce-breadth-stat up"><div class="ce-bs-label">上涨</div><div class="ce-bs-num">487</div></div><div class="ce-breadth-stat down"><div class="ce-bs-label">下跌</div><div class="ce-bs-num">6162</div></div><div class="ce-breadth-stat flat"><div class="ce-bs-label">平盘</div><div class="ce-bs-num">33</div></div></div><div class="ce-breadth-bar"><div class="ce-bar-up" style="flex:487"></div><div class="ce-bar-flat" style="flex:33"></div><div class="ce-bar-down" style="flex:6162"></div></div><div class="ce-breadth-meta"><span>红盘率 <b>7%</b></span><span>成交额 <b>25110亿</b> (沪深合计)</span></div></div><div class="ce-broad-right"><div class="ce-index-block"><div class="ce-block-h">指数表现</div><div class="ce-idx-row" data-code="000001" data-prefix="sh"><span class="ce-idx-name">上证指数</span><span class="ce-idx-val down">-2.40%</span><span class="ce-idx-price">3894.42</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:72%"></div></div></div><div class="ce-idx-row" data-code="399001" data-prefix="sz"><span class="ce-idx-name">深证成指</span><span class="ce-idx-val down">-5.01%</span><span class="ce-idx-price">13890.15</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:100%"></div></div></div><div class="ce-idx-row" data-code="399006" data-prefix="sz"><span class="ce-idx-name">创业板指</span><span class="ce-idx-val down">-6.26%</span><span class="ce-idx-price">3473.49</span><div class="ce-idx-bar"><div class="ce-idx-bar-fill down" style="width:100%"></div></div></div><div class="ce-block-hint">量能维持在 2 万亿上方 (25110 亿)</div></div></div></div></div><div class="card"><div class="card-title">03 主线强度与资金流向</div><div class="ce-flow-grid"><div class="ce-flow-item"><div class="ce-ml-block"><div class="ce-block-h">主线强度</div><div class="ce-ml-row"><span class="ce-ml-name">农产品加</span><span class="ce-ml-val up">+6.9%</span></div><div class="ce-ml-row"><span class="ce-ml-name">焦炭Ⅱ</span><span class="ce-ml-val up">+5.3%</span></div><div class="ce-ml-row"><span class="ce-ml-name">房地产服</span><span class="ce-ml-val up">+5.3%</span></div></div></div><div class="ce-flow-item"><div class="ce-mi-block"><div class="ce-block-h">主力净流入(亿元)</div><div class="ce-mi-row"><span class="ce-mi-name">农产品加</span><span class="ce-ml-val up">+6.9亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">焦炭Ⅱ</span><span class="ce-ml-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">房地产服</span><span class="ce-ml-val up">+5.3亿</span></div><div class="ce-mi-row"><span class="ce-mi-name">化学制药</span><span class="ce-ml-val up">+5.3亿</span></div></div></div><div class="ce-flow-item"><div class="ce-block-h">📌 结论</div><div class="ce-flow-conclusion">宽度 × 高度 × 资金<br>三维共振,确认主线。</div></div></div></div><div class="card bt-card-outer"><div class="card-title"><span class="bt-eyebrow">04</span> 涨停梯队 + 主线研判 + 关注锚点 + 板块强弱 + 资金切换<span class="bt-time">· 11:35</span></div><div class="bt-banner"><span class="bt-b-dot"></span><b>实时追踪 · 主力资金 · 连板梯队</b><span class="bt-b-tip">盘后接力判断 · 主线确认 · 风险提示</span></div><div class="bt-row"><div class="bt-card bt-3"><div class="bt-lv">3板</div><div class="bt-name">金健米业</div><div class="bt-sub">三板高度</div></div><div class="bt-card bt-2"><div class="bt-lv">2板</div><div class="bt-name">日丰股份</div><div class="bt-sub">二板</div></div><div class="bt-card bt-1"><div class="bt-lv">1板</div><div class="bt-name">罗普斯金</div><div class="bt-sub">首板</div></div><div class="bt-card bt-new"><div class="bt-lv">断板</div><div class="bt-name">--</div><div class="bt-sub">断板</div></div><div class="bt-card bt-zb"><div class="bt-lv">炸板</div><div class="bt-name">--</div><div class="bt-sub">炸板</div></div></div><div class="bt-struct-note"><b>结构辨证</b>:农产品加 今日最高 3板(龙头 金健米业),板块 +10.0% / 资金 +0.0亿;农化制品 +10.0% 居次,电网设备 +15.0% 第三,焦炭Ⅱ +10.0%。梯队高度 3板,情绪 58°(中温区),注意高位分歧与一致兑现风险。</div><div class="vt-section"><div class="vt-h">② 主线研判</div><div class="vt-line"><span class="vt-rank">①</span><b>农产品加</b> — 穿越板块总龙头(<b class="up">金健米业 3板</b>)<div class="vt-desc">板块 +10.02%、资金 +0.0亿,0家涨停,龙头 金健米业 领涨,是当前情绪总龙头,注意高位分歧。</div></div><div class="vt-line"><span class="vt-rank">②</span><b>农化制品</b> — 今日次强爆发(<b class="up">红四方</b>)<div class="vt-desc">板块 +10.02%、资金 +0.0亿,0家涨停,龙头 红四方 领涨,为二线主线。</div></div><div class="vt-line"><span class="vt-rank">③</span><b>电网设备</b> — 梯队成形<div class="vt-desc">板块 +15.03%、资金 +0.0亿,0家涨停,龙头 日丰股份。</div></div><div class="vt-line"><span class="vt-rank">④</span><b>焦炭Ⅱ</b> — 资金主节奏<div class="vt-desc">板块 +10.04%、资金 +0.0亿,0家涨停,关注承接力度。</div></div></div><div class="vt-section"><div class="vt-h">③ 午后·明日观察锚</div><ul class="vt-anchors"><li><span class="vt-tag">金健米业 3板</span>农产品加 板块 +10.0% 领涨,龙头 金健米业 表态,关注能否延续 3 板穿越</li><li><span class="vt-tag">红四方</span>农化制品 今日次强,龙头 红四方 领涨,观察明日能否接力</li><li><span class="vt-tag">日丰股份</span>电网设备 梯队成形,资金 净流入 0.0亿,关注持续性</li><li><span class="vt-tag">宝泰隆</span>焦炭Ⅱ 板块 +10.0%,资金 净流入 0.0亿,高位注意回撤</li><li><span class="vt-tag">炸板监控</span>今日炸板 12家,炸板率超 40% 需警惕情绪退潮</li><li><span class="vt-tag">量能验证</span>成交额 25110亿,关注量能能否维持</li></ul></div><div class="bd-section"><div class="bd-h">④ 板块强弱 · 3最强 · 3分歧 · 3流出</div><table class="bd-tbl"><thead><tr><th>#</th><th>板块</th><th>涨幅</th><th>资金</th><th>方向</th></tr></thead><tbody><tr class="bd-seg-h bd-seg-1"><td colspan="5"><span class="bd-seg-num">1</span><b>最强</b> · 一字带动 · 龙头确立</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">化学制药</td><td class="up">+16.65%</td><td class="up">+10.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">电网设备</td><td class="up">+15.03%</td><td class="up">+9.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">厨卫电器</td><td class="up">+13.32%</td><td class="up">+8.0亿</td><td><span class="bd-seg-pill bd-seg-pill-1">最强</span></td></tr><tr class="bd-seg-h bd-seg-2"><td colspan="5"><span class="bd-seg-num">2</span><b>分歧</b> · 资金流入但涨幅收敛</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">房地产服</td><td class="up">+10.10%</td><td class="up">+6.1亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">装修建材</td><td class="up">+10.07%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">中药Ⅱ</td><td class="up">+10.07%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-2">分歧</span></td></tr><tr class="bd-seg-h bd-seg-3"><td colspan="5"><span class="bd-seg-num">3</span><b>流出</b> · 退潮 / 资金撤离</td></tr><tr><td class="bd-rank">1</td><td class="bd-cat">焦炭Ⅱ</td><td class="up">+10.04%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">2</td><td class="bd-cat">通用设备</td><td class="up">+10.03%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr><tr><td class="bd-rank">3</td><td class="bd-cat">农产品加</td><td class="up">+10.02%</td><td class="up">+6.0亿</td><td><span class="bd-seg-pill bd-seg-pill-3">流出</span></td></tr></tbody></table></div><div class="msw-card"><div class="msw-h">⑤ 资金切换信号(今日核心)</div><div class="msw-row"><span class="msw-tag msw-tag-def">防御</span><div class="msw-vals"><span class="up">+0.00%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-row"><span class="msw-tag msw-tag-ag">农产品加</span><div class="msw-vals"><span class="up">+10.02%</span> · <span class="up">资金 +0.0亿</span></div></div><div class="msw-note">今日主力净流入最强:农产品加 +0.0亿;资金承接方向切换至 农产品加 / 防御</div><div class="msw-nums"><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">农产品加</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">农化制品</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">电网设备</div></div><div class="msw-num"><div class="msw-num-v up">+0.0亿</div><div class="msw-num-l">焦炭Ⅱ</div></div></div><div class="msw-foot">主力净流入(亿元)取自东财行业板块口径(真实值,非估算):农产品加、农化制品、电网设备、焦炭Ⅱ 居前;防御(防御)与农业(农产品加)为资金切换承接方向,谨防一致兑现。</div></div><div class="hint">今日核心:资金切换信号 + 板块强弱 + 主线研判 三维判断;午后-明日 6 项锚点紧盯龙头表态。</div></div><div class="ce-banner">🔥 高温普涨不是诱多;主攻仍看主线板块,明日验证资金与量能能否继续共振。</div></div>
@@ -4285,11 +4263,43 @@ function updateWatchlistCardAfterEnrich(code, data){
   var d=stock.querySelector('.wl-detail[data-detail-code]');
   if(d)d.innerHTML=buildDecisionCardHtml(data);
 }
+// v11.154:新浪 K 线 JSONP(script 注入绕 CORS;返回 [date,open,close,high,low,volume],不复权)
+function fetchSinaKlineJSONP(code, count) {
+  return new Promise(function (resolve) {
+    try {
+      var cb = '__sinaK' + Date.now();
+      var sc = document.createElement('script');
+      var done = false;
+      var timer = setTimeout(function () { if (!done) { done = true; cleanup(); resolve([]); } }, 8000);
+      function cleanup() { clearTimeout(timer); try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (sc && sc.parentNode) sc.parentNode.removeChild(sc); }
+      function parseSina(data) {
+        try {
+          var arr = Array.isArray(data) ? data : ((data && data.day) || []);
+          return arr.map(function (x) {
+            if (Array.isArray(x)) return [x[0], +x[1], +x[2], +x[3], +x[4], +x[5] || 0];
+            return [x.day, +x.open, +x.close, +x.high, +x.low, +x.volume || 0];
+          }).filter(function (r) { return r[0] && !isNaN(r[1]); });
+        } catch (e) { return []; }
+      }
+      // ⚠️ 新浪 jsonp_v2 返回「var CB=([数据])」——var 赋值会覆盖 window[cb],必须用 setter 拦截(回调函数会被覆盖,永远不触发)
+      try {
+        Object.defineProperty(window, cb, {
+          configurable: true,
+          set: function (v) { if (done) return; done = true; cleanup(); resolve(parseSina(v)); },
+          get: function () { return undefined; }
+        });
+      } catch (e) { window[cb] = function (data) { if (!done) { done = true; cleanup(); resolve(parseSina(data)); } }; }
+      sc.onerror = function () { if (!done) { done = true; cleanup(); resolve([]); } };
+      sc.src = 'https://quotes.sina.cn/cn/api/jsonp_v2.php/var%20' + cb + '=/CN_MarketDataService.getKLineData?symbol=' + code + '&scale=240&ma=no&datalen=' + Math.min(count || 120, 1023);
+      document.head.appendChild(sc);
+    } catch (e) { resolve([]); }
+  });
+}
 async function fetchKlineF(code, count) {
   count = count || 70;
   try {
     const url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + code + ',day,,,' + count + ',qfq';
-    const res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, 9000);
+    const res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' }, 15000);
     const txt = await res.text();
     const j = JSON.parse(txt);
     const series = j && j.data && j.data[code] && (j.data[code].qfqday || j.data[code].day);
@@ -4310,10 +4320,16 @@ async function fetchKlineF(code, count) {
       return series;
     }
   } catch (e) {}
+  // v11.154:新浪 JSONP 第三源(script 注入 100% 绕跨域;与腾讯不同网络路径,弱网/腾讯限流时兜底)。
+  //   ⚠️ 新浪该接口返回【不复权】数据 —— 除权股近期K线可能跳变,仅在腾讯不可达时兜底使用(拿到数据胜过拿不到)。
+  try {
+    const sina = await fetchSinaKlineJSONP(code, count);
+    if (sina && sina.length >= 30) return tagKlineSourceF(sina, { src: 'sina', tradeDate: String((sina[sina.length - 1] || [])[0] || ''), capturedAt: '', partial: false });
+  } catch (e) {}
   // 失败兜底:浏览器本地缓存 → 仓库 data/kline_cache.json(GitHub Pages 同源)
   // v11.55:兜底路径必须说明"这是哪天的K线",否则卡片会拿几天前的K线算"当前关键位"却不自知。
   try { var kc2=debouncedRead('atds_kline_cache'); if(kc2[code]&&kc2[code].series&&kc2[code].series.length) return tagKlineSourceF(kc2[code].series,{src:'localCache',tradeDate:kc2[code].tradeDate||'',capturedAt:kc2[code].capturedAt||'',partial:!!kc2[code].partial}); } catch(e) {}
-  try { var r=await fetch('data/kline_cache.json',{cache:'no-store'}); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
+  try { var r=await fetchWithTimeout('data/kline_cache.json',{cache:'no-store'},6000); if(r.ok){var jc=await r.json(); if(jc[code]&&jc[code].series) return tagKlineSourceF(jc[code].series,{src:'repoCache',tradeDate:String((jc[code].series[jc[code].series.length-1]||[])[0]||''),capturedAt:'',partial:false});} } catch(e) {}
   return [];
 }
 // 给兜底K线打上"来源"标记(非枚举属性,不会被 JSON.stringify 带进缓存/属性,避免体积膨胀)
@@ -5228,10 +5244,22 @@ function addToWatchlistUI(s){
 function removeWatchlistRow(code){
   code=String(code||'').trim();
   console.log('[removeWatchlistRow] code=', JSON.stringify(code));
-  // v11.76【归档优先】:删除个股前,若其模拟跟踪尚有未结算的虚拟持仓,必须按现价了结并归档 —— 绝不静默丢历史
+  // v11.140【入场后禁止中途取消】馨馨定:个股一旦入场只能以止盈/止损结束,删除个股同样禁止 —— 保证胜率口径准确。
+  //   未入场(仅监控队列)与已结算的记录不受影响,可正常删除;历史归档永久保留。
   try{
     var _sm=getShadowMap(),_rec=_sm[code];
-    if(_rec&&_rec.enabled){ if(_rec.entryHit&&!_rec.settled)archiveShadowPositionF(code,_rec,'删除个股'); delete _sm[code]; setShadowMap(_sm); }
+    if(_rec&&_rec.enabled&&_rec.entryHit&&!_rec.settled){
+      showToast('【'+(_rec.name||code)+'】已入场模拟跟踪,须等止盈/止损结算后才能删除(保证胜率口径)','warn');
+      return;
+    }
+    if(getShortMap){
+      var _shm=getShortMap(),_srec=_shm[code];
+      if(_srec&&_srec.enabled&&_srec.entryHit&&!_srec.settled){
+        showToast('【'+(_srec.name||code)+'】短线跟踪已入场,须等止盈/止损结算后才能删除(保证胜率口径)','warn');
+        return;
+      }
+    }
+    if(_rec&&_rec.enabled){ delete _sm[code]; setShadowMap(_sm); }
     try{localStorage.removeItem('sim_track_'+code);}catch(e){}
   }catch(e){console.warn('[removeWatchlistRow] 模拟跟踪归档失败:',e&&e.message);}
   var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();
@@ -5495,7 +5523,29 @@ function restoreSavedWatchlist(){
     }
   })();
 }
-if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
+// v11.155:回退 09-25(中秋休市)产生的虚假入场 —— 休市日无成交,entryDate=2026-09-25 均为脏数据;
+//   回退为未入场(计划参数保留),下一交易日(09-28)打开页面时由回补路径按真实触及重新判定入场(届时带分钟级 touchAt)。
+function purgeFakeEntries0925(){
+  try{
+    if(localStorage.getItem('atds_purged_0925'))return;
+    var fixed=[];
+    ['atds_shadow','atds_shadow_short'].forEach(function(key){
+      var m;try{m=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){m={};}
+      var hit=false;
+      for(var c in m){
+        var r=m[c];
+        if(r&&r.entryHit&&r.entryDate==='2026-09-25'&&!r.settled){
+          r.entryHit=false;delete r.entryDate;delete r.entryPrice;delete r.touchAt;delete r.entryMinute;
+          fixed.push(c+'('+(key==='atds_shadow'?'波段':'短线')+')');hit=true;
+        }
+      }
+      if(hit)localStorage.setItem(key,JSON.stringify(m));
+    });
+    localStorage.setItem('atds_purged_0925','1');
+    if(fixed.length)console.log('[v11.155] 已回退 09-25 休市日虚假入场(将于下一交易日重新按门控判定):',fixed.join('、'));
+  }catch(e){}
+}
+if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{purgeBJData();}catch(e){}} ,100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
 
 /* ============ 观察池实时行情刷新(电脑关机后手机端仍可刷新) ============ */
 function escHtmlR(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -5618,7 +5668,6 @@ async function refreshWatchlistQuotes(){
     var timeEl=document.querySelector('.wl-time');
     if(timeEl){timeEl.textContent='行情 '+bjNowStrF();timeEl.className='wl-time';timeEl.title='最近一次行情刷新成功时刻';}
     window.__atdsLastQuoteOk=bjNowStrF();
-    try{ if(typeof updateEntryFAB==='function') updateEntryFAB(); }catch(e){}   // v11.82:今日已入场弹窗 5s 同步
     // v11.21:行情刷新后评估模拟跟踪(当日最高/最低触达止盈/止损即自动结算),60s 限频防抖动
     var nowS=Date.now();
     if(nowS-Number(window.__atdsSettleTs||0)>60000){
@@ -7387,23 +7436,8 @@ function archiveHistoryCopyF(code,obj){
     localStorage.setItem(k,JSON.stringify(arr));
   }catch(e){}
 }
-// v11.76:取消勾选/删除个股时,若该股尚有【未结算的虚拟持仓】,按现价了结并归档(result='cancelled',
-//   单列展示、不计入胜率 —— 这是用户主动终止,不是策略打出的止盈/止损)。绝不允许静默丢弃历史。
-function archiveShadowPositionF(code,rec,reason){
-  if(!rec)return;
-  var block=document.querySelector('.wl-detail[data-detail-code="'+code+'"] .dc-review[data-review-code="'+code+'"]') || document.querySelector('.dc-review[data-review-code="'+code+'"]');
-  var price=block?(parseFloat(block.getAttribute('data-price'))||0):0;
-  if(!(price>0))price=Number(rec.refPrice)||0;
-  var pnl=(price&&rec.entry)?Math.round((price-rec.entry)/rec.entry*10000)/100:0;
-  var note=(reason||'取消')+'，按现价了结（未触发止盈/止损，不计入胜率）';
-  var planKey=[code,rec.entry,rec.stop,rec.target,'cancelled'].join('|');
-  try{ if(getJournal().some(function(x){return x.planKey===planKey;}))return; }catch(e){}   // v11.80:同一持仓只归档一次
-  addJournalEntry({code:code,name:rec.name||code,date:bjTodayF(),entry:rec.entry,stop:rec.stop,target:rec.target,close:price,pnl:pnl,shadow:true,
-    result:'cancelled',note:note,openedDate:rec.openedDate||'',entryDate:rec.entryDate||rec.openedDate||'',settleDate:bjTodayF(),settlePrice:price,mode:rec.mode||'swing',exitReason:'手动取消',settledAt:bjNowStrF(),
-    v:28,planKey:planKey,strategy:'swing',entryType:rec.entryType||'',entryConds:rec.entryConds||''});
-  archiveHistoryCopyF(code,{entry:rec.entry,entryDate:rec.entryDate||rec.openedDate,stop:rec.stop,target:rec.target,result:'cancelled',pnl:pnl,settleDate:bjTodayF(),settlePrice:price,note:reason||'取消'});
-  showToast('已归档 '+code+' 的模拟跟踪记录（按现价 '+(pnl>0?'+':'')+pnl+'% 了结，历史保留在复盘模块）');
-}
+// v11.140:「取消/删除时按现价了结归档」的函数已删除 —— 馨馨定「入场后不可中途取消」,
+//   该路径不再存在;止盈/止损结算走 archiveHistoryCopyF(见 settleShadowTrade),历史归档仍只增不删。
 function lhbAgoTxtF(d){
   var k=tradingDaysBetweenF(d,bjTodayF());
   return k>0?('，约'+k+'个交易日前'):'（今日）';
@@ -7424,8 +7458,12 @@ function bjNowHM(){ return new Date(Date.now()+8*3600*1000).toISOString().slice(
      14:50-15:00  尾盘风控  新触发一律停止;【例外】短线模式的时间止损(T+3纪律)在此执行
      15:00 之后   盘后复盘  只允许用【定型日K】结算(K路径);卡片实时字段(路径②)一律禁用
    周末整日 closed。节假日无法本地识别(接受残余风险,由 K 线数据自然缺日兜底)。 */
+var HOLIDAYS_CN = ['2026-09-25','2026-10-01','2026-10-02','2026-10-05','2026-10-06','2026-10-07'];   // v11.155:与 scripts/trading_calendar.json 同步(2026 中秋+国庆);新增年份须手动补
 function tradingPhaseF(){
   var d = new Date(Date.now() + 8 * 3600 * 1000);
+  var _ty = d.getUTCFullYear(), _tm = d.getUTCMonth() + 1, _td = d.getUTCDate();
+  var _today = _ty + '-' + (_tm < 10 ? '0' : '') + _tm + '-' + (_td < 10 ? '0' : '') + _td;
+  if (HOLIDAYS_CN.indexOf(_today) >= 0) return { phase: 'closed', canSettle: false, klineReview: false, allowTimeStop: false, label: '法定节假日休市' };   // v11.155:休市日不判入场/不结算/不回补(实测 09-25 中秋虚假入场)
   var dow = d.getUTCDay();
   var hm = d.getUTCHours() * 60 + d.getUTCMinutes();
   if (dow === 0 || dow === 6) return { phase: 'closed', canSettle: false, klineReview: true, allowTimeStop: false, label: '周末休市' };
@@ -7466,41 +7504,8 @@ function renderJournalStats(){
   var el=document.getElementById('wl-journal-stats'); if(!el)return;
   var j=getJournal();
   var c=reviewClassification();
-  if(!j.length){
-    var tm0=getTradeStatusMap(),tn0=0;
-    for(var t0 in tm0){ if(tm0[t0]&&tm0[t0].status)tn0++; }
-    el.innerHTML='📒 模拟跟踪复盘：暂无样本 —— 勾选个股「系统模拟跟踪」后开始累计'+
-      (tn0?('<div class="jrn-warn">已有 '+tn0+' 只标记了交易状态　<button class="jrn-btn jrn-del" onclick="confirmClearReviewData()">清空复盘数据</button></div>'):'');
-    return;
-  }
-  var head='📒 模拟跟踪复盘：有效样本 <b>'+c.valid+'</b> 笔'+
-    (c.winRate!=null?(' · 胜率 <b>'+c.winRate+'%</b>（'+c.win+'胜'+c.loss+'负'+(c.expired?'·'+c.expired+'过期':'')+'）'):'')+
-    ' · 平均 <b>'+(c.avg>0?'+':'')+c.avg+'%</b>'+
-    // v11.63:A股 T+1 —— 入场当日即结算的历史样本物理上无法成交,已单列标记、不计入胜率
-    (c.t1?('　<span class="jrn-warn-chip" title="买入当日不可卖出（A股 T+1）。这些样本记录为“入场当日即止盈/止损”，实际无法成交，已从胜率中剔除并保持可追溯。对应跟踪记录已重置，将按新口径自入场次一交易日起重新判定。">⚠ T+1 无效样本 '+c.t1+' 笔（入场当日即结算，已剔除）</span>'):'')+
-    ((c.win+c.loss)<10?'　<span class="jrn-warn-chip">⚠ 样本不足10笔，统计偶发性大，不构成投资参考</span>':'')+
-    '　<button class="jrn-btn" onclick="toggleJournalDetail()">'+(jrnOpen?'收起明细':'每笔明细')+'</button>'+
-    // v11.35:按入场方式分组(每类满 3 笔才显示,避免小样本误导)
-    (function(){
-      function rt(x){ return (x&&(x.w+x.l)>=3)?(Math.round(x.w/(x.w+x.l)*100)+'%('+(x.w+x.l)+'笔·'+x.w+'胜)'):null; }
-      var a=rt(c.byType&&c.byType.pullback), b=rt(c.byType&&c.byType.current);
-      if(!a&&!b)return '';
-      return '<div class="jrn-types">入场方式胜率：回踩支撑 <b>'+(a||'样本不足3笔')+'</b> ｜ 现价入场 <b>'+(b||'样本不足3笔')+'</b></div>';
-    })();
-  // v11.80:短线2-3天策略独立胜率(与波段分开) + 离场原因占比(时间止损占比越高 ⇒ 越需优化选股/入场)
-  var shortLine='';
-  if(c.short&&(c.short.w+c.short.loss)>0){
-    var sw=c.short.w,sl=c.short.loss,swr=Math.round(sw/(sw+sl)*100);
-    var se=c.shortExit||{};var seParts=[];
-    Object.keys(se).forEach(function(k){seParts.push(k+' '+se[k]+'笔');});
-    shortLine='<div class="jrn-types">⏱ <b>短线2-3天策略胜率 <b>'+swr+'%</b>（'+(sw+sl)+'笔·'+sw+'胜'+sl+'负）</b>'+(seParts.length?('　离场原因:'+seParts.join(' / ')):'')+'</div>';
-  }
-  // v11.98:波段(T+1)策略独立胜率行 —— 与短线对称,三维度:综合/波段/短线
-  var swingLine='';
-  if(c.swing&&(c.swing.w+c.swing.l)>0){
-    var gw=c.swing.w,gl=c.swing.l,gwr=Math.round(gw/(gw+gl)*100);
-    swingLine='<div class="jrn-types">📊 <b>波段(T+1)策略胜率 <b>'+gwr+'%</b>（'+(gw+gl)+'笔·'+gw+'胜'+gl+'负）</b></div>';
-  }
+  // v11.141:📒 模拟跟踪复盘 只显示【当前未结算的入场持仓】;止盈/止损结算即迁入「个股历史档案」,此处清零重新开始。
+  var active=renderActivePositions();
   var ex=[];
   if(c.timeTravel)ex.push('时间穿越作废 '+c.timeTravel+' 笔（非交易时段产出，已剔除胜率并重判）');
   if(c.legacy)ex.push('早期未校验 '+c.legacy+' 笔（无入场门控，不计入胜率）');
@@ -7518,7 +7523,7 @@ function renderJournalStats(){
       '<button class="jrn-btn" onclick="importReviewData()">⬆ 恢复合并</button>'+
       '</div></div>'):'');
   var rows='';
-  var perStock=renderPerStockArchive();   // v11.76:个股历史档案(按股票聚合,永久保留)
+  var perStock=renderPerStockArchive(c);   // v11.141:📁 个股历史档案(已结算样本 + 胜率总结)
   if(jrnOpen){
     rows='<div class="jrn-wrap">';
     for(var i=j.length-1;i>=0;i--){
@@ -7549,14 +7554,54 @@ function renderJournalStats(){
     // v11.29:口径声明 —— 把理想化假设显式写出来,比假装数据精确更可信。
     rows+='<div class="jrn-disc">口径说明：<b>① 入场门控（多周期多指标）</b> —— 需<b>价格回落至计划入场价</b> 且 <b>前收门控五项全过</b>：周K方向(周MA5≥周MA10)、MACD(DIF≥DEA)、KDJ(K≤85 不超买)、BOLL(收盘不站上轨)、量比(≥0.8)；全部用<b>入场日前一根已完成K线</b>计算（<b>无未来函数</b>），未过则记「⏸ 门控未通过·未入场」并继续等待（不消耗观察期）。<b>② 【A股 T+1】买入当日不可卖出</b>，故<b>入场日一律不结算</b>（只按 <b>1 分钟分时</b>，取不到时用 15 分钟K，记录「<b>入场之后</b>」的区间与曾否触达止盈/止损价；当日最低可能出现在入场之前，故不得用日K当日最低判入场日；取不到分钟K则当日不留判定）；<b>结算自入场次一交易日起</b>，用<b>当日最高/最低</b>判定（日线无法还原日内先后，同日双触保守计为止损）；按<b>计划价</b>成交、<b>不含</b>滑点与手续费；未打开页面的交易日<b>不回溯</b>；未触发入场与计划失效的样本<b>不计入</b>胜率；<b>入场当日即结算的历史样本违反 T+1，已单列标记、不计入胜率</b>。<b>入场方式按"勾选时入场价相对现价"划分（回踩支撑=需回落才入场；现价入场=勾选价即入场价）；同一时段多只个股相关性高，胜率样本的有效性应打折看待</b>；样本不足 10 笔仅供参考。</div>';
   }
-  el.innerHTML=head+warn+shortLine+swingLine+perStock+rows;
+  el.innerHTML=active+warn+perStock+rows;
+}
+
+// v11.141:📒 模拟跟踪复盘 = 当前【未结算的入场持仓】实时视图(波段+短线);止盈/止损结算后自动迁入历史档案,此处清零。
+var activeOpen=false;   // v11.143:模拟跟踪复盘默认收起,点击标题展开明细
+function toggleActivePositions(){ activeOpen=!activeOpen; renderJournalStats(); }
+window.toggleActivePositions=toggleActivePositions;
+// v11.143:入场日期去前导零(2026-09-23 → 2026-9-23,按用户示例格式)
+function fmtEntryDateF(d){ var p=String(d||'').split('-'); return p.length===3?(p[0]+'-'+parseInt(p[1],10)+'-'+parseInt(p[2],10)):String(d||'—'); }
+// v11.144:连续竞价时段校验(09:30-11:30 / 13:00-15:00)—— 盘后/盘前时刻不得冒充入场时间
+function inTradingPeriodF(hm){ var m=parseInt(String(hm).slice(0,2),10)*60+parseInt(String(hm).slice(3,5),10); return (m>=570&&m<=690)||(m>=780&&m<=900); }
+function renderActivePositions(){
+  var sm=getShadowMap(),sh=getShortMap(),items=[];
+  for(var c in sm){var r=sm[c];if(r&&r.enabled&&r.entryHit&&!r.settled)items.push({code:c,name:r.name,mode:'swing',entry:r.entry,entryPrice:r.entryPrice,stop:r.stop,target:r.target,entryDate:r.entryDate||r.openedDate,entryType:r.entryType,touchAt:r.touchAt});}
+  for(var c2 in sh){var r2=sh[c2];if(r2&&r2.enabled&&r2.entryHit&&!r2.settled)items.push({code:c2,name:r2.name,mode:'short',entry:r2.entry,entryPrice:r2.entryPrice,stop:(r2.priceStop!=null?r2.priceStop:r2.stop),target:(r2.tp2!=null?r2.tp2:r2.target),entryDate:r2.entryDate||r2.openedDate,entryType:r2.entryType,touchAt:r2.touchAt});}
+  // v11.143:可回缩 —— 默认收起,点击标题展开明细
+  var head='<div class="jrn-archive-head" style="border:1px solid #eef2f7;border-radius:10px;background:#f8fafc;margin-bottom:4px" onclick="toggleActivePositions()">📒 <b>模拟跟踪复盘</b> · 当前持仓 <b>'+items.length+'</b> 笔 <span class="jrn-arc-caret">'+(activeOpen?'▾':'▸')+'</span></div>';
+  var tip='<div class="jrn-disc">当前持仓（已入场未结算）。止盈/止损结算后自动迁入「📁 个股历史档案」，此处清零重新开始。</div>';
+  var body;
+  if(!items.length){
+    body=tip+'<div class="jrn-disc">暂无持仓 —— 勾选个股「系统模拟跟踪」，盘中触发入场后在此实时显示。</div>';
+  }else{
+    var rows='';
+    for(var i=0;i<items.length;i++){
+      var it=items[i];
+      var blk=document.querySelector('.wl-detail[data-detail-code="'+it.code+'"] .dc-review[data-review-code="'+it.code+'"]')||document.querySelector('.dc-review[data-review-code="'+it.code+'"]');
+      var price=blk?(parseFloat(blk.getAttribute('data-price'))||0):0;
+      var pnl=(price&&it.entry)?(Math.round((price-it.entry)/it.entry*10000)/100):null;
+      var etTxt=(it.entryType==='pullback')?'回踩低吸':(it.entryType==='current'?'现价入场':'');
+      // v11.144:入场时间只认【真实分钟级触发时刻】(touchAt)且必须在连续竞价时段内 ——
+      //   打勾时刻(entryTime,可能是盘后)绝不冒充入场时间;旧样本无 touchAt 则只显示日期,诚实呈现。
+      var et=(it.touchAt&&/^[0-2]\d:[0-5]\d$/.test(it.touchAt)&&inTradingPeriodF(it.touchAt))?it.touchAt:'';
+      var ep=(it.entryPrice!=null?it.entryPrice:it.entry);
+      rows+='<div class="jrn-row'+(pnl==null?'':(pnl>0?' jrn-pos':(pnl<0?' jrn-neg':'')))+'">'+
+        '<span class="jrn-code">'+escHtmlF(String(it.code))+' '+escHtmlF(it.name||'')+(it.mode==='short'?' <b style="color:#b45309">[短线]</b>':' <b style="color:#1d4ed8">[波段]</b>')+'</span>'+
+        '<span class="jrn-flow">入场 '+escHtmlF(fmtEntryDateF(it.entryDate))+(et?(' '+escHtmlF(et)):'')+'@'+ep+(etTxt?'（'+etTxt+'）':'')+' → 止损 '+it.stop+' / 止盈 '+it.target+'</span>'+
+        '<span class="jrn-num">'+(pnl==null?'—':((pnl>0?'+':'')+pnl+'%'))+'</span></div>';
+    }
+    body=tip+'<div class="jrn-wrap">'+rows+'</div>';
+  }
+  return '<div class="jrn-archive'+(activeOpen?' open':'')+'" id="jrn-active">'+head+'<div class="jrn-archive-body">'+body+'</div></div>';
 }
 // v11.76:个股历史档案视图(按股票聚合 journal 中该股的全部模拟跟踪记录)。
 //   ⭐ 独立于观察池:个股被删除/取消勾选/清空跟踪后,这里的档案**永久保留**(除非「清空复盘数据」)。
 var archiveFilter='all';   // v11.98:档案策略筛选 all|swing|short
 function setArchiveFilter(f){ archiveFilter=f; renderJournalStats(); }
 window.setArchiveFilter=setArchiveFilter;
-function renderPerStockArchive(){
+function renderPerStockArchive(c){
   var j=getJournal(),g={};
   for(var i=0;i<j.length;i++){
     var e=j[i];if(!e||!e.shadow)continue;
@@ -7583,9 +7628,29 @@ function renderPerStockArchive(){
   var filterBar='<div class="jrn-arc-filters" style="margin:6px 0;">筛选：'+fbtn('all','全部')+fbtn('swing','波段')+fbtn('short','短线')+'</div>';
   // v11.83:可折叠(默认收起,点标题才展开);表头带 N 只计数与 caret
   var head = '📁 个股历史档案 <span class="jrn-arc-cnt">' + keys.length + ' 只</span> <span class="jrn-arc-caret">▸</span>';
+  // v11.141:胜率总结迁入「个股历史档案」顶部 —— 已结算样本(综合/波段/短线)的胜率口径
+  var summary='';
+  if(c){
+    summary='<div class="jrn-summary">'+
+      '<div class="jrn-disc">📊 <b>胜率总结</b>（已结算样本）：有效 <b>'+c.valid+'</b> 笔'+
+      (c.winRate!=null?(' · 综合胜率 <b>'+c.winRate+'%</b>（'+c.win+'胜'+c.loss+'负'+(c.expired?'·'+c.expired+'过期':'')+'）'):'')+
+      ' · 平均 <b>'+(c.avg>0?'+':'')+c.avg+'%</b>'+
+      '　<button class="jrn-btn" onclick="toggleJournalDetail()">'+(jrnOpen?'收起明细':'每笔明细')+'</button>'+
+      ((c.win+c.loss)<10?'　<span class="jrn-warn-chip">⚠ 样本不足10笔，统计偶发性大，不构成投资参考</span>':'')+'</div>'+
+      (function(){
+        function rt(x){ return (x&&(x.w+x.l)>=3)?(Math.round(x.w/(x.w+x.l)*100)+'%('+(x.w+x.l)+'笔·'+x.w+'胜)'):null; }
+        var a=rt(c.byType&&c.byType.pullback), b=rt(c.byType&&c.byType.current);
+        if(!a&&!b)return '';
+        return '<div class="jrn-types">入场方式胜率：回踩支撑 <b>'+(a||'样本不足3笔')+'</b> ｜ 现价入场 <b>'+(b||'样本不足3笔')+'</b></div>';
+      })()+
+      (c.swing&&(c.swing.w+c.swing.l)>0?('<div class="jrn-types">📊 <b>波段(T+1)策略胜率 <b>'+Math.round(c.swing.w/(c.swing.w+c.swing.l)*100)+'%</b>（'+(c.swing.w+c.swing.l)+'笔·'+c.swing.w+'胜'+c.swing.l+'负）</b></div>'):'')+
+      (c.short&&(c.short.w+c.short.loss)>0?('<div class="jrn-types">⏱ <b>短线2-3天策略胜率 <b>'+Math.round(c.short.w/(c.short.w+c.short.loss)*100)+'%</b>（'+(c.short.w+c.short.loss)+'笔·'+c.short.w+'胜'+c.short.loss+'负）</b></div>'):'')+
+      (c.t1?('<div class="jrn-warn-chip">⚠ T+1 无效样本 '+c.t1+' 笔（入场当日即结算，已剔除）</div>'):'')+
+      '</div>';
+  }
   var body;
   if(!keys.length){
-    body = filterBar + '<div class="jrn-disc">'+(archiveFilter!=='all'?'该策略下暂无档案（切换「全部」查看）':'个股档案：暂无（勾选个股「系统模拟跟踪」后，每笔虚拟买入/结算都会按股票永久归档在这里）')+'</div>';
+    body = summary + filterBar + '<div class="jrn-disc">'+(archiveFilter!=='all'?'该策略下暂无档案（切换「全部」查看）':'个股档案：暂无（勾选个股「系统模拟跟踪」后，每笔虚拟买入/结算都会按股票永久归档在这里）')+'</div>';
   } else {
     var h = '<div class="jrn-disc">（按股票聚合 · 删除个股/取消勾选/清空跟踪都不会丢，仅「清空复盘数据」可清）';
   for(var i2=0;i2<keys.length;i2++){
@@ -7596,7 +7661,7 @@ function renderPerStockArchive(){
       +(it2.cancelled?(' · 取消归档 '+it2.cancelled):'')+(it2.missed?(' · 未触发 '+it2.missed):'')+(it2.invalid?(' · 失效 '+it2.invalid):'')+(it2.open?(' · <b>监控中</b>'):'')
       +(it2.last?('　最近：'+escHtmlF(String(it2.last.settleDate||it2.last.date||'—'))+' '+(it2.last.pnl!=null?((it2.last.pnl>0?'+':'')+it2.last.pnl+'%'):'—')+(it2.last.mode==='short'?'［短线］':'［波段］')):'')+'</div>';
   }
-    body = filterBar + h + '</div>';
+    body = summary + filterBar + h + '</div>';
   }
   return '<div class="jrn-archive" id="jrn-archive">' +
     '<div class="jrn-archive-head" onclick="toggleJournalArchive()">' + head + '</div>' +
@@ -7977,7 +8042,12 @@ function toggleShortTrack(cb){
   } else {
     var rec2 = m[code];
     if (rec2 && rec2.mode === 'short') {
-      if (rec2.entryHit && !rec2.settled) { try { archiveShadowPositionF(code, rec2, '取消短线跟踪'); } catch (e) {} }
+      // v11.140【入场后禁止中途取消】:短线已入场未结算 → 拒绝取消,回滚勾选
+      if (rec2.entryHit && !rec2.settled) {
+        cb.checked = true;
+        showToast('【' + (rec2.name || code) + '】短线跟踪已入场,不可中途取消 —— 只能止盈或止损结束(保证胜率口径)', 'warn');
+        return;
+      }
       delete m[code];
       try { localStorage.removeItem('sim_track_short_' + code); } catch (e) {}
       setShortMap(m);
@@ -8023,9 +8093,13 @@ function toggleShadowTrack(cb){
     updateReviewProgress();
     return;   // ⚠️ 不再立即评估 —— 打勾当日的入场只认「打勾之后」的分钟级触及,交给限频刷新判定
   }else{
-    // v11.76【归档】取消勾选:若已有虚拟持仓(入场未结算),按现价了结并写入复盘档案 —— 绝不静默丢历史。
+    // v11.140【入场后禁止中途取消】馨馨定:已入场未结算的持仓不可取消勾选 —— 只能等止盈/止损结算(保证胜率口径)。
     var _rec=m[code];
-    if(_rec&&_rec.entryHit&&!_rec.settled){ try{ archiveShadowPositionF(code,_rec,'取消勾选'); }catch(e){} }
+    if(_rec&&_rec.entryHit&&!_rec.settled){
+      cb.checked=true;   // 回滚勾选状态(保持已启用)
+      showToast('【'+(_rec.name||code)+'】已入场模拟跟踪,不可中途取消 —— 只能止盈或止损结束(保证胜率口径)','warn');
+      return;
+    }
     if(m[code])delete m[code];
     try{localStorage.removeItem('sim_track_'+code);}catch(e){}
   }
@@ -8223,7 +8297,12 @@ function settleShadowTrade(code,klines,minBars){
   //   由上面的日K路径执行。
   //   取不到分钟K时【只留空、不判定】,绝不退回用当日最低。
   if(!rec.settled&&rec.entryHit&&rec.entryDate===today){
-    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.entryTime||null);
+    // v11.147:入场时刻补录 —— touchAt 缺失且打勾时刻在交易时段内时,用当日分钟K找回首次触达时刻(真实数据,不编造)
+    if(!rec.touchAt&&rec.entryTime&&inTradingPeriodF(rec.entryTime)&&minBars&&minBars.length){
+      var _bj=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);
+      if(_bj&&_bj.touched&&_bj.at){ rec.touchAt=_bj.at; rec.entryMinute=_bj.at; }
+    }
+    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.entryTime||null);   // 打勾时刻用于排除打勾前K线(语义正确,勿改 touchAt)
     if(mj){
       if(!rec.trace||!rec.trace.length)rec.trace=[];
       var k3=[];for(var t3=0;t3<rec.trace.length;t3++){if(rec.trace[t3].d!==today)k3.push(rec.trace[t3]);}
@@ -8433,7 +8512,12 @@ function settleShortTradeF(code,rec,sm,klines,minBars,block,ph,today){
   }
   // T+1:入场当日不结算(只记轨迹)
   if(rec.entryDate===today){
-    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.touchAt||rec.entryTime);
+    // v11.147:入场时刻补录(同波段) + 打勾时刻不冒充入场时间
+    if(!rec.touchAt&&rec.entryTime&&inTradingPeriodF(rec.entryTime)&&minBars&&minBars.length){
+      var _bj2=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);
+      if(_bj2&&_bj2.touched&&_bj2.at){ rec.touchAt=_bj2.at; rec.entryMinute=_bj2.at; }
+    }
+    var mj=shadowJudgeEntryDayF(rec,minBars,today,rec.entryTime||null);   // 打勾时刻用于排除打勾前K线(勿改 touchAt)
     if(mj)pushTrace({d:today,hi:Math.round(mj.hi*100)/100,lo:Math.round(mj.lo*100)/100,ev:'hold',afterEntry:true,t1:true});
     rec.lastCheck={date:today,price:price,src:'m1',t1:true};
     setShortMap(sm);return;
@@ -8984,215 +9068,6 @@ window.recordTTrade=recordTTrade;
 window.getManualTags=getManualTags;
 window.setManualTag=setManualTag;
 
-/* ════════ v11.82 盘前「今日已入场」悬浮弹窗(只读) ════════
-   实时聚焦当日(entryDate===今天)真实触发入场的个股;只读(无勾选/无编辑);
-   与主列表共用 atds_shadow + 实时行情 DOM,5s 刷新同步(挂 refreshWatchlistQuotes)。
-   A股时间锁联动:入场只可能发生在 09:30-14:50(tradingPhaseF 已保证),故 entryDate===今天 即"今日入场",
-   盘前(<09:15)天然为 0。 */
-var __entryFAB = { open: false, sort: 'fl' };   // sort: fl=浮盈降序(默认,优先表现最好) / time=入场时间升序
-function todayEntryCodesF(){
-  var sm = getShadowMap(), sh = getShortMap(), out = [], today = bjTodayF();
-  for (var c in sm) { var r = sm[c];
-    if (r && r.enabled && r.entryHit && String(r.entryDate) === today) out.push(c);
-  }
-  for (var c in sh) { var r = sh[c];
-    if (r && r.enabled && r.entryHit && String(r.entryDate) === today) out.push(c);
-  }
-  return out;
-}
-// v11.114:今日入场拆分计数(波段/短线独立,互不混计)
-function todayEntryCountF(){
-  var sm = getShadowMap(), sh = getShortMap(), today = bjTodayF(), swing = 0, short = 0;
-  for (var c in sm) { var r = sm[c]; if (r && r.enabled && r.entryHit && String(r.entryDate) === today) swing++; }
-  for (var c in sh) { var r = sh[c]; if (r && r.enabled && r.entryHit && String(r.entryDate) === today) short++; }
-  return { swing: swing, short: short };
-}
-// v11.102:当日止盈/止损结算列表(来自 journal,shadow 且 settleDate===今天)
-function todaySettleListF(result){
-  var j = getJournal(), out = [], today = bjTodayF();
-  for (var i = 0; i < j.length; i++) { var e = j[i];
-    if (e && e.shadow && e.result === result && String(e.settleDate || e.date) === today) out.push(e);
-  }
-  return out;
-}
-function ensureEntryUI(){
-  if (document.getElementById('entry-fab')) return;
-  if (!document.querySelector('.wl-stock[data-stock-code]')) return;   // 仅盘前观察池页
-  var fab = document.createElement('button');
-  fab.id = 'entry-fab'; fab.className = 'entry-fab'; fab.textContent = '📌 今日已入场 (0)';
-  document.body.appendChild(fab);
-  fab.addEventListener('click', function (e) { if (window.__entryFABDrag) return; toggleEntryPop(); });
-  // 可拖动(pointer 兼容鼠标+触屏),位置持久化到 localStorage
-  (function () {
-    var sx = 0, sy = 0, ox = 0, oy = 0, dragging = false;
-    fab.addEventListener('mousedown', function (e) { startDrag(e); });
-    fab.addEventListener('touchstart', function (e) { startDrag(e); }, { passive: true });
-    function startDrag(e) {
-      var p = (e.touches && e.touches[0]) || e;
-      sx = p.clientX; sy = p.clientY;
-      var r = fab.getBoundingClientRect(); ox = r.left; oy = r.top;
-      dragging = false; window.__entryFABDrag = false;
-      var mv = function (ev) {
-        var q = (ev.touches && ev.touches[0]) || ev;
-        var dx = q.clientX - sx, dy = q.clientY - sy;
-        if (Math.abs(dx) + Math.abs(dy) > 6) dragging = true;
-        if (dragging) {
-          window.__entryFABDrag = true;
-          fab.style.left = Math.min(window.innerWidth - 64, Math.max(0, ox + dx)) + 'px';
-          fab.style.top = Math.min(window.innerHeight - 48, Math.max(0, oy + dy)) + 'px';
-        }
-      };
-      var up = function () {
-        document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up);
-        document.removeEventListener('touchmove', mv); document.removeEventListener('touchend', up);
-        setTimeout(function () { window.__entryFABDrag = false; }, 0);
-        try { localStorage.setItem('atds_entry_fab_pos', fab.style.left + '|' + fab.style.top); } catch (e2) {}
-      };
-      document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
-      document.addEventListener('touchmove', mv); document.addEventListener('touchend', up);
-    }
-  })();
-  var pop = document.createElement('div');
-  pop.id = 'entry-pop'; pop.className = 'entry-pop';
-  pop.innerHTML = '<div class="entry-pop-h"><span>📌 今日已入场</span><span class="entry-sort" onclick="toggleEntrySort()" title="切换排序:浮盈高低 / 入场时间">排序:💰浮盈</span><span class="entry-pop-close" onclick="toggleEntryPop()">收起</span></div><div class="entry-pop-body"></div>';
-  document.body.appendChild(pop);
-  try { var pos = localStorage.getItem('atds_entry_fab_pos'); if (pos) { var xy = pos.split('|'); fab.style.left = xy[0]; fab.style.top = xy[1]; } } catch (e2) {}
-}
-function toggleEntryPop(){
-  var pop = document.getElementById('entry-pop'); if (!pop) return;
-  __entryFAB.open = !__entryFAB.open;
-  pop.classList.toggle('show', __entryFAB.open);
-  if (__entryFAB.open) renderEntryPop();
-}
-function entryLiveRowF(code){
-  var row = document.querySelector('.wl-stock-row[data-code="' + code + '"]');
-  var priceEl = row && row.querySelector('.wl-cell-price .price');
-  var pctEl = row && row.querySelector('.wl-cell-pct');
-  var nameEl = row && row.querySelector('.wl-name');
-  var price = priceEl ? parseFloat(priceEl.textContent) || 0 : 0;
-  var pct = pctEl ? parseFloat(pctEl.textContent) || 0 : 0;
-  return { price: price, pct: pct, name: nameEl ? nameEl.textContent : code };
-}
-function renderEntryPop(){
-  var pop = document.getElementById('entry-pop'); if (!pop) return;
-  var body = pop.querySelector('.entry-pop-body'); if (!body) return;
-  var today = bjTodayF();
-  // ① 今日新入场(波段 swing + 短线 short 都算)
-  var sm = getShadowMap(), sh = getShortMap(), items = [];
-  for (var c in sm) { var r = sm[c];
-    if (!(r && r.enabled && r.entryHit && String(r.entryDate) === today)) continue;
-    var lv = entryLiveRowF(c);
-    var fl = (lv.price && r.entry) ? Math.round((lv.price - r.entry) / r.entry * 10000) / 100 : null;
-    items.push({ code: c, name: lv.name, price: lv.price, pct: lv.pct, entry: r.entry, stop: r.stop, target: r.target, fl: fl, at: r.touchAt || r.entryTime || '', mode: 'swing' });
-  }
-  for (var c2 in sh) { var r2 = sh[c2];
-    if (!(r2 && r2.enabled && r2.entryHit && String(r2.entryDate) === today)) continue;
-    var lv2 = entryLiveRowF(c2);
-    var fl2 = (lv2.price && r2.entry) ? Math.round((lv2.price - r2.entry) / r2.entry * 10000) / 100 : null;
-    items.push({ code: c2, name: lv2.name, price: lv2.price, pct: lv2.pct, entry: r2.entry, stop: r2.stop || r2.priceStop, target: r2.target || r2.tp2, fl: fl2, at: r2.touchAt || r2.entryTime || '', mode: 'short' });
-  }
-  if (__entryFAB.sort === 'time') { items.sort(function (a, b) { return String(a.at) < String(b.at) ? -1 : 1; }); }
-  else { items.sort(function (a, b) { var fa = (a.fl == null) ? -Infinity : a.fl; var fb = (b.fl == null) ? -Infinity : b.fl; return fb - fa; }); }
-  // ②③ 当日止盈 / 当日止损(结算)
-  var wins = todaySettleListF('win');
-  var losses = todaySettleListF('loss');
-
-  var h = '';
-  // 分区1:今日新入场
-  var swCnt = 0, shCnt = 0;
-  for (var ii = 0; ii < items.length; ii++) { if (items[ii].mode === 'short') shCnt++; else swCnt++; }
-  h += '<div class="entry-sec-h">🟢 今日新入场：波段 <b>' + swCnt + '</b> ｜ 短线 <b>' + shCnt + '</b></div>';
-  if (!items.length) h += '<div class="entry-empty">暂无</div>';
-  else {
-    for (var i = 0; i < items.length; i++) {
-      var it = items[i];
-      var flCls = (it.fl == null) ? '' : (it.fl >= 0 ? 'entry-fl-up' : 'entry-fl-down');
-      h += '<div class="entry-item" data-code="' + escHtmlF(it.code) + '" onclick="entryItemJump(this)">' +
-        '<div class="entry-item-main"><span class="entry-name">' + escHtmlF(it.name) + '</span><span class="entry-code">' + escHtmlF(it.code) + (it.mode === 'short' ? '<em class="entry-tag-short">短线</em>' : '<em class="entry-tag-swing">波段</em>') + '</span>' +
-        '<span class="entry-price ' + (it.pct >= 0 ? 'up' : 'down') + '">' + it.price.toFixed(2) + '</span>' +
-        '<span class="entry-pct ' + (it.pct >= 0 ? 'up' : 'down') + '">' + (it.pct >= 0 ? '+' : '') + it.pct.toFixed(2) + '%</span>' +
-        '<span class="entry-fl ' + flCls + '">' + (it.fl == null ? '--' : ((it.fl >= 0 ? '+' : '') + it.fl + '%')) + '</span></div>' +
-        '<div class="entry-item-sub">今日入场 · ' + (it.at || '--') + ' 触发 · 入场 ' + it.entry + ' · 止损 ' + it.stop + ' · 止盈 ' + it.target + '</div>' +
-        '</div>';
-    }
-  }
-  // 分区2:当日止盈
-  h += '<div class="entry-sec-h win">✅ 当日止盈 <b>' + wins.length + '</b></div>';
-  if (!wins.length) h += '<div class="entry-empty">暂无</div>';
-  else {
-    for (var k = 0; k < wins.length; k++) {
-      var w = wins[k];
-      h += settleRowF(w, 'win');
-    }
-  }
-  // 分区3:当日止损
-  h += '<div class="entry-sec-h loss">🔴 当日止损 <b>' + losses.length + '</b></div>';
-  if (!losses.length) h += '<div class="entry-empty">暂无</div>';
-  else {
-    for (var m2 = 0; m2 < losses.length; m2++) {
-      var ls = losses[m2];
-      h += settleRowF(ls, 'loss');
-    }
-  }
-  body.innerHTML = h;
-}
-// v11.102:结算行(止盈/止损)渲染
-function settleRowF(e, kind){
-  var pnl = (e.pnl == null) ? '--' : ((e.pnl > 0 ? '+' : '') + e.pnl + '%');
-  var cls = kind === 'win' ? 'entry-fl-up' : 'entry-fl-down';
-  return '<div class="entry-item" data-code="' + escHtmlF(String(e.code)) + '" onclick="entryItemJump(this)">' +
-    '<div class="entry-item-main"><span class="entry-name">' + escHtmlF(String(e.name || e.code)) + '</span><span class="entry-code">' + escHtmlF(String(e.code)) + (e.mode === 'short' ? '<em class="entry-tag-short">短线</em>' : '<em class="entry-tag-swing">波段</em>') + '</span>' +
-    '<span class="entry-price">' + escHtmlF(kind === 'win' ? '止盈' : '止损') + '</span>' +
-    '<span class="entry-pct ' + (kind === 'win' ? 'up' : 'down') + '">' + escHtmlF(String(e.settlePrice != null ? e.settlePrice : '')) + '</span></div>' +
-    '<div class="entry-item-sub">' + escHtmlF(String(e.entryDate || e.openedDate || '') + ' 入场@' + e.entry + ' → ' + String(e.settleDate || '') + ' 结算' + (e.exitReason ? ('（' + e.exitReason + '）') : '')) + '</div>' +
-    '<div class="entry-fl ' + cls + '">' + pnl + '</div>' +
-    '</div>';
-}
-function entryItemJump(el){
-  var code = el.getAttribute('data-code');
-  var pop = document.getElementById('entry-pop'); if (pop) pop.classList.remove('show');
-  __entryFAB.open = false;
-  var card = document.querySelector('.wl-stock[data-stock-code="' + code + '"]');
-  if (card) {
-    try { card.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { card.scrollIntoView(); }
-    card.classList.add('entry-flash'); setTimeout(function () { card.classList.remove('entry-flash'); }, 3000);
-  }
-}
-function toggleEntrySort(){
-  __entryFAB.sort = (__entryFAB.sort === 'time') ? 'fl' : 'time';
-  var el = document.querySelector('.entry-sort');
-  if (el) el.textContent = (__entryFAB.sort === 'time') ? '排序:⏱时间' : '排序:💰浮盈';
-  renderEntryPop();
-}
-function updateEntryFAB(){
-  var fab = document.getElementById('entry-fab'); if (!fab) return;
-  var cnt = todayEntryCountF();   // v11.114:波段/短线独立计数
-  var nWin = todaySettleListF('win').length;
-  var nLoss = todaySettleListF('loss').length;
-  var n = cnt.swing + cnt.short + nWin + nLoss;
-  fab.textContent = '📌 波段 ' + cnt.swing + ' · 短线 ' + cnt.short;
-  if (n > 0) fab.classList.add('has'); else fab.classList.remove('has');
-  var pop = document.getElementById('entry-pop');
-  if (pop && pop.classList.contains('show')) renderEntryPop();
-  // v11.102:交易日 + 有新数据 + 当天未自动弹过 → 自动弹出一次(避免每次刷新打扰)
-  try{
-    if(n > 0){
-      var ph = tradingPhaseF();
-      if(ph && ph.canSettle){
-        var key = 'atds_entry_pop_auto_' + bjTodayF();
-        if(localStorage.getItem(key) !== '1'){
-          localStorage.setItem(key, '1');
-          if(pop){ __entryFAB.open = true; pop.classList.add('show'); renderEntryPop(); }
-        }
-      }
-    }
-  }catch(e){}
-}
-window.toggleEntryPop = toggleEntryPop;
-window.entryItemJump = entryItemJump;
-window.updateEntryFAB = updateEntryFAB;
-window.toggleEntrySort = toggleEntrySort;
-(function () { setTimeout(function () { try { ensureEntryUI(); updateEntryFAB(); } catch (e) {} }, 900); })();
 if(document.readyState==='complete'||document.readyState==='interactive'){setTimeout(initWatchlistProUI,700);}else{document.addEventListener('DOMContentLoaded',function(){setTimeout(initWatchlistProUI,700);});}
 
 /* ════════ v11.132 K线·结构信号(盘前独立查询窗口) ════════
@@ -9231,7 +9106,7 @@ function cdBottomPatternsF(i,O,C,H,L,V){
 async function fetchKlinePeriod(code, period, count){
   var url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=' + encodeURIComponent(code) + ',' + period + ',,,' + count + ',qfq';
   try{
-    var res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' }, 9000);   // v11.134:no-store 确保每日/每次查询都拉最新,不被浏览器缓存
+    var res = await fetchWithTimeout(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' }, 15000);   // v11.134:no-store;v11.154:9s→15s(弱网 2G 下 9s 拉不完)
     var txt = await res.text();
     var j = JSON.parse(txt);
     var d = j && j.data && j.data[code];
@@ -9266,9 +9141,10 @@ function structSignalCalc(kl, code, name, count, suf){
     H.push(parseFloat(kl[i][3])); L.push(parseFloat(kl[i][4]));
     V.push(parseFloat(kl[i][5])||0);
   }
-  var ma5=[],ma20=[];
+  var ma5=[],ma10=[],ma20=[];
   for(var i=0;i<n;i++){
     ma5.push(i>=4?(C.slice(i-4,i+1).reduce(function(a,b){return a+b;},0)/5):null);
+    ma10.push(i>=9?(C.slice(i-9,i+1).reduce(function(a,b){return a+b;},0)/10):null);
     ma20.push(i>=19?(C.slice(i-19,i+1).reduce(function(a,b){return a+b;},0)/20):null);
   }
   var nY=ssqSuperTrend(H,L,C,20,3), nB=ssqSuperTrend(H,L,C,10,2);
@@ -9280,7 +9156,7 @@ function structSignalCalc(kl, code, name, count, suf){
   for(var i=20;i<=lastComplete;i++){
     var rHi=-Infinity,rLo=Infinity;
     for(var j=Math.max(0,i-60);j<=i;j++){if(H[j]>rHi)rHi=H[j];if(L[j]<rLo)rLo=L[j];}
-    if(((C[i]-rLo)/((rHi-rLo)||1))<0.4){
+    if(((C[i]-rLo)/((rHi-rLo)||1))<0.3){   // v11.144:低位收紧 40%→30%(下跌中继的“半山腰”不再满足低位前提)
       var sig=cdBottomPatternsF(i,O,C,H,L,V);
       if(sig.pats.length){cd.push(i);cdMeta[i]={pats:sig.pats,volOk:sig.volOk};}
     }
@@ -9288,6 +9164,17 @@ function structSignalCalc(kl, code, name, count, suf){
   // v11.135 准确性:CD 与推荐日【配对】——从最近的 CD 往前找,取第一个「其后确实发生 MA5 上穿 MA20 真金叉」的 CD。
   //   原逻辑机械取最后一个 CD,若它之后没出现金叉(如回调新低),推荐日/±3%/±5% 全部落空(600111 实证);
   //   正确语义:最新 CD 尚未确认(无金叉)时,展示最近一组「已确认」的 CD→金叉结构。
+  // v11.144:CD 企稳确认 —— CD 后 5 根内若跌破 CD 当日最低价(容差0.5%),该信号是【下跌中继】而非底部,剔除。
+  //   修复"半山腰误标":此前低位区间(下40%)太宽,下跌途中任何小阳线都被当 CD。
+  var cd2=[],cdMeta2={};
+  for(var di=0;di<cd.length;di++){
+    var ci2=cd[di],okStable=true;
+    for(var sj=ci2+1;sj<=Math.min(ci2+5,lastComplete);sj++){
+      if(L[sj]<L[ci2]*0.995){okStable=false;break;}
+    }
+    if(okStable){cd2.push(ci2);cdMeta2[ci2]=cdMeta[ci2];}
+  }
+  cd=cd2;cdMeta=cdMeta2;
   var recoIdx=null,cdPick=null;
   for(var ci=cd.length-1;ci>=0 && recoIdx==null;ci--){
     for(var i=cd[ci]+1;i<=lastComplete;i++){
@@ -9295,6 +9182,78 @@ function structSignalCalc(kl, code, name, count, suf){
     }
   }
   var lastIdx=lastComplete;
+  // v11.142:启动点判定按「复利行动」模式重写(用户反馈:北方稀土此前误报 —— 缺少横盘缩量酝酿期,
+  //   把推荐日后的脉冲长阳当成了启动)。完整链条 = 推荐(金叉) → ④横盘缩量·不破关键位 → ⑤再次放量突破均线。
+  //   【阶段④ 横盘缩量期】(推荐日次日起 3~6 根):
+  //     a. 横盘:段内收盘价最大振幅 ≤ 8%;
+  //     b. 缩量:段内日均量 ≤ 推荐日量×1.2 且 ≤ 近30日均量(持续缩量);
+  //     c. 不破关键位:段内最低价 ≥ 关键支撑(推荐日前20日至推荐日的最低价,容差0.5%)。
+  //   【阶段⑤ 突破信号日】需同时满足:
+  //     a. 再次放量:当日量 ≥ 横盘期日均量×2 且 ≥ 前5日均量×1.5;
+  //     b. 突破均线:收盘 > MA5/MA10/MA20(一阳穿三线);
+  //     c. 平台突破:收盘创推荐日以来新高;
+  //     d. 阳线:收盘 > 开盘。
+  //   次日为低吸建仓点(图2模式);任一条件不满足则不标 —— 无横盘酝酿的脉冲大涨是虚假信号。
+  var launchIdx=null;
+  if(recoIdx!=null){
+    var keyLow=Math.min.apply(null,L.slice(Math.max(0,recoIdx-20),recoIdx+1));   // 关键支撑(含 CD 低点)
+    for(var li=recoIdx+1;li<=lastComplete;li++){
+      var flatN=Math.min(6,li-recoIdx-1);
+      if(flatN<2)continue;                                                       // v11.150:横盘期至少 2 根(原3根会漏掉金叉后快速启动的形态,实测百亚股份)
+      var s0=Math.max(recoIdx+1,li-flatN);                                       // 横盘段起点(推荐日次日起)
+      // ④a 横盘:段内收盘振幅 ≤ 8%
+      var hiC=-Infinity,loC=Infinity;
+      for(var k3=s0;k3<li;k3++){if(C[k3]>hiC)hiC=C[k3];if(C[k3]<loC)loC=C[k3];}
+      if(!(loC>0&&(hiC-loC)/loC<=0.08))continue;
+      // v11.156:横盘段必须【全程缩量】—— 段内任一根量比>1.1 即不算缩量横盘。
+      //   实测南华生物:推荐日(08-07)后第3根(08-12)被标启动,实为金叉放量行情的直接延续
+      //   (横盘段首根 08-10 量比 1.30>1.1);真正的启动是 09-17 横盘一个月后的爆量突破。
+      //   对照:百亚横盘段量比 0.92~0.96、移远 0.47~0.98,全程缩量不受影响。
+      if(s0>=5){
+        var maxVR=0;
+        for(var kvr=s0;kvr<li;kvr++){
+          var base=(V[kvr-1]+V[kvr-2]+V[kvr-3]+V[kvr-4]+V[kvr-5])/5;
+          if(base>0){ var vr2=V[kvr]/base; if(vr2>maxVR)maxVR=vr2; }
+        }
+        // 蓄势深度规则:横盘越久容忍越宽(2根→1.00,6根→1.30) —— 2根横盘必须全程缩量(拦金叉延续),
+        //   长横盘允许偶发放量试探(南华 09-17 横盘段 max 1.24 放行)
+        var vrThresh = 1.0 + (flatN - 2) * 0.075;
+        if(!(maxVR<=vrThresh))continue;
+      }
+      // ④b 缩量:段均量 ≤ 推荐日量×1.2 且 ≤ 近30日均量
+      var fv=0;for(var k4=s0;k4<li;k4++)fv+=V[k4];fv/=(li-s0);
+      var refV=V[recoIdx]||0;
+      var v30=0,vn=0;for(var k5=Math.max(0,li-30);k5<li;k5++){v30+=V[k5];vn++;}
+      v30=vn?v30/vn:0;
+      // v11.150:缩量锚放宽 —— 推荐日(金叉日)本身常为放量日,金叉后温和爬升的横盘量自然略高于它,
+      //   原锚(fv≤推荐日量×1.2)必失败(实测百亚股份)。改取两者宽者。
+      if(!(refV>0&&fv<=Math.max(refV*1.2,v30*1.3)))continue;
+      // ④c 不破关键支撑
+      var sLo=Infinity;for(var k6=s0;k6<li;k6++){if(L[k6]<sLo)sLo=L[k6];}
+      if(!(sLo>=keyLow*0.995))continue;
+      // v11.143 强化(全市场通用,进一步压虚假信号):
+      // ④d 横盘中枢在 MA20 附近或上方(段均收盘 ≥ MA20×0.98)—— 排除下跌趋势中的反弹横盘
+      var midC=0;for(var k9=s0;k9<li;k9++)midC+=C[k9];midC/=(li-s0);
+      if(!(ma20[li]!=null&&midC>=ma20[li]*0.98))continue;
+      // ⑤ 突破日:再次放量 + 一阳穿三线 + 平台新高 + 阳线
+      var va5=0;for(var k7=1;k7<=5;k7++)va5+=(V[li-k7]||0);va5/=5;
+      // v11.150:量能门槛改二选一(≥横盘均量×1.8 或 ≥前5日均量×1.5) —— 原「必须≥横盘×2」在极缩量横盘下
+      //   相对门槛过高,漏掉温和放量启动(实测百亚股份 09-07 量1.54×横盘但随后连涨70%)
+      if(!(V[li]>=fv*1.8||V[li]>=va5*1.5))continue;
+      if(!(C[li]>O[li]))continue;
+      // v11.152:突破日实体≥1% —— 排除十字星假突破(实测福能股份 09-11 实体仅0.2%被标启动,随后回落)
+      if(!((C[li]-O[li])/O[li]>=0.004))continue;   // v11.156:下限 1%→0.4% —— 0.4% 在福能(0.2%十字星,拦)与百亚(0.5%小阳启动,放行)之间取界
+      if(!(ma5[li]!=null&&ma10[li]!=null&&ma20[li]!=null&&C[li]>ma5[li]&&C[li]>ma10[li]&&C[li]>ma20[li]))continue;
+      // v11.143 强化:⑤b 突破日为温和放量阳线(实体≤7%) —— 排除脉冲/涨停式大涨(那是模式①,不是低吸启动)
+      // v11.156:移除实体上限7% —— 实测南华生物 09-17 实体10.2%的爆量长阳正是模式⑤启动(横盘一个月后),
+      //   上限会把它漏掉;防脉冲由横盘期条件把关(振幅≤8%要求突破前真的横住)
+      // ⑤c MA20 走平或上拐(ma20[li] ≥ ma20[li-2]) —— 排除 MA20 仍向下的趋势内突破
+      // v11.157:MA20 上拐加 0.1% 容差 —— 横盘一个月的 MA20 本就走平,±0.008 级的微降是噪声
+      //   (实测新华文轩 09-16:ma20 11.696 vs 11.704 差-0.008 被拦,但那正是横盘一个月后的爆量突破)
+      if(!(ma20[li-2]!=null&&ma20[li]>=ma20[li-2]*0.999))continue;
+      launchIdx=li;break;
+    }
+  }
   var confirmHigh=H[lastIdx];
   var failLow=Math.min.apply(null,L.slice(Math.max(0,n-10)));
   var recoClose=recoIdx!=null?C[recoIdx]:null;
@@ -9306,20 +9265,21 @@ function structSignalCalc(kl, code, name, count, suf){
       var a20=V.slice(i-19,i+1).reduce(function(a,b){return a+b;},0)/20;
       bm.push(a20>0?Math.round(a5/a20*100):null);}else bm.push(null);
   }
-  // v11.133:disp 保留【全部已取回数据】(含预热根数,平移/缩放有真实历史可看),
   // 默认视窗(最后 cnt 根)由 drawStructChart 的 SSQ.view 控制,数据不再物理截断。
   var cnt=count||SSQ.count||66;
-  var disp={D:D,O:O,C:C,H:H,L:L,V:V,ma5:ma5,ma20:ma20,nY:nY,nB:nB,bm:bm,win0:0};
+  var disp={D:D,O:O,C:C,H:H,L:L,V:V,ma5:ma5,ma10:ma10,ma20:ma20,nY:nY,nB:nB,bm:bm,win0:0};
   var cdDisp=cd.slice();
   var recoDisp=recoIdx;
+  var launchDisp=launchIdx;
   var lastC=C[n-1];
   var atr14=null;
   if(n>=15){var trs=[];
     for(var i=n-14;i<n;i++){var pc=C[i-1];trs.push(Math.max(H[i]-L[i],Math.abs(H[i]-pc),Math.abs(L[i]-pc)));}
     atr14=trs.reduce(function(a,b){return a+b;},0)/trs.length;}
   var risk=atr14!=null?Math.round(atr14*1.5*100)/100:null;
-  return {disp:disp,cdDisp:cdDisp,recoDisp:recoDisp,cdPick:cdPick,cdMeta:cdMeta,n:n,
+  return {disp:disp,cdDisp:cdDisp,recoDisp:recoDisp,cdPick:cdPick,cdMeta:cdMeta,launch:launchDisp,n:n,
     levels:{recoDate:recoIdx!=null?D[recoIdx]:null,cdDate:cdPick!=null?D[cdPick]:null,
+      launchDate:launchIdx!=null?D[launchIdx]:null,
       cdPats:(cdPick!=null&&cdMeta[cdPick])?cdMeta[cdPick].pats:[],cdVolOk:(cdPick!=null&&cdMeta[cdPick])?!!cdMeta[cdPick].volOk:false,
       recoClose:recoClose,confirmHigh:Math.round(confirmHigh*100)/100,
       failLow:Math.round(failLow*100)/100,p3:p3,m95:m95,lastIdx:lastIdx,lastDate:D[lastIdx]},
@@ -9382,15 +9342,23 @@ function drawStructChart(cv, calc){
     else{ctx.fillRect(x-bw/2,yo,bw,Math.max(1,yc-yo));}
   }
   drawLine(d.ma5,'#f87171');drawLine(d.ma20,'#c084fc');
+  // v11.140:只画与推荐日配对的 CD 抄底三角(其余历史候选不再显示,应用户要求"黄色三角形去除掉,只显示CD抄底三角形")
   ctx.fillStyle='#f59e0b';
-  for(var k=0;k<calc.cdDisp.length;k++){var idx=calc.cdDisp[k];if(idx<vs||idx>=ve)continue;
-    var x=X(idx),y=Y(d.L[idx])+8,isPick=(calc.cdPick===idx);
-    // v11.135:与推荐日配对的 CD 加大并标「CD」(模板样式),其余候选保持小三角
-    ctx.beginPath();
-    if(isPick){ctx.moveTo(x,y-8);ctx.lineTo(x-6,y+2);ctx.lineTo(x+6,y+2);}
-    else{ctx.moveTo(x,y-6);ctx.lineTo(x-4,y+1);ctx.lineTo(x+4,y+1);}
-    ctx.closePath();ctx.fill();
-    if(isPick){ctx.font='bold 9px sans-serif';ctx.fillText('CD',x-6,y+12);ctx.font='9px sans-serif';}
+  if(calc.cdPick!=null&&calc.cdPick>=vs&&calc.cdPick<ve){
+    var x=X(calc.cdPick),y=Y(d.L[calc.cdPick])+8;
+    ctx.beginPath();ctx.moveTo(x,y-8);ctx.lineTo(x-6,y+2);ctx.lineTo(x+6,y+2);ctx.closePath();ctx.fill();
+    ctx.font='bold 9px sans-serif';ctx.fillText('CD',x-6,y+12);ctx.font='9px sans-serif';
+  }
+  // v11.140:启动信号(明艳圆形)—— 图2模式⑤「再次放量突破均线」,画在该K线上方,一眼可辨
+  if(calc.launch!=null&&calc.launch>=vs&&calc.launch<ve){
+    var gx=X(calc.launch),gy=Y(d.H[calc.launch])-12;
+    ctx.beginPath();ctx.arc(gx,gy,5.5,0,Math.PI*2);
+    ctx.fillStyle='#ff2d78';ctx.fill();
+    ctx.strokeStyle='#ffe066';ctx.lineWidth=1.5;ctx.stroke();
+    // v11.143:圆下加向下小箭头,直观指向启动K线位置
+    ctx.fillStyle='#ff2d78';
+    ctx.beginPath();ctx.moveTo(gx-4,gy+8);ctx.lineTo(gx+4,gy+8);ctx.lineTo(gx,gy+14);ctx.closePath();ctx.fill();
+    ctx.font='bold 9px sans-serif';ctx.fillStyle='#ff2d78';ctx.fillText('启',gx-5,gy-9);
   }
   if(calc.recoDisp!=null&&calc.recoDisp>=vs&&calc.recoDisp<ve){var rx=X(calc.recoDisp);
     ctx.strokeStyle='#ef4444';ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(rx,padT-6);ctx.lineTo(rx,padT+mainH+10);ctx.stroke();ctx.setLineDash([]);
@@ -9523,6 +9491,7 @@ function ssqRenderLevels(calc){
     row('推荐日',rd,'红色竖线。只评价这一天之后的走势,避免用后来的结果倒推推荐质量')+
     row('CD 信号',lv.cdPats&&lv.cdPats.length?(lv.cdPats.join('·')+(lv.cdVolOk?' (量能确认)':' (量能未确认)')):'--',
       '九大进场信号:低位出现经典底部形态(笔直大阳/旭日东升/大长腿/十字星/双锤/阳包阴/希望之星/大阴接小阳/新低收阳);量能确认=温和放量')+
+    row('启动信号',lv.launchDate||'--','图2模式:前期横盘缩量(≥3根,振幅≤8%,量≤推荐日1.2倍且≤30日均量)且不破关键支撑,当日再放量(≥横盘均量2倍且≥5日均量1.5倍)一阳穿三线+创推荐日以来新高;粉色圆形;次日为低吸观察点;无酝酿期不标(防虚假信号)')+
     row('裸K确认参考',lv.confirmHigh,'最新完整日K的高点。价格有效站上,说明突破得到进一步确认;不是自动买入价')+
     row('结构失效参考',lv.failLow,'近10日低点。跌破后,原来的上行结构明显转弱,应重新评估')+
     row('+3% 兑现线',lv.p3!=null?lv.p3:'--','从推荐价出发的统一验证门槛,用来记录结果,不是止盈指令')+
@@ -9551,34 +9520,103 @@ function openStructSignalModal(){
   if(SSQ.code && !cur){ if(inp)inp.value=SSQ.code; cur=SSQ.code; }
   if(cur && /^\d{6}$/.test(cur)){ SSQ.code=cur; try{ runStructQuery(); }catch(e){} }
 }
-function closeStructSignalModal(){var m=document.getElementById('struct-modal');if(m){m.classList.remove('show');document.body.style.overflow='';}}
+function closeStructSignalModal(){var m=document.getElementById('struct-modal');if(m){m.classList.remove('show');document.body.style.overflow='';}stopStructAutoRefresh();}
 function ssqSetP(btn){SSQ.period=btn.getAttribute('data-p');var sp=document.getElementById('ssq-period');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});if(SSQ.code)runStructQuery();}
-function ssqSetC(btn){SSQ.count=parseInt(btn.getAttribute('data-c'),10)||66;var sp=document.getElementById('ssq-range');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});if(SSQ.code)runStructQuery();}
+function ssqSetC(btn){SSQ.count=parseInt(btn.getAttribute('data-c'),10)||66;var sp=document.getElementById('ssq-range');sp.querySelectorAll('.ssq-btn').forEach(function(b){b.classList.toggle('on',b===btn);});
+  // v11.151:范围切换不重新拉取 —— 日线一次已拉 count+80 根,切范围只改视窗秒级重渲染(根治:原逻辑重新查询,
+  //   一年 330 根在手机网络下 10-20s 才返回,期间 canvas 无响应 = 用户看到的"半年/一年无法移动缩放")
+  if(SSQ.kl&&SSQ.klPeriod===SSQ.period&&SSQ.kl.length>=Math.max(SSQ.count,35)&&typeof rerenderStruct==='function'){ rerenderStruct(); return; }
+  if(SSQ.code)runStructQuery();}
 async function runStructQuery(){
   var inp=document.getElementById('ssq-code');var code=(inp&&inp.value||'').trim();
   SSQ.code=code;
   if(!/^\d{6}$/.test(code)){showToast('请输入 6 位个股代码','warn');return;}
   var c0=code.charAt(0);var full=(c0==='6'||c0==='5')?('sh'+code):((c0==='4'||c0==='8'||c0==='9')?('bj'+code):('sz'+code));
   var out=document.getElementById('ssq-out');
-  out.innerHTML='<div class="ssq-empty">查询中…</div>';
+  out.innerHTML='<div class="ssq-empty">查询中…(弱网下最长约 30 秒,请稍候)</div>';
+  // v11.148:北交所拦截(与加股一致:92/83/87/88 缺历史K线,无法算MA/ATR等指标)
+  if(isBJCode(code)){ out.innerHTML='<div class="ssq-empty">暂不支持北交所股票(缺历史K线,无法计算MA/ATR等指标,且 30% 涨跌幅破坏风控)</div>'; return; }
   var period=SSQ.period==='m15'?'m15':(SSQ.period==='m60'?'m60':(SSQ.period==='week'?'week':'day'));
-  var kl=await fetchKlinePeriod(full,period,Math.max(SSQ.count+80,120));   // v11.133:+80 余量(平移可看到范围外历史)
-  if((!kl||kl.length<35)&&period==='day'){ try{ kl=await fetchKlineF(full,Math.max(SSQ.count+80,120)); }catch(e){} }   // v11.132:日线降级三源兜底
-  if(!kl||kl.length<35){out.innerHTML='<div class="ssq-empty">未获取到该代码K线(请确认代码/北交所暂不支持)</div>';return;}
-  // v11.132c:拉真实个股名称(图上标题用);失败降级显示代码,不阻断查询
-  var suf=full.slice(0,2).toUpperCase(),nm='';
+  var suf=full.slice(0,2).toUpperCase();
+  var kl,nm='';
   try{
-    var qres=await fetchWithTimeout('https://qt.gtimg.cn/q='+full,{cache:'no-store'});
-    var qbuf=await qres.arrayBuffer();
-    var qm=new TextDecoder('gbk').decode(qbuf).match(/="([^"]+)"/);
-    if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)nm=String(qf[1]);}
-  }catch(e){}
-  var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
+    // v11.144:①双源并行竞速(原串行最长 18s → 并行 9s) ②成功结果 60s 内存缓存(重复点击秒出) ③整体 try/catch(任何异常都给终态,绝不卡"查询中")
+    SSQ.cache=SSQ.cache||{};
+    var cacheKey=full+'|'+period+'|'+SSQ.count;
+    var hit=SSQ.cache[cacheKey];
+    var namePromise=fetchWithTimeout('https://qt.gtimg.cn/q='+full,{cache:'no-store'}).then(function(r){return r.arrayBuffer();}).then(function(b){
+        var qm=new TextDecoder('gbk').decode(b).match(/="([^"]+)"/);
+        if(qm){var qf=qm[1].split('~');if(String(qf[1]||'').length>0&&String(qf[2]||'').trim()===code)return String(qf[1]);}
+        return '';}).catch(function(){return '';});
+    if(hit&&(Date.now()-hit.t)<60000){
+      kl=hit.kl;
+    }else{
+      var pA=fetchKlinePeriod(full,period,Math.max(SSQ.count+80,120)).catch(function(){return [];});
+      var pB=(period==='day')?fetchKlineF(full,Math.max(SSQ.count+80,120)).catch(function(){return [];}):Promise.resolve([]);
+      // v11.147:首个有效结果优先(主源成功立即出图,不等慢源),12s 硬兜底(绝不无限等)
+      kl=await new Promise(function(resolve){
+        var nDone=0,got=null;
+        function fin(){ nDone++; if(nDone>=2||got){ resolve(got); } }
+        pA.then(function(v){ if(v&&v.length>=35&&!got)got=v; fin(); }).catch(function(){ fin(); });
+        pB.then(function(v){ if(v&&v.length>=35&&!got)got=v; fin(); }).catch(function(){ fin(); });
+        setTimeout(function(){ resolve(got); },32000);   // v11.154:12s→32s(弱网下 pB 降级链最坏 ~30s)
+      });
+      if(kl&&kl.length>=35)SSQ.cache[cacheKey]={t:Date.now(),kl:kl};
+    }
+    if(!kl||kl.length<35){out.innerHTML='<div class="ssq-empty">未获取到该代码K线(请确认代码/北交所暂不支持;数据源偶发限流可稍后重试)</div>';return;}
+    // v11.148:名称(用于 ST 剔除与图上标题);K线有效后再等名称(通常已并行完成,几乎不额外耗时)
+    try{ nm=await namePromise; }catch(e){ nm=''; }
+    if(nm && /^\*?ST/i.test(String(nm).trim())){ out.innerHTML='<div class="ssq-empty">暂不支持 ST / 风险警示股（'+escHtmlF(nm)+'），结构信号判定不适用于风险警示股</div>'; return; }
+    SSQ.kl=kl;SSQ.klPeriod=period;SSQ.lastName=nm||code;SSQ.lastSuf=suf;SSQ._full=full;   // v11.151:缓存K线供范围切换复用
+    var calc=structSignalCalc(kl,code,nm||code,SSQ.count,suf);
   SSQ.view=null;   // v11.133:新查询重置视窗(默认显示所选范围,再由手势平移/缩放)
+  renderStructOutput(out,calc);
+  startStructAutoRefresh();   // v11.153:盘中自动刷新(手动搜索查完随行情动态更新)
+  }catch(e){
+    out.innerHTML='<div class="ssq-empty">查询失败:'+(String(e&&e.message||e)).slice(0,80)+' —— 请稍后重试</div>';
+  }
+}
+// v11.151:结构信号渲染收口(runStructQuery 与范围切换 ssqSetC 共用)
+function renderStructOutput(out,calc){
   out.innerHTML=ssqRenderParams(calc)+'<div class="ssq-cwrap" id="ssq-canvas-wrap"><canvas id="ssq-canvas"></canvas></div>'+
-    '<div class="ssq-legend"><span style="white-space:nowrap"><i style="background:#ef4444"></i>K线(阳空心/阴实心)/MA5</span> <span style="white-space:nowrap"><i style="background:#c084fc"></i>MA20</span> <span style="white-space:nowrap"><i style="color:#f59e0b">▲</i>CD抄底</span> <span style="white-space:nowrap"><span style="color:#ef4444;margin:0 3px 0 8px">┆</span>推荐日</span> <span style="white-space:nowrap"><i style="background:#384250"></i>成交量</span> <span style="white-space:nowrap"><i style="background:#22c55e"></i>资金活跃度</span> <span style="white-space:nowrap;color:#94a3b8">按住看日期</span></div>'+
+    '<div class="ssq-legend"><span style="white-space:nowrap"><i style="background:#ef4444"></i>K线(阳空心/阴实心)/MA5</span> <span style="white-space:nowrap"><i style="background:#c084fc"></i>MA20</span> <span style="white-space:nowrap"><i style="color:#f59e0b">▲</i>CD抄底</span> <span style="white-space:nowrap"><i style="background:#ff2d78;border-radius:50%"></i>启动</span> <span style="white-space:nowrap"><span style="color:#ef4444;margin:0 3px 0 8px">┆</span>推荐日</span> <span style="white-space:nowrap"><i style="background:#384250"></i>成交量</span> <span style="white-space:nowrap"><i style="background:#22c55e"></i>资金活跃度</span> <span style="white-space:nowrap;color:#94a3b8">按住看日期</span></div>'+
     ssqRenderLevels(calc);
   drawStructChart(document.getElementById('ssq-canvas'),calc);
+}
+// v11.151:范围切换复用已拉K线,仅重算+重渲染(不重新拉取)
+function rerenderStruct(){
+  var out=document.getElementById('ssq-out'); if(!out||!SSQ.kl)return;
+  try{
+    var calc=structSignalCalc(SSQ.kl,SSQ.code,SSQ.lastName||SSQ.code,SSQ.count,SSQ.lastSuf||'');
+    SSQ.view=null;
+    renderStructOutput(out,calc);
+  }catch(e){ console.warn('[rerenderStruct]',e.message); }
+}
+
+// v11.153:结构信号「盘中自动刷新」—— 手动搜索查完后,交易时段内每 60s 重拉最新日线并重算重渲染,
+//   让 K 线与三大信号(CD/推荐日/启动)随行情动态更新(此前是"一次性快照,查完不自动变")。
+function startStructAutoRefresh(){
+  stopStructAutoRefresh();
+  try{
+    if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle)return;   // 仅连续竞价时段(09:30-11:30/13:00-14:50)
+    SSQ._autoTimer=setInterval(function(){ refreshStructLive(); },60000);
+  }catch(e){}
+}
+function stopStructAutoRefresh(){ if(SSQ._autoTimer){ clearInterval(SSQ._autoTimer); SSQ._autoTimer=null; } }
+function refreshStructLive(){
+  try{
+    if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle){ stopStructAutoRefresh(); return; }
+    if(!SSQ._full||!SSQ.code)return;
+    var out=document.getElementById('ssq-out'); if(!out)return;
+    fetchKlinePeriod(SSQ._full,'day',Math.max(SSQ.count+80,120)).then(function(kl){
+      if(kl&&kl.length>=35){
+        SSQ.kl=kl;
+        // 保留当前视窗(不重置 SSQ.view),仅重算+重渲染 —— 避免自动刷新把用户正在拖动/缩放的视窗跳回默认
+        var calc=structSignalCalc(SSQ.kl,SSQ.code,SSQ.lastName||SSQ.code,SSQ.count,SSQ.lastSuf||'');
+        try{ renderStructOutput(out,calc); }catch(e){}
+      }
+    }).catch(function(){});
+  }catch(e){}
 }
 window.openStructSignalModal=openStructSignalModal;window.closeStructSignalModal=closeStructSignalModal;
 window.ssqSetP=ssqSetP;window.ssqSetC=ssqSetC;window.runStructQuery=runStructQuery;
