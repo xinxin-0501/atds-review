@@ -4,11 +4,10 @@
     "time": "16:20",
     "type": "close",
     "typeLabel": "收盘复盘",
-    "generatedAt": "2026-09-28 17:15:06",
-    "capturedAt": "2026-09-28 17:15:06",
+    "generatedAt": "2026-09-28 18:46:40",
+    "capturedAt": "2026-09-28 18:46:40",
     "market": "A股",
     "dataSource": "腾讯行情 + 东方财富公开接口",
-    "degraded": "板块数据源(东财)暂不可用,主线/资金流向/板块排行缺失",
     "dataAsOfDate": "2026-09-28",
     "dataAsOfLabel": "今日盘中/收盘"
   },
@@ -38,7 +37,7 @@
     "flatCount": 115,
     "breadthScope": "沪深",
     "limitUpCount": 33,
-    "limitDownCount": 0,
+    "limitDownCount": 56,
     "zhaBanCount": 11,
     "maxLianBan": 5,
     "maxLianBanStock": "新华传媒",
@@ -20855,7 +20854,158 @@
       "kaiban": 2
     }
   ],
-  "limitDown": [],
+  "limitDown": [
+    {
+      "rank": 1,
+      "code": "000988",
+      "name": "华工科技",
+      "price": 92.61,
+      "pct": -10,
+      "lianban": 1,
+      "reason": "自动化设",
+      "sealAmount": "0.02"
+    },
+    {
+      "rank": 2,
+      "code": "002796",
+      "name": "世嘉科技",
+      "price": 26.24,
+      "pct": -10.01,
+      "lianban": 1,
+      "reason": "通信设备",
+      "sealAmount": "0.02"
+    },
+    {
+      "rank": 3,
+      "code": "002484",
+      "name": "江海股份",
+      "price": 52.16,
+      "pct": -10.01,
+      "lianban": 1,
+      "reason": "元件",
+      "sealAmount": "0.03"
+    },
+    {
+      "rank": 4,
+      "code": "603663",
+      "name": "三祥新材",
+      "price": 43.38,
+      "pct": -10,
+      "lianban": 1,
+      "reason": "化学原料",
+      "sealAmount": "0.06"
+    },
+    {
+      "rank": 5,
+      "code": "002937",
+      "name": "兴瑞科技",
+      "price": 27.23,
+      "pct": -9.98,
+      "lianban": 1,
+      "reason": "汽车零部",
+      "sealAmount": "0.07"
+    },
+    {
+      "rank": 6,
+      "code": "601567",
+      "name": "三星电气",
+      "price": 14.63,
+      "pct": -9.97,
+      "lianban": 1,
+      "reason": "电网设备",
+      "sealAmount": "0.08"
+    },
+    {
+      "rank": 7,
+      "code": "603052",
+      "name": "可川科技",
+      "price": 52.61,
+      "pct": -10.01,
+      "lianban": 1,
+      "reason": "消费电子",
+      "sealAmount": "0.09"
+    },
+    {
+      "rank": 8,
+      "code": "600743",
+      "name": "华远控股",
+      "price": 2.3,
+      "pct": -10.16,
+      "lianban": 1,
+      "reason": "房地产服",
+      "sealAmount": "0.09"
+    },
+    {
+      "rank": 9,
+      "code": "600345",
+      "name": "长江通信",
+      "price": 46.7,
+      "pct": -10,
+      "lianban": 1,
+      "reason": "通信设备",
+      "sealAmount": "0.09"
+    },
+    {
+      "rank": 10,
+      "code": "600547",
+      "name": "山东黄金",
+      "price": 26.16,
+      "pct": -10.01,
+      "lianban": 1,
+      "reason": "贵金属",
+      "sealAmount": "0.10"
+    },
+    {
+      "rank": 11,
+      "code": "600246",
+      "name": "万通发展",
+      "price": 12.91,
+      "pct": -9.97,
+      "lianban": 1,
+      "reason": "房地产开",
+      "sealAmount": "0.11"
+    },
+    {
+      "rank": 12,
+      "code": "603636",
+      "name": "南威软件",
+      "price": 7.15,
+      "pct": -9.95,
+      "lianban": 1,
+      "reason": "IT服务Ⅱ",
+      "sealAmount": "0.11"
+    },
+    {
+      "rank": 13,
+      "code": "603115",
+      "name": "海星股份",
+      "price": 71.46,
+      "pct": -10,
+      "lianban": 1,
+      "reason": "元件",
+      "sealAmount": "0.11"
+    },
+    {
+      "rank": 14,
+      "code": "603738",
+      "name": "泰晶科技",
+      "price": 34.02,
+      "pct": -10,
+      "lianban": 1,
+      "reason": "元件",
+      "sealAmount": "0.14"
+    },
+    {
+      "rank": 15,
+      "code": "603124",
+      "name": "江南新材",
+      "price": 118.64,
+      "pct": -10,
+      "lianban": 1,
+      "reason": "金属新材",
+      "sealAmount": "0.16"
+    }
+  ],
   "watchlist": [
     {
       "code": "600487",
@@ -20967,7 +21117,7 @@
         "pct5": -12.74,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -20983,12 +21133,19 @@
         "atr": 3.9
       },
       "fundFlow": {
-        "d1": -9.99,
-        "d3": -20.07,
-        "d5": -18.71,
-        "fromCache": true,
-        "cacheDate": "2026-09-28",
-        "source": "local-eastmoney-push2his"
+        "date": "2026-09-28",
+        "d1": -19.1,
+        "d3": -41.07,
+        "d5": -38.14,
+        "src": "eastmoney-push2his",
+        "series": {
+          "2026-09-18": 0.33,
+          "2026-09-21": 1.03,
+          "2026-09-22": 1.9,
+          "2026-09-23": -11.98,
+          "2026-09-24": -9.99,
+          "2026-09-28": -19.1
+        }
       },
       "minTrend": {
         "m60": {
@@ -21036,7 +21193,9 @@
           "impactLevel": "高",
           "detail": "亨通光电关于最近五年被证券监管部门和证券交易所采取处罚或监管措施的公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600487&announcementId=1225582557&orgId=gssh0600487&announcementTime=2026-09-25"
+          "announcementId": "1225582557",
+          "orgId": "gssh0600487",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600487&announcementId=1225582557"
         },
         {
           "type": "业绩预告",
@@ -21069,7 +21228,9 @@
           "impactLevel": "中",
           "detail": "亨通光电关于回购注销部分限制性股票并减少注册资本通知债权人的公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600487&announcementId=1225563335&orgId=gssh0600487&announcementTime=2026-09-15"
+          "announcementId": "1225563335",
+          "orgId": "gssh0600487",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600487&announcementId=1225563335"
         },
         {
           "type": "解禁",
@@ -21117,7 +21278,9 @@
           "impactLevel": "低",
           "detail": "亨通光电2026年第四次临时股东会会议材料",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600487&announcementId=1225553720&orgId=gssh0600487&announcementTime=2026-09-09"
+          "announcementId": "1225553720",
+          "orgId": "gssh0600487",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600487&announcementId=1225553720"
         },
         {
           "type": "股东大会",
@@ -21135,7 +21298,9 @@
           "impactLevel": "低",
           "detail": "安徽承义律师事务所关于江苏亨通光电股份有限公司召开2026年第四次临时股东会的法律意见书",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600487&announcementId=1225563333&orgId=gssh0600487&announcementTime=2026-09-15"
+          "announcementId": "1225563333",
+          "orgId": "gssh0600487",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600487&announcementId=1225563333"
         },
         {
           "type": "股东大会",
@@ -21153,7 +21318,9 @@
           "impactLevel": "低",
           "detail": "亨通光电关于暂不提请股东会审议本次向特定对象发行A股股票相关事项的公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600487&announcementId=1225582566&orgId=gssh0600487&announcementTime=2026-09-25"
+          "announcementId": "1225582566",
+          "orgId": "gssh0600487",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600487&announcementId=1225582566"
         },
         {
           "type": "财报披露",
@@ -21284,7 +21451,7 @@
         "pct5": -6.55,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -21300,12 +21467,19 @@
         "atr": 0.69
       },
       "fundFlow": {
-        "d1": -0.36,
-        "d3": -0.87,
-        "d5": -0.4,
-        "fromCache": true,
-        "cacheDate": "2026-09-28",
-        "source": "local-eastmoney-push2his"
+        "date": "2026-09-28",
+        "d1": -1.02,
+        "d3": -1.92,
+        "d5": -1.24,
+        "src": "eastmoney-push2his",
+        "series": {
+          "2026-09-18": -0.17,
+          "2026-09-21": 0.64,
+          "2026-09-22": 0.04,
+          "2026-09-23": -0.55,
+          "2026-09-24": -0.36,
+          "2026-09-28": -1.02
+        }
       },
       "minTrend": {
         "m60": {
@@ -21365,7 +21539,9 @@
           "impactLevel": "中",
           "detail": "盛和资源控股股份有限公司关于股份回购进展公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600392&announcementId=1225540463&orgId=gssh0600392&announcementTime=2026-09-02"
+          "announcementId": "1225540463",
+          "orgId": "gssh0600392",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600392&announcementId=1225540463"
         },
         {
           "type": "回购",
@@ -21383,7 +21559,9 @@
           "impactLevel": "中",
           "detail": "盛和资源控股股份有限公司关于以集中竞价交易方式首次回购股份的公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600392&announcementId=1225566023&orgId=gssh0600392&announcementTime=2026-09-16"
+          "announcementId": "1225566023",
+          "orgId": "gssh0600392",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600392&announcementId=1225566023"
         },
         {
           "type": "股东大会",
@@ -21401,7 +21579,9 @@
           "impactLevel": "低",
           "detail": "盛和资源控股股份有限公司关于召开2026年第一次临时股东会的通知",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600392&announcementId=1225524986&orgId=gssh0600392&announcementTime=2026-08-29"
+          "announcementId": "1225524986",
+          "orgId": "gssh0600392",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600392&announcementId=1225524986"
         },
         {
           "type": "股东大会",
@@ -21419,7 +21599,9 @@
           "impactLevel": "低",
           "detail": "盛和资源控股股份有限公司2026年第一次临时股东会资料",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600392&announcementId=1225550595&orgId=gssh0600392&announcementTime=2026-09-08"
+          "announcementId": "1225550595",
+          "orgId": "gssh0600392",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600392&announcementId=1225550595"
         },
         {
           "type": "股东大会",
@@ -21437,7 +21619,9 @@
           "impactLevel": "低",
           "detail": "盛和资源控股股份有限公司2026年第一次临时股东会资料（更新版）",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600392&announcementId=1225563523&orgId=gssh0600392&announcementTime=2026-09-15"
+          "announcementId": "1225563523",
+          "orgId": "gssh0600392",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600392&announcementId=1225563523"
         },
         {
           "type": "股东大会",
@@ -21455,7 +21639,9 @@
           "impactLevel": "低",
           "detail": "盛和资源控股股份有限公司2026年第一次临时股东会决议公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600392&announcementId=1225566052&orgId=gssh0600392&announcementTime=2026-09-16"
+          "announcementId": "1225566052",
+          "orgId": "gssh0600392",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600392&announcementId=1225566052"
         },
         {
           "type": "财报披露",
@@ -21584,7 +21770,7 @@
         "pct5": -3.13,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -21604,7 +21790,7 @@
         "d1": -4.9,
         "d3": 6.12,
         "d5": 0.95,
-        "src": "eastmoney-push2+series",
+        "src": "eastmoney-push2his",
         "series": {
           "2026-09-18": -0.3,
           "2026-09-21": -2.55,
@@ -21657,7 +21843,9 @@
           "impactLevel": "中",
           "detail": "关于2026年中期权益分派实施后调整回购股份价格上限的公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=300285&announcementId=1225536767&orgId=9900021557&announcementTime=2026-09-01 00:00:00"
+          "announcementId": "1225536767",
+          "orgId": "9900021557",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900021557&announcementId=1225536767"
         },
         {
           "type": "回购",
@@ -21675,7 +21863,9 @@
           "impactLevel": "中",
           "detail": "关于回购公司股份的进展公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=300285&announcementId=1225544834&orgId=9900021557&announcementTime=2026-09-02 19:28:09"
+          "announcementId": "1225544834",
+          "orgId": "9900021557",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900021557&announcementId=1225544834"
         },
         {
           "type": "股东大会",
@@ -21693,7 +21883,9 @@
           "impactLevel": "低",
           "detail": "关于召开2026年第二次临时股东会的通知",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=300285&announcementId=1225536769&orgId=9900021557&announcementTime=2026-09-01 00:00:00"
+          "announcementId": "1225536769",
+          "orgId": "9900021557",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900021557&announcementId=1225536769"
         },
         {
           "type": "股东大会",
@@ -21711,7 +21903,9 @@
           "impactLevel": "低",
           "detail": "北京天达共和律师事务所关于山东国瓷功能材料股份有限公司2026年第二次临时股东会的法律意见书",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=300285&announcementId=1225572194&orgId=9900021557&announcementTime=2026-09-18 17:26:28"
+          "announcementId": "1225572194",
+          "orgId": "9900021557",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900021557&announcementId=1225572194"
         }
       ],
       "eventsStatus": {
@@ -21833,7 +22027,7 @@
         "pct5": -12.03,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -21851,9 +22045,9 @@
       "fundFlow": {
         "date": "2026-09-28",
         "d1": -31.58,
-        "d3": -51.38,
-        "d5": -49.61,
-        "src": "eastmoney-push2+series",
+        "d3": -51.37,
+        "d5": -49.6,
+        "src": "eastmoney-push2his",
         "series": {
           "2026-09-18": 16.64,
           "2026-09-21": 11.74,
@@ -21906,7 +22100,9 @@
           "impactLevel": "中",
           "detail": "关于首次回购公司股份的公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=300308&announcementId=1225542046&orgId=9900022016&announcementTime=2026-09-01 18:38:10"
+          "announcementId": "1225542046",
+          "orgId": "9900022016",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900022016&announcementId=1225542046"
         },
         {
           "type": "回购",
@@ -21924,7 +22120,9 @@
           "impactLevel": "中",
           "detail": "关于回购股份事项前十名股东和前十名无限售条件股东持股情况的公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=300308&announcementId=1225544461&orgId=9900022016&announcementTime=2026-09-02 18:12:09"
+          "announcementId": "1225544461",
+          "orgId": "9900022016",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900022016&announcementId=1225544461"
         },
         {
           "type": "回购",
@@ -21942,7 +22140,9 @@
           "impactLevel": "中",
           "detail": "关于股份回购结果暨股份变动公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=300308&announcementId=1225583167&orgId=9900022016&announcementTime=2026-09-25 00:00:00"
+          "announcementId": "1225583167",
+          "orgId": "9900022016",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900022016&announcementId=1225583167"
         }
       ],
       "eventsStatus": {
@@ -22053,7 +22253,7 @@
         "pct5": -1.8,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -22069,12 +22269,19 @@
         "atr": 1.3
       },
       "fundFlow": {
-        "d1": -1.01,
-        "d3": -0.25,
-        "d5": 0.32,
-        "fromCache": true,
-        "cacheDate": "2026-09-28",
-        "source": "local-eastmoney-push2his"
+        "date": "2026-09-28",
+        "d1": -0.02,
+        "d3": -1.51,
+        "d5": -0.03,
+        "src": "eastmoney-push2his",
+        "series": {
+          "2026-09-18": 0.33,
+          "2026-09-21": 0.24,
+          "2026-09-22": 1.24,
+          "2026-09-23": -0.48,
+          "2026-09-24": -1.01,
+          "2026-09-28": -0.02
+        }
       },
       "minTrend": {
         "m60": {
@@ -22123,7 +22330,9 @@
           "impactLevel": "低",
           "detail": "宁波美诺华药业股份有限公司2026年第二次临时股东会决议公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=603538&announcementId=1225546978&orgId=9900029824&announcementTime=2026-09-04"
+          "announcementId": "1225546978",
+          "orgId": "9900029824",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900029824&announcementId=1225546978"
         },
         {
           "type": "财报披露",
@@ -22282,7 +22491,7 @@
         "pct5": -6.56,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -22302,7 +22511,7 @@
         "d1": -0.28,
         "d3": 0.47,
         "d5": 0.33,
-        "src": "eastmoney-push2+series",
+        "src": "eastmoney-push2his",
         "series": {
           "2026-09-18": -0.19,
           "2026-09-21": -0.05,
@@ -22461,7 +22670,7 @@
         "pct5": -8.93,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -22477,12 +22686,19 @@
         "atr": 1.99
       },
       "fundFlow": {
-        "d1": -0.29,
-        "d3": -0.45,
-        "d5": -1.68,
-        "fromCache": true,
-        "cacheDate": "2026-09-28",
-        "source": "local-eastmoney-push2+series"
+        "date": "2026-09-28",
+        "d1": -0.36,
+        "d3": -0.52,
+        "d5": -1.74,
+        "src": "eastmoney-push2his",
+        "series": {
+          "2026-09-18": -0.38,
+          "2026-09-21": -0.81,
+          "2026-09-22": -0.42,
+          "2026-09-23": -0.39,
+          "2026-09-24": 0.23,
+          "2026-09-28": -0.36
+        }
       },
       "minTrend": {
         "m60": {
@@ -22644,7 +22860,7 @@
         "pct5": -4.08,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -22664,7 +22880,7 @@
         "d1": 0.02,
         "d3": -0.64,
         "d5": -0.81,
-        "src": "eastmoney-push2+series",
+        "src": "eastmoney-push2his",
         "series": {
           "2026-09-18": -0.15,
           "2026-09-21": 0.07,
@@ -22732,7 +22948,9 @@
           "impactLevel": "中",
           "detail": "关于回购股份进展情况的公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=002385&announcementId=1225543430&orgId=9900011648&announcementTime=2026-09-03"
+          "announcementId": "1225543430",
+          "orgId": "9900011648",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900011648&announcementId=1225543430"
         },
         {
           "type": "回购",
@@ -22750,7 +22968,9 @@
           "impactLevel": "中",
           "detail": "关于回购注销部分限制性股票并减少注册资本暨通知债权人的公告",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=002385&announcementId=1225560315&orgId=9900011648&announcementTime=2026-09-12"
+          "announcementId": "1225560315",
+          "orgId": "9900011648",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900011648&announcementId=1225560315"
         },
         {
           "type": "股东大会",
@@ -22768,7 +22988,9 @@
           "impactLevel": "低",
           "detail": "北京市天元律师事务所关于北京大北农科技集团股份有限公司2026年第四次临时股东会的法律意见",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=002385&announcementId=1225560314&orgId=9900011648&announcementTime=2026-09-12"
+          "announcementId": "1225560314",
+          "orgId": "9900011648",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=9900011648&announcementId=1225560314"
         }
       ],
       "eventsStatus": {
@@ -22886,7 +23108,7 @@
         "pct5": -3.91,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -22906,7 +23128,7 @@
         "d1": -0.06,
         "d3": -0.52,
         "d5": -0.43,
-        "src": "eastmoney-push2+series",
+        "src": "eastmoney-push2his",
         "series": {
           "2026-09-18": -0.04,
           "2026-09-21": 0.03,
@@ -23062,7 +23284,7 @@
         "pct5": -5.28,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -23078,12 +23300,19 @@
         "atr": 1.06
       },
       "fundFlow": {
-        "d1": -0.74,
-        "d3": -1.49,
-        "d5": -0.52,
-        "fromCache": true,
-        "cacheDate": "2026-09-28",
-        "source": "local-eastmoney-push2his"
+        "date": "2026-09-28",
+        "d1": -1.21,
+        "d3": -1.83,
+        "d5": -2.01,
+        "src": "eastmoney-push2his",
+        "series": {
+          "2026-09-18": 0.27,
+          "2026-09-21": 0.7,
+          "2026-09-22": -0.87,
+          "2026-09-23": 0.12,
+          "2026-09-24": -0.74,
+          "2026-09-28": -1.21
+        }
       },
       "minTrend": {
         "m60": {
@@ -23130,7 +23359,9 @@
           "impactLevel": "低",
           "detail": "中粮糖业控股股份有限公司关于召开2026年第二次临时股东会通知",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600737&announcementId=1225576153&orgId=gssh0600737&announcementTime=2026-09-23"
+          "announcementId": "1225576153",
+          "orgId": "gssh0600737",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600737&announcementId=1225576153"
         },
         {
           "type": "财报披露",
@@ -23262,7 +23493,7 @@
         "pct5": -6.01,
         "klineStamp": {
           "tradeDate": "2026-09-28",
-          "capturedAt": "17:17",
+          "capturedAt": "18:47",
           "staleTDays": 0,
           "partial": false
         }
@@ -23282,7 +23513,7 @@
         "d1": -0.44,
         "d3": -1.59,
         "d5": -2.22,
-        "src": "eastmoney-push2+series",
+        "src": "eastmoney-push2his",
         "series": {
           "2026-09-18": -0.32,
           "2026-09-21": -0.19,
@@ -23338,7 +23569,9 @@
           "impactLevel": "低",
           "detail": "亚盛集团2026年第三次临时股东会资料",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600108&announcementId=1225555018&orgId=gssh0600108&announcementTime=2026-09-10"
+          "announcementId": "1225555018",
+          "orgId": "gssh0600108",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600108&announcementId=1225555018"
         },
         {
           "type": "股东大会",
@@ -23356,7 +23589,9 @@
           "impactLevel": "低",
           "detail": "北京大成（兰州）律师事务所关于亚盛集团2026年第三次临时股东会法律意见书",
           "source": "巨潮",
-          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?stockCode=600108&announcementId=1225567581&orgId=gssh0600108&announcementTime=2026-09-17"
+          "announcementId": "1225567581",
+          "orgId": "gssh0600108",
+          "cninfoUrl": "http://www.cninfo.com.cn/new/disclosure/detail?orgId=gssh0600108&announcementId=1225567581"
         },
         {
           "type": "财报披露",
@@ -23616,31 +23851,6 @@
     "list": [
       {
         "rank": 1,
-        "code": "603396",
-        "name": "金辰股份",
-        "price": 39.2,
-        "pct": 9.99,
-        "amount": "9.1亿",
-        "turnover": 16.97,
-        "score": 100,
-        "ztCount": 5,
-        "lianban": 3,
-        "volRatio": 3.01,
-        "maAlign": true,
-        "newHigh": true,
-        "gain20": 22.9,
-        "openPct": 9.99,
-        "aucVol": 142.05,
-        "aucTurn": 3.34,
-        "fromAuction": true,
-        "sealYi": 0.4,
-        "kaiban": 2,
-        "rawScore": 177,
-        "ident": "主线龙头",
-        "signalType": "3连板"
-      },
-      {
-        "rank": 2,
         "code": "603949",
         "name": "雪龙集团",
         "price": 18.59,
@@ -23655,12 +23865,37 @@
         "newHigh": true,
         "gain20": 33.4,
         "openPct": 10,
-        "aucVol": 312.02,
-        "aucTurn": 1.64,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": 0.51,
         "kaiban": 1,
-        "rawScore": 173,
+        "rawScore": 152,
+        "ident": "主线龙头",
+        "signalType": "3连板"
+      },
+      {
+        "rank": 2,
+        "code": "603396",
+        "name": "金辰股份",
+        "price": 39.2,
+        "pct": 9.99,
+        "amount": "9.1亿",
+        "turnover": 16.97,
+        "score": 100,
+        "ztCount": 5,
+        "lianban": 3,
+        "volRatio": 3.01,
+        "maAlign": true,
+        "newHigh": true,
+        "gain20": 22.9,
+        "openPct": 9.99,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
+        "sealYi": 0.4,
+        "kaiban": 2,
+        "rawScore": 152,
         "ident": "主线龙头",
         "signalType": "3连板"
       },
@@ -23680,42 +23915,17 @@
         "newHigh": true,
         "gain20": 51.4,
         "openPct": 0.6,
-        "aucVol": 123.87,
-        "aucTurn": 4.75,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": 0.61,
         "kaiban": 1,
-        "rawScore": 157,
+        "rawScore": 132,
         "ident": "主线龙头",
         "signalType": "3连板"
       },
       {
         "rank": 4,
-        "code": "000678",
-        "name": "襄阳轴承",
-        "price": 10.65,
-        "pct": 10.02,
-        "amount": "3.7亿",
-        "turnover": 7.61,
-        "score": 100,
-        "ztCount": 3,
-        "lianban": 2,
-        "volRatio": 3.11,
-        "maAlign": false,
-        "newHigh": true,
-        "gain20": 20.2,
-        "openPct": 7.95,
-        "aucVol": 456.94,
-        "aucTurn": 4.65,
-        "fromAuction": true,
-        "sealYi": 0.76,
-        "kaiban": 1,
-        "rawScore": 145,
-        "ident": "",
-        "signalType": "2连板"
-      },
-      {
-        "rank": 5,
         "code": "603278",
         "name": "大业股份",
         "price": 10.78,
@@ -23730,67 +23940,17 @@
         "newHigh": true,
         "gain20": 18.1,
         "openPct": 3.98,
-        "aucVol": 320.42,
-        "aucTurn": 2.95,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": 0.45,
         "kaiban": 1,
-        "rawScore": 143,
+        "rawScore": 122,
         "ident": "主线龙头",
         "signalType": "2连板"
       },
       {
-        "rank": 6,
-        "code": "601218",
-        "name": "吉鑫科技",
-        "price": 6.05,
-        "pct": 10,
-        "amount": "15.1亿",
-        "turnover": 27.33,
-        "score": 100,
-        "ztCount": 4,
-        "lianban": 2,
-        "volRatio": 1.76,
-        "maAlign": true,
-        "newHigh": true,
-        "gain20": 33.6,
-        "openPct": 0,
-        "aucVol": 53.08,
-        "aucTurn": 3.43,
-        "fromAuction": true,
-        "sealYi": 0.27,
-        "kaiban": 1,
-        "rawScore": 142,
-        "ident": "主线龙头",
-        "signalType": "2连板"
-      },
-      {
-        "rank": 7,
-        "code": "002640",
-        "name": "跨境通",
-        "price": 3.96,
-        "pct": 10,
-        "amount": "10.5亿",
-        "turnover": 17.28,
-        "score": 100,
-        "ztCount": 2,
-        "lianban": 1,
-        "volRatio": 1.09,
-        "maAlign": true,
-        "newHigh": true,
-        "gain20": 16.1,
-        "openPct": 5.56,
-        "aucVol": 72.23,
-        "aucTurn": 4.75,
-        "fromAuction": true,
-        "sealYi": 1.12,
-        "kaiban": 1,
-        "rawScore": 139,
-        "ident": "板块龙头",
-        "signalType": "多涨停"
-      },
-      {
-        "rank": 8,
+        "rank": 5,
         "code": "601579",
         "name": "会稽山",
         "price": 41.84,
@@ -23805,42 +23965,92 @@
         "newHigh": true,
         "gain20": 116.5,
         "openPct": 6.36,
-        "aucVol": 34.1,
-        "aucTurn": 1.37,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": 0.19,
         "kaiban": 4,
-        "rawScore": 139,
+        "rawScore": 121,
+        "ident": "板块龙头",
+        "signalType": "多涨停"
+      },
+      {
+        "rank": 6,
+        "code": "000678",
+        "name": "襄阳轴承",
+        "price": 10.65,
+        "pct": 10.02,
+        "amount": "3.7亿",
+        "turnover": 7.61,
+        "score": 100,
+        "ztCount": 3,
+        "lianban": 2,
+        "volRatio": 3.11,
+        "maAlign": false,
+        "newHigh": true,
+        "gain20": 20.2,
+        "openPct": 7.95,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
+        "sealYi": 0.76,
+        "kaiban": 1,
+        "rawScore": 120,
+        "ident": "",
+        "signalType": "2连板"
+      },
+      {
+        "rank": 7,
+        "code": "601218",
+        "name": "吉鑫科技",
+        "price": 6.05,
+        "pct": 10,
+        "amount": "15.1亿",
+        "turnover": 27.33,
+        "score": 100,
+        "ztCount": 4,
+        "lianban": 2,
+        "volRatio": 1.76,
+        "maAlign": true,
+        "newHigh": true,
+        "gain20": 33.6,
+        "openPct": 0,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
+        "sealYi": 0.27,
+        "kaiban": 1,
+        "rawScore": 117,
+        "ident": "主线龙头",
+        "signalType": "2连板"
+      },
+      {
+        "rank": 8,
+        "code": "002640",
+        "name": "跨境通",
+        "price": 3.96,
+        "pct": 10,
+        "amount": "10.5亿",
+        "turnover": 17.28,
+        "score": 100,
+        "ztCount": 2,
+        "lianban": 1,
+        "volRatio": 1.09,
+        "maAlign": true,
+        "newHigh": true,
+        "gain20": 16.1,
+        "openPct": 5.56,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
+        "sealYi": 1.12,
+        "kaiban": 1,
+        "rawScore": 114,
         "ident": "板块龙头",
         "signalType": "多涨停"
       },
       {
         "rank": 9,
-        "code": "000513",
-        "name": "丽珠集团",
-        "price": 30.34,
-        "pct": 10.01,
-        "amount": "8.4亿",
-        "turnover": 4.92,
-        "score": 100,
-        "ztCount": 1,
-        "lianban": 1,
-        "volRatio": 4.64,
-        "maAlign": true,
-        "newHigh": true,
-        "gain20": 13.4,
-        "openPct": 6.74,
-        "aucVol": 147.27,
-        "aucTurn": 0.65,
-        "fromAuction": true,
-        "sealYi": 0.66,
-        "kaiban": 1,
-        "rawScore": 128,
-        "ident": "主线龙头",
-        "signalType": "强势涨停"
-      },
-      {
-        "rank": 10,
         "code": "600418",
         "name": "江淮汽车",
         "price": 25.22,
@@ -23855,17 +24065,17 @@
         "newHigh": true,
         "gain20": 19.9,
         "openPct": 1.66,
-        "aucVol": 14.37,
-        "aucTurn": 0.35,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": 1.77,
         "kaiban": 1,
-        "rawScore": 127,
+        "rawScore": 112,
         "ident": "板块龙头",
         "signalType": "多涨停"
       },
       {
-        "rank": 11,
+        "rank": 10,
         "code": "002242",
         "name": "九阳股份",
         "price": 10.33,
@@ -23880,42 +24090,42 @@
         "newHigh": true,
         "gain20": 22.5,
         "openPct": 4.69,
-        "aucVol": 43.48,
-        "aucTurn": 0.45,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": 0.5,
         "kaiban": 4,
-        "rawScore": 126,
+        "rawScore": 111,
         "ident": "板块龙头",
         "signalType": "多涨停"
       },
       {
-        "rank": 12,
-        "code": "000503",
-        "name": "国新健康",
-        "price": 7.44,
-        "pct": 10.06,
-        "amount": "3.6亿",
-        "turnover": 5.02,
+        "rank": 11,
+        "code": "000513",
+        "name": "丽珠集团",
+        "price": 30.34,
+        "pct": 10.01,
+        "amount": "8.4亿",
+        "turnover": 4.92,
         "score": 100,
         "ztCount": 1,
         "lianban": 1,
-        "volRatio": 4.8,
-        "maAlign": false,
+        "volRatio": 4.64,
+        "maAlign": true,
         "newHigh": true,
-        "gain20": 6.4,
-        "openPct": 6.8,
-        "aucVol": 151.25,
-        "aucTurn": 0.66,
-        "fromAuction": true,
-        "sealYi": 0.34,
+        "gain20": 13.4,
+        "openPct": 6.74,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
+        "sealYi": 0.66,
         "kaiban": 1,
-        "rawScore": 118,
+        "rawScore": 110,
         "ident": "主线龙头",
         "signalType": "强势涨停"
       },
       {
-        "rank": 13,
+        "rank": 12,
         "code": "000011",
         "name": "深物业A",
         "price": 10.12,
@@ -23930,49 +24140,49 @@
         "newHigh": true,
         "gain20": 10.6,
         "openPct": 2.17,
-        "aucVol": 10.47,
-        "aucTurn": 0.15,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": 1.14,
         "kaiban": 1,
-        "rawScore": 117,
+        "rawScore": 102,
         "ident": "板块龙头",
         "signalType": "多涨停"
       },
       {
-        "rank": 14,
-        "code": "000850",
-        "name": "华茂股份",
-        "price": 5.14,
-        "pct": 0.39,
-        "amount": "11.3亿",
-        "turnover": 21.86,
+        "rank": 13,
+        "code": "000503",
+        "name": "国新健康",
+        "price": 7.44,
+        "pct": 10.06,
+        "amount": "3.6亿",
+        "turnover": 5.02,
         "score": 100,
-        "ztCount": 2,
-        "lianban": 0,
-        "volRatio": 8.79,
-        "maAlign": true,
+        "ztCount": 1,
+        "lianban": 1,
+        "volRatio": 4.8,
+        "maAlign": false,
         "newHigh": true,
-        "gain20": 16,
-        "openPct": 9.77,
-        "aucVol": 637.36,
-        "aucTurn": 6.6,
-        "fromAuction": true,
-        "sealYi": null,
-        "kaiban": null,
-        "rawScore": 113,
-        "ident": "",
-        "signalType": "多涨停"
+        "gain20": 6.4,
+        "openPct": 6.8,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
+        "sealYi": 0.34,
+        "kaiban": 1,
+        "rawScore": 100,
+        "ident": "主线龙头",
+        "signalType": "强势涨停"
       },
       {
-        "rank": 15,
+        "rank": 14,
         "code": "002962",
         "name": "五方光电",
         "price": 14.76,
         "pct": 9.99,
         "amount": "4.6亿",
         "turnover": 14.96,
-        "score": 100,
+        "score": 97,
         "ztCount": 1,
         "lianban": 1,
         "volRatio": 3.93,
@@ -23980,24 +24190,24 @@
         "newHigh": true,
         "gain20": 14.1,
         "openPct": 1.94,
-        "aucVol": 14.78,
-        "aucTurn": 0.23,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": 0.27,
         "kaiban": 3,
-        "rawScore": 112,
+        "rawScore": 97,
         "ident": "板块龙头",
         "signalType": "强势涨停"
       },
       {
-        "rank": 16,
+        "rank": 15,
         "code": "002852",
         "name": "道道全",
         "price": 8.9,
         "pct": 10.01,
         "amount": "2.4亿",
         "turnover": 9.82,
-        "score": 100,
+        "score": 92,
         "ztCount": 3,
         "lianban": 1,
         "volRatio": 2.98,
@@ -24005,99 +24215,74 @@
         "newHigh": false,
         "gain20": 1.6,
         "openPct": 1.11,
-        "aucVol": 13.45,
-        "aucTurn": 0.18,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": 0.22,
         "kaiban": 2,
-        "rawScore": 107,
+        "rawScore": 92,
         "ident": "板块龙头",
         "signalType": "多涨停"
       },
       {
-        "rank": 17,
-        "code": "000592",
-        "name": "平潭发展",
-        "price": 9.09,
-        "pct": 3.53,
-        "amount": "50.8亿",
-        "turnover": 29.09,
-        "score": 100,
-        "ztCount": 4,
+        "rank": 16,
+        "code": "000850",
+        "name": "华茂股份",
+        "price": 5.14,
+        "pct": 0.39,
+        "amount": "11.3亿",
+        "turnover": 21.86,
+        "score": 88,
+        "ztCount": 2,
         "lianban": 0,
-        "volRatio": 1.81,
+        "volRatio": 8.79,
         "maAlign": true,
         "newHigh": true,
-        "gain20": 29.7,
-        "openPct": 0,
-        "aucVol": 41.36,
-        "aucTurn": 2.77,
-        "fromAuction": true,
+        "gain20": 16,
+        "openPct": 9.77,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": null,
         "kaiban": null,
-        "rawScore": 103,
+        "rawScore": 88,
         "ident": "",
         "signalType": "多涨停"
       },
       {
-        "rank": 18,
-        "code": "002413",
-        "name": "雷科防务",
-        "price": 9.18,
-        "pct": 2.34,
-        "amount": "28.5亿",
-        "turnover": 23.69,
-        "score": 100,
+        "rank": 17,
+        "code": "688225",
+        "name": "亚信安全",
+        "price": 15.64,
+        "pct": 6.18,
+        "amount": "3.3亿",
+        "turnover": 5.38,
+        "score": 84,
         "ztCount": 1,
         "lianban": 0,
-        "volRatio": 3.96,
+        "volRatio": 2.19,
         "maAlign": true,
         "newHigh": true,
-        "gain20": 15.3,
-        "openPct": 3.79,
-        "aucVol": 186.24,
-        "aucTurn": 4.64,
-        "fromAuction": true,
+        "gain20": 23.3,
+        "openPct": 3.73,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": null,
         "kaiban": null,
-        "rawScore": 102,
+        "rawScore": 84,
         "ident": "",
         "signalType": "强势涨停"
       },
       {
-        "rank": 19,
-        "code": "600293",
-        "name": "三峡新材",
-        "price": 3.93,
-        "pct": 3.97,
-        "amount": "8.2亿",
-        "turnover": 18.04,
-        "score": 100,
-        "ztCount": 2,
-        "lianban": 0,
-        "volRatio": 1.55,
-        "maAlign": true,
-        "newHigh": true,
-        "gain20": 30.1,
-        "openPct": 0,
-        "aucVol": 32.71,
-        "aucTurn": 1.59,
-        "fromAuction": true,
-        "sealYi": null,
-        "kaiban": null,
-        "rawScore": 101,
-        "ident": "",
-        "signalType": "多涨停"
-      },
-      {
-        "rank": 20,
+        "rank": 18,
         "code": "600707",
         "name": "彩虹股份",
         "price": 10.38,
         "pct": 9.38,
         "amount": "37.7亿",
         "turnover": 10.19,
-        "score": 100,
+        "score": 82,
         "ztCount": 1,
         "lianban": 0,
         "volRatio": 1.92,
@@ -24105,14 +24290,64 @@
         "newHigh": true,
         "gain20": 12.3,
         "openPct": 4.21,
-        "aucVol": 32.89,
-        "aucTurn": 0.73,
-        "fromAuction": true,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
         "sealYi": null,
         "kaiban": null,
-        "rawScore": 100,
+        "rawScore": 82,
         "ident": "",
         "signalType": "强势涨停"
+      },
+      {
+        "rank": 19,
+        "code": "000592",
+        "name": "平潭发展",
+        "price": 9.09,
+        "pct": 3.53,
+        "amount": "50.8亿",
+        "turnover": 29.09,
+        "score": 82,
+        "ztCount": 4,
+        "lianban": 0,
+        "volRatio": 1.81,
+        "maAlign": true,
+        "newHigh": true,
+        "gain20": 29.7,
+        "openPct": 0,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
+        "sealYi": null,
+        "kaiban": null,
+        "rawScore": 82,
+        "ident": "",
+        "signalType": "多涨停"
+      },
+      {
+        "rank": 20,
+        "code": "600059",
+        "name": "古越龙山",
+        "price": 11.73,
+        "pct": 6.64,
+        "amount": "14.5亿",
+        "turnover": 13.48,
+        "score": 81,
+        "ztCount": 2,
+        "lianban": 0,
+        "volRatio": 1.13,
+        "maAlign": true,
+        "newHigh": true,
+        "gain20": 42.9,
+        "openPct": 1.82,
+        "aucVol": null,
+        "aucTurn": null,
+        "fromAuction": false,
+        "sealYi": null,
+        "kaiban": null,
+        "rawScore": 81,
+        "ident": "",
+        "signalType": "多涨停"
       }
     ],
     "limitUpExcluded": 15,
@@ -24741,47 +24976,47 @@
         "price": 40.66,
         "pct": 8.98,
         "entry": 40,
-        "rr": 4.68,
+        "rr": 4.61,
         "volRatio": 1.93,
-        "ma20": 35.91,
+        "ma20": 35.84,
         "priceStop": 38.17,
-        "tp1": 48.56
+        "tp1": 48.44
       },
       {
         "rank": 5,
-        "code": "300443",
-        "name": "金雷股份",
+        "code": "603519",
+        "name": "立霸股份",
         "signalType": "short",
-        "score": 91,
+        "score": 97,
         "timeScore": 100,
-        "finalScore": 94,
+        "finalScore": 98,
         "firstDate": "2026-09-28",
-        "price": 20.93,
-        "pct": 4.91,
-        "entry": 20,
-        "rr": 3.04,
-        "volRatio": 1.37,
-        "ma20": 19.35,
-        "priceStop": 19.2,
-        "tp1": 22.43
+        "price": 16.9,
+        "pct": -3.87,
+        "entry": 16.84,
+        "rr": 3.06,
+        "volRatio": 1.81,
+        "ma20": 15.8,
+        "priceStop": 16.16,
+        "tp1": 18.92
       },
       {
         "rank": 6,
-        "code": "301149",
-        "name": "隆华新材",
-        "signalType": "swing",
+        "code": "300443",
+        "name": "金雷股份",
+        "signalType": "short",
         "score": 90,
         "timeScore": 100,
         "finalScore": 93,
         "firstDate": "2026-09-28",
-        "price": 8.56,
-        "pct": -3.93,
-        "entry": 8.17,
-        "rr": null,
-        "volRatio": 2,
-        "ma20": 8.76,
-        "priceStop": null,
-        "tp1": null
+        "price": 20.93,
+        "pct": 4.91,
+        "entry": 20,
+        "rr": 2.92,
+        "volRatio": 1.37,
+        "ma20": 19.28,
+        "priceStop": 19.2,
+        "tp1": 22.34
       },
       {
         "rank": 7,
@@ -25217,24 +25452,6 @@
       },
       {
         "rank": 31,
-        "code": "603170",
-        "name": "宝立食品",
-        "signalType": "short",
-        "score": 70,
-        "timeScore": 100,
-        "finalScore": 79,
-        "firstDate": "2026-09-28",
-        "price": 13.09,
-        "pct": 6.25,
-        "entry": 12.41,
-        "rr": 3.87,
-        "volRatio": 2.1,
-        "ma20": 12.35,
-        "priceStop": 12.04,
-        "tp1": 13.85
-      },
-      {
-        "rank": 32,
         "code": "000560",
         "name": "我爱我家",
         "signalType": "short",
@@ -25252,7 +25469,43 @@
         "tp1": 4.1
       },
       {
+        "rank": 32,
+        "code": "600380",
+        "name": "健康元",
+        "signalType": "swing",
+        "score": 68,
+        "timeScore": 100,
+        "finalScore": 78,
+        "firstDate": "2026-09-28",
+        "price": 9.79,
+        "pct": 5.84,
+        "entry": 9.45,
+        "rr": null,
+        "volRatio": 1.5,
+        "ma20": 9.32,
+        "priceStop": null,
+        "tp1": null
+      },
+      {
         "rank": 33,
+        "code": "688171",
+        "name": "纬德信息",
+        "signalType": "short",
+        "score": 69,
+        "timeScore": 100,
+        "finalScore": 78,
+        "firstDate": "2026-09-28",
+        "price": 25.95,
+        "pct": 4.55,
+        "entry": 25.9,
+        "rr": 2.93,
+        "volRatio": 2.77,
+        "ma20": 24.18,
+        "priceStop": 24.5,
+        "tp1": 30
+      },
+      {
+        "rank": 34,
         "code": "002333",
         "name": "罗普斯金",
         "signalType": "short",
@@ -25270,7 +25523,7 @@
         "tp1": 6.66
       },
       {
-        "rank": 34,
+        "rank": 35,
         "code": "605555",
         "name": "德昌股份",
         "signalType": "short",
@@ -25288,7 +25541,7 @@
         "tp1": 13.89
       },
       {
-        "rank": 35,
+        "rank": 36,
         "code": "688110",
         "name": "东芯股份",
         "signalType": "swing",
@@ -25306,7 +25559,7 @@
         "tp1": null
       },
       {
-        "rank": 36,
+        "rank": 37,
         "code": "002583",
         "name": "海能达",
         "signalType": "short",
@@ -25324,7 +25577,7 @@
         "tp1": 9.19
       },
       {
-        "rank": 37,
+        "rank": 38,
         "code": "603693",
         "name": "江苏新能",
         "signalType": "swing",
@@ -25342,7 +25595,7 @@
         "tp1": null
       },
       {
-        "rank": 38,
+        "rank": 39,
         "code": "300768",
         "name": "迪普科技",
         "signalType": "swing",
@@ -25360,7 +25613,7 @@
         "tp1": null
       },
       {
-        "rank": 39,
+        "rank": 40,
         "code": "300847",
         "name": "中船汉光",
         "signalType": "short",
@@ -25378,7 +25631,7 @@
         "tp1": 17.18
       },
       {
-        "rank": 40,
+        "rank": 41,
         "code": "002633",
         "name": "申科股份",
         "signalType": "short",
@@ -25396,7 +25649,7 @@
         "tp1": 16.79
       },
       {
-        "rank": 41,
+        "rank": 42,
         "code": "002959",
         "name": "小熊电器",
         "signalType": "short",
@@ -25414,7 +25667,7 @@
         "tp1": 35.08
       },
       {
-        "rank": 42,
+        "rank": 43,
         "code": "300817",
         "name": "双飞集团",
         "signalType": "short",
@@ -25432,7 +25685,7 @@
         "tp1": 18.93
       },
       {
-        "rank": 43,
+        "rank": 44,
         "code": "600661",
         "name": "昂立教育",
         "signalType": "short",
@@ -25450,7 +25703,7 @@
         "tp1": 10
       },
       {
-        "rank": 44,
+        "rank": 45,
         "code": "002896",
         "name": "中大力德",
         "signalType": "short",
@@ -25461,14 +25714,14 @@
         "price": 63.31,
         "pct": 3.41,
         "entry": 62.2,
-        "rr": 3.14,
+        "rr": 3.13,
         "volRatio": 1.16,
         "ma20": 62.2,
         "priceStop": 60.33,
-        "tp1": 68.05
+        "tp1": 68.04
       },
       {
-        "rank": 45,
+        "rank": 46,
         "code": "688339",
         "name": "亿华通-U",
         "signalType": "short",
@@ -25484,24 +25737,6 @@
         "ma20": 17.6,
         "priceStop": 17.26,
         "tp1": 20
-      },
-      {
-        "rank": 46,
-        "code": "600351",
-        "name": "亚宝药业",
-        "signalType": "short",
-        "score": 56,
-        "timeScore": 100,
-        "finalScore": 69,
-        "firstDate": "2026-09-28",
-        "price": 6.83,
-        "pct": 2.4,
-        "entry": 6.8,
-        "rr": 3.1,
-        "volRatio": 1.07,
-        "ma20": 6.77,
-        "priceStop": 6.59,
-        "tp1": 7.45
       },
       {
         "rank": 47,
@@ -25559,21 +25794,21 @@
       },
       {
         "rank": 50,
-        "code": "000014",
-        "name": "沙河股份",
+        "code": "000703",
+        "name": "恒逸石化",
         "signalType": "short",
         "score": 53,
         "timeScore": 100,
         "finalScore": 67,
         "firstDate": "2026-09-28",
-        "price": 11.2,
-        "pct": 5.26,
-        "entry": 10.9,
-        "rr": 2.33,
-        "volRatio": 1.44,
-        "ma20": 10.62,
-        "priceStop": 10.44,
-        "tp1": 11.97
+        "price": 17.26,
+        "pct": 0.12,
+        "entry": 17.24,
+        "rr": 3.37,
+        "volRatio": 0.85,
+        "ma20": 17.24,
+        "priceStop": 16.42,
+        "tp1": 20
       }
     ],
     "source": "全A剔除ST/北交所 → 候选 1500 只",
@@ -25584,9 +25819,9 @@
       "name": "出版",
       "mappedName": "出版",
       "changePct": 10.04,
-      "sectorPct": null,
+      "sectorPct": -2.69,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -3.8,
       "sealYi": 23.9,
       "limitUpMax": "1家 / 5板",
       "ztCount": 1,
@@ -25600,23 +25835,37 @@
       "newsAdjust": "+1",
       "techTag": "异动高+空间+高",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-3.80",
+      "flowMid": "-2.76",
       "rank": 1,
       "leadOpen": 7.77,
       "leadClose": 7.77,
       "leadHigh": 7.77,
       "leadLow": 7.77,
       "leadVol": 5985192,
-      "leadTurnover": 0
+      "leadTurnover": 0,
+      "picks": [
+        {
+          "code": "601858",
+          "name": "中国科传",
+          "pct": 3.59,
+          "turnover": 1.64
+        },
+        {
+          "code": "603096",
+          "name": "新经典",
+          "pct": 0.56,
+          "turnover": 1.48
+        }
+      ]
     },
     {
       "name": "汽车零部",
       "mappedName": "汽车零部",
       "changePct": 9.94,
-      "sectorPct": null,
+      "sectorPct": -1.54,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": 3.4,
       "sealYi": "1.8",
       "limitUpMax": "3家 / 3板",
       "ztCount": 3,
@@ -25628,25 +25877,39 @@
       "status": "主线确认",
       "atds": 96,
       "newsAdjust": "+1",
-      "techTag": "异动高+空间+高",
+      "techTag": "主线+趋势技术",
       "trendSub": "连续强势 / +9.9%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "3.40",
+      "flowMid": "3.91",
       "rank": 2,
-      "leadOpen": 18.59,
-      "leadClose": 18.59,
-      "leadHigh": 18.59,
-      "leadLow": 16.82,
-      "leadVol": 162580,
-      "leadTurnover": 0
+      "picks": [
+        {
+          "code": "603418",
+          "name": "友升股份",
+          "pct": 8.07,
+          "turnover": 8.67
+        },
+        {
+          "code": "002553",
+          "name": "南方精工",
+          "pct": 6.58,
+          "turnover": 14.45
+        },
+        {
+          "code": "600006",
+          "name": "东风股份",
+          "pct": 6.19,
+          "turnover": 4.22
+        }
+      ]
     },
     {
       "name": "通用设备",
       "mappedName": "通用设备",
       "changePct": 9.98,
-      "sectorPct": null,
+      "sectorPct": -2.9,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -20.7,
       "sealYi": "1.5",
       "limitUpMax": "3家 / 2板",
       "ztCount": 3,
@@ -25660,23 +25923,43 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "资金聚焦 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-20.70",
+      "flowMid": "-18.01",
       "rank": 3,
-      "leadOpen": 10.19,
-      "leadClose": 10.78,
-      "leadHigh": 10.78,
-      "leadLow": 9.77,
-      "leadVol": 639681,
-      "leadTurnover": 5.8
+      "leadOpen": 8.91,
+      "leadClose": 9.8,
+      "leadHigh": 9.8,
+      "leadLow": 8.85,
+      "leadVol": 160925,
+      "leadTurnover": 10,
+      "picks": [
+        {
+          "code": "301699",
+          "name": "洛轴股份",
+          "pct": 14.46,
+          "turnover": 65.57
+        },
+        {
+          "code": "300828",
+          "name": "锐新科技",
+          "pct": 7.91,
+          "turnover": 14.5
+        },
+        {
+          "code": "300817",
+          "name": "双飞集团",
+          "pct": 6.72,
+          "turnover": 7.28
+        }
+      ]
     },
     {
       "name": "光伏设备",
       "mappedName": "光伏设备",
       "changePct": 9.99,
-      "sectorPct": null,
+      "sectorPct": -2.38,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -6,
       "sealYi": 0.4,
       "limitUpMax": "1家 / 3板",
       "ztCount": 1,
@@ -25690,23 +25973,43 @@
       "newsAdjust": "+1",
       "techTag": "异动高+空间+高",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-6.00",
+      "flowMid": "-5.14",
       "rank": 4,
-      "leadOpen": 39.2,
-      "leadClose": 39.2,
-      "leadHigh": 39.2,
-      "leadLow": 38.79,
-      "leadVol": 125736,
-      "leadTurnover": 0
+      "leadOpen": 32.77,
+      "leadClose": 35.64,
+      "leadHigh": 35.64,
+      "leadLow": 32.77,
+      "leadVol": 110358,
+      "leadTurnover": 8.8,
+      "picks": [
+        {
+          "code": "600207",
+          "name": "安彩高科",
+          "pct": 5.81,
+          "turnover": 7.64
+        },
+        {
+          "code": "605117",
+          "name": "德业股份",
+          "pct": 1.7,
+          "turnover": 1.29
+        },
+        {
+          "code": "603628",
+          "name": "清源股份",
+          "pct": 1.26,
+          "turnover": 2.22
+        }
+      ]
     },
     {
       "name": "水泥",
       "mappedName": "水泥",
       "changePct": 9.97,
-      "sectorPct": null,
+      "sectorPct": -1.27,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -1.1,
       "sealYi": 0.6,
       "limitUpMax": "1家 / 3板",
       "ztCount": 1,
@@ -25720,23 +26023,43 @@
       "newsAdjust": "+1",
       "techTag": "异动高+空间+高",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-1.10",
+      "flowMid": "-1.11",
       "rank": 5,
-      "leadOpen": 6.66,
-      "leadClose": 7.28,
-      "leadHigh": 7.28,
-      "leadLow": 6.62,
-      "leadVol": 832690,
-      "leadTurnover": 9.3
+      "leadOpen": 5.8,
+      "leadClose": 6.62,
+      "leadHigh": 6.62,
+      "leadLow": 5.53,
+      "leadVol": 704784,
+      "leadTurnover": 14.1,
+      "picks": [
+        {
+          "code": "600801",
+          "name": "华新建材",
+          "pct": 0.42,
+          "turnover": 0.37
+        },
+        {
+          "code": "600668",
+          "name": "尖峰集团",
+          "pct": 0,
+          "turnover": 0.92
+        },
+        {
+          "code": "002596",
+          "name": "海南瑞泽",
+          "pct": 0,
+          "turnover": 1.46
+        }
+      ]
     },
     {
       "name": "风电设备",
       "mappedName": "风电设备",
       "changePct": 10,
-      "sectorPct": null,
+      "sectorPct": 0.35,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -3.7,
       "sealYi": 0.3,
       "limitUpMax": "1家 / 2板",
       "ztCount": 1,
@@ -25750,17 +26073,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-3.70",
+      "flowMid": "-2.94",
       "rank": 6
     },
     {
       "name": "软件开发",
       "mappedName": "软件开发",
       "changePct": 15.03,
-      "sectorPct": null,
+      "sectorPct": -1.32,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -7.5,
       "sealYi": "0.6",
       "limitUpMax": "2家 / 1板",
       "ztCount": 2,
@@ -25774,17 +26097,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +15.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-7.50",
+      "flowMid": "-8.96",
       "rank": 7
     },
     {
       "name": "化学制药",
       "mappedName": "化学制药",
       "changePct": 10,
-      "sectorPct": null,
+      "sectorPct": -0.44,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -3,
       "sealYi": "1.0",
       "limitUpMax": "2家 / 1板",
       "ztCount": 2,
@@ -25798,17 +26121,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-3.00",
+      "flowMid": "-2.39",
       "rank": 8
     },
     {
       "name": "电力",
       "mappedName": "电力",
       "changePct": 10,
-      "sectorPct": null,
+      "sectorPct": -0.14,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": 6.4,
       "sealYi": "1.0",
       "limitUpMax": "2家 / 1板",
       "ztCount": 2,
@@ -25822,17 +26145,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "6.40",
+      "flowMid": "4.74",
       "rank": 9
     },
     {
       "name": "化学制品",
       "mappedName": "化学制品",
       "changePct": 10,
-      "sectorPct": null,
+      "sectorPct": -2.62,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -14.7,
       "sealYi": 0.6,
       "limitUpMax": "2家 / 1板",
       "ztCount": 2,
@@ -25846,17 +26169,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-14.70",
+      "flowMid": "-13.28",
       "rank": 10
     },
     {
       "name": "光学光电",
       "mappedName": "光学光电",
       "changePct": 9.99,
-      "sectorPct": null,
+      "sectorPct": -2.82,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -6.7,
       "sealYi": "0.5",
       "limitUpMax": "2家 / 1板",
       "ztCount": 2,
@@ -25870,17 +26193,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-6.70",
+      "flowMid": "-7.25",
       "rank": 11
     },
     {
       "name": "影视院线",
       "mappedName": "影视院线",
       "changePct": 10.03,
-      "sectorPct": null,
+      "sectorPct": -1.8,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": 1.7,
       "sealYi": 1.9,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -25894,17 +26217,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "1.70",
+      "flowMid": "1.22",
       "rank": 12
     },
     {
       "name": "计算机设",
       "mappedName": "计算机设",
       "changePct": 10.02,
-      "sectorPct": null,
+      "sectorPct": -1.93,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -44,
       "sealYi": 1.3,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -25918,17 +26241,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-44.00",
+      "flowMid": "-43.93",
       "rank": 13
     },
     {
       "name": "互联网电",
       "mappedName": "互联网电",
       "changePct": 10,
-      "sectorPct": null,
+      "sectorPct": -0.86,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": 3.4,
       "sealYi": 1.1,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -25942,17 +26265,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "3.40",
+      "flowMid": "4.07",
       "rank": 14
     },
     {
       "name": "小家电",
       "mappedName": "小家电",
       "changePct": 10.01,
-      "sectorPct": null,
+      "sectorPct": 1.33,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": 1.5,
       "sealYi": 0.5,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -25966,17 +26289,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "1.50",
+      "flowMid": "1.23",
       "rank": 15
     },
     {
       "name": "房地产开",
       "mappedName": "房地产开",
       "changePct": 10,
-      "sectorPct": null,
+      "sectorPct": -0.7,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -0.8,
       "sealYi": 1.1,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -25990,17 +26313,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-0.80",
+      "flowMid": "-0.95",
       "rank": 16
     },
     {
       "name": "养殖业",
       "mappedName": "养殖业",
       "changePct": 10.03,
-      "sectorPct": null,
+      "sectorPct": 0.8,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": 2.3,
       "sealYi": 0.2,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -26014,17 +26337,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "2.30",
+      "flowMid": "2.48",
       "rank": 17
     },
     {
       "name": "IT服务Ⅱ",
       "mappedName": "IT服务Ⅱ",
       "changePct": 10,
-      "sectorPct": null,
+      "sectorPct": -2.28,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -22.2,
       "sealYi": 1.1,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -26038,17 +26361,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-22.20",
+      "flowMid": "-18.23",
       "rank": 18
     },
     {
       "name": "农产品加",
       "mappedName": "农产品加",
       "changePct": 10.01,
-      "sectorPct": null,
+      "sectorPct": -1.6,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -1.4,
       "sealYi": 0.2,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -26062,17 +26385,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-1.40",
+      "flowMid": "-1.44",
       "rank": 19
     },
     {
       "name": "化学原料",
       "mappedName": "化学原料",
       "changePct": 20.01,
-      "sectorPct": null,
+      "sectorPct": -1.41,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -5.2,
       "sealYi": 0.6,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -26086,17 +26409,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +20.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-5.20",
+      "flowMid": "-5.85",
       "rank": 20
     },
     {
       "name": "文娱用品",
       "mappedName": "文娱用品",
       "changePct": 10,
-      "sectorPct": null,
+      "sectorPct": -0.78,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -0.4,
       "sealYi": 0.1,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -26110,17 +26433,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-0.40",
+      "flowMid": "-0.36",
       "rank": 21
     },
     {
       "name": "非白酒",
       "mappedName": "非白酒",
       "changePct": 9.99,
-      "sectorPct": null,
+      "sectorPct": 1.15,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": 4.3,
       "sealYi": 0.2,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -26134,17 +26457,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "4.30",
+      "flowMid": "3.02",
       "rank": 22
     },
     {
       "name": "电池",
       "mappedName": "电池",
       "changePct": 9.99,
-      "sectorPct": null,
+      "sectorPct": -3.1,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": -21.8,
       "sealYi": 0.1,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -26158,17 +26481,17 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "-21.80",
+      "flowMid": "-16.82",
       "rank": 23
     },
     {
       "name": "商用车",
       "mappedName": "商用车",
       "changePct": 9.99,
-      "sectorPct": null,
+      "sectorPct": 1.59,
       "upDown": "-- / --",
-      "inflowYi": null,
+      "inflowYi": 6.3,
       "sealYi": 1.8,
       "limitUpMax": "1家 / 1板",
       "ztCount": 1,
@@ -26182,8 +26505,8 @@
       "newsAdjust": "+1",
       "techTag": "主线+成长",
       "trendSub": "异动爆发 / +10.0%",
-      "flowMain": "0.00",
-      "flowMid": "0.00",
+      "flowMain": "6.30",
+      "flowMid": "7.34",
       "rank": 24
     }
   ],
@@ -28808,17 +29131,17 @@
     },
     "hf_CL": {
       "name": "纽约原油",
-      "price": 95.72,
-      "change": 3.59,
-      "changePct": 3.88,
-      "time": "17:18:06"
+      "price": 96.27,
+      "change": 4.18,
+      "changePct": 4.52,
+      "time": "18:47:09"
     },
     "hf_GC": {
       "name": "纽约黄金",
-      "price": 4173.87,
-      "change": -3.41,
-      "changePct": -0.08,
-      "time": "17:18:07"
+      "price": 4187.33,
+      "change": -3.1,
+      "changePct": -0.07,
+      "time": "18:47:05"
     }
   },
   "closeEmotion": {
@@ -28836,8 +29159,44 @@
     "downCount": 4298,
     "flatCount": 115,
     "total": 5287,
-    "mainLines": [],
-    "moneyInflow": [],
+    "mainLines": [
+      {
+        "rank": 1,
+        "name": "厨房小家电",
+        "changePct": 2.66,
+        "leader": "九阳股份"
+      },
+      {
+        "rank": 2,
+        "name": "燃料电池",
+        "changePct": 2.16,
+        "leader": "时代万恒"
+      },
+      {
+        "rank": 3,
+        "name": "商用载货车",
+        "changePct": 1.89,
+        "leader": ""
+      }
+    ],
+    "moneyInflow": [
+      {
+        "name": "电力",
+        "valueYi": 6.4
+      },
+      {
+        "name": "公用事业",
+        "valueYi": 6.4
+      },
+      {
+        "name": "商用车",
+        "valueYi": 6.3
+      },
+      {
+        "name": "商用载货车",
+        "valueYi": 5.8
+      }
+    ],
     "ladder": [
       {
         "lianban": "5板",
@@ -28974,13 +29333,53 @@
         "name": "汽车零部",
         "count": 3,
         "maxLB": 3,
-        "leadStock": "雪龙集团"
+        "leadStock": "雪龙集团",
+        "picks": [
+          {
+            "code": "603418",
+            "name": "友升股份",
+            "pct": 8.07,
+            "turnover": 8.67
+          },
+          {
+            "code": "002553",
+            "name": "南方精工",
+            "pct": 6.58,
+            "turnover": 14.45
+          },
+          {
+            "code": "600006",
+            "name": "东风股份",
+            "pct": 6.19,
+            "turnover": 4.22
+          }
+        ]
       },
       {
         "name": "通用设备",
         "count": 3,
         "maxLB": 2,
-        "leadStock": "大业股份"
+        "leadStock": "大业股份",
+        "picks": [
+          {
+            "code": "301699",
+            "name": "洛轴股份",
+            "pct": 14.46,
+            "turnover": 65.57
+          },
+          {
+            "code": "300828",
+            "name": "锐新科技",
+            "pct": 7.91,
+            "turnover": 14.5
+          },
+          {
+            "code": "300817",
+            "name": "双飞集团",
+            "pct": 6.72,
+            "turnover": 7.28
+          }
+        ]
       }
     ],
     "defense": [
@@ -29005,12 +29404,46 @@
         "name": "影视",
         "stocks": [
           "博纳影业"
+        ],
+        "picks": [
+          {
+            "code": "300182",
+            "name": "捷成股份",
+            "pct": 1.83,
+            "turnover": 4.37
+          },
+          {
+            "code": "603721",
+            "name": "中广天择",
+            "pct": 0.66,
+            "turnover": 3.86
+          }
         ]
       },
       {
         "name": "光伏",
         "stocks": [
           "金辰股份"
+        ],
+        "picks": [
+          {
+            "code": "300317",
+            "name": "珈伟新能",
+            "pct": 5.28,
+            "turnover": 11.56
+          },
+          {
+            "code": "603105",
+            "name": "芯能科技",
+            "pct": 3,
+            "turnover": 9.11
+          },
+          {
+            "code": "002617",
+            "name": "露笑科技",
+            "pct": 1.05,
+            "turnover": 4.92
+          }
         ]
       }
     ],
@@ -31151,46 +31584,55 @@
         "name": "汽车零部",
         "category": "可买入",
         "picks": [
-          "雪龙集团"
+          "友升股份",
+          "南方精工",
+          "东风股份"
         ],
-        "reason": "汽车零部 主线确认、3家涨停·最高3板;明日只做龙头不追高,看量能能否延续"
+        "reason": "汽车零部 主线确认、3家涨停·最高3板、净流入3.4亿;明日只做龙头不追高,看量能能否延续"
+      },
+      {
+        "name": "电力",
+        "category": "可买入",
+        "picks": [
+          "浙江新能"
+        ],
+        "reason": "电力 主线确认、2家涨停、净流入6.4亿;明日只做龙头不追高,看量能能否延续"
       },
       {
         "name": "通用设备",
-        "category": "可买入",
+        "category": "可观察",
         "picks": [
-          "大业股份"
+          "洛轴股份",
+          "锐新科技",
+          "双飞集团"
         ],
-        "reason": "通用设备 主线确认、3家涨停·最高2板;明日只做龙头不追高,看量能能否延续"
+        "reason": "通用设备 主线确认、3家涨停·最高2板、净流出20.7亿;明日看能否晋级主线,先观察资金是否真实回流"
       },
       {
         "name": "光伏设备",
         "category": "可观察",
         "picks": [
-          "金辰股份"
+          "安彩高科",
+          "德业股份",
+          "清源股份"
         ],
-        "reason": "光伏设备 主线确认、1家涨停·最高3板;明日看能否晋级主线,先观察资金是否真实回流"
-      },
-      {
-        "name": "水泥",
-        "category": "可观察",
-        "picks": [
-          "福建水泥"
-        ],
-        "reason": "水泥 主线确认、1家涨停·最高3板;明日看能否晋级主线,先观察资金是否真实回流"
+        "reason": "光伏设备 主线确认、1家涨停·最高3板、净流出6.0亿;明日看能否晋级主线,先观察资金是否真实回流"
       },
       {
         "name": "出版",
         "category": "等回调",
         "picks": [
+          "中国科传",
+          "新经典",
           "新华传媒"
         ],
-        "reason": "出版 主线确认、1家涨停·最高5板;短期过热,等回调企稳再择机"
+        "reason": "出版 主线确认、1家涨停·最高5板、净流出3.8亿;短期过热,等回调企稳再择机"
       }
     ],
     "caution": [
       "出版高位加速谨防兑现",
       "汽车零部主线一致高开勿追高",
+      "计算机设资金净流出暂避",
       "无量不追,放量才跟"
     ]
   }
