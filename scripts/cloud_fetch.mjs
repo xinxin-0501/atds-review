@@ -3769,13 +3769,20 @@ async function main() {
         console.log('竞价快照日期不符(' + (j && j.date) + '≠' + date + '),尝试从云端仓库拉取当日快照…');
         // v11.145:本地/迟到重采时,本地 auction_cache 可能是旧日期 → 导致收盘报告的竞价字段(aucVol/aucTurn)整块为 null。
         //   修:日期不符时主动从云端仓库 raw 拉当日快照(CI 09:30 已 git commit)。成功则用,失败仍降级。
-        try {
-          const rr = await fetch('https://raw.githubusercontent.com/xinxin-0501/atds-review/main/data/auction_cache.json', { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' });
-          if (rr.ok) {
-            const cj = await rr.json();
-            if (cj && cj.date === date && cj.map) { auctionMap = cj.map; console.log('已从云端拉取当日竞价快照:', Object.keys(cj.map).length, '只(采集于', cj.capturedAt, ')'); }
-          }
-        } catch (e2) { console.log('云端竞价快照拉取失败:', e2.message); }
+        // v11.160:raw.githubusercontent 对部分网络(本机/某些 IP)超时,补 jsDelivr CDN 兜底源(更稳)
+        for (const src of [
+          'https://raw.githubusercontent.com/xinxin-0501/atds-review/main/data/auction_cache.json',
+          'https://cdn.jsdelivr.net/gh/xinxin-0501/atds-review@main/data/auction_cache.json'
+        ]) {
+          if (auctionMap) break;
+          try {
+            const rr = await fetch(src, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' });
+            if (rr.ok) {
+              const cj = await rr.json();
+              if (cj && cj.date === date && cj.map) { auctionMap = cj.map; console.log('已从云端拉取当日竞价快照:', Object.keys(cj.map).length, '只(采集于', cj.capturedAt, ')'); }
+            }
+          } catch (e2) { console.log('竞价快照拉取失败(' + src.slice(8, 28) + '):', e2.message); }
+        }
         if (!auctionMap) console.log('竞价快照仍不可用(降级:使用盘中实时开盘涨幅,竞价字段将为 null)');
       }
     } catch (e) { console.log('无竞价快照(降级:使用盘中实时开盘涨幅)'); }
