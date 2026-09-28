@@ -4220,7 +4220,7 @@ function settleShadowTrade(code,klines,minBars){
       var v=shadowJudgeKlinesF(rec,klines,today);
       if(v){
         kUsed=true;
-        if(v.entered&&!rec.entryHit){ rec.entryHit=true;rec.entryDate=v.entryDate;rec.entryPrice=entry; }
+        if(v.entered&&!rec.entryHit){ rec.entryHit=true;rec.entryDate=v.entryDate;rec.entryPrice=entry;  if(!rec.touchAt&&v.entryDate===today&&minBars&&minBars.length){try{var _bk=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);if(_bk&&_bk.touched&&_bk.at){rec.touchAt=_bk.at;rec.entryMinute=_bk.at;}}catch(e){}} }
         // v11.65:持久化"本次入场满足了哪几个门控条件",供归因/每笔明细展示
         if(v.entryConds)rec.entryConds=v.entryConds;
         if(v.trace&&v.trace.length)rec.trace=v.trace;      // v11.32:保存逐日轨迹
@@ -4490,7 +4490,7 @@ function settleShortTradeF(code,rec,sm,klines,minBars,block,ph,today){
   // 入场判定(短线强制 5 项门控)
   if(!rec.entryHit){
     var det=shortEntryDetectF(rec,klines,minBars,today);
-    if(det&&det.entered){ rec.entryHit=true;rec.entryDate=det.date;rec.entryPrice=entry;rec.touchAt=det.at||null;rec.entryConds=det.conds||''; }
+    if(det&&det.entered){ rec.entryHit=true;rec.entryDate=det.date;rec.entryPrice=entry;rec.touchAt=det.at||null;rec.entryConds=det.conds||'';  if(!rec.touchAt&&det.date===today&&minBars&&minBars.length){try{var _bk2=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);if(_bk2&&_bk2.touched&&_bk2.at){rec.touchAt=_bk2.at;rec.entryMinute=_bk2.at;}}catch(e){}} }
     else{
       rec.lastCheck={date:today,price:price,high:high,low:low,phaseNote:(det&&det.blocked)?('已触入场价但门控未过:'+(det.blocked||[]).join('/')):(ph.label+'，短线等待真实触及 '+entry)};
       setShortMap(sm);return;
@@ -5268,6 +5268,8 @@ function structSignalCalc(kl, code, name, count, suf){
   return {disp:disp,cdDisp:cdDisp,recoDisp:recoDisp,cdPick:cdPick,cdMeta:cdMeta,launch:launchDisp,n:n,
     levels:{recoDate:recoIdx!=null?D[recoIdx]:null,cdDate:cdPick!=null?D[cdPick]:null,
       launchDate:launchIdx!=null?D[launchIdx]:null,
+      launchHighPct:launchIdx!=null?Math.round((C[launchIdx]-C[recoIdx])/C[recoIdx]*10000)/100:null,
+      launchHigh:launchIdx!=null&&recoIdx!=null&&((C[launchIdx]-C[recoIdx])/C[recoIdx])>=0.12,
       cdPats:(cdPick!=null&&cdMeta[cdPick])?cdMeta[cdPick].pats:[],cdVolOk:(cdPick!=null&&cdMeta[cdPick])?!!cdMeta[cdPick].volOk:false,
       recoClose:recoClose,confirmHigh:Math.round(confirmHigh*100)/100,
       failLow:Math.round(failLow*100)/100,p3:p3,m95:m95,lastIdx:lastIdx,lastDate:D[lastIdx]},
@@ -5479,7 +5481,7 @@ function ssqRenderLevels(calc){
     row('推荐日',rd,'红色竖线。只评价这一天之后的走势,避免用后来的结果倒推推荐质量')+
     row('CD 信号',lv.cdPats&&lv.cdPats.length?(lv.cdPats.join('·')+(lv.cdVolOk?' (量能确认)':' (量能未确认)')):'--',
       '九大进场信号:低位出现经典底部形态(笔直大阳/旭日东升/大长腿/十字星/双锤/阳包阴/希望之星/大阴接小阳/新低收阳);量能确认=温和放量')+
-    row('启动信号',lv.launchDate||'--','图2模式:前期横盘缩量(≥3根,振幅≤8%,量≤推荐日1.2倍且≤30日均量)且不破关键支撑,当日再放量(≥横盘均量2倍且≥5日均量1.5倍)一阳穿三线+创推荐日以来新高;粉色圆形;次日为低吸观察点;无酝酿期不标(防虚假信号)')+
+    row('启动信号',lv.launchDate||'--',lv.launchHigh?('⚠ 高位突破:启动日距推荐日收盘 +'+lv.launchHighPct+'%(≥12%),接近压力位,假突破风险高,止损纪律必须执行 —— 实测美年健康 08-10 后最大回撤 -18%。'):"图2模式:前期横盘缩量(≥3根,振幅≤8%,量≤推荐日1.2倍且≤30日均量)且不破关键支撑,当日再放量(≥横盘均量2倍且≥5日均量1.5倍)一阳穿三线+创推荐日以来新高;粉色圆形;次日为低吸观察点;无酝酿期不标(防虚假信号)")+
     row('裸K确认参考',lv.confirmHigh,'最新完整日K的高点。价格有效站上,说明突破得到进一步确认;不是自动买入价')+
     row('结构失效参考',lv.failLow,'近10日低点。跌破后,原来的上行结构明显转弱,应重新评估')+
     row('+3% 兑现线',lv.p3!=null?lv.p3:'--','从推荐价出发的统一验证门槛,用来记录结果,不是止盈指令')+
