@@ -5669,6 +5669,17 @@ function shadowJudgeEntryDayF(rec,bars,entryDate,entryTime){
 //   打勾之前的分钟一律排除(那时用户还没决定跟踪,其价格与本次跟踪决策无关)。
 //   分钟K不可得/无触及 ⇒ 返回 touched:false,调用方保持「监控中」,绝不回退用当日最低判入场。
 function judgeEntryTouchIntradayF(rec,bars,tickDate,tickTime){
+// v11.161:通用价格触达时刻(止盈/止损结算用)—— 分钟K里找价格首次触达的时刻(HH:MM),找不到返回 null
+function judgePriceTouchAtF(bars,date,price){
+  if(!price||!bars||!bars.length)return null;
+  var seq=[];
+  for(var i=0;i<bars.length;i++){var b=bars[i];if(!b)continue;if(String(b.d||'').slice(0,10)!==date)continue;seq.push(b);}
+  if(!seq.length)return null;
+  seq.sort(function(a,b){return String(a.t)<String(b.t)?-1:1;});
+  for(var j=0;j<seq.length;j++){var x=seq[j];var lo=Number(x.l),hi=Number(x.h);if(!(lo>0))continue;if(lo<=price&&hi>=price)return String(x.t).slice(0,5);}
+  return null;
+}
+
   var entry=Number(rec&&rec.entry);
   if(!entry||!bars||!bars.length)return {touched:false,reason:'分钟K不可得'};
   var seq=[];
@@ -5805,7 +5816,7 @@ function renderJournalStats(){
         flow=(e.openedDate||e.date||'—')+' 起观察 → 起点现价已低于计划止损位'+e.stop+' → 计划失效，未入场';
       }else{
         var mid=e.shadow?(e.entryDate?('入场 '+e.entryDate+'@'+e.entry):'—'):('真实交易 @'+(e.entry==null?'—':e.entry));
-        flow=(e.openedDate||e.date||'—')+' 开始观察 → '+mid+' → '+rn+' '+(e.settleDate||e.date||'—')+(e.settlePrice!=null?('@'+e.settlePrice):'')+
+        flow=(e.openedDate||e.date||'—')+' 开始观察 → '+mid+' → '+rn+' '+(e.settleDate||e.date||'—')+(e.settleAt?(' '+e.settleAt):'')+(e.settlePrice!=null?('@'+e.settlePrice):'')+
           (e.note?'（'+e.note+'）':'');
       }
       var pnlTxt=(e.pnl==null?'—':((e.pnl>0?'+':'')+e.pnl+'%'));
@@ -5923,7 +5934,7 @@ function renderPerStockArchive(c){
     h+='<div class="jrn-ps"><b>'+escHtmlF(String(keys[i2]))+' '+escHtmlF(it2.name)+'</b>：共 '+it2.n+' 笔 · 止盈 '+it2.win+' / 止损 '+it2.loss+'（胜率 '+wr+'）'
       +'<br><span style="color:#1d4ed8;">波段 '+it2.sw.w+'胜'+it2.sw.l+'负</span> ｜ <span style="color:#b45309;">短线 '+it2.sh.w+'胜'+it2.sh.l+'负</span>'
       +(it2.cancelled?(' · 取消归档 '+it2.cancelled):'')+(it2.missed?(' · 未触发 '+it2.missed):'')+(it2.invalid?(' · 失效 '+it2.invalid):'')+(it2.open?(' · <b>监控中</b>'):'')
-      +(it2.last?('　最近：'+escHtmlF(String(it2.last.settleDate||it2.last.date||'—'))+' '+(it2.last.pnl!=null?((it2.last.pnl>0?'+':'')+it2.last.pnl+'%'):'—')+(it2.last.mode==='short'?'［短线］':'［波段］')):'')+'</div>';
+      +(it2.last?('　最近：'+escHtmlF(String(it2.last.settleDate||it2.last.date||'—'))+(it2.last.settleAt?(' '+it2.last.settleAt):'')+' '+(it2.last.pnl!=null?((it2.last.pnl>0?'+':'')+it2.last.pnl+'%'):'—')+(it2.last.mode==='short'?'［短线］':'［波段］')):'')+'</div>';
   }
     body = summary + filterBar + h + '</div>';
   }
@@ -6470,17 +6481,17 @@ function settleShadowTrade(code,klines,minBars){
   if(!entry||!stop||!target||!(target>entry&&entry>stop))return;
   if(!(price>0))return;
   var pct=function(v){return Math.round((v-entry)/entry*10000)/100;};
-  var doSettle=function(result,pnl,settlePrice,note,settleDate){
+  var doSettle=function(result,pnl,settlePrice,note,settleDate,settleAt){
     var sd=settleDate||today;
     // v11.31 去重:同一股票+同一计划+同一结算日只记一次(防止取消勾选后重勾产生重复样本)
     var planKey=[code,entry,stop,target,sd].join('|'),dup=false;
     try{ dup=getJournal().some(function(x){return x.planKey===planKey;}); }catch(e){}
-    rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=sd;rec.settlePrice=settlePrice;rec.settleNote=note||'';
+    rec.settled=true;rec.result=result;rec.pnl=pnl;rec.settleDate=sd;rec.settlePrice=settlePrice;rec.settleNote=note||'';rec.settleAt=settleAt||'';
     if(!dup){
       addJournalEntry({code:code,name:rec.name||code,date:sd,entry:entry,stop:stop,target:target,close:price,pnl:pnl,shadow:true,result:result,note:note||'',
-        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing',mode:'swing',exitReason:(result==='win'?'止盈':(result==='loss'?'价格止损':result)),settledAt:bjNowStrF(),entryType:rec.entryType||'',
+        openedDate:rec.openedDate||'',entryDate:rec.entryDate||'',settleDate:sd,settlePrice:settlePrice,v:28,planKey:planKey,strategy:'swing',mode:'swing',exitReason:(result==='win'?'止盈':(result==='loss'?'价格止损':result)),settledAt:bjNowStrF(),settleAt:(settleAt||''),entryType:rec.entryType||'',
         entryConds:rec.entryConds||''});   // v11.65:本次触发满足的门控条件(归因用)
-      try{ archiveHistoryCopyF(code,{entry:entry,entryDate:rec.entryDate||rec.openedDate,stop:stop,target:target,result:result,pnl:pnl,settleDate:sd,settlePrice:settlePrice,note:note||''}); }catch(e){}
+      try{ archiveHistoryCopyF(code,{entry:entry,entryDate:rec.entryDate||rec.openedDate,entryTime:rec.touchAt||'',stop:stop,target:target,result:result,pnl:pnl,settleDate:sd,settlePrice:settlePrice,settleAt:(settleAt||''),note:note||''}); }catch(e){}
     }
     setShadowMap(sm);
   };
@@ -6549,9 +6560,9 @@ function settleShadowTrade(code,klines,minBars){
       kept.push({d:today,hi:high,lo:low,ev:ev,px:(ev==='enter'?entry:(ev==='win'?target:((ev==='loss'||ev==='both-stop'||ev==='enter-stop')?stop:null))),gapT:(ev==='hold'?Math.round((target-high)/high*10000)/100:null)});
       rec.trace=kept.slice(-12);
     }
-    if(ev==='both-stop'){ doSettle('loss',pct(stop),stop,'当日最高触止盈、最低触止损，保守计为止损'); return; }
-    if(ev==='win'){ doSettle('win',pct(target),target,'入场后当日最高触及止盈'); return; }
-    if(ev==='loss'){ doSettle('loss',pct(stop),stop,'当日最低触及止损'); return; }
+    if(ev==='both-stop'){ var _sA0=minBars&&minBars.length?judgePriceTouchAtF(minBars,today,stop):null; doSettle('loss',pct(stop),stop,'当日最高触止盈、最低触止损，保守计为止损',null,_sA0); return; }
+    if(ev==='win'){ var _sA1=minBars&&minBars.length?judgePriceTouchAtF(minBars,today,target):null; doSettle('win',pct(target),target,'入场后当日最高触及止盈',null,_sA1); return; }
+    if(ev==='loss'){ var _sA2=minBars&&minBars.length?judgePriceTouchAtF(minBars,today,stop):null; doSettle('loss',pct(stop),stop,'当日最低触及止损',null,_sA2); return; }
   }
   // ①-b v11.63【T+1】:入场当日【只记轨迹、不结算】。
   //   为什么必须排除入场前价格:当日最低可能发生在入场之前(实测 002289 当日最低 34.14@09:31,
