@@ -3670,7 +3670,16 @@ async function main() {
   const forceClose = process.argv.includes('--force-close');
   if (type === 'close' && !isReplay && !forceClose) {
     const _exClose = path.join(DATA_DIR, `${date}_16-20.json`);
-    if (fs.existsSync(_exClose)) {
+    let _exists = fs.existsSync(_exClose);
+    // v11.165:本地无当日 close 时,查云端是否已生成 —— 本地一键脚本不 sync 云端 reviews,幂等闸的
+    //   fs.existsSync 会失效(实测 09-29 18:30 本地重采覆盖了 CI 17:17 的正确产物,竞价字段因此丢失)。
+    if (!_exists) {
+      try {
+        const _chk = await fetch(`https://api.github.com/repos/xinxin-0501/atds-review/contents/data/reviews/${date}_16-20.json?ref=main`, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' });
+        if (_chk.ok) _exists = true;
+      } catch (e) {}
+    }
+    if (_exists) {
       const _nowHM = now.getHours() * 60 + now.getMinutes();
       const _inWin = _nowHM >= (16 * 60 + 10) && _nowHM <= (17 * 60 + 30);
       if (!_inWin) {
