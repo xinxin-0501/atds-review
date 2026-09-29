@@ -4268,7 +4268,38 @@ function purgeFakeEntries0925(){
     if(fixed.length)console.log('[v11.155] 已回退 09-25 休市日虚假入场(将于下一交易日重新按门控判定):',fixed.join('、'));
   }catch(e){}
 }
-if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{purgeBJData();}catch(e){}} ,100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
+// v11.163:补录近期(近2日)无时间入场记录 —— 入场时页面未开/分钟不可得的记录,用腾讯 m1 分钟K(近320根≈2交易日,
+//   实时价口径与勾选时一致)找回首次触达计划入场价的时刻;一次性执行(标记 atds_bf_touch_v1),历史日期分钟已过期的不补。
+async function backfillRecentTouchAt(){
+  try{
+    if(localStorage.getItem('atds_bf_touch_v1'))return;
+    localStorage.setItem('atds_bf_touch_v1','1');
+    var now=new Date(Date.now()+8*3600*1000);var days=[];
+    for(var i=0;i<2;i++){var d=new Date(now.getTime()-i*86400000);days.push(d.getUTCFullYear()+'-'+('0'+(d.getUTCMonth()+1)).slice(-2)+'-'+('0'+d.getUTCDate()).slice(-2));}
+    var fixed=[];
+    for(var mi=0;mi<2;mi++){
+      var key=mi===0?'atds_shadow':'atds_shadow_short';
+      var m;try{m=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){m={};}
+      var hit=false;
+      for(var c in m){
+        var r=m[c];
+        if(!r||!r.entryHit||r.touchAt||!r.entryDate||days.indexOf(r.entryDate)<0)continue;
+        if(isBJCode(c))continue;
+        var c0=String(c).charAt(0);var full=(c0==='6')?'sh'+c:((c0==='4'||c0==='8'||c0==='9')?'bj'+c:'sz'+c);
+        try{
+          var j=await fetch('https://web.ifzq.gtimg.cn/appstock/app/kline/mkline?param='+full+',m1,,320',{cache:'no-store'}).then(function(x){return x.json();});
+          var d2=j&&j.data&&j.data[full]&&j.data[full].m1;if(!d2||!d2.length)continue;
+          var bars=d2.map(function(x){var dt=String(x[0]);return {d:dt.slice(0,4)+'-'+dt.slice(4,6)+'-'+dt.slice(6,8),t:dt.slice(8,13),l:+x[4],h:+x[3]};});
+          var at=judgePriceTouchAtF(bars,r.entryDate,Number(r.entryPrice));
+          if(at){r.touchAt=at;r.entryMinute=at;hit=true;fixed.push(c+'('+at+')');}
+        }catch(e){}
+      }
+      if(hit)localStorage.setItem(key,JSON.stringify(m));
+    }
+    if(fixed.length)console.log('[v11.163] 已补录近期入场触达时刻:',fixed.join('、'));
+  }catch(e){}
+}
+if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{purgeBJData();}catch(e){}} ,100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
 
 /* ============ 观察池实时行情刷新(电脑关机后手机端仍可刷新) ============ */
 function escHtmlR(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}

@@ -2254,7 +2254,7 @@
       <a href="index.html">首页</a><a href="2026-08-12_08-30.html" class="active">盘前</a><a href="2026-08-12_15-20.html">收盘</a><a href="2026-09-29_14-30.html">尾盘</a>
     </div>
   </div>
-<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:35</b>（约 1300 分钟前）</div><h1 class="hero-title">2026-08-12 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div></div>
+<div class="hero"><div class="hero-eyebrow">A 股每日复盘 · 盘前简报 · <b>数据时间 21:35</b>（约 1272 分钟前）</div><h1 class="hero-title">2026-08-12 · <span class="hero-time">08:30</span></h1><div class="hero-sub">开盘后实时数据 · 今日盘前参考 · 非买卖建议</div><div class="hero-warn">⚠️ 盘后补采（实际数据时点 21:35），非当日 09:45 盘前简报</div><div class="hero-refresh"><button class="wl-btn wl-btn-primary" onclick="refreshAllData()">🔄 一键刷新最新数据</button></div></div>
 <div class="card risk-banner"><div class="risk-banner-title">⚠️ 跟风股风险提示</div><div class="risk-banner-body">跟风股容错率极低，若龙头股不及预期，坚决放弃交易计划。</div></div>
 <div class="section">
   <div class="card watchlist-card"><div class="wl-header"><div class="wl-title">LIVE 我的实时观察池 <span style="background:linear-gradient(90deg,#ef4444,#f59e0b);color:#fff;padding:2px 8px;border-radius:6px;font-size:10px;margin-left:6px;font-weight:800;box-shadow:0 2px 4px rgba(239,68,68,0.4);">v8-强滚</span> <span class="wl-time">● 2026-08-12 21:35:31</span></div><div class="wl-tools"><input id="search-input" class="wl-search-input" placeholder="🔍 池内搜索：代码 / 名称" maxlength="20" inputmode="search" autocomplete="off" oninput="filterWatchlist()"><button class="wl-tool wl-tool-red" onclick="handleSearchStock()">+ 搜索加入</button><button class="wl-tool" onclick="handleSearchStock()">个股分析</button><button class="wl-tool sr-entry-btn" onclick="openSignalRadarModal()">🎯 信号雷达</button><button class="wl-tool" onclick="openStructSignalModal()">📉 结构信号</button><button class="wl-tool" onclick="alert('批量导入待接入')">↥ 批量导入</button><button class="wl-tool wl-tool-reset" onclick="confirmResetCache()" title="清空所有 ATDS 本地状态(自选股/隐藏标记/资金缓存/事件缓存/交易状态/模拟跟踪),强制从云端重新拉取。遇到诡异 Bug 时一键自救">🔄 重置本地缓存</button></div></div><div class="wl-scroll-hint">↕ 上下滚动查看全部个股 · ← → 左右滑动 7 列 · 🔄 重置本地缓存可一键修复诡异消失/暂缺</div><div class="wl-stocks"><div class="wl-stocks-scroll-wrap"><div class="wl-stocks-scroll"><div class="wl-stock" data-stock-code="600392"><div class="wl-stock-scroll"><div class="wl-stock-row wl-stock-head">
@@ -4764,25 +4764,10 @@ async function refreshAllData(){
   var now = new Date();
   var todayStr = now.getFullYear() + '-' + pad2F(now.getMonth() + 1) + '-' + pad2F(now.getDate());
   if (m && m[1] !== todayStr) {
-    // v11.162:旧报告 → 自动探测今日同类型(同时段)报告,存在则确认跳转(实测用户在旧报告页内切 tab 看不到最新)
-    var slotM = (location.pathname.match(/_(\d{2}-\d{2})\.html/) || []);
-    var slot = slotM[1] || '16-20';
-    var target = todayStr + '_' + slot + '.html';
-    fetch(target, { method: 'HEAD' }).then(function (r) {
-      if (r.ok) {
-        if (confirm('当前报告为 ' + m[1] + ',今日(' + todayStr + ')最新报告已生成。\n是否跳转查看?')) location.href = target;
-        else if (btn) { btn.disabled = false; btn.textContent = '🔄 一键刷新最新数据'; }
-      } else {
-        alert('当前报告日期为 ' + m[1] + ',今日(' + todayStr + ')的 ' + slot + ' 报告尚未生成。\n请稍后再试,或打开首页查看。');
-        if (btn) { btn.disabled = false; btn.textContent = '🔄 一键刷新最新数据'; }
-      }
-    }).catch(function () {
-      alert('当前报告日期为 ' + m[1] + ',请打开首页查看最新报告。');
-      if (btn) { btn.disabled = false; btn.textContent = '🔄 一键刷新最新数据'; }
-    });
-    return;
+    alert('当前报告日期为 ' + m[1] + ',尚未更新到今日。\n请打开首页查看最新报告,或稍后再点一次。');
+  } else {
+    alert('已刷新最新行情数据 ✓\n(报告内容由每日定时任务更新,非交易日/收盘后可能仍为最近交易日数据)');
   }
-  alert('已刷新最新行情数据 ✓\n(报告内容由每日定时任务更新,非交易日/收盘后可能仍为最近交易日数据)');
 }
 
 /* ==================== 交易复盘 / 交易行为复盘 (2026-08-20) ==================== */
@@ -6826,7 +6811,7 @@ function settleShadowTrade(code,klines,minBars){
       var v=shadowJudgeKlinesF(rec,klines,today);
       if(v){
         kUsed=true;
-        if(v.entered&&!rec.entryHit){ rec.entryHit=true;rec.entryDate=v.entryDate;rec.entryPrice=entry;  if(!rec.touchAt&&v.entryDate===today&&minBars&&minBars.length){try{var _tkD=(String(rec.openedDate||'')===today)?rec.entryTime:null;var _bk=judgeEntryTouchIntradayF(rec,minBars,today,_tkD);if(_bk&&_bk.touched&&_bk.at){rec.touchAt=_bk.at;rec.entryMinute=_bk.at;}}catch(e){}} }
+        if(v.entered&&!rec.entryHit){ rec.entryHit=true;rec.entryDate=v.entryDate;rec.entryPrice=entry;  if(!rec.touchAt&&v.entryDate===today&&minBars&&minBars.length){try{var _bk=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);if(_bk&&_bk.touched&&_bk.at){rec.touchAt=_bk.at;rec.entryMinute=_bk.at;}}catch(e){}} }
         // v11.65:持久化"本次入场满足了哪几个门控条件",供归因/每笔明细展示
         if(v.entryConds)rec.entryConds=v.entryConds;
         if(v.trace&&v.trace.length)rec.trace=v.trace;      // v11.32:保存逐日轨迹
@@ -7096,7 +7081,7 @@ function settleShortTradeF(code,rec,sm,klines,minBars,block,ph,today){
   // 入场判定(短线强制 5 项门控)
   if(!rec.entryHit){
     var det=shortEntryDetectF(rec,klines,minBars,today);
-    if(det&&det.entered){ rec.entryHit=true;rec.entryDate=det.date;rec.entryPrice=entry;rec.touchAt=det.at||null;rec.entryConds=det.conds||'';  if(!rec.touchAt&&det.date===today&&minBars&&minBars.length){try{var _tkD2=(String(rec.openedDate||'')===today)?rec.entryTime:null;var _bk2=judgeEntryTouchIntradayF(rec,minBars,today,_tkD2);if(_bk2&&_bk2.touched&&_bk2.at){rec.touchAt=_bk2.at;rec.entryMinute=_bk2.at;}}catch(e){}} }
+    if(det&&det.entered){ rec.entryHit=true;rec.entryDate=det.date;rec.entryPrice=entry;rec.touchAt=det.at||null;rec.entryConds=det.conds||'';  if(!rec.touchAt&&det.date===today&&minBars&&minBars.length){try{var _bk2=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);if(_bk2&&_bk2.touched&&_bk2.at){rec.touchAt=_bk2.at;rec.entryMinute=_bk2.at;}}catch(e){}} }
     else{
       rec.lastCheck={date:today,price:price,high:high,low:low,phaseNote:(det&&det.blocked)?('已触入场价但门控未过:'+(det.blocked||[]).join('/')):(ph.label+'，短线等待真实触及 '+entry)};
       setShortMap(sm);return;
