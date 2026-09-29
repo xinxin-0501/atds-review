@@ -3770,18 +3770,23 @@ async function main() {
         // v11.145:本地/迟到重采时,本地 auction_cache 可能是旧日期 → 导致收盘报告的竞价字段(aucVol/aucTurn)整块为 null。
         //   修:日期不符时主动从云端仓库 raw 拉当日快照(CI 09:30 已 git commit)。成功则用,失败仍降级。
         // v11.160:raw.githubusercontent 对部分网络(本机/某些 IP)超时,补 jsDelivr CDN 兜底源(更稳)
-        for (const src of [
-          'https://raw.githubusercontent.com/xinxin-0501/atds-review/main/data/auction_cache.json',
-          'https://cdn.jsdelivr.net/gh/xinxin-0501/atds-review@main/data/auction_cache.json'
-        ]) {
+        // v11.164:兜底源按可达性排序 —— raw(部分网络不通)→GitHub Contents API(本机今日验证可通,返回当日最新)→jsDelivr(CDN缓存延迟,仅旧日兜底)
+        const API_URL = 'https://api.github.com/repos/xinxin-0501/atds-review/contents/data/auction_cache.json?ref=main';
+        const srcs = [
+          { u: 'https://raw.githubusercontent.com/xinxin-0501/atds-review/main/data/auction_cache.json', raw: true },
+          { u: API_URL, raw: false },
+          { u: 'https://cdn.jsdelivr.net/gh/xinxin-0501/atds-review@main/data/auction_cache.json', raw: true }
+        ];
+        for (const sd of srcs) {
           if (auctionMap) break;
           try {
-            const rr = await fetch(src, { headers: { 'User-Agent': 'Mozilla/5.0' }, cache: 'no-store' });
-            if (rr.ok) {
-              const cj = await rr.json();
-              if (cj && cj.date === date && cj.map) { auctionMap = cj.map; console.log('已从云端拉取当日竞价快照:', Object.keys(cj.map).length, '只(采集于', cj.capturedAt, ')'); }
-            }
-          } catch (e2) { console.log('竞价快照拉取失败(' + src.slice(8, 28) + '):', e2.message); }
+            const rr = await fetch(sd.u, { headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'application/vnd.github+json' }, cache: 'no-store' });
+            if (!rr.ok) continue;
+            let cj = null;
+            if (sd.raw) { cj = await rr.json().catch(() => null); }
+            else { const jj = await rr.json().catch(() => null); if (jj && jj.content) { cj = JSON.parse(Buffer.from(jj.content, 'base64').toString('utf8')); } }
+            if (cj && cj.date === date && cj.map) { auctionMap = cj.map; console.log('已从云端拉取当日竞价快照:', Object.keys(cj.map).length, '只(采集于', cj.capturedAt, ')'); break; }
+          } catch (e2) { console.log('竞价快照拉取失败(' + sd.u.slice(8, 26) + '):', e2.message); }
         }
         if (!auctionMap) console.log('竞价快照仍不可用(降级:使用盘中实时开盘涨幅,竞价字段将为 null)');
       }
