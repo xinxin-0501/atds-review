@@ -6175,8 +6175,9 @@ function shadowJudgeEntryDayF(rec,bars,entryDate,entryTime){
 //   只有 l≤入场价 而 h<入场价 意味着该分钟根本没交易到入场价,不能成交。
 //   打勾之前的分钟一律排除(那时用户还没决定跟踪,其价格与本次跟踪决策无关)。
 //   分钟K不可得/无触及 ⇒ 返回 touched:false,调用方保持「监控中」,绝不回退用当日最低判入场。
-function judgeEntryTouchIntradayF(rec,bars,tickDate,tickTime){
 // v11.161:通用价格触达时刻(止盈/止损结算用)—— 分钟K里找价格首次触达的时刻(HH:MM),找不到返回 null
+//   ⚠️ 必须在顶层:此前误嵌套在 judgeEntryTouchIntradayF 内部,而调用方 settleShadowTrade 是另一个顶层函数
+//   ⇒ 运行时 ReferenceError(结算止盈/止损分支整条中断)。2026-09-29 修正作用域。
 function judgePriceTouchAtF(bars,date,price){
   if(!price||!bars||!bars.length)return null;
   var seq=[];
@@ -6186,7 +6187,7 @@ function judgePriceTouchAtF(bars,date,price){
   for(var j=0;j<seq.length;j++){var x=seq[j];var lo=Number(x.l),hi=Number(x.h);if(!(lo>0))continue;if(lo<=price&&hi>=price)return String(x.t).slice(0,5);}
   return null;
 }
-
+function judgeEntryTouchIntradayF(rec,bars,tickDate,tickTime){
   var entry=Number(rec&&rec.entry);
   if(!entry||!bars||!bars.length)return {touched:false,reason:'分钟K不可得'};
   var seq=[];
