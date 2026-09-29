@@ -4970,10 +4970,25 @@ async function refreshAllData(){
   var now = new Date();
   var todayStr = now.getFullYear() + '-' + pad2F(now.getMonth() + 1) + '-' + pad2F(now.getDate());
   if (m && m[1] !== todayStr) {
-    alert('当前报告日期为 ' + m[1] + ',尚未更新到今日。\n请打开首页查看最新报告,或稍后再点一次。');
-  } else {
-    alert('已刷新最新行情数据 ✓\n(报告内容由每日定时任务更新,非交易日/收盘后可能仍为最近交易日数据)');
+    // v11.162:旧报告 → 自动探测今日同类型(同时段)报告,存在则确认跳转(实测用户在旧报告页内切 tab 看不到最新)
+    var slotM = (location.pathname.match(/_(\d{2}-\d{2})\.html/) || []);
+    var slot = slotM[1] || '16-20';
+    var target = todayStr + '_' + slot + '.html';
+    fetch(target, { method: 'HEAD' }).then(function (r) {
+      if (r.ok) {
+        if (confirm('当前报告为 ' + m[1] + ',今日(' + todayStr + ')最新报告已生成。\n是否跳转查看?')) location.href = target;
+        else if (btn) { btn.disabled = false; btn.textContent = '🔄 一键刷新最新数据'; }
+      } else {
+        alert('当前报告日期为 ' + m[1] + ',今日(' + todayStr + ')的 ' + slot + ' 报告尚未生成。\n请稍后再试,或打开首页查看。');
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 一键刷新最新数据'; }
+      }
+    }).catch(function () {
+      alert('当前报告日期为 ' + m[1] + ',请打开首页查看最新报告。');
+      if (btn) { btn.disabled = false; btn.textContent = '🔄 一键刷新最新数据'; }
+    });
+    return;
   }
+  alert('已刷新最新行情数据 ✓\n(报告内容由每日定时任务更新,非交易日/收盘后可能仍为最近交易日数据)');
 }
 
 /* ==================== 交易复盘 / 交易行为复盘 (2026-08-20) ==================== */
@@ -7017,7 +7032,7 @@ function settleShadowTrade(code,klines,minBars){
       var v=shadowJudgeKlinesF(rec,klines,today);
       if(v){
         kUsed=true;
-        if(v.entered&&!rec.entryHit){ rec.entryHit=true;rec.entryDate=v.entryDate;rec.entryPrice=entry;  if(!rec.touchAt&&v.entryDate===today&&minBars&&minBars.length){try{var _bk=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);if(_bk&&_bk.touched&&_bk.at){rec.touchAt=_bk.at;rec.entryMinute=_bk.at;}}catch(e){}} }
+        if(v.entered&&!rec.entryHit){ rec.entryHit=true;rec.entryDate=v.entryDate;rec.entryPrice=entry;  if(!rec.touchAt&&v.entryDate===today&&minBars&&minBars.length){try{var _tkD=(String(rec.openedDate||'')===today)?rec.entryTime:null;var _bk=judgeEntryTouchIntradayF(rec,minBars,today,_tkD);if(_bk&&_bk.touched&&_bk.at){rec.touchAt=_bk.at;rec.entryMinute=_bk.at;}}catch(e){}} }
         // v11.65:持久化"本次入场满足了哪几个门控条件",供归因/每笔明细展示
         if(v.entryConds)rec.entryConds=v.entryConds;
         if(v.trace&&v.trace.length)rec.trace=v.trace;      // v11.32:保存逐日轨迹
@@ -7287,7 +7302,7 @@ function settleShortTradeF(code,rec,sm,klines,minBars,block,ph,today){
   // 入场判定(短线强制 5 项门控)
   if(!rec.entryHit){
     var det=shortEntryDetectF(rec,klines,minBars,today);
-    if(det&&det.entered){ rec.entryHit=true;rec.entryDate=det.date;rec.entryPrice=entry;rec.touchAt=det.at||null;rec.entryConds=det.conds||'';  if(!rec.touchAt&&det.date===today&&minBars&&minBars.length){try{var _bk2=judgeEntryTouchIntradayF(rec,minBars,today,rec.entryTime);if(_bk2&&_bk2.touched&&_bk2.at){rec.touchAt=_bk2.at;rec.entryMinute=_bk2.at;}}catch(e){}} }
+    if(det&&det.entered){ rec.entryHit=true;rec.entryDate=det.date;rec.entryPrice=entry;rec.touchAt=det.at||null;rec.entryConds=det.conds||'';  if(!rec.touchAt&&det.date===today&&minBars&&minBars.length){try{var _tkD2=(String(rec.openedDate||'')===today)?rec.entryTime:null;var _bk2=judgeEntryTouchIntradayF(rec,minBars,today,_tkD2);if(_bk2&&_bk2.touched&&_bk2.at){rec.touchAt=_bk2.at;rec.entryMinute=_bk2.at;}}catch(e){}} }
     else{
       rec.lastCheck={date:today,price:price,high:high,low:low,phaseNote:(det&&det.blocked)?('已触入场价但门控未过:'+(det.blocked||[]).join('/')):(ph.label+'，短线等待真实触及 '+entry)};
       setShortMap(sm);return;
