@@ -2841,18 +2841,6 @@ async function fetchStockData(raw){
     }catch(e){}
     if(attempt<2)await new Promise(function(r){setTimeout(r,500);});
   }
-  // v11.170:腾讯 qt.gtimg.cn 失败(手机网络/WAF 拦截)时,用 fetchKlinePeriod 多源兜底(腾讯fqkline→新浪→本地→repo)
-  //   取最新K线构造行情快照 —— 修复"无法手动新增个股"(实测 qt.gtimg.cn 被 WAF 拦截时 fetchStockData 单源静默失败)
-  try{
-    var kl=await fetchKlinePeriod(sc+raw,'day',30).catch(function(){return [];});
-    if(kl&&kl.length>=2){
-      var last=kl[kl.length-1],prev=kl[kl.length-2];
-      var close=parseFloat(last[2]),prevC=parseFloat(prev[2]);
-      return {code:raw,name:raw,price:close,pct:prevC?((close-prevC)/prevC*100):0,amount:'--',turnover:'--',setcode:sc,
-        prevClose:prevC,open:parseFloat(last[1])||close,high:parseFloat(last[3])||close,low:parseFloat(last[4])||close,
-        amplitude:0,volRatio:0,avgPrice:0,floatMcap:0,totalMcap:0,fromFallback:true};
-    }
-  }catch(e){}
   return null;
 }
 async function openStockResearch(code){
@@ -2885,30 +2873,12 @@ function showBJBlock(code){
   }catch(e){}
 }
 window.showBJBlock=showBJBlock;
-// v11.168:观察池双写备份 —— 手机浏览器清理/存储异常会清掉 localStorage 单 key,导致手动添加的个股全部丢失;
-//   主 key(atds_watchlist) 每次写入同步写备份 key(atds_watchlist_bak),启动守卫自动恢复。
-function saveWatchlistDual(arr){
-  try{ localStorage.setItem('atds_watchlist', JSON.stringify(arr)); }catch(e){}
-  try{ localStorage.setItem('atds_watchlist_bak', JSON.stringify(arr)); }catch(e){}
-}
-// v11.168:启动守卫 —— 主 key 空/损坏而备份有数据时自动恢复;两边都在时以主为准并同步备份。
-function watchlistBackupGuard(){
-  var main=null,bak=null;
-  try{main=JSON.parse(localStorage.getItem('atds_watchlist')||'null');}catch(e){main=null;}
-  try{bak=JSON.parse(localStorage.getItem('atds_watchlist_bak')||'null');}catch(e){bak=null;}
-  // v11.168b:空数组视为无效(实测主 key 被清成 [] 时,旧逻辑"以主为准"会把备份也清空——正是数据丢失场景)
-  var mainOk=Array.isArray(main)&&main.length>0,bakOk=Array.isArray(bak)&&bak.length>0;
-  if(mainOk&&bakOk){ if(JSON.stringify(main)!==JSON.stringify(bak)) saveWatchlistDual(main); return; }
-  if(!mainOk&&bakOk){ saveWatchlistDual(bak); console.log('[v11.168] 观察池主 key 异常,已从备份恢复 '+bak.length+' 只'); return; }
-  if(mainOk&&!bakOk){ saveWatchlistDual(main); return; }
-  // 两者都空/损坏:不动作(可能是全新设备)
-}
 // v11.101:清理北交所脏数据 —— 扫描本地存储,移除 92/83/87/88 开头的自选/跟踪/样本/档案,避免污染双策略胜率
 function purgeBJData(){
   try{
     var cleaned=[], isBJ=isBJCode;
     var wl=[]; try{wl=JSON.parse(localStorage.getItem('atds_watchlist')||'[]');}catch(e){}
-    if(Array.isArray(wl)){ var wl2=wl.filter(function(c){return !isBJ(c);}); if(wl2.length!==wl.length){ saveWatchlistDual(wl2); cleaned.push('自选'+(wl.length-wl2.length)); } }
+    if(Array.isArray(wl)){ var wl2=wl.filter(function(c){return !isBJ(c);}); if(wl2.length!==wl.length){ localStorage.setItem('atds_watchlist',JSON.stringify(wl2)); cleaned.push('自选'+(wl.length-wl2.length)); } }
     var wd=null; try{wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'null');}catch(e){}
     if(wd&&typeof wd==='object'){ var wd2={},rw=0; for(var k in wd){ if(isBJ(k))rw++; else wd2[k]=wd[k]; } if(rw>0){ localStorage.setItem('atds_watchlist_data',JSON.stringify(wd2)); cleaned.push('个股数据'+rw); } }
     var hd=[]; try{hd=JSON.parse(localStorage.getItem('atds_watchlist_hidden')||'[]');}catch(e){}
@@ -3916,8 +3886,6 @@ function buildDecisionCardHtml(s){
         '<button class="ts-btn ts-t-btn" data-code="'+escHtmlF(s.code)+'" onclick="recordTTrade(this)">记做T</button>'+
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
-      // v11.167:波段计划块(勾选跟踪后仍显示完整计划要素,实测亨通光电勾选后要素消失)
-      buildSwingPlanBlock(s,p)+
 
       '<div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 入场需【两道条件同时满足】—— (a) 当日最低回落至计划入场价；(b) 【前收门控】五项全过：周K方向(周MA5≥周MA10)、MACD(DIF≥DEA)、KDJ(K≤85 不超买)、BOLL(收盘不站上轨)、量比(≥0.8)；门控未过则记「⏸ 门控未通过·未入场」并继续等待（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满 10 个交易日未触及则判为未触发入场）② 【A股 T+1：入场当日不可卖出】⇒ 入场日一律【不结算】，只用【1 分钟分时】(取不到时用 15 分钟K)记录「入场之后」的区间与曾否触达止盈/止损价(排除入场前价格，故不得用当日最低判止损)；结算自【入场次一交易日】起，用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-trace" data-trace-code="'+escHtmlF(s.code)+'"></div>'+
@@ -4059,7 +4027,7 @@ function removeWatchlistRow(code){
   }catch(e){console.warn('[removeWatchlistRow] 模拟跟踪归档失败:',e&&e.message);}
   var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();
   var m=document.getElementById("modal-"+code);if(m)m.remove();
-  try{var w=localStorage.getItem("atds_watchlist");var arr=w?JSON.parse(w):[];arr=arr.filter(function(c){return String(c)!==String(code);});saveWatchlistDual(arr);}catch(e){console.warn('[removeWatchlistRow] atds_watchlist 删除失败:',e.message);}
+  try{var w=localStorage.getItem("atds_watchlist");var arr=w?JSON.parse(w):[];arr=arr.filter(function(c){return String(c)!==String(code);});localStorage.setItem("atds_watchlist",JSON.stringify(arr));}catch(e){console.warn('[removeWatchlistRow] atds_watchlist 删除失败:',e.message);}
   try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');if(wd[code]){delete wd[code];localStorage.setItem('atds_watchlist_data',JSON.stringify(wd));}}catch(e){console.warn('[removeWatchlistRow] atds_watchlist_data 删除失败:',e.message);}
   try{var h=localStorage.getItem("atds_watchlist_hidden");var hidden=h?JSON.parse(h):[];if(hidden.indexOf(code)<0)hidden.push(code);localStorage.setItem("atds_watchlist_hidden",JSON.stringify(hidden));}catch(e){console.warn('[removeWatchlistRow] atds_watchlist_hidden 写入失败:',e.message);}
 }
@@ -4130,7 +4098,7 @@ function saveWatchlist(extraCode){
     var merged=codes.slice();
     prevCodes.forEach(function(c){if(merged.indexOf(c)<0&&/^\d{6}$/.test(String(c)))merged.push(c);});
     if(extraCode&&/^\d{6}$/.test(String(extraCode))&&merged.indexOf(String(extraCode))<0)merged.push(String(extraCode));
-    saveWatchlistDual(merged);
+    localStorage.setItem("atds_watchlist",JSON.stringify(merged));
   }catch(e){}
 }
 function renderStockModalFront(s){
@@ -4371,7 +4339,7 @@ async function backfillRecentTouchAt(){
     if(fixed.length)console.log('[v11.163] 已补录近期入场触达时刻:',fixed.join('、'));
   }catch(e){}
 }
-if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{watchlistBackupGuard();}catch(e){}},80);setTimeout(function(){try{purgeBJData();}catch(e){}} ,100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{watchlistBackupGuard();}catch(e){}},80);setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
+if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{purgeBJData();}catch(e){}} ,100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
 
 /* ============ 观察池实时行情刷新(电脑关机后手机端仍可刷新) ============ */
 function escHtmlR(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -4634,7 +4602,7 @@ async function bulkAddToWatchlist(codes, label){
     var existing = loadSavedWatchlist();
     var merged = existing.slice();
     codes.forEach(function(c){ if (/^\d{6}$/.test(String(c)) && !isBJCode(c) && merged.indexOf(String(c)) < 0) merged.push(String(c)); });
-    saveWatchlistDual(merged);
+    localStorage.setItem('atds_watchlist', JSON.stringify(merged));
   } catch(e){}
   showToast('已加入 ' + added + ' 只' + (label || '') + '到观察池' + (hasCard ? '' : '（午盘已隐藏观察池卡片，收盘复盘中可查看）'));
   try { Promise.all(saveTasks).then(function(){}); } catch(e){}
@@ -6846,22 +6814,7 @@ function setTradeStatus(btn,status){
   try{renderJournalStats();}catch(e){}
 }
 
-// v11.167:波段计划块 —— 用户 2026-10-08 要求:波段跟踪也要显示 入场/价格止损/分批止盈/资金量能/逻辑催化
-//   (这些要素原先在短线计划块里,v11.166 删短线后缺失)。注意:波段【无 T+3 时间止损】(那是短线规则),不硬搬。
-function buildSwingPlanBlock(s, plan) {
-  var entry = plan.entry, stop = plan.stop, target = plan.target;
-  var ff = s.fundFlow || {};
-  var evNear = ((s.events || [])[0]) || null;
-  var tp1 = entry ? Math.round(entry * 1.04 * 100) / 100 : null;
-  return '<div class="sp-wrap" data-s-entry="' + f2(entry) + '" data-s-stop="' + f2(stop) + '" data-s-tp1="' + (tp1 != null ? f2(tp1) : '') + '" data-s-tp2="' + (target != null ? f2(target) : '') + '">' +
-    '<div class="dc-line sp-row">入场：<b>' + f2(entry) + '</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div>' +
-    '<div class="dc-line sp-row">价格止损：<b>' + f2(stop) + '</b>（跌破无条件清仓）</div>' +
-    (tp1 != null && target != null && target > tp1 ? ('<div class="dc-line sp-row">分批止盈：①<b>' + f2(tp1) + '</b>(+4%)减仓50%·止损上移至成本 ②<b>' + f2(target) + '</b>清仓剩余</div>') : (target != null ? ('<div class="dc-line sp-row">止盈：<b>' + f2(target) + '</b></div>') : '')) +
-    '<div class="dc-line sp-row">资金量能：主力净流入 ' + f2(ff.d1) + '亿(d3 ' + f2(ff.d3) + ') · 量比 ' + f2(s.volRatio) + '</div>' +
-    '<div class="dc-line sp-row">逻辑催化：' + escHtmlF(String(s.logic || '--').slice(0, 60)) + (evNear ? (' · 最近事件:' + escHtmlF(String(evNear.type || '') + ' ' + String(evNear.date || ''))) : '') + '</div>' +
-    '</div>';
-}
-// v11.80:短线2-3天计划块(客户端重建用,与 SSR renderShortPlanHtml 同口径) —— v11.166 UI 下线后仅保留函数(历史兼容)
+// v11.80:短线2-3天计划块(客户端重建用,与 SSR renderShortPlanHtml 同口径)
 function buildShortPlanHtml(s, plan, banned) {
   var entry = plan.entry, stop = plan.stop;
   var ma20 = N2F(s.tech && s.tech.ma20), openP = N2F(s.open);
@@ -7511,24 +7464,7 @@ async function settleAllShadowTrades(){
     try{ settleShortTradeWrap(shortCodes[j2],skls[shortCodes[j2]],smbs[shortCodes[j2]]); }catch(e){ console.warn('[settleShortTradeWrap]',shortCodes[j2],e.message); }
   }
   updateReviewProgress();
-  if(typeof startShadowAutoSettle==='function')startShadowAutoSettle();   // v11.171:盘中实时结算(见下)
 }
-
-// v11.171:模拟跟踪盘中实时结算 —— 打勾后交易时段内每 60s 重跑 settleAllShadowTrades,
-//   实现"该入场就入场、该止损就止损、该止盈就止盈"(此前仅页面加载/重建时结算一次,盘中价格变动不自动重判)。
-function startShadowAutoSettle(){
-  try{
-    if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle)return;
-    if(window.__shadowSettleTimer)return;
-    window.__shadowSettleTimer=setInterval(function(){
-      try{
-        if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle)return;
-        settleAllShadowTrades();
-      }catch(e){}
-    },60000);
-  }catch(e){}
-}
-window.startShadowAutoSettle=startShadowAutoSettle;
 
 // v11.24:任何 decision 卡重建后,除恢复勾选/交易状态外,还必须重算归因文本。
 // 否则重建出来的新块 .ts-attr 会退回模板默认值("尚未跟踪"),用户会误以为跟踪丢失。

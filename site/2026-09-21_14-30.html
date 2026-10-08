@@ -6855,6 +6855,7 @@ function setTradeStatus(btn,status){
 // v11.167:波段计划块 —— 用户 2026-10-08 要求:波段跟踪也要显示 入场/价格止损/分批止盈/资金量能/逻辑催化
 //   (这些要素原先在短线计划块里,v11.166 删短线后缺失)。注意:波段【无 T+3 时间止损】(那是短线规则),不硬搬。
 function buildSwingPlanBlock(s, plan) {
+  var f2=function(x){return (x==null||isNaN(Number(x)))?'--':Number(x).toFixed(2);};   // v11.172:f2 是 buildDecisionCardHtml 局部函数,顶层函数须自带
   var entry = plan.entry, stop = plan.stop, target = plan.target;
   var ff = s.fundFlow || {};
   var evNear = ((s.events || [])[0]) || null;
