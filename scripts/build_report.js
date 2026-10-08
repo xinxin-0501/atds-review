@@ -1594,7 +1594,7 @@ const lhbHtml = lhb
       <div class="dc-line">资金验证：${fundVerify}</div>
       <div class="dc-line dc-trade-status">交易状态：<button class="ts-btn" data-code="${esc(code)}" data-status="bought" onclick="setTradeStatus(this,'bought')">已买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="not_bought" onclick="setTradeStatus(this,'not_bought')">未买入</button><button class="ts-btn" data-code="${esc(code)}" data-status="sold" onclick="setTradeStatus(this,'sold')">已卖出</button><button class="ts-btn ts-t-btn" data-code="${esc(code)}" onclick="recordTTrade(this)">记做T</button></div>
       <div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="${esc(code)}" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>
-      <div class="dc-block dc-short" data-short-code="${esc(code)}"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div>${renderShortPlanHtml(s, report)}</div>
+      <div class="dc-block dc-swing-plan" data-swing-code="${esc(code)}">${renderSwingPlanHtml(s, report)}</div>
       <div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 需当日最低回落至计划入场价才算入场（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满10日未触及则判为未触发入场）② 入场次日起用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span><span class="ts-winrate"></span></div>
       <div class="dc-line dc-trace" data-trace-code="${esc(code)}"></div>
       <div class="dc-line dc-next-day">🎯 明日核心观察点：${nextDayFocus}</div>
@@ -1629,6 +1629,23 @@ function calcDynamicTakeProfit(s, entry, tp1) {
   return Math.round(target * 100) / 100;
 }
 
+// v11.169:波段计划块(SSR 重建模板用) —— 替代短线块;要素对齐客户端 buildSwingPlanBlock;波段无 T+3 时间止损(短线规则不硬搬)
+function renderSwingPlanHtml(s, report) {
+  const entry = Number(s.strategy && s.strategy.entry) || Number(s.price) || 0;
+  const stop = Number(s.strategy && s.strategy.stop) || entry * 0.95;
+  const target = Number(s.strategy && s.strategy.target) || null;
+  const ff = s.fundFlow || {};
+  const evNear = ((s.events || [])[0]) || null;
+  const f2 = (v) => (v == null || isNaN(Number(v))) ? '--' : Number(v).toFixed(2);
+  const tp1 = entry ? Math.round(entry * 1.04 * 100) / 100 : null;
+  return '<div class="sp-wrap" data-s-entry="' + f2(entry) + '" data-s-stop="' + f2(stop) + '" data-s-tp1="' + (tp1 != null ? f2(tp1) : '') + '" data-s-tp2="' + (target != null ? f2(target) : '') + '">' +
+    '<div class="dc-line sp-row">入场：<b>' + f2(entry) + '</b>(盘中真实触及才虚拟买入；打勾仅加入候选)</div>' +
+    '<div class="dc-line sp-row">价格止损：<b>' + f2(stop) + '</b>（跌破无条件清仓）</div>' +
+    (tp1 != null && target != null && target > tp1 ? ('<div class="dc-line sp-row">分批止盈：①<b>' + f2(tp1) + '</b>(+4%)减仓50%·止损上移至成本 ②<b>' + f2(target) + '</b>清仓剩余</div>') : (target != null ? ('<div class="dc-line sp-row">止盈：<b>' + f2(target) + '</b></div>') : '')) +
+    '<div class="dc-line sp-row">资金量能：主力净流入 ' + f2(ff.d1) + '亿(d3 ' + f2(ff.d3) + ') · 量比 ' + f2(s.volRatio) + '</div>' +
+    '<div class="dc-line sp-row">逻辑催化：' + String(s.logic || '--').slice(0, 60) + (evNear ? (' · 最近事件:' + String(evNear.type || '') + ' ' + String(evNear.date || '')) : '') + '</div>' +
+    '</div>';
+}
 function renderShortPlanHtml(s, report) {
   const entry = Number(s.strategy && s.strategy.entry) || Number(s.price) || 0;
   const ma20 = Number(s.tech && s.tech.ma20) || null;
