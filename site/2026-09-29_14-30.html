@@ -2819,12 +2819,29 @@ function showBJBlock(code){
   }catch(e){}
 }
 window.showBJBlock=showBJBlock;
+// v11.168:观察池双写备份 —— 手机浏览器清理/存储异常会清掉 localStorage 单 key,导致手动添加的个股全部丢失;
+//   主 key(atds_watchlist) 每次写入同步写备份 key(atds_watchlist_bak),启动守卫自动恢复。
+function saveWatchlistDual(arr){
+  try{ localStorage.setItem('atds_watchlist', JSON.stringify(arr)); }catch(e){}
+  try{ localStorage.setItem('atds_watchlist_bak', JSON.stringify(arr)); }catch(e){}
+}
+// v11.168:启动守卫 —— 主 key 空/损坏而备份有数据时自动恢复;两边都在时以主为准并同步备份。
+function watchlistBackupGuard(){
+  var main=null,bak=null;
+  try{main=JSON.parse(localStorage.getItem('atds_watchlist')||'null');}catch(e){main=null;}
+  try{bak=JSON.parse(localStorage.getItem('atds_watchlist_bak')||'null');}catch(e){bak=null;}
+  var mainOk=Array.isArray(main),bakOk=Array.isArray(bak);
+  if(mainOk&&bakOk){ if(JSON.stringify(main)!==JSON.stringify(bak)) saveWatchlistDual(main); return; }
+  if(!mainOk&&bakOk){ saveWatchlistDual(bak); console.log('[v11.168] 观察池主 key 异常,已从备份恢复 '+bak.length+' 只'); return; }
+  if(mainOk&&!bakOk){ saveWatchlistDual(main); return; }
+  // 两者都空/损坏:不动作(可能是全新设备)
+}
 // v11.101:清理北交所脏数据 —— 扫描本地存储,移除 92/83/87/88 开头的自选/跟踪/样本/档案,避免污染双策略胜率
 function purgeBJData(){
   try{
     var cleaned=[], isBJ=isBJCode;
     var wl=[]; try{wl=JSON.parse(localStorage.getItem('atds_watchlist')||'[]');}catch(e){}
-    if(Array.isArray(wl)){ var wl2=wl.filter(function(c){return !isBJ(c);}); if(wl2.length!==wl.length){ localStorage.setItem('atds_watchlist',JSON.stringify(wl2)); cleaned.push('自选'+(wl.length-wl2.length)); } }
+    if(Array.isArray(wl)){ var wl2=wl.filter(function(c){return !isBJ(c);}); if(wl2.length!==wl.length){ saveWatchlistDual(wl2); cleaned.push('自选'+(wl.length-wl2.length)); } }
     var wd=null; try{wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'null');}catch(e){}
     if(wd&&typeof wd==='object'){ var wd2={},rw=0; for(var k in wd){ if(isBJ(k))rw++; else wd2[k]=wd[k]; } if(rw>0){ localStorage.setItem('atds_watchlist_data',JSON.stringify(wd2)); cleaned.push('个股数据'+rw); } }
     var hd=[]; try{hd=JSON.parse(localStorage.getItem('atds_watchlist_hidden')||'[]');}catch(e){}
@@ -3975,7 +3992,7 @@ function removeWatchlistRow(code){
   }catch(e){console.warn('[removeWatchlistRow] 模拟跟踪归档失败:',e&&e.message);}
   var s=document.querySelector('.wl-stock[data-stock-code="'+code+'"]');if(s)s.remove();
   var m=document.getElementById("modal-"+code);if(m)m.remove();
-  try{var w=localStorage.getItem("atds_watchlist");var arr=w?JSON.parse(w):[];arr=arr.filter(function(c){return String(c)!==String(code);});localStorage.setItem("atds_watchlist",JSON.stringify(arr));}catch(e){console.warn('[removeWatchlistRow] atds_watchlist 删除失败:',e.message);}
+  try{var w=localStorage.getItem("atds_watchlist");var arr=w?JSON.parse(w):[];arr=arr.filter(function(c){return String(c)!==String(code);});saveWatchlistDual(arr);}catch(e){console.warn('[removeWatchlistRow] atds_watchlist 删除失败:',e.message);}
   try{var wd=JSON.parse(localStorage.getItem('atds_watchlist_data')||'{}');if(wd[code]){delete wd[code];localStorage.setItem('atds_watchlist_data',JSON.stringify(wd));}}catch(e){console.warn('[removeWatchlistRow] atds_watchlist_data 删除失败:',e.message);}
   try{var h=localStorage.getItem("atds_watchlist_hidden");var hidden=h?JSON.parse(h):[];if(hidden.indexOf(code)<0)hidden.push(code);localStorage.setItem("atds_watchlist_hidden",JSON.stringify(hidden));}catch(e){console.warn('[removeWatchlistRow] atds_watchlist_hidden 写入失败:',e.message);}
 }
@@ -4046,7 +4063,7 @@ function saveWatchlist(extraCode){
     var merged=codes.slice();
     prevCodes.forEach(function(c){if(merged.indexOf(c)<0&&/^\d{6}$/.test(String(c)))merged.push(c);});
     if(extraCode&&/^\d{6}$/.test(String(extraCode))&&merged.indexOf(String(extraCode))<0)merged.push(String(extraCode));
-    localStorage.setItem("atds_watchlist",JSON.stringify(merged));
+    saveWatchlistDual(merged);
   }catch(e){}
 }
 function renderStockModalFront(s){
@@ -4287,7 +4304,7 @@ async function backfillRecentTouchAt(){
     if(fixed.length)console.log('[v11.163] 已补录近期入场触达时刻:',fixed.join('、'));
   }catch(e){}
 }
-if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{purgeBJData();}catch(e){}} ,100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
+if(document.readyState==="complete"||document.readyState==="interactive"){setTimeout(function(){try{watchlistBackupGuard();}catch(e){}},80);setTimeout(function(){try{purgeBJData();}catch(e){}} ,100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);}else{document.addEventListener("DOMContentLoaded",function(){setTimeout(function(){try{watchlistBackupGuard();}catch(e){}},80);setTimeout(function(){try{purgeBJData();}catch(e){}},100);setTimeout(function(){try{purgeFakeEntries0925();}catch(e){}},120);setTimeout(function(){try{backfillRecentTouchAt();}catch(e){}},150);setTimeout(seedConfigStockData,400);setTimeout(restoreSavedWatchlist,600);});}
 
 /* ============ 观察池实时行情刷新(电脑关机后手机端仍可刷新) ============ */
 function escHtmlR(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -4550,7 +4567,7 @@ async function bulkAddToWatchlist(codes, label){
     var existing = loadSavedWatchlist();
     var merged = existing.slice();
     codes.forEach(function(c){ if (/^\d{6}$/.test(String(c)) && !isBJCode(c) && merged.indexOf(String(c)) < 0) merged.push(String(c)); });
-    localStorage.setItem('atds_watchlist', JSON.stringify(merged));
+    saveWatchlistDual(merged);
   } catch(e){}
   showToast('已加入 ' + added + ' 只' + (label || '') + '到观察池' + (hasCard ? '' : '（午盘已隐藏观察池卡片，收盘复盘中可查看）'));
   try { Promise.all(saveTasks).then(function(){}); } catch(e){}
