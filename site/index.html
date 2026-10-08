@@ -2383,7 +2383,8 @@ function watchlistBackupGuard(){
   var main=null,bak=null;
   try{main=JSON.parse(localStorage.getItem('atds_watchlist')||'null');}catch(e){main=null;}
   try{bak=JSON.parse(localStorage.getItem('atds_watchlist_bak')||'null');}catch(e){bak=null;}
-  var mainOk=Array.isArray(main),bakOk=Array.isArray(bak);
+  // v11.168b:空数组视为无效(实测主 key 被清成 [] 时,旧逻辑"以主为准"会把备份也清空——正是数据丢失场景)
+  var mainOk=Array.isArray(main)&&main.length>0,bakOk=Array.isArray(bak)&&bak.length>0;
   if(mainOk&&bakOk){ if(JSON.stringify(main)!==JSON.stringify(bak)) saveWatchlistDual(main); return; }
   if(!mainOk&&bakOk){ saveWatchlistDual(bak); console.log('[v11.168] 观察池主 key 异常,已从备份恢复 '+bak.length+' 只'); return; }
   if(mainOk&&!bakOk){ saveWatchlistDual(main); return; }
