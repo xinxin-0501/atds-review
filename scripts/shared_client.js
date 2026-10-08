@@ -62,6 +62,18 @@ async function fetchStockData(raw){
     }catch(e){}
     if(attempt<2)await new Promise(function(r){setTimeout(r,500);});
   }
+  // v11.170:腾讯 qt.gtimg.cn 失败(手机网络/WAF 拦截)时,用 fetchKlinePeriod 多源兜底(腾讯fqkline→新浪→本地→repo)
+  //   取最新K线构造行情快照 —— 修复"无法手动新增个股"(实测 qt.gtimg.cn 被 WAF 拦截时 fetchStockData 单源静默失败)
+  try{
+    var kl=await fetchKlinePeriod(sc+raw,'day',30).catch(function(){return [];});
+    if(kl&&kl.length>=2){
+      var last=kl[kl.length-1],prev=kl[kl.length-2];
+      var close=parseFloat(last[2]),prevC=parseFloat(prev[2]);
+      return {code:raw,name:raw,price:close,pct:prevC?((close-prevC)/prevC*100):0,amount:'--',turnover:'--',setcode:sc,
+        prevClose:prevC,open:parseFloat(last[1])||close,high:parseFloat(last[3])||close,low:parseFloat(last[4])||close,
+        amplitude:0,volRatio:0,avgPrice:0,floatMcap:0,totalMcap:0,fromFallback:true};
+    }
+  }catch(e){}
   return null;
 }
 async function openStockResearch(code){
@@ -4720,7 +4732,24 @@ async function settleAllShadowTrades(){
     try{ settleShortTradeWrap(shortCodes[j2],skls[shortCodes[j2]],smbs[shortCodes[j2]]); }catch(e){ console.warn('[settleShortTradeWrap]',shortCodes[j2],e.message); }
   }
   updateReviewProgress();
+  if(typeof startShadowAutoSettle==='function')startShadowAutoSettle();   // v11.171:盘中实时结算(见下)
 }
+
+// v11.171:模拟跟踪盘中实时结算 —— 打勾后交易时段内每 60s 重跑 settleAllShadowTrades,
+//   实现"该入场就入场、该止损就止损、该止盈就止盈"(此前仅页面加载/重建时结算一次,盘中价格变动不自动重判)。
+function startShadowAutoSettle(){
+  try{
+    if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle)return;
+    if(window.__shadowSettleTimer)return;
+    window.__shadowSettleTimer=setInterval(function(){
+      try{
+        if(typeof tradingPhaseF!=='function'||!tradingPhaseF().canSettle)return;
+        settleAllShadowTrades();
+      }catch(e){}
+    },60000);
+  }catch(e){}
+}
+window.startShadowAutoSettle=startShadowAutoSettle;
 
 // v11.24:任何 decision 卡重建后,除恢复勾选/交易状态外,还必须重算归因文本。
 // 否则重建出来的新块 .ts-attr 会退回模板默认值("尚未跟踪"),用户会误以为跟踪丢失。
