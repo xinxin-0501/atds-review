@@ -2257,7 +2257,7 @@
   </div>
 <div class="hero">
   <div class="hero-title">14:30 尾盘定调快照 <span class="hero-time">14:30</span></div>
-  <div class="hero-sub">四大选股模块盘中快照 · 采集于 14:29 · 16:20 收盘复盘会用定型数据覆盖</div>
+  <div class="hero-sub">14:30 尾盘定调（14:20 触发全市场扫描，14:29 完成 · 约 8~10 分钟） · 16:20 收盘复盘会用定型数据覆盖</div>
   <div class="hero-warn hero-warn-late">⚠️ 14:30 盘中快照，指标未定型，尾盘可能有变盘风险，非最终结果。本页仅用于筛选<b>次日观察池候选</b>。</div>
   <div class="ts-idxline"><span class="ts-idx">上证指数 <b>3,950.91</b> +0.03%</span><span class="ts-idx">深证成指 <b>13,722.48</b> -0.05%</span><span class="ts-idx">创业板指 <b>3,397.98</b> -0.05%</span></div>
   <div class="wave-tools" style="margin-top:8px">
@@ -3886,8 +3886,6 @@ function buildDecisionCardHtml(s){
         '<button class="ts-btn ts-t-btn" data-code="'+escHtmlF(s.code)+'" onclick="recordTTrade(this)">记做T</button>'+
       '</div>'+
       '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-shadow-check" data-code="'+escHtmlF(s.code)+'" onchange="toggleShadowTrack(this)"> 系统模拟跟踪（观察未买入 → 若触发入场则虚拟结算盈亏，累计策略胜率样本）</label></div>'+
-      '<div class="dc-block dc-short" data-short-code="'+escHtmlF(s.code)+'"><div class="dc-h">⏱ 短线2-3天计划（T+1~T+3 · 时间止损 · 分批止盈）</div>'+
-      buildShortPlanHtml(s,p,_shortBan)+'</div>'+
 
       '<div class="dc-line">策略执行/归因：<span class="ts-attr">未激活 —— 勾选"系统模拟跟踪"后开始累计样本</span> <span class="ts-hint" title="两阶段结算：① 入场需【两道条件同时满足】—— (a) 当日最低回落至计划入场价；(b) 【前收门控】五项全过：周K方向(周MA5≥周MA10)、MACD(DIF≥DEA)、KDJ(K≤85 不超买)、BOLL(收盘不站上轨)、量比(≥0.8)；门控未过则记「⏸ 门控未通过·未入场」并继续等待（观察起点若已跌破计划止损位则判为计划失效，不计入；观察满 10 个交易日未触及则判为未触发入场）② 【A股 T+1：入场当日不可卖出】⇒ 入场日一律【不结算】，只用【1 分钟分时】(取不到时用 15 分钟K)记录「入场之后」的区间与曾否触达止盈/止损价(排除入场前价格，故不得用当日最低判止损)；结算自【入场次一交易日】起，用当日最高/最低判定止盈/止损并自动结算，同日双触保守计为止损。每笔的入场/结算日期与价格见顶部「每笔明细」与口径说明；有效样本≥10 笔才展示胜率">?</span> <span class="ts-progress-badge">进度 <b class="ts-progress">0/10</b></span> <span class="ts-winrate"></span></div>'+
       '<div class="dc-line dc-trace" data-trace-code="'+escHtmlF(s.code)+'"></div>'+
@@ -6389,9 +6387,9 @@ function fmtEntryDateF(d){ var p=String(d||'').split('-'); return p.length===3?(
 // v11.144:连续竞价时段校验(09:30-11:30 / 13:00-15:00)—— 盘后/盘前时刻不得冒充入场时间
 function inTradingPeriodF(hm){ var m=parseInt(String(hm).slice(0,2),10)*60+parseInt(String(hm).slice(3,5),10); return (m>=570&&m<=690)||(m>=780&&m<=900); }
 function renderActivePositions(){
-  var sm=getShadowMap(),sh=getShortMap(),items=[];
+  var sm=getShadowMap(),items=[];
+  // v11.166:短线2-3天方案 UI 下线(用户决策只留波段);atds_shadow_short 数据保留,已入场短线仍由结算链自然完结
   for(var c in sm){var r=sm[c];if(r&&r.enabled&&r.entryHit&&!r.settled)items.push({code:c,name:r.name,mode:'swing',entry:r.entry,entryPrice:r.entryPrice,stop:r.stop,target:r.target,entryDate:r.entryDate||r.openedDate,entryType:r.entryType,touchAt:r.touchAt});}
-  for(var c2 in sh){var r2=sh[c2];if(r2&&r2.enabled&&r2.entryHit&&!r2.settled)items.push({code:c2,name:r2.name,mode:'short',entry:r2.entry,entryPrice:r2.entryPrice,stop:(r2.priceStop!=null?r2.priceStop:r2.stop),target:(r2.tp2!=null?r2.tp2:r2.target),entryDate:r2.entryDate||r2.openedDate,entryType:r2.entryType,touchAt:r2.touchAt});}
   // v11.143:可回缩 —— 默认收起,点击标题展开明细
   var head='<div class="jrn-archive-head" style="border:1px solid #eef2f7;border-radius:10px;background:#f8fafc;margin-bottom:4px" onclick="toggleActivePositions()">📒 <b>模拟跟踪复盘</b> · 当前持仓 <b>'+items.length+'</b> 笔 <span class="jrn-arc-caret">'+(activeOpen?'▾':'▸')+'</span></div>';
   var tip='<div class="jrn-disc">当前持仓（已入场未结算）。止盈/止损结算后自动迁入「📁 个股历史档案」，此处清零重新开始。</div>';
@@ -6410,9 +6408,30 @@ function renderActivePositions(){
       //   打勾时刻(entryTime,可能是盘后)绝不冒充入场时间;旧样本无 touchAt 则只显示日期,诚实呈现。
       var et=(it.touchAt&&/^[0-2]\d:[0-5]\d$/.test(it.touchAt)&&inTradingPeriodF(it.touchAt))?it.touchAt:'';
       var ep=(it.entryPrice!=null?it.entryPrice:it.entry);
+      // v11.166:波段持仓行信息增强(对齐决策卡) —— 从决策卡 sp-wrap 提取价格止损/分批止盈/资金量能/逻辑催化
+      var spw=blk?blk.querySelector('.sp-wrap[data-s-entry]'):null;
+      var sStop=spw?(parseFloat(spw.getAttribute('data-s-stop'))||null):null;
+      var sTp1=spw?(parseFloat(spw.getAttribute('data-s-tp1'))||null):null;
+      var sTp2=spw?(parseFloat(spw.getAttribute('data-s-tp2'))||null):null;
+      var sFund='',sCat='';
+      if(spw){
+        var spRows=spw.querySelectorAll('.sp-row');
+        for(var si=0;si<spRows.length;si++){
+          var rt=(spRows[si].textContent||'').trim();
+          if(rt.indexOf('资金量能')===0)sFund=rt.replace(/^资金量能：/,'');
+          else if(rt.indexOf('逻辑催化')===0)sCat=rt.replace(/^逻辑催化：/,'');
+        }
+      }
+      var stopShow=(sStop!=null?sStop:it.stop);
+      var tp1Show=(sTp1!=null?sTp1:(ep?Math.round(ep*1.04*100)/100:null));
+      var tp2Show=(sTp2!=null?sTp2:it.target);
       rows+='<div class="jrn-row'+(pnl==null?'':(pnl>0?' jrn-pos':(pnl<0?' jrn-neg':'')))+'">'+
-        '<span class="jrn-code">'+escHtmlF(String(it.code))+' '+escHtmlF(it.name||'')+(it.mode==='short'?' <b style="color:#b45309">[短线]</b>':' <b style="color:#1d4ed8">[波段]</b>')+'</span>'+
-        '<span class="jrn-flow">入场 '+escHtmlF(fmtEntryDateF(it.entryDate))+(et?(' '+escHtmlF(et)):'')+'@'+ep+(etTxt?'（'+etTxt+'）':'')+' → 止损 '+it.stop+' / 止盈 '+it.target+'</span>'+
+        '<span class="jrn-code">'+escHtmlF(String(it.code))+' '+escHtmlF(it.name||'')+' <b style="color:#1d4ed8">[波段]</b></span>'+
+        '<span class="jrn-flow">入场 '+escHtmlF(fmtEntryDateF(it.entryDate))+(et?(' '+escHtmlF(et)):'')+'@'+ep+(etTxt?'（'+etTxt+'）':'')+
+        '<br>价格止损：<b>'+escHtmlF(String(stopShow))+'</b>（无条件清仓）· 时间止损：第3个交易日 14:50'+
+        (tp1Show?('。<br>分批止盈：①<b>'+escHtmlF(String(tp1Show))+'</b>(+4%)减仓50%·止损上移至成本 ②<b>'+escHtmlF(String(tp2Show))+'</b>清仓剩余'):'')+
+        (sFund?('<br>资金量能：'+escHtmlF(sFund)):'')+
+        (sCat?('<br>逻辑催化：'+escHtmlF(sCat)):'')+'</span>'+
         '<span class="jrn-num">'+(pnl==null?'—':((pnl>0?'+':'')+pnl+'%'))+'</span></div>';
     }
     body=tip+'<div class="jrn-wrap">'+rows+'</div>';
@@ -6824,7 +6843,8 @@ function buildShortPlanHtml(s, plan, banned) {
     '<div class="dc-line sp-row">分批止盈：①<b>' + f2(r2(tp1)) + '</b>(+4%或前压力)减仓50%·止损上移至成本 ②<b>' + f2(r2(tp2)) + '</b>(+' + tp2pct + '%)清仓剩余</div>' +
     '<div class="dc-line sp-row">资金量能：主力净流入 ' + f2(ff.d1) + '亿(d3 ' + f2(ff.d3) + ') · 量比 ' + f2(s.volRatio) + '</div>' +
     '<div class="dc-line sp-row">逻辑催化：' + escHtmlF(String(s.logic || '--').slice(0, 60)) + (evNear ? (' · 最近事件:' + escHtmlF(String(evNear.type || '') + ' ' + String(evNear.date || ''))) : '') + '</div>' +
-    '<div class="dc-line dc-shadow"><label class="ts-shadow"><input type="checkbox" class="ts-short-check" data-code="' + escHtmlF(s.code) + '" onchange="toggleShortTrack(this)"' + (isBan ? ' disabled' : '') + '> 启用短线2-3天模拟跟踪（替代波段跟踪；离场原因计入复盘归因）</label>' + (isBan ? '<span class="sp-ban">⛔ 已禁用</span>' : '') + '</div></div>';
+    // v11.166:短线2-3天计划 UI 下线(用户 2026-10-08 决策:只留波段;历史短线数据保留于 atds_shadow_short/历史档案,不影响其他数据)
+    '</div>';
 }
 // v11.80:短线跟踪开关 —— 与波段互斥;参数=shortParamsF 同口径;入场语义与波段一致(打勾=候选,盘中真实触及才入场)
 function toggleShortTrack(cb){

@@ -2619,7 +2619,7 @@ function renderTailscanReport(report, nav) {
 ${renderHeader(report, nav)}
 <div class="hero">
   <div class="hero-title">14:30 尾盘定调快照 <span class="hero-time">${esc(m.time || '14:30')}</span></div>
-  <div class="hero-sub">四大选股模块盘中快照 · 采集于 ${esc(genHM || '--')}${capDate && m.date && capDate !== m.date ? '（' + esc(capDate.slice(5)) + ' 重采）' : ''} · 16:20 收盘复盘会用定型数据覆盖</div>
+  <div class="hero-sub">14:30 尾盘定调（14:20 触发全市场扫描，${esc(genHM || '--')} 完成 · 约 8~10 分钟）${capDate && m.date && capDate !== m.date ? '（' + esc(capDate.slice(5)) + ' 重采）' : ''} · 16:20 收盘复盘会用定型数据覆盖</div>
   <div class="hero-warn hero-warn-late">⚠️ 14:30 盘中快照，指标未定型，尾盘可能有变盘风险，非最终结果。本页仅用于筛选<b>次日观察池候选</b>。</div>
   <div class="ts-idxline">${idxLine}</div>
   <div class="wave-tools" style="margin-top:8px">
