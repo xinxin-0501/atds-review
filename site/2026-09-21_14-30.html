@@ -2847,10 +2847,11 @@ async function fetchStockData(raw){
     }catch(e){}
     if(attempt<2)await new Promise(function(r){setTimeout(r,500);});
   }
-  // v11.170:腾讯 qt.gtimg.cn 失败(手机网络/WAF 拦截)时,用 fetchKlinePeriod 多源兜底(腾讯fqkline→新浪→本地→repo)
-  //   取最新K线构造行情快照 —— 修复"无法手动新增个股"(实测 qt.gtimg.cn 被 WAF 拦截时 fetchStockData 单源静默失败)
+  // v11.170:腾讯 qt.gtimg.cn 失败(手机网络/WAF 拦截)时,用 fetchKlineF 多源兜底(腾讯fqkline→新浪JSONP→本地→repo)
+  //   取最新K线构造行情快照 —— 修复"无法手动新增个股"(实测 qt.gtimg.cn 被拦截时 fetchStockData 单源静默失败)
+  // v11.173:兜底从 fetchKlinePeriod(腾讯单源)改为 fetchKlineF(含新浪JSONP兜底)——手机拦腾讯时也能通过新浪成功新增
   try{
-    var kl=await fetchKlinePeriod(sc+raw,'day',30).catch(function(){return [];});
+    var kl=await fetchKlineF(sc+raw,30).catch(function(){return [];});
     if(kl&&kl.length>=2){
       var last=kl[kl.length-1],prev=kl[kl.length-2];
       var close=parseFloat(last[2]),prevC=parseFloat(prev[2]);
